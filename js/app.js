@@ -1621,7 +1621,7 @@ function deleteFight(i) {
 // ===== YOUTUBE EMBED HELPER =====
 function getYouTubeId(url) {
   if (!url) return null;
-  var m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  var m = url.match(/(?:youtube\.com\/(?:watch\?.*v=|embed\/|shorts\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   return m ? m[1] : null;
 }
 
@@ -2013,104 +2013,158 @@ function openFightDetail(idx) {
   const label = f.result === 'S' ? 'SIEG' : f.result === 'N' ? 'NIEDERLAGE' : 'UNENTSCHIEDEN';
   const ytId = getYouTubeId(f.videoLink);
 
-  // Video section — embed with fallback thumbnail+link
-  let videoHTML = '';
-  if (ytId) {
-    videoHTML = `
-      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;">
-        <iframe id="fight-video-frame" src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
-      </div>
-      <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
-        <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:12px;color:#444;text-decoration:none;min-height:44px;display:inline-flex;align-items:center;">Auf YouTube ansehen ↗</a>
-        <button onclick="editFightVideo(${idx})" style="font-family:'Space Mono',monospace;font-size:12px;color:#444;background:none;border:none;cursor:pointer;min-height:44px;">Video ändern</button>
-      </div>`;
-  } else {
-    videoHTML = `
-      <div style="aspect-ratio:16/9;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
-        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#222;">Kein Video hinterlegt</div>
-        <button onclick="editFightVideo(${idx})" style="font-family:'Space Mono',monospace;font-size:11px;color:#555;background:none;border:1px solid #1a1a1a;padding:8px 20px;cursor:pointer;">YouTube-Link hinzufügen</button>
-      </div>`;
+  // Ensure rounds array exists
+  if (!f.rounds || f.rounds.length < 3) {
+    f.rounds = [
+      { round: 1, notes: (f.rounds && f.rounds[0]) ? f.rounds[0].notes : '' },
+      { round: 2, notes: (f.rounds && f.rounds[1]) ? f.rounds[1].notes : '' },
+      { round: 3, notes: (f.rounds && f.rounds[2]) ? f.rounds[2].notes : '' }
+    ];
   }
 
-  // Round notes
-  const hasRounds = f.rounds && f.rounds.some(r => r.notes);
-  let roundsHTML = '';
-  if (hasRounds) {
-    roundsHTML = f.rounds.filter(r => r.notes).map(r => `
-      <div style="padding:12px 0;border-bottom:1px solid #111;">
-        <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);letter-spacing:2px;margin-bottom:4px;">RUNDE ${r.round}</div>
-        <div style="font-size:13px;color:#888;line-height:1.6;">${r.notes}</div>
-      </div>`).join('');
+  // Meta pills
+  const pills = [formatDate(f.date), f.method, f.style, f.type].filter(Boolean).map(t =>
+    '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;background:#0e0e0e;padding:3px 10px;border-radius:3px;">' + t + '</span>'
+  ).join('');
+
+  // Video section
+  let videoHTML;
+  if (ytId) {
+    videoHTML = `
+      <div style="width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;box-shadow:0 0 40px rgba(232,0,13,.08);">
+        <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&playsinline=1" style="width:100%;height:100%;border:none;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:10px;">
+        <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;text-decoration:none;">Auf YouTube öffnen ↗</a>
+        <span onclick="showVideoInput(${idx})" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;cursor:pointer;">Video ändern</span>
+      </div>
+      <div id="video-input-area" style="display:none;margin-top:8px;"></div>`;
+  } else {
+    videoHTML = `
+      <div onclick="showVideoInput(${idx})" style="width:100%;aspect-ratio:16/9;border-radius:8px;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;" onmouseenter="this.style.background='#0e0e0e'" onmouseleave="this.style.background='#0a0a0a'">
+        <div style="width:48px;height:48px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+          <span style="font-size:20px;color:#333;margin-left:3px;">▶</span>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:#333;letter-spacing:1px;">KAMPFVIDEO HINZUFÜGEN</div>
+      </div>
+      <div id="video-input-area" style="margin-top:10px;"></div>`;
+  }
+
+  // Editable field helper
+  function editField(fieldName, val, placeholder, accentColor) {
+    const escaped = (val || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const display = val || '<span style="color:#222;">' + placeholder + '</span>';
+    return `<div id="fd-${fieldName}" onclick="makeFightFieldEditable(${idx},'${fieldName}',this)" style="font-size:14px;color:#888;line-height:1.7;min-height:24px;cursor:text;padding:4px 0;">${display}</div>`;
   }
 
   el.innerHTML = `
-  <div style="margin-bottom:20px;">
-    <button onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:12px;color:#444;background:none;border:none;cursor:pointer;padding:8px 0;min-height:44px;letter-spacing:1px;">← ALLE KÄMPFE</button>
+  <!-- BACK -->
+  <div style="padding-bottom:20px;">
+    <button onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:11px;color:#444;background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">← Alle Kämpfe</button>
   </div>
 
   <!-- HEADER -->
-  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:24px;">
-    <div style="width:52px;height:52px;border:2px solid ${color};border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${color};">${f.result}</span>
+  <div style="margin-bottom:32px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,44px);color:${color};letter-spacing:2px;">${label}</span>
     </div>
-    <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,42px);color:var(--white);letter-spacing:2px;line-height:.9;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</div>
-      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;margin-top:4px;">${formatDate(f.date)} · ${label} · ${f.method || ''}${f.style ? ' · ' + f.style : ''}${f.type ? ' · ' + f.type : ''}</div>
-    </div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--white);letter-spacing:3px;line-height:.9;margin-bottom:12px;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">${pills}</div>
   </div>
 
-  <!-- MAIN: Video links, Analyse rechts -->
-  <div style="display:grid;grid-template-columns:${isMobile() ? '1fr' : '1fr 340px'};gap:24px;margin-bottom:32px;" class="fight-detail-grid">
+  <!-- VIDEO -->
+  <div style="margin-bottom:40px;">
+    ${videoHTML}
+  </div>
 
-    <!-- LEFT: VIDEO -->
-    <div>${videoHTML}</div>
-
-    <!-- RIGHT: NOTES -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
-
-      <div style="padding:14px 0;border-bottom:1px solid #111;">
-        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--green);letter-spacing:2px;margin-bottom:6px;">STÄRKEN</div>
-        <div style="font-size:13px;color:#888;line-height:1.5;">${f.good || '—'}</div>
-      </div>
-
-      <div style="padding:14px 0;border-bottom:1px solid #111;">
-        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:6px;">VERBESSERUNG</div>
-        <div style="font-size:13px;color:#888;line-height:1.5;">${f.improve || '—'}</div>
-      </div>
-
-      ${f.opponentWeaknesses ? `
-      <div style="padding:14px 0;border-bottom:1px solid #111;">
-        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--red);letter-spacing:2px;margin-bottom:6px;">GEGNER-SCHWÄCHEN</div>
-        <div style="font-size:13px;color:#888;line-height:1.5;">${f.opponentWeaknesses}</div>
-      </div>` : ''}
-
+  <!-- ANALYSE CARDS -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:40px;">
+    <div style="padding:20px 0;border-bottom:1px solid #1a1a1a;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green);letter-spacing:1.5px;margin-bottom:10px;">WAS LIEF GUT</div>
+      ${editField('good', f.good, 'Klicke hier um Notizen hinzuzufügen...', 'green')}
+    </div>
+    <div style="padding:20px 0;border-bottom:1px solid #1a1a1a;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red);letter-spacing:1.5px;margin-bottom:10px;">WAS MUSS BESSER WERDEN</div>
+      ${editField('improve', f.improve, 'Klicke hier um Notizen hinzuzufügen...', 'red')}
+    </div>
+    <div style="padding:20px 0;border-bottom:1px solid #1a1a1a;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--blue);letter-spacing:1.5px;margin-bottom:10px;">GEGNER-SCHWÄCHEN</div>
+      ${editField('opponentWeaknesses', f.opponentWeaknesses, 'Klicke hier um Notizen hinzuzufügen...', 'blue')}
     </div>
   </div>
 
   <!-- RUNDEN -->
-  ${hasRounds ? `
-  <div style="margin-bottom:32px;">
-    <div style="font-family:'Space Mono',monospace;font-size:12px;color:#333;letter-spacing:3px;margin-bottom:12px;">RUNDEN-ANALYSE</div>
-    ${roundsHTML}
-  </div>` : ''}
+  <div style="margin-bottom:40px;">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;letter-spacing:3px;margin-bottom:16px;">RUNDEN-ANALYSE</div>
+    ${[1,2,3].map(r => {
+      const notes = f.rounds[r-1] ? f.rounds[r-1].notes : '';
+      return `<div style="display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #111;align-items:flex-start;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--blue);opacity:.3;line-height:1;min-width:32px;">${r}</div>
+        <div style="flex:1;" id="fd-round${r}" onclick="makeFightFieldEditable(${idx},'round${r}',this)">
+          <div style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;padding:4px 0;">${notes || '<span style="color:#222;">Wie lief diese Runde? Klicke zum Eintragen...</span>'}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
 
-  <!-- FOOTER -->
-  <div style="padding-top:16px;border-top:1px solid #111;display:flex;flex-wrap:wrap;gap:12px;">
-    <button onclick="editFightVideo(${idx})" style="font-family:'Space Mono',monospace;font-size:12px;color:#444;background:none;border:1px solid #1a1a1a;padding:10px 14px;cursor:pointer;min-height:44px;">${ytId ? 'VIDEO ÄNDERN' : '+ VIDEO'}</button>
-    <button onclick="if(confirm('Kampf löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:12px;color:#333;background:none;border:1px solid #1a1a1a;padding:10px 14px;cursor:pointer;min-height:44px;">LÖSCHEN</button>
+  <!-- ACTIONS -->
+  <div style="display:flex;flex-wrap:wrap;gap:12px;padding-top:20px;border-top:1px solid #111;">
+    <button onclick="if(confirm('Diesen Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);padding:10px 20px;border-radius:4px;cursor:pointer;min-height:44px;">KAMPF LÖSCHEN</button>
   </div>`;
 
   showPage('fight-detail');
 }
 
-function editFightVideo(idx) {
-  var url = prompt('YouTube-Link eingeben:');
-  if (url === null) return;
+// Inline video URL input
+function showVideoInput(idx) {
+  var area = document.getElementById('video-input-area');
+  if (!area) return;
+  area.style.display = 'block';
+  area.innerHTML = '<div style="display:flex;gap:8px;"><input id="vid-url-input" type="url" placeholder="YouTube-Link einfügen..." style="flex:1;background:#111;border:1px solid #222;color:var(--white);padding:10px 14px;font-size:13px;border-radius:6px;outline:none;min-height:44px;" autofocus><button onclick="saveVideoUrl(' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:10px 16px;border-radius:6px;cursor:pointer;min-height:44px;white-space:nowrap;">SPEICHERN</button></div>';
+  var inp = document.getElementById('vid-url-input');
+  if (inp) { inp.focus(); inp.onkeydown = function(e) { if (e.key === 'Enter') saveVideoUrl(idx); }; }
+}
+
+function saveVideoUrl(idx) {
+  var inp = document.getElementById('vid-url-input');
+  if (!inp) return;
   var data = getData();
   if (!data || !data.fights[idx]) return;
-  data.fights[idx].videoLink = url.trim();
+  data.fights[idx].videoLink = inp.value.trim();
   saveData(data);
   openFightDetail(idx);
+}
+
+// Inline edit for fight text fields
+function makeFightFieldEditable(idx, field, container) {
+  var data = getData();
+  if (!data || !data.fights[idx]) return;
+  var f = data.fights[idx];
+  var val = '';
+  if (field === 'round1') val = f.rounds[0] ? f.rounds[0].notes : '';
+  else if (field === 'round2') val = f.rounds[1] ? f.rounds[1].notes : '';
+  else if (field === 'round3') val = f.rounds[2] ? f.rounds[2].notes : '';
+  else val = f[field] || '';
+
+  // Already editing?
+  if (container.querySelector('textarea')) return;
+
+  container.innerHTML = '<textarea style="width:100%;background:#0e0e0e;border:1px solid #1a1a1a;color:#ccc;padding:10px 12px;font-size:14px;font-family:\'DM Sans\',sans-serif;line-height:1.7;border-radius:6px;outline:none;resize:vertical;min-height:60px;box-sizing:border-box;" autofocus>' + val.replace(/</g,'&lt;') + '</textarea>';
+  var ta = container.querySelector('textarea');
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+  ta.onblur = function() {
+    var newVal = ta.value.trim();
+    var d = getData();
+    if (!d || !d.fights[idx]) return;
+    if (field === 'round1') { if (!d.fights[idx].rounds) d.fights[idx].rounds = [{round:1,notes:''},{round:2,notes:''},{round:3,notes:''}]; d.fights[idx].rounds[0].notes = newVal; }
+    else if (field === 'round2') { if (!d.fights[idx].rounds) d.fights[idx].rounds = [{round:1,notes:''},{round:2,notes:''},{round:3,notes:''}]; d.fights[idx].rounds[1].notes = newVal; }
+    else if (field === 'round3') { if (!d.fights[idx].rounds) d.fights[idx].rounds = [{round:1,notes:''},{round:2,notes:''},{round:3,notes:''}]; d.fights[idx].rounds[2].notes = newVal; }
+    else { d.fights[idx][field] = newVal; }
+    saveData(d);
+    // Replace textarea with display text
+    container.innerHTML = '<div style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;padding:4px 0;">' + (newVal || '<span style="color:#222;">Klicke hier um Notizen hinzuzufügen...</span>') + '</div>';
+  };
 }
 
 // ===== VORBEREITUNG (PREP) TAB =====
