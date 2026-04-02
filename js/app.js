@@ -3,9 +3,13 @@
    Auth, Navigation, Fight Date, HRV, Logs
    ============================================ */
 
+// ===== MOBILE HELPER =====
+function isMobile() { return window.innerWidth < 768; }
+
 // ===== STATE =====
 let currentUser = null;
 let editingBlock = null;
+var currentFightsTab = 'kaempfe';
 
 // ===== BENCHMARK CONSTANTS =====
 const BENCH_LEVEL_THRESHOLDS = [
@@ -732,7 +736,7 @@ function buildUpcomingFightsHTML(data) {
     '</div>';
   }).join('');
   return '<div style="margin-top:14px;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">' +
-    '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#666;letter-spacing:1.5px;margin-bottom:6px;">WEITERE K\u00c4MPFE</div>' +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#666;letter-spacing:1.5px;margin-bottom:6px;">WEITERE K\u00c4MPFE</div>' +
     rows +
   '</div>';
 }
@@ -1232,7 +1236,7 @@ function renderHinweise() {
       const textColor = st.done ? 'var(--green)' : 'var(--white)';
       const strikeStyle = st.done ? 'text-decoration:line-through;' : '';
       gsStepsHtml += '<div onclick="' + clickAttr + '" style="display:flex;align-items:center;gap:10px;padding:6px 0;' + rowStyle + '">'
-        + '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid ' + circleColor + ';font-size:10px;color:var(--green);flex-shrink:0;">' + checkMark + '</span>'
+        + '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid ' + circleColor + ';font-size:12px;color:var(--green);flex-shrink:0;">' + checkMark + '</span>'
         + '<span style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + textColor + ';line-height:1.4;' + strikeStyle + '">' + st.text + '</span>'
         + '</div>';
     }
@@ -1598,7 +1602,7 @@ function renderFightLog() {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${color};width:28px;text-align:center;">${f.result}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;color:var(--white);">vs. ${f.opponent || 'Unbekannt'}</div>
-        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#444;">${formatDate(f.date)} · ${f.method || ''}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:#444;">${formatDate(f.date)} · ${f.method || ''}</div>
       </div>
       <div style="font-size:12px;color:#333;">→</div>
     </div>`;
@@ -1626,6 +1630,41 @@ function renderFightsPage() {
   const data = getData();
   if (!data) return;
   const el = document.getElementById('page-fights');
+
+  // Tab bar
+  const tabs = [
+    { key: 'kaempfe', label: 'MEINE KÄMPFE' },
+    { key: 'vorbereitung', label: 'VORBEREITUNG' },
+    { key: 'analyse', label: 'ANALYSE' }
+  ];
+
+  const tabBarHTML = `
+  <div class="page-header">
+    <div class="page-title">MEINE <span>KÄMPFE</span></div>
+    <div class="page-sub">Dein komplettes Kampfarchiv — Analyse, Video, Runden-Notizen.</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid #1a1a1a;margin-bottom:24px;">
+    ${tabs.map(t => {
+      const isActive = currentFightsTab === t.key;
+      return `<div onclick="currentFightsTab='${t.key}';renderFightsPage();" style="padding:12px ${isMobile() ? '12px' : '20px'};cursor:pointer;font-family:'Space Mono',monospace;font-size:${isMobile() ? '11px' : '12px'};text-transform:uppercase;letter-spacing:${isMobile() ? '1px' : '2px'};color:${isActive ? 'var(--white)' : '#555'};border-bottom:${isActive ? '2px solid var(--red)' : '2px solid transparent'};transition:all .2s;margin-bottom:-1px;" onmouseenter="if(!${isActive})this.style.color='#888'" onmouseleave="if(!${isActive})this.style.color='#555'">${t.label}</div>`;
+    }).join('')}
+  </div>
+  <div id="fights-tab-content"></div>`;
+
+  el.innerHTML = tabBarHTML;
+
+  // Render active tab content
+  const contentEl = document.getElementById('fights-tab-content');
+  if (currentFightsTab === 'kaempfe') {
+    renderFightsTab1(contentEl, data);
+  } else if (currentFightsTab === 'vorbereitung') {
+    renderFightsTab2(contentEl, data);
+  } else if (currentFightsTab === 'analyse') {
+    renderFightsTab3(contentEl, data);
+  }
+}
+
+function renderFightsTab1(contentEl, data) {
   const fights = data.fights || [];
   const wins = fights.filter(f => f.result === 'S').length;
   const losses = fights.filter(f => f.result === 'N').length;
@@ -1633,103 +1672,335 @@ function renderFightsPage() {
   const kos = fights.filter(f => f.result === 'S' && (f.method === 'KO' || f.method === 'RSC')).length;
   const koRate = wins > 0 ? Math.round((kos / wins) * 100) : 0;
 
-  // Opponent style breakdown
-  const styleStats = {};
+  // Best win streak
+  let bestStreak = 0;
+  let currentStreak = 0;
   fights.forEach(f => {
-    const t = f.type || 'Unbekannt';
-    if (!styleStats[t]) styleStats[t] = { total: 0, wins: 0 };
-    styleStats[t].total++;
-    if (f.result === 'S') styleStats[t].wins++;
+    if (f.result === 'S') {
+      currentStreak++;
+      if (currentStreak > bestStreak) bestStreak = currentStreak;
+    } else {
+      currentStreak = 0;
+    }
   });
 
   // Record bar
   const total = fights.length || 1;
   const wPct = (wins / total * 100).toFixed(0);
   const lPct = (losses / total * 100).toFixed(0);
+  const dPct = (draws / total * 100).toFixed(0);
 
-  el.innerHTML = `
-  <div class="page-header">
-    <div class="page-title">MEINE <span>KÄMPFE</span></div>
-    <div class="page-sub">Dein komplettes Kampfarchiv — Analyse, Video, Runden-Notizen.</div>
-  </div>
+  // Matchup matrix — opponent types
+  const types = ['Distanz', 'Infighter', 'Konter', 'Allrounder', 'Unbekannt'];
+  const typeStats = {};
+  types.forEach(t => { typeStats[t] = { total: 0, wins: 0 }; });
+  fights.forEach(f => {
+    const t = f.type || 'Unbekannt';
+    const key = types.includes(t) ? t : 'Unbekannt';
+    typeStats[key].total++;
+    if (f.result === 'S') typeStats[key].wins++;
+  });
 
-  <!-- RECORD OVERVIEW -->
-  <div style="display:flex;gap:32px;flex-wrap:wrap;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid #1a1a1a;">
-    <div style="flex:1;min-width:200px;">
-      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:12px;">
+  // Build matchup matrix rows (only types with fights)
+  const matrixRows = types.filter(t => typeStats[t].total > 0).map(t => {
+    const s = typeStats[t];
+    const wr = Math.round((s.wins / s.total) * 100);
+    const wrColor = wr > 60 ? 'var(--green)' : wr >= 40 ? 'var(--gold)' : 'var(--red)';
+    return `<tr>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--white);padding:8px 12px 8px 0;">${t}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:#888;padding:8px 12px;text-align:center;">${s.total}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:#888;padding:8px 12px;text-align:center;">${s.wins}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:${wrColor};padding:8px 12px;text-align:center;font-weight:bold;">${wr}%</td>
+    </tr>`;
+  }).join('');
+
+  // Fight timeline rows
+  const timelineRows = fights.map((f, i) => {
+    const dotColor = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
+    const methodTag = f.method ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#888;background:#111;padding:2px 6px;border-radius:3px;margin-left:8px;">${f.method}</span>` : '';
+    const typeTag = f.type ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#666;background:#0a0a0a;border:1px solid #1a1a1a;padding:2px 6px;border-radius:3px;margin-left:4px;">${f.type}</span>` : '';
+    return `<div onclick="openFightDetail(${i})" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #111;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:#555;min-width:70px;">${formatDate(f.date)}</div>
+      <div style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;display:flex;align-items:center;flex-wrap:wrap;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</span>
+        ${methodTag}${typeTag}
+      </div>
+      <div style="font-size:14px;color:#333;">&#8250;</div>
+    </div>`;
+  }).join('');
+
+  contentEl.innerHTML = `
+  <!-- RECORD DISPLAY -->
+  <div style="display:flex;gap:${isMobile() ? '16px' : '32px'};flex-wrap:wrap;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid #1a1a1a;">
+    <div style="flex:1;min-width:${isMobile() ? '100%' : '220px'};">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--white);line-height:1;">${wins}</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#333;">–</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${losses > 0 ? 'var(--red)' : '#333'};line-height:1;">${losses}</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#333;">–</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--gold);line-height:1;">${draws}</span>
       </div>
-      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#444;letter-spacing:2px;margin-bottom:12px;">SIEGE – NIEDERLAGEN – UNENTSCHIEDEN</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:#444;letter-spacing:2px;margin-bottom:12px;">SIEGE – NIEDERLAGEN – UNENTSCHIEDEN</div>
       <div style="height:6px;background:#111;border-radius:3px;overflow:hidden;max-width:300px;">
         <div style="display:flex;height:100%;">
           <div style="width:${wPct}%;background:var(--green);"></div>
           <div style="width:${lPct}%;background:var(--red);"></div>
+          <div style="width:${dPct}%;background:var(--gold);"></div>
         </div>
       </div>
     </div>
-    <div style="display:flex;gap:24px;">
-      <div style="text-align:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--white);">${fights.length}</div>
-        <div style="font-family:'Space Mono',monospace;font-size:9px;color:#444;letter-spacing:2px;">KÄMPFE</div>
-      </div>
+    <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
       <div style="text-align:center;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--red);">${koRate}%</div>
-        <div style="font-family:'Space Mono',monospace;font-size:9px;color:#444;letter-spacing:2px;">KO-RATE</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;">KO-RATE</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--green);">${bestStreak}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;">BEST STREAK</div>
       </div>
     </div>
   </div>
 
-  <!-- GEGNER-TYP ANALYSE -->
-  ${Object.keys(styleStats).length > 1 ? `
+  <!-- MATCHUP MATRIX -->
+  ${matrixRows ? `
   <div style="margin-bottom:28px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">GEGNER-ANALYSE</div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;">
-      ${Object.entries(styleStats).map(([type, s]) => {
-        const winRate = Math.round((s.wins / s.total) * 100);
-        const barColor = winRate >= 60 ? 'var(--green)' : winRate >= 40 ? 'var(--gold)' : 'var(--red)';
-        return `<div style="flex:1;min-width:120px;padding:12px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);">${type}</div>
-          <div style="font-family:'Space Mono',monospace;font-size:10px;color:#555;">${s.total} Kämpfe · ${winRate}% Winrate</div>
-          <div style="height:3px;background:#111;border-radius:2px;margin-top:6px;"><div style="width:${winRate}%;height:100%;background:${barColor};border-radius:2px;"></div></div>
-        </div>`;
-      }).join('')}
-    </div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">MATCHUP MATRIX</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid #1a1a1a;">
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;text-align:left;padding:6px 12px 6px 0;text-transform:uppercase;">Gegner-Typ</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Kämpfe</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Siege</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Winrate</th>
+        </tr>
+      </thead>
+      <tbody>${matrixRows}</tbody>
+    </table>
   </div>` : ''}
 
-  <!-- FIGHT LIST -->
+  <!-- FIGHT TIMELINE -->
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">ALLE KÄMPFE</div>
-    <button class="submit-btn" style="padding:6px 14px;font-size:12px;" onclick="openFightModal()">+ KAMPF EINTRAGEN</button>
+    <button class="submit-btn" style="padding:6px 14px;font-size:12px;" onclick="openFightModal()">+ NEUEN KAMPF</button>
   </div>
-  <div id="fights-page-list"></div>`;
+  <div id="fights-timeline-list">
+    ${fights.length === 0
+      ? '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#444;padding:20px 0;text-align:center;">Noch keine Kämpfe. Trage deinen ersten Kampf ein.</div>'
+      : timelineRows}
+  </div>`;
+}
 
-  // Render fight cards
-  const listEl = document.getElementById('fights-page-list');
-  if (!fights.length) {
-    listEl.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#444;padding:20px 0;text-align:center;">Noch keine Kämpfe. Trage deinen ersten Kampf ein.</div>';
+function renderFightsTab2(contentEl, data) {
+  contentEl.innerHTML = '<div id="fights-tab2-content">' + renderPrepTabContent() + '</div>';
+}
+
+function renderFightsTab3(contentEl, data) {
+  const fights = data.fights || [];
+
+  // Guard: need at least 3 fights
+  if (fights.length < 3) {
+    contentEl.innerHTML = '<div style="padding:40px 0;text-align:center;font-family:\'Space Mono\',monospace;font-size:12px;color:#444;">Trage mindestens 3 K\u00e4mpfe ein um Muster zu erkennen.</div>';
     return;
   }
 
-  listEl.innerHTML = fights.map((f, i) => {
-    const color = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
-    const label = f.result === 'S' ? 'SIEG' : f.result === 'N' ? 'NIEDERLAGE' : 'UNENTSCHIEDEN';
-    const hasVideo = !!getYouTubeId(f.videoLink);
-    return `<div onclick="openFightDetail(${i})" style="display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid #111;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
-      <div style="width:48px;height:48px;border-radius:50%;border:2px solid ${color};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${color};">${f.result}</span>
-      </div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</div>
-        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#555;">${formatDate(f.date)} · ${label} · ${f.method || ''}${f.type ? ' · ' + f.type : ''}</div>
-      </div>
-      ${hasVideo ? '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--blue);border:1px solid rgba(41,121,255,.3);padding:3px 8px;border-radius:3px;">VIDEO</div>' : ''}
-      <div style="font-size:14px;color:#333;">→</div>
-    </div>`;
+  // ---- SECTION A: WIEDERKEHRENDE SCHWÄCHEN ----
+  var last10 = fights.slice(0, 10);
+  var schwHTML = last10.map(function(f) {
+    if (!f.improve) return '';
+    return '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid #111;gap:8px 16px;">' +
+      '<div style="flex-shrink:0;min-width:' + (isMobile() ? '100%' : '120px') + ';">' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + formatDate(f.date) + '</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#888;">vs. ' + (f.opponent || 'Unbekannt') + '</div>' +
+      '</div>' +
+      '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:13px;color:#aaa;line-height:1.5;">' + f.improve + '</div>' +
+    '</div>';
   }).join('');
+
+  var sectionA = '<div style="margin-bottom:36px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:2px;margin-bottom:14px;">WIEDERKEHRENDE SCHW\u00c4CHEN</div>' +
+    schwHTML +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;font-style:italic;margin-top:14px;">Lies deine letzten Eintr\u00e4ge \u2014 siehst du ein Thema das sich wiederholt?</div>' +
+  '</div>';
+
+  // ---- SECTION B: MATCHUP-ANALYSE ----
+  var typeMap = {};
+  fights.forEach(function(f) {
+    var t = f.type || 'Unbekannt';
+    if (!typeMap[t]) typeMap[t] = { wins: 0, losses: 0, draws: 0, fights: [] };
+    if (f.result === 'S') typeMap[t].wins++;
+    else if (f.result === 'N') typeMap[t].losses++;
+    else typeMap[t].draws++;
+    typeMap[t].fights.push(f);
+  });
+
+  var matchupHTML = '';
+  Object.keys(typeMap).forEach(function(t) {
+    var s = typeMap[t];
+    var total = s.wins + s.losses + s.draws;
+    var winrate = total > 0 ? Math.round((s.wins / total) * 100) : 0;
+
+    // Collect good/improve bullets (most recent first, max 3 each)
+    var goodBullets = [];
+    var improveBullets = [];
+    s.fights.forEach(function(f) {
+      if (f.good && goodBullets.length < 3) goodBullets.push(f.good);
+      if (f.improve && improveBullets.length < 3) improveBullets.push(f.improve);
+    });
+
+    var bulletsHTML = '';
+    if (goodBullets.length) {
+      bulletsHTML += '<div style="margin-top:8px;"><div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--green);letter-spacing:2px;margin-bottom:4px;">ST\u00c4RKEN</div>';
+      goodBullets.forEach(function(b) {
+        bulletsHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#888;padding:2px 0 2px 12px;position:relative;"><span style="position:absolute;left:0;color:var(--green);">\u2022</span>' + b + '</div>';
+      });
+      bulletsHTML += '</div>';
+    }
+    if (improveBullets.length) {
+      bulletsHTML += '<div style="margin-top:8px;"><div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:4px;">VERBESSERUNG</div>';
+      improveBullets.forEach(function(b) {
+        bulletsHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#888;padding:2px 0 2px 12px;position:relative;"><span style="position:absolute;left:0;color:var(--gold);">\u2022</span>' + b + '</div>';
+      });
+      bulletsHTML += '</div>';
+    }
+
+    matchupHTML += '<div style="padding:14px 0;border-bottom:1px solid #111;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);font-weight:600;">' + t + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">' + s.wins + 'S - ' + s.losses + 'N' + (s.draws > 0 ? ' - ' + s.draws + 'U' : '') + '</div>' +
+      '</div>' +
+      '<div style="height:6px;background:#111;border-radius:3px;overflow:hidden;">' +
+        '<div style="height:100%;width:' + winrate + '%;background:var(--green);border-radius:3px;transition:width .3s;"></div>' +
+      '</div>' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#444;margin-top:4px;">' + winrate + '% Winrate</div>' +
+      bulletsHTML +
+    '</div>';
+  });
+
+  var sectionB = '<div style="margin-bottom:36px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:2px;margin-bottom:14px;">MATCHUP-ANALYSE</div>' +
+    matchupHTML +
+  '</div>';
+
+  // ---- SECTION C: FORTSCHRITTS-TIMELINE ----
+  // Fights are stored newest first; timeline should be chronological (oldest at top)
+  var chronFights = fights.slice().reverse();
+  var timelineHTML = '';
+  chronFights.forEach(function(f, i) {
+    var dotColor = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
+    var topPx = i * 90;
+
+    // Gap in days to next fight
+    var gapHTML = '';
+    if (i < chronFights.length - 1) {
+      var d1 = new Date(f.date + 'T00:00:00');
+      var d2 = new Date(chronFights[i + 1].date + 'T00:00:00');
+      var diffDays = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+      if (diffDays > 0) {
+        gapHTML = '<div style="position:absolute;left:18px;top:' + (topPx + 28) + 'px;font-family:\'Space Mono\',monospace;font-size:11px;color:#333;">' + diffDays + ' Tage Pause</div>';
+      }
+    }
+
+    timelineHTML += '<div style="position:absolute;left:0;top:' + topPx + 'px;display:flex;align-items:flex-start;gap:14px;">' +
+      '<div style="width:12px;height:12px;border-radius:50%;background:' + dotColor + ';flex-shrink:0;margin-top:2px;z-index:1;"></div>' +
+      '<div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + formatDate(f.date) + ' <span style="color:#888;">vs. ' + (f.opponent || 'Unbekannt') + '</span></div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;">' + (f.method || '') + '</div>' +
+      '</div>' +
+    '</div>' + gapHTML;
+  });
+
+  var timelineHeight = chronFights.length * 90;
+  var sectionC = '<div style="margin-bottom:36px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:2px;margin-bottom:14px;">FORTSCHRITTS-TIMELINE</div>' +
+    '<div style="position:relative;padding-left:6px;height:' + timelineHeight + 'px;">' +
+      '<div style="position:absolute;left:5px;top:0;width:2px;height:100%;background:#1a1a1a;"></div>' +
+      timelineHTML +
+    '</div>' +
+  '</div>';
+
+  // ---- SECTION D: KAMPF-STATISTIKEN ----
+  var totalWins = fights.filter(function(f) { return f.result === 'S'; }).length;
+  var totalLosses = fights.filter(function(f) { return f.result === 'N'; }).length;
+  var totalDraws = fights.filter(function(f) { return f.result === 'U'; }).length;
+
+  // Current streak
+  var currentStreak = 0;
+  var streakResult = fights.length > 0 ? fights[0].result : '';
+  for (var si = 0; si < fights.length; si++) {
+    if (fights[si].result === streakResult) currentStreak++;
+    else break;
+  }
+  var streakLabel = streakResult === 'S' ? 'Siege' : streakResult === 'N' ? 'Niederlagen' : 'Unentschieden';
+  var streakColor = streakResult === 'S' ? 'var(--green)' : streakResult === 'N' ? 'var(--red)' : 'var(--gold)';
+
+  // Best win streak
+  var bestStreak = 0;
+  var currWinRun = 0;
+  fights.forEach(function(f) {
+    if (f.result === 'S') { currWinRun++; if (currWinRun > bestStreak) bestStreak = currWinRun; }
+    else currWinRun = 0;
+  });
+
+  // Most common win method
+  var winMethods = {};
+  fights.forEach(function(f) {
+    if (f.result === 'S' && f.method) {
+      winMethods[f.method] = (winMethods[f.method] || 0) + 1;
+    }
+  });
+  var topWinMethod = '\u2014';
+  var topWinCount = 0;
+  Object.keys(winMethods).forEach(function(m) {
+    if (winMethods[m] > topWinCount) { topWinCount = winMethods[m]; topWinMethod = m; }
+  });
+
+  // Most common loss method
+  var lossMethods = {};
+  fights.forEach(function(f) {
+    if (f.result === 'N' && f.method) {
+      lossMethods[f.method] = (lossMethods[f.method] || 0) + 1;
+    }
+  });
+  var topLossMethod = '\u2014';
+  var topLossCount = 0;
+  Object.keys(lossMethods).forEach(function(m) {
+    if (lossMethods[m] > topLossCount) { topLossCount = lossMethods[m]; topLossMethod = m; }
+  });
+
+  // Fight frequency
+  var freqText = '\u2014';
+  if (fights.length >= 2) {
+    var sorted = fights.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+    var firstDate = new Date(sorted[0].date + 'T00:00:00');
+    var lastDate = new Date(sorted[sorted.length - 1].date + 'T00:00:00');
+    var monthsSpan = (lastDate - firstDate) / (1000 * 60 * 60 * 24 * 30.44);
+    if (monthsSpan > 0) {
+      freqText = (fights.length / monthsSpan).toFixed(1) + ' K\u00e4mpfe/Monat';
+    }
+  }
+
+  function statRow(label, value, color) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #111;">' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">' + label + '</div>' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:13px;color:' + (color || 'var(--white)') + ';font-weight:700;">' + value + '</div>' +
+    '</div>';
+  }
+
+  var sectionD = '<div style="margin-bottom:36px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:2px;margin-bottom:14px;">KAMPF-STATISTIKEN</div>' +
+    statRow('Gesamtk\u00e4mpfe', fights.length) +
+    statRow('Siege', totalWins, 'var(--green)') +
+    statRow('Niederlagen', totalLosses, 'var(--red)') +
+    statRow('Unentschieden', totalDraws, 'var(--gold)') +
+    statRow('Aktueller Streak', currentStreak + ' ' + streakLabel, streakColor) +
+    statRow('Bester Streak', bestStreak + ' Siege', 'var(--green)') +
+    statRow('H\u00e4ufigste Siegmethode', topWinMethod + (topWinCount > 0 ? ' (' + topWinCount + 'x)' : ''), 'var(--green)') +
+    statRow('H\u00e4ufigste Niederlagemethode', topLossMethod + (topLossCount > 0 ? ' (' + topLossCount + 'x)' : ''), 'var(--red)') +
+    statRow('Kampffrequenz', freqText) +
+  '</div>';
+
+  contentEl.innerHTML = sectionA + sectionB + sectionC + sectionD;
 }
 
 // ===== KAMPF DETAIL =====
@@ -1750,8 +2021,8 @@ function openFightDetail(idx) {
         <iframe id="fight-video-frame" src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
       </div>
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
-        <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:10px;color:#444;text-decoration:none;">Auf YouTube ansehen ↗</a>
-        <button onclick="editFightVideo(${idx})" style="font-family:'Space Mono',monospace;font-size:10px;color:#444;background:none;border:none;cursor:pointer;">Video ändern</button>
+        <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:12px;color:#444;text-decoration:none;min-height:44px;display:inline-flex;align-items:center;">Auf YouTube ansehen ↗</a>
+        <button onclick="editFightVideo(${idx})" style="font-family:'Space Mono',monospace;font-size:12px;color:#444;background:none;border:none;cursor:pointer;min-height:44px;">Video ändern</button>
       </div>`;
   } else {
     videoHTML = `
@@ -1767,18 +2038,18 @@ function openFightDetail(idx) {
   if (hasRounds) {
     roundsHTML = f.rounds.filter(r => r.notes).map(r => `
       <div style="padding:12px 0;border-bottom:1px solid #111;">
-        <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--blue);letter-spacing:2px;margin-bottom:4px;">RUNDE ${r.round}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);letter-spacing:2px;margin-bottom:4px;">RUNDE ${r.round}</div>
         <div style="font-size:13px;color:#888;line-height:1.6;">${r.notes}</div>
       </div>`).join('');
   }
 
   el.innerHTML = `
   <div style="margin-bottom:20px;">
-    <button onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:10px;color:#444;background:none;border:none;cursor:pointer;padding:0;letter-spacing:1px;">← ALLE KÄMPFE</button>
+    <button onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:12px;color:#444;background:none;border:none;cursor:pointer;padding:8px 0;min-height:44px;letter-spacing:1px;">← ALLE KÄMPFE</button>
   </div>
 
   <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:24px;">
     <div style="width:52px;height:52px;border:2px solid ${color};border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
       <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${color};">${f.result}</span>
     </div>
@@ -1789,7 +2060,7 @@ function openFightDetail(idx) {
   </div>
 
   <!-- MAIN: Video links, Analyse rechts -->
-  <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;margin-bottom:32px;" class="fight-detail-grid">
+  <div style="display:grid;grid-template-columns:${isMobile() ? '1fr' : '1fr 340px'};gap:24px;margin-bottom:32px;" class="fight-detail-grid">
 
     <!-- LEFT: VIDEO -->
     <div>${videoHTML}</div>
@@ -1798,18 +2069,18 @@ function openFightDetail(idx) {
     <div style="display:flex;flex-direction:column;gap:16px;">
 
       <div style="padding:14px 0;border-bottom:1px solid #111;">
-        <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--green);letter-spacing:2px;margin-bottom:6px;">STÄRKEN</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--green);letter-spacing:2px;margin-bottom:6px;">STÄRKEN</div>
         <div style="font-size:13px;color:#888;line-height:1.5;">${f.good || '—'}</div>
       </div>
 
       <div style="padding:14px 0;border-bottom:1px solid #111;">
-        <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:2px;margin-bottom:6px;">VERBESSERUNG</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:6px;">VERBESSERUNG</div>
         <div style="font-size:13px;color:#888;line-height:1.5;">${f.improve || '—'}</div>
       </div>
 
       ${f.opponentWeaknesses ? `
       <div style="padding:14px 0;border-bottom:1px solid #111;">
-        <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;margin-bottom:6px;">GEGNER-SCHWÄCHEN</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--red);letter-spacing:2px;margin-bottom:6px;">GEGNER-SCHWÄCHEN</div>
         <div style="font-size:13px;color:#888;line-height:1.5;">${f.opponentWeaknesses}</div>
       </div>` : ''}
 
@@ -1819,14 +2090,14 @@ function openFightDetail(idx) {
   <!-- RUNDEN -->
   ${hasRounds ? `
   <div style="margin-bottom:32px;">
-    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#333;letter-spacing:3px;margin-bottom:12px;">RUNDEN-ANALYSE</div>
+    <div style="font-family:'Space Mono',monospace;font-size:12px;color:#333;letter-spacing:3px;margin-bottom:12px;">RUNDEN-ANALYSE</div>
     ${roundsHTML}
   </div>` : ''}
 
   <!-- FOOTER -->
-  <div style="padding-top:16px;border-top:1px solid #111;display:flex;gap:12px;">
-    <button onclick="editFightVideo(${idx})" style="font-family:'Space Mono',monospace;font-size:10px;color:#444;background:none;border:1px solid #1a1a1a;padding:6px 14px;cursor:pointer;">${ytId ? 'VIDEO ÄNDERN' : '+ VIDEO'}</button>
-    <button onclick="if(confirm('Kampf löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:10px;color:#333;background:none;border:1px solid #1a1a1a;padding:6px 14px;cursor:pointer;">LÖSCHEN</button>
+  <div style="padding-top:16px;border-top:1px solid #111;display:flex;flex-wrap:wrap;gap:12px;">
+    <button onclick="editFightVideo(${idx})" style="font-family:'Space Mono',monospace;font-size:12px;color:#444;background:none;border:1px solid #1a1a1a;padding:10px 14px;cursor:pointer;min-height:44px;">${ytId ? 'VIDEO ÄNDERN' : '+ VIDEO'}</button>
+    <button onclick="if(confirm('Kampf löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:12px;color:#333;background:none;border:1px solid #1a1a1a;padding:10px 14px;cursor:pointer;min-height:44px;">LÖSCHEN</button>
   </div>`;
 
   showPage('fight-detail');
@@ -1840,6 +2111,323 @@ function editFightVideo(idx) {
   data.fights[idx].videoLink = url.trim();
   saveData(data);
   openFightDetail(idx);
+}
+
+// ===== VORBEREITUNG (PREP) TAB =====
+
+function getDefaultPrep() {
+  return {
+    step: 1,
+    opponent: { name: '', club: '', stance: '', type: '', height: '', reach: '', strengths: '', weaknesses: '', videoLink: '', notes: '' },
+    gameplan: { r1: '', r2: '', r3: '', planB: '', combo1: '', combo2: '', combo3: '' },
+    mentalChecklist: { alterEgo: false, triggerWords: false, visualization: false, breathing: false, videoStudied: false, comboDrilled: false },
+    packingList: { mundschutz: false, bandagen: false, wettkampfpass: false, boxschuhe: false, kleidung: false, handtuch: false, wasser: false, essen: false, musik: false, seil: false },
+    triggerWords: { technik: '', motivation: '', krisen: '' }
+  };
+}
+
+function savePrepField(path, value) {
+  var data = getData();
+  if (!data) return;
+  if (!data.nextFightPrep) data.nextFightPrep = getDefaultPrep();
+  var keys = path.split('.');
+  var obj = data.nextFightPrep;
+  for (var i = 0; i < keys.length - 1; i++) {
+    if (!obj[keys[i]]) obj[keys[i]] = {};
+    obj = obj[keys[i]];
+  }
+  obj[keys[keys.length - 1]] = value;
+  saveData(data);
+}
+
+function togglePrepCheck(path) {
+  var data = getData();
+  if (!data) return;
+  if (!data.nextFightPrep) data.nextFightPrep = getDefaultPrep();
+  var keys = path.split('.');
+  var obj = data.nextFightPrep;
+  for (var i = 0; i < keys.length - 1; i++) {
+    if (!obj[keys[i]]) obj[keys[i]] = {};
+    obj = obj[keys[i]];
+  }
+  obj[keys[keys.length - 1]] = !obj[keys[keys.length - 1]];
+  saveData(data);
+  renderFightsTab2Refresh();
+}
+
+function advancePrepStep(step) {
+  var data = getData();
+  if (!data) return;
+  if (!data.nextFightPrep) data.nextFightPrep = getDefaultPrep();
+  data.nextFightPrep.step = step;
+  saveData(data);
+  renderFightsTab2Refresh();
+}
+
+function resetPrep() {
+  if (!confirm('Vorbereitung zuruecksetzen? Alle Eingaben gehen verloren.')) return;
+  var data = getData();
+  if (!data) return;
+  data.nextFightPrep = getDefaultPrep();
+  saveData(data);
+  renderFightsTab2Refresh();
+}
+
+function renderFightsTab2Refresh() {
+  var el = document.getElementById('fights-tab2-content');
+  if (el) el.innerHTML = renderPrepTabContent();
+}
+
+function renderPrepTabContent() {
+  var data = getData();
+  if (!data) return '';
+  if (!data.nextFightPrep) {
+    data.nextFightPrep = getDefaultPrep();
+    saveData(data);
+  }
+  var prep = data.nextFightPrep;
+  var step = prep.step || 1;
+  var fights = data.fights || [];
+
+  var inputStyle = 'width:100%;padding:10px 12px;background:#141414;border:1px solid #252525;color:#fff;font-family:"DM Sans",sans-serif;font-size:13px;border-radius:4px;outline:none;box-sizing:border-box;';
+  var textareaStyle = inputStyle + 'resize:vertical;min-height:80px;';
+  var labelStyle = 'font-family:"Space Mono",monospace;font-size:10px;color:#555;letter-spacing:2px;margin-bottom:6px;display:block;';
+  var headingStyle = 'font-family:"Bebas Neue",sans-serif;color:var(--white);letter-spacing:1px;';
+  var cardStyle = 'background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:20px;margin-bottom:16px;';
+  var btnPrimary = 'font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;';
+  var btnSecondary = 'font-family:"Space Mono",monospace;font-size:11px;letter-spacing:1px;padding:10px 20px;background:transparent;color:#555;border:1px solid #252525;border-radius:4px;cursor:pointer;';
+
+  // Progress bar
+  var stepLabels = ['GEGNER', 'GAMEPLAN', 'MENTAL', 'EQUIPMENT', 'FIGHT DAY'];
+  var progressHTML = '<div style="margin-bottom:32px;">';
+  progressHTML += '<div style="display:flex;align-items:center;justify-content:center;gap:0;position:relative;max-width:500px;margin:0 auto 12px auto;">';
+  for (var s = 1; s <= 5; s++) {
+    var isCompleted = s < step;
+    var isCurrent = s === step;
+    var circleBg = isCompleted ? 'var(--red)' : (isCurrent ? 'transparent' : '#1a1a1a');
+    var circleBorder = isCompleted ? 'var(--red)' : (isCurrent ? 'var(--red)' : '#333');
+    var circleColor = isCompleted ? '#fff' : (isCurrent ? 'var(--red)' : '#555');
+    if (s > 1) {
+      var lineBg = s <= step ? 'var(--red)' : '#252525';
+      progressHTML += '<div style="flex:1;height:2px;background:' + lineBg + ';"></div>';
+    }
+    progressHTML += '<div style="width:36px;height:36px;border-radius:50%;background:' + circleBg + ';border:2px solid ' + circleBorder + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;" onclick="advancePrepStep(' + s + ')">';
+    if (isCompleted) {
+      progressHTML += '<span style="color:#fff;font-size:14px;">\u2713</span>';
+    } else {
+      progressHTML += '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:' + circleColor + ';">' + s + '</span>';
+    }
+    progressHTML += '</div>';
+  }
+  progressHTML += '</div>';
+  progressHTML += '<div style="text-align:center;font-family:\'Space Mono\',monospace;font-size:10px;color:#444;letter-spacing:2px;">SCHRITT ' + step + ' VON 5 \u2014 ' + stepLabels[step - 1] + '</div>';
+  progressHTML += '</div>';
+
+  function navButtons(currentStep) {
+    var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid #1a1a1a;">';
+    if (currentStep > 1) {
+      html += '<button style="' + btnSecondary + '" onclick="advancePrepStep(' + (currentStep - 1) + ')">\u2190 ZUR\u00dcCK</button>';
+    } else {
+      html += '<div></div>';
+    }
+    if (currentStep < 5) {
+      html += '<button style="' + btnPrimary + '" onclick="advancePrepStep(' + (currentStep + 1) + ')">WEITER \u2192</button>';
+    } else {
+      html += '<button style="' + btnPrimary + 'background:var(--green);" onclick="resetPrep()">VORBEREITUNG ABSCHLIESSEN</button>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  var contentHTML = '';
+
+  // STEP 1: GEGNER-PROFIL
+  if (step === 1) {
+    var opp = prep.opponent || {};
+    var typeHint = '';
+    if (opp.type) {
+      var typeRecord = { wins: 0, losses: 0, total: 0 };
+      fights.forEach(function(f) {
+        if ((f.type || '').toLowerCase() === opp.type.toLowerCase()) {
+          typeRecord.total++;
+          if (f.result === 'S') typeRecord.wins++;
+          else if (f.result === 'N') typeRecord.losses++;
+        }
+      });
+      if (typeRecord.total > 0) {
+        typeHint = '<div style="' + cardStyle + 'background:#0c0c00;border-color:#332d00;margin-bottom:20px;">' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--gold);letter-spacing:1px;">ERFAHRUNG VS. ' + opp.type.toUpperCase() + '</div>' +
+          '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;margin-top:6px;">' + typeRecord.wins + ' Siege, ' + typeRecord.losses + ' Niederlagen aus ' + typeRecord.total + ' K\u00e4mpfen gegen diesen Gegnertyp.</div>' +
+          '</div>';
+      }
+    }
+    contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">GEGNER-PROFIL</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:20px;">Trage alle bekannten Infos \u00fcber deinen n\u00e4chsten Gegner ein.</div>' +
+      typeHint +
+      '<div style="' + cardStyle + '">' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+          '<div><label style="' + labelStyle + '">NAME</label><input style="' + inputStyle + '" value="' + (opp.name || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'opponent.name\', this.value)" placeholder="Gegner-Name"></div>' +
+          '<div><label style="' + labelStyle + '">VEREIN</label><input style="' + inputStyle + '" value="' + (opp.club || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'opponent.club\', this.value)" placeholder="Verein / Gym"></div>' +
+          '<div><label style="' + labelStyle + '">AUSLAGE</label><select style="' + inputStyle + '" onchange="savePrepField(\'opponent.stance\', this.value)"><option value="">-- W\u00e4hlen --</option><option value="Orthodox"' + (opp.stance === 'Orthodox' ? ' selected' : '') + '>Orthodox</option><option value="Southpaw"' + (opp.stance === 'Southpaw' ? ' selected' : '') + '>Southpaw</option><option value="Switch"' + (opp.stance === 'Switch' ? ' selected' : '') + '>Switch</option></select></div>' +
+          '<div><label style="' + labelStyle + '">TYP / STIL</label><select style="' + inputStyle + '" onchange="savePrepField(\'opponent.type\', this.value);renderFightsTab2Refresh()"><option value="">-- W\u00e4hlen --</option><option value="Boxer"' + (opp.type === 'Boxer' ? ' selected' : '') + '>Boxer (Distanz)</option><option value="Fighter"' + (opp.type === 'Fighter' ? ' selected' : '') + '>Fighter (Druck)</option><option value="Slugger"' + (opp.type === 'Slugger' ? ' selected' : '') + '>Slugger (Puncher)</option><option value="Swarmer"' + (opp.type === 'Swarmer' ? ' selected' : '') + '>Swarmer (Infight)</option><option value="Outboxer"' + (opp.type === 'Outboxer' ? ' selected' : '') + '>Outboxer</option></select></div>' +
+          '<div><label style="' + labelStyle + '">GR\u00d6SSE (CM)</label><input type="number" style="' + inputStyle + '" value="' + (opp.height || '') + '" oninput="savePrepField(\'opponent.height\', this.value)" placeholder="z.B. 178"></div>' +
+          '<div><label style="' + labelStyle + '">REICHWEITE (CM)</label><input type="number" style="' + inputStyle + '" value="' + (opp.reach || '') + '" oninput="savePrepField(\'opponent.reach\', this.value)" placeholder="z.B. 182"></div>' +
+        '</div>' +
+        '<div style="margin-top:16px;"><label style="' + labelStyle + '">ST\u00c4RKEN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'opponent.strengths\', this.value)" placeholder="Was macht der Gegner gut?">' + (opp.strengths || '') + '</textarea></div>' +
+        '<div style="margin-top:12px;"><label style="' + labelStyle + '">SCHW\u00c4CHEN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'opponent.weaknesses\', this.value)" placeholder="Wo hat der Gegner L\u00fccken?">' + (opp.weaknesses || '') + '</textarea></div>' +
+        '<div style="margin-top:12px;"><label style="' + labelStyle + '">VIDEO-LINK</label><input style="' + inputStyle + '" value="' + (opp.videoLink || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'opponent.videoLink\', this.value)" placeholder="YouTube-Link zum Gegner"></div>' +
+        '<div style="margin-top:12px;"><label style="' + labelStyle + '">NOTIZEN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'opponent.notes\', this.value)" placeholder="Sonstige Infos...">' + (opp.notes || '') + '</textarea></div>' +
+      '</div>' +
+      navButtons(1);
+  }
+
+  // STEP 2: GAMEPLAN
+  else if (step === 2) {
+    var gp = prep.gameplan || {};
+    contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">GAMEPLAN</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:20px;">Plane deine Strategie f\u00fcr jede Runde.</div>' +
+      '<div style="' + cardStyle + '">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">RUNDEN-STRATEGIE</div>' +
+        '<div style="margin-bottom:16px;"><label style="' + labelStyle + '">RUNDE 1 \u2014 ABTASTEN & DOMINIEREN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'gameplan.r1\', this.value)" placeholder="Jab aufbauen, Rhythmus finden, Distanz kontrollieren...">' + (gp.r1 || '') + '</textarea></div>' +
+        '<div style="margin-bottom:16px;"><label style="' + labelStyle + '">RUNDE 2 \u2014 TEMPO ERH\u00d6HEN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'gameplan.r2\', this.value)" placeholder="Kombis starten, Schw\u00e4chen ausnutzen, Druck machen...">' + (gp.r2 || '') + '</textarea></div>' +
+        '<div style="margin-bottom:16px;"><label style="' + labelStyle + '">RUNDE 3 \u2014 FINISH</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'gameplan.r3\', this.value)" placeholder="Alles geben, Ausg\u00e4nge dominieren, Ring abschneiden...">' + (gp.r3 || '') + '</textarea></div>' +
+        '<div style="margin-bottom:16px;"><label style="' + labelStyle + '">PLAN B \u2014 WENN ES NICHT L\u00c4UFT</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'gameplan.planB\', this.value)" placeholder="Was tun wenn Plan A nicht funktioniert? Stilwechsel, Clinch, Konter...">' + (gp.planB || '') + '</textarea></div>' +
+      '</div>' +
+      '<div style="' + cardStyle + '">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">KEY COMBOS</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">' +
+          '<div><label style="' + labelStyle + '">COMBO 1</label><input style="' + inputStyle + '" value="' + (gp.combo1 || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'gameplan.combo1\', this.value)" placeholder="z.B. Jab-Cross-Hook"></div>' +
+          '<div><label style="' + labelStyle + '">COMBO 2</label><input style="' + inputStyle + '" value="' + (gp.combo2 || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'gameplan.combo2\', this.value)" placeholder="z.B. 1-2-Uppercut"></div>' +
+          '<div><label style="' + labelStyle + '">COMBO 3</label><input style="' + inputStyle + '" value="' + (gp.combo3 || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'gameplan.combo3\', this.value)" placeholder="z.B. Body-Head-Body"></div>' +
+        '</div>' +
+      '</div>' +
+      navButtons(2);
+  }
+
+  // STEP 3: MENTAL PREP
+  else if (step === 3) {
+    var mc = prep.mentalChecklist || {};
+    var tw = prep.triggerWords || {};
+    var alterEgoName = (data.alterEgo && data.alterEgo.name) ? data.alterEgo.name : 'Alter Ego';
+    var checkedCount = [mc.alterEgo, mc.triggerWords, mc.visualization, mc.breathing, mc.videoStudied, mc.comboDrilled].filter(Boolean).length;
+
+    var checkItem = function(label, path, checked) {
+      var boxStyle = 'width:20px;height:20px;border-radius:3px;border:2px solid ' + (checked ? 'var(--red)' : '#333') + ';background:' + (checked ? 'var(--red)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;';
+      return '<div onclick="togglePrepCheck(\'' + path + '\')" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #111;cursor:pointer;">' +
+        '<div style="' + boxStyle + '">' + (checked ? '<span style="color:#fff;font-size:12px;">\u2713</span>' : '') + '</div>' +
+        '<span style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:' + (checked ? '#888' : '#555') + ';' + (checked ? 'text-decoration:line-through;' : '') + '">' + label + '</span>' +
+      '</div>';
+    };
+
+    contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">MENTALE VORBEREITUNG</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:20px;">Mentale Checkliste \u2014 bereite deinen Kopf vor.</div>' +
+      '<div style="' + cardStyle + '">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">CHECKLISTE</div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:' + (checkedCount === 6 ? 'var(--green)' : 'var(--red)') + ';">' + checkedCount + '/6</div>' +
+        '</div>' +
+        '<div style="height:4px;background:#111;border-radius:2px;margin-bottom:16px;overflow:hidden;"><div style="width:' + Math.round(checkedCount / 6 * 100) + '%;height:100%;background:' + (checkedCount === 6 ? 'var(--green)' : 'var(--red)') + ';border-radius:2px;transition:width .3s;"></div></div>' +
+        checkItem('Alter Ego aktiviert \u2014 ' + alterEgoName, 'mentalChecklist.alterEgo', mc.alterEgo) +
+        checkItem('Trigger-W\u00f6rter festgelegt', 'mentalChecklist.triggerWords', mc.triggerWords) +
+        checkItem('Kampf visualisiert (3x durchgespielt)', 'mentalChecklist.visualization', mc.visualization) +
+        checkItem('Atem\u00fcbung / Box-Breathing gemacht', 'mentalChecklist.breathing', mc.breathing) +
+        checkItem('Gegner-Video studiert', 'mentalChecklist.videoStudied', mc.videoStudied) +
+        checkItem('Key Combos gedrillt (mind. 50x)', 'mentalChecklist.comboDrilled', mc.comboDrilled) +
+      '</div>' +
+      '<div style="' + cardStyle + '">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">TRIGGER-W\u00d6RTER</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#555;margin-bottom:16px;">Kurze W\u00f6rter, die dich im Ring triggern \u2014 Technik, Motivation, Krisenmodus.</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">' +
+          '<div><label style="' + labelStyle + '">TECHNIK</label><input style="' + inputStyle + '" value="' + (tw.technik || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'triggerWords.technik\', this.value)" placeholder="z.B. JAB!"></div>' +
+          '<div><label style="' + labelStyle + '">MOTIVATION</label><input style="' + inputStyle + '" value="' + (tw.motivation || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'triggerWords.motivation\', this.value)" placeholder="z.B. KRIEG!"></div>' +
+          '<div><label style="' + labelStyle + '">KRISEN</label><input style="' + inputStyle + '" value="' + (tw.krisen || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'triggerWords.krisen\', this.value)" placeholder="z.B. ATMEN!"></div>' +
+        '</div>' +
+      '</div>' +
+      navButtons(3);
+  }
+
+  // STEP 4: EQUIPMENT
+  else if (step === 4) {
+    var pl = prep.packingList || {};
+    var packItems = [
+      ['mundschutz', 'Mundschutz'],
+      ['bandagen', 'Bandagen'],
+      ['wettkampfpass', 'Wettkampfpass'],
+      ['boxschuhe', 'Boxschuhe'],
+      ['kleidung', 'Wettkampf-Kleidung'],
+      ['handtuch', 'Handtuch'],
+      ['wasser', 'Wasser / Getr\u00e4nke'],
+      ['essen', 'Snacks / Verpflegung'],
+      ['musik', 'Walkout-Musik / Kopfh\u00f6rer'],
+      ['seil', 'Springseil / Aufw\u00e4rm-Equipment']
+    ];
+    var packedCount = packItems.filter(function(p) { return pl[p[0]]; }).length;
+
+    contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">EQUIPMENT</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:20px;">Packliste \u2014 vergiss nichts am Kampftag.</div>' +
+      '<div style="' + cardStyle + '">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">PACKLISTE</div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:' + (packedCount === 10 ? 'var(--green)' : '#555') + ';">' + packedCount + '/10</div>' +
+        '</div>' +
+        '<div style="height:4px;background:#111;border-radius:2px;margin-bottom:16px;overflow:hidden;"><div style="width:' + (packedCount * 10) + '%;height:100%;background:' + (packedCount === 10 ? 'var(--green)' : 'var(--blue)') + ';border-radius:2px;transition:width .3s;"></div></div>';
+
+    packItems.forEach(function(item) {
+      var key = item[0], label = item[1];
+      var checked = !!pl[key];
+      var boxStyle = 'width:20px;height:20px;border-radius:3px;border:2px solid ' + (checked ? 'var(--green)' : '#333') + ';background:' + (checked ? 'var(--green)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;';
+      contentHTML += '<div onclick="togglePrepCheck(\'packingList.' + key + '\')" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #111;cursor:pointer;">' +
+        '<div style="' + boxStyle + '">' + (checked ? '<span style="color:#fff;font-size:12px;">\u2713</span>' : '') + '</div>' +
+        '<span style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:' + (checked ? 'var(--green)' : '#888') + ';' + (checked ? 'text-decoration:line-through;' : '') + '">' + label + '</span>' +
+      '</div>';
+    });
+
+    contentHTML += '</div>' + navButtons(4);
+  }
+
+  // STEP 5: FIGHT DAY TIMELINE
+  else if (step === 5) {
+    var timeline = [
+      { offset: 'X \u2212 4h', label: 'LETZTE MAHLZEIT', desc: 'Leicht verdaulich: Reis, Nudeln, Banane. Kein Fett, keine Ballaststoffe.' },
+      { offset: 'X \u2212 3h', label: 'ANREISE', desc: 'Tasche gecheckt, Wettkampfpass dabei, Anfahrt geplant.' },
+      { offset: 'X \u2212 2h', label: 'ANKUNFT & CHECK-IN', desc: 'Wiegen, Wettkampfpass abgeben, Halle kennenlernen.' },
+      { offset: 'X \u2212 1h', label: 'MENTALE AKTIVIERUNG', desc: 'Musik an, Alter Ego aktivieren, Trigger-W\u00f6rter wiederholen, Visualisierung.' },
+      { offset: 'X \u2212 30min', label: 'AUFW\u00c4RMEN', desc: 'Seilspringen, Schattenboxen, Pratzen (leicht), Schwitzen kommen.' },
+      { offset: 'X \u2212 10min', label: 'BANDAGEN & HANDSCHUHE', desc: 'Bandagen anlegen, Handschuhe checken, Mundschutz rein.' },
+      { offset: 'X \u2212 5min', label: 'LETZTE WORTE', desc: 'Trainer-Anweisungen, Gameplan nochmal durchgehen, Box-Breathing.' },
+      { offset: 'X', label: 'KAMPF', desc: 'Gameplan umsetzen. Runde f\u00fcr Runde. Vertraue deiner Vorbereitung.' }
+    ];
+
+    contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">FIGHT DAY TIMELINE</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:24px;">Dein Fahrplan f\u00fcr den Kampftag. X = deine Kampfzeit.</div>' +
+      '<div style="' + cardStyle + 'padding:24px 20px;">';
+
+    timeline.forEach(function(t, i) {
+      var isLast = i === timeline.length - 1;
+      var dotColor = isLast ? 'var(--red)' : 'var(--white)';
+      var dotSize = isLast ? '14px' : '10px';
+      contentHTML += '<div style="display:flex;gap:16px;position:relative;' + (isLast ? '' : 'padding-bottom:28px;') + '">';
+      if (!isLast) {
+        contentHTML += '<div style="position:absolute;left:4px;top:14px;width:2px;height:calc(100% - 6px);background:#1a1a1a;"></div>';
+      }
+      contentHTML += '<div style="width:' + dotSize + ';height:' + dotSize + ';border-radius:50%;background:' + dotColor + ';flex-shrink:0;margin-top:4px;position:relative;z-index:1;"></div>';
+      contentHTML += '<div style="flex:1;">';
+      contentHTML += '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;">';
+      contentHTML += '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:' + (isLast ? 'var(--red)' : 'var(--gold)') + ';letter-spacing:1px;white-space:nowrap;">' + t.offset + '</span>';
+      contentHTML += '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">' + t.label + '</span>';
+      contentHTML += '</div>';
+      contentHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;line-height:1.5;">' + t.desc + '</div>';
+      contentHTML += '</div></div>';
+    });
+
+    contentHTML += '</div>' + navButtons(5);
+  }
+
+  var resetHTML = '<div style="text-align:center;margin-top:20px;">' +
+    '<button onclick="resetPrep()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;background:none;border:none;cursor:pointer;letter-spacing:1px;">VORBEREITUNG ZUR\u00dcCKSETZEN</button>' +
+  '</div>';
+
+  return progressHTML + contentHTML + resetHTML;
 }
 
 // ===== TRAINING LOG =====
@@ -2266,7 +2854,7 @@ function renderWeekPlan() {
             <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--gold);">HEUTE</span>' : ''}</div>
             ${dp ? `<div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:${dp.color};margin-top:2px;">${dp.label}</div>` : ''}
           </div>
-          ${(s.weekSchedule[day] && s.weekSchedule[day].type === 'sparring' && blocks.some(b => b.type === 'strength')) ? '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--orange);padding:4px 0;">\u26A0 Schweres S&C + Sparring am gleichen Tag \u2014 erh\u00F6htes Verletzungsrisiko</div>' : ''}
+          ${(s.weekSchedule[day] && s.weekSchedule[day].type === 'sparring' && blocks.some(b => b.type === 'strength')) ? '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--orange);padding:4px 0;">\u26A0 Schweres S&C + Sparring am gleichen Tag \u2014 erh\u00F6htes Verletzungsrisiko</div>' : ''}
           <div class="day-blocks">
             ${blocks.map((b, bi) => {
               const logKey = day + '_' + bi + '_' + getWeekId();
@@ -2467,7 +3055,7 @@ function openSettingsModal() {
       <select id="sched-type-${day}" onchange="document.getElementById('sched-time-${day}').disabled=this.value==='frei'" style="flex:1;background:#141414;border:1px solid #252525;color:var(--white);padding:8px;font-family:'DM Sans';font-size:12px;border-radius:4px;">
         ${types.map(t => `<option value="${t.val}" ${d.type===t.val?'selected':''}>${t.label}</option>`).join('')}
       </select>
-      <input id="sched-time-${day}" type="time" value="${d.time || '18:00'}" ${isFrei?'disabled':''} style="width:90px;background:#141414;border:1px solid #252525;color:var(--white);padding:8px;font-family:'DM Sans';font-size:12px;border-radius:4px;">
+      <input id="sched-time-${day}" type="time" value="${d.time || '18:00'}" ${isFrei?'disabled':''} style="width:90px;min-height:44px;background:#141414;border:1px solid #252525;color:var(--white);padding:8px;font-family:'DM Sans';font-size:14px;border-radius:4px;box-sizing:border-box;">
     </div>`;
   }).join('');
 
@@ -2868,7 +3456,76 @@ function renderReminders() {
 }
 
 // ===== RENDER DASHBOARD =====
+function checkAndSaveWeeklySnapshot() {
+  const data = getData();
+  if (!data) return;
+  if (!data.weeklySnapshots) data.weeklySnapshots = [];
+
+  // Calculate last week's Monday and Sunday
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dow = today.getDay() === 0 ? 7 : today.getDay(); // Mo=1..So=7
+  const thisMonday = new Date(today);
+  thisMonday.setDate(today.getDate() - (dow - 1));
+  const lastMonday = new Date(thisMonday);
+  lastMonday.setDate(thisMonday.getDate() - 7);
+  const lastSunday = new Date(lastMonday);
+  lastSunday.setDate(lastMonday.getDate() + 6);
+
+  // Compute last week's ISO week ID (same logic as getWeekId but for lastMonday)
+  const lwDate = new Date(lastMonday);
+  const lastWeekId = lwDate.toISOString().split('T')[0];
+
+  // Already snapshotted?
+  if (data.weeklySnapshots.length > 0 && data.weeklySnapshots[0].week === lastWeekId) return;
+
+  // Date range strings
+  const monStr = lastMonday.toISOString().split('T')[0];
+  const sunStr = lastSunday.toISOString().split('T')[0];
+
+  // Training log stats for last week
+  const weekLogs = (data.log || []).filter(e => e.date >= monStr && e.date <= sunStr);
+  const sessions = weekLogs.length;
+  const totalMin = weekLogs.reduce((s, e) => s + (parseInt(e.duration) || 0), 0);
+  const rpeVals = weekLogs.map(e => parseFloat(e.rpe)).filter(v => v > 0);
+  const avgRPE = rpeVals.length ? Math.round((rpeVals.reduce((s, v) => s + v, 0) / rpeVals.length) * 10) / 10 : 0;
+
+  // Checklist adherence: count days with ≥3/5 items checked
+  let checklistDays = 0;
+  for (let d = 0; d < 7; d++) {
+    const dayDate = new Date(lastMonday);
+    dayDate.setDate(lastMonday.getDate() + d);
+    const dateStr = dayDate.toISOString().split('T')[0];
+    const key = 'fos_checklist_' + currentUser + '_' + dateStr;
+    let cl = {};
+    try { cl = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { cl = {}; }
+    const checked = DAILY_ITEMS.filter(item => cl[item.id] === true).length;
+    if (checked >= 3) checklistDays++;
+  }
+
+  // Overall score from benchmarks
+  const scores = calcProfileScores(data);
+  const filledScores = Object.values(scores).filter(v => v !== null);
+  const overallScore = filledScores.length ? Math.round(filledScores.reduce((a, b) => a + b, 0) / filledScores.length) : null;
+
+  // Create snapshot
+  const snapshot = {
+    week: lastWeekId,
+    sessions: sessions,
+    totalMin: totalMin,
+    avgRPE: avgRPE,
+    checklistDays: checklistDays,
+    overallScore: overallScore,
+    date: sunStr
+  };
+
+  data.weeklySnapshots.unshift(snapshot);
+  if (data.weeklySnapshots.length > 52) data.weeklySnapshots.pop();
+  saveData(data);
+}
+
 function renderDashboard() {
+  checkAndSaveWeeklySnapshot();
   renderFightCountdown();
   renderDashStats();
   renderHRV();
@@ -3229,7 +3886,7 @@ function renderTestsPage() {
         + summaryText
         + '</div>'
         + progressItems.map(p =>
-          '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #111;font-family:\'Space Mono\',monospace;font-size:12px;">'
+          '<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #111;font-family:\'Space Mono\',monospace;font-size:12px;gap:4px;">'
           + '<div style="flex:1;min-width:0;">'
           + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:1px;color:#ccc;">' + p.name + '</div>'
           + '<div style="color:#666;font-size:11px;margin-top:2px;">' + p.refVal + ' \u2192 ' + p.curVal + ' ' + p.unit + '</div>'

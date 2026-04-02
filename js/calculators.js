@@ -52,12 +52,12 @@ function calcMakrosErn() {
     <div style="background:#141414;border:1px solid #1e1e1e;border-radius:6px;padding:20px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white);margin-bottom:14px;">MAHLZEITEN-AUFTEILUNG · ${phaseLabel}</div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
-        <div style="display:flex;justify-content:space-between;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.pre} Vor-Training</span><span style="color:#7eb4ff">${Math.round(p*0.08)}g P</span><span style="color:#6dffa7">${Math.round(k*0.1)}g KH</span></div>
-        <div style="display:flex;justify-content:space-between;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.post} Hauptmahlzeit</span><span style="color:#7eb4ff">${Math.round(p*0.22)}g P</span><span style="color:#6dffa7">${Math.round(k*0.2)}g KH</span></div>
-        <div style="display:flex;justify-content:space-between;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.snack} Protein-Bolus</span><span style="color:#7eb4ff">${Math.round(p*0.15)}g P</span><span style="color:#6dffa7">${Math.round(k*0.1)}g KH</span></div>
-        <div style="display:flex;justify-content:space-between;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.lunch} Mittagessen</span><span style="color:#7eb4ff">${Math.round(p*0.22)}g P</span><span style="color:#6dffa7">${Math.round(k*0.3)}g KH</span></div>
-        <div style="display:flex;justify-content:space-between;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.preTrain} Pre-Training</span><span style="color:#7eb4ff">${Math.round(p*0.12)}g P</span><span style="color:#6dffa7">${Math.round(k*0.18)}g KH</span></div>
-        <div style="display:flex;justify-content:space-between;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.recovery} Recovery</span><span style="color:#7eb4ff">${Math.round(p*0.21)}g P (Casein)</span><span style="color:#6dffa7">${Math.round(k*0.12)}g KH</span></div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.pre} Vor-Training</span><span style="color:#7eb4ff">${Math.round(p*0.08)}g P</span><span style="color:#6dffa7">${Math.round(k*0.1)}g KH</span></div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.post} Hauptmahlzeit</span><span style="color:#7eb4ff">${Math.round(p*0.22)}g P</span><span style="color:#6dffa7">${Math.round(k*0.2)}g KH</span></div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.snack} Protein-Bolus</span><span style="color:#7eb4ff">${Math.round(p*0.15)}g P</span><span style="color:#6dffa7">${Math.round(k*0.1)}g KH</span></div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.lunch} Mittagessen</span><span style="color:#7eb4ff">${Math.round(p*0.22)}g P</span><span style="color:#6dffa7">${Math.round(k*0.3)}g KH</span></div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.preTrain} Pre-Training</span><span style="color:#7eb4ff">${Math.round(p*0.12)}g P</span><span style="color:#6dffa7">${Math.round(k*0.18)}g KH</span></div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.recovery} Recovery</span><span style="color:#7eb4ff">${Math.round(p*0.21)}g P (Casein)</span><span style="color:#6dffa7">${Math.round(k*0.12)}g KH</span></div>
       </div>
     </div>`;
 }
@@ -85,8 +85,8 @@ function calcHFZonen() {
   el.innerHTML = `
     <div style="margin-bottom:12px;font-family:'Space Mono',monospace;font-size:12px;color:#555;">Max HF: ${maxHF} bpm · Ruhepuls: ${rest} bpm · Methode: Karvonen</div>
     ${zones.map(z => `
-      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#141414;border-radius:4px;margin-bottom:6px;border-left:3px solid ${z.color};">
-        <div style="min-width:120px;font-size:12px;color:${z.color};font-weight:700;font-family:'Space Mono',monospace;">${z.min}–${z.max} bpm</div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px;background:#141414;border-radius:4px;margin-bottom:6px;border-left:3px solid ${z.color};">
+        <div style="min-width:90px;font-size:12px;color:${z.color};font-weight:700;font-family:'Space Mono',monospace;">${z.min}–${z.max} bpm</div>
         <div><div style="font-size:12px;color:var(--white);font-weight:600;">${z.name}</div><div style="font-size:11px;color:#666;">${z.desc}</div></div>
       </div>`).join('')}`;
 }
@@ -129,7 +129,7 @@ function calcWettkampfPrep() {
     <div style="background:#141414;border:1px solid #1e1e1e;border-radius:6px;padding:20px;border-left:4px solid ${color};">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${color};margin-bottom:8px;">${status}</div>
       <div style="font-size:13px;color:#aaa;line-height:1.8;">${plan}</div>
-      <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+      <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));gap:10px;">
         <div style="text-align:center;padding:12px;background:#1a1a1a;border-radius:4px;">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);">${diff.toFixed(1)}</div>
           <div style="font-size:12px;color:#555;">kg zu reduzieren</div>
@@ -174,7 +174,7 @@ function calc1RM() {
     </div>
     ${percentages.map(p => {
       const val = Math.round(oneRM * p.pct / 100);
-      return `<div style="display:flex;align-items:center;gap:12px;padding:8px;background:#141414;border-radius:4px;margin-bottom:4px;border-left:3px solid ${p.color};">
+      return `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px;background:#141414;border-radius:4px;margin-bottom:4px;border-left:3px solid ${p.color};">
         <div style="min-width:60px;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--white);">${val} kg</div>
         <div style="flex:1;">
           <div style="font-family:'Space Mono',monospace;font-size:12px;color:${p.color};">${p.pct}%</div>

@@ -1429,6 +1429,7 @@ function renderErnaehrungPage() {
     <div class="card-title">KALORIENBEDARF EINES BOXERS</div>
     <div class="card-body" style="line-height:1.8;">
       Ein Boxer der 6–10 Stunden/Woche trainiert verbrennt deutlich mehr als ein normaler Sportler. Grobe Richtwerte:<br><br>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <table class="data-table" style="margin:10px 0;">
         <thead><tr><th>Gewicht</th><th>Aufbau</th><th>Halten</th><th>Cutten</th></tr></thead>
         <tbody>
@@ -1438,6 +1439,7 @@ function renderErnaehrungPage() {
           <tr><td>90 kg</td><td>3500–3900 kcal</td><td>3200–3500 kcal</td><td>2700–3100 kcal</td></tr>
         </tbody>
       </table>
+      </div>
       <div style="font-size:11px;color:#666;">Das sind Richtwerte. Nutze den Makro-Rechner unten für deine persönlichen Werte. Dein Beruf (sitzend vs. körperlich) macht 300–600 kcal Unterschied pro Tag.</div>
     </div>
   </div>
@@ -1460,6 +1462,7 @@ function renderErnaehrungPage() {
       4–5 Mahlzeiten mit je <strong>30–50g Protein</strong>. Jede Mahlzeit muss mindestens ${tt('2.5g Leucin','Leucin ist die Aminosäure die den "Schalter" für Muskelaufbau umlegt. Unter 2.5g pro Mahlzeit wird die Muskelproteinsynthese nicht maximal angeregt. Enthalten in: 25g Whey (2.5g), 3 Eier (1.3g), 100g Hähnchen (2.4g), 200g Skyr (1.6g).')} enthalten — darunter wird die Muskelproteinsynthese nicht maximal angeregt.<br><br>
 
       <strong style="color:var(--blue);">Beste Proteinquellen (sortiert nach biologischer Wertigkeit):</strong><br>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <table class="data-table" style="margin:10px 0;">
         <thead><tr><th>Lebensmittel</th><th>Protein/100g</th><th>Leucin</th><th>Anmerkung</th></tr></thead>
         <tbody>
@@ -1474,6 +1477,7 @@ function renderErnaehrungPage() {
           <tr><td>Linsen (gekocht)</td><td>9g</td><td>0.6g</td><td>Pflanzlich — mit Reis kombinieren</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 
@@ -1481,6 +1485,7 @@ function renderErnaehrungPage() {
     <div class="card-title">KOHLENHYDRATE — DER TREIBSTOFF</div>
     <div class="card-body" style="line-height:1.8;">
       <strong>Wie viel?</strong><br>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <table class="data-table" style="margin:10px 0;">
         <thead><tr><th>Phase</th><th>g/kg/Tag</th><th>Bei ${userW}kg</th><th>Warum</th></tr></thead>
         <tbody>
@@ -1490,6 +1495,7 @@ function renderErnaehrungPage() {
           <tr><td>Cutten</td><td>2.5–4g/kg</td><td>${Math.round(userW*2.5)}–${Math.round(userW*4)}g</td><td>Minimum für Leistungserhalt</td></tr>
         </tbody>
       </table>
+      </div>
 
       <strong>Warum brauchen Boxer so viele Kohlenhydrate?</strong><br>
       Boxtraining ist zu <strong>~70% glykogenbasiert</strong>. Leere Glykogenspeicher = müde Beine, schwache Schläge, langsame Reaktion. Kohlenhydrate sind KEIN Feind — sie sind dein Benzin. Low-Carb-Diäten und Boxen sind nicht kompatibel.<br><br>
@@ -1703,6 +1709,7 @@ function renderErnaehrungPage() {
   <div class="card card-top" style="--ca:var(--blue);margin-bottom:30px;">
     <div class="card-title">TIMING-REGELN AUF EINEN BLICK</div>
     <div class="card-body">
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <table class="data-table">
         <thead><tr><th>Zeitpunkt</th><th>Was</th><th>Was NICHT</th></tr></thead>
         <tbody>
@@ -1714,6 +1721,7 @@ function renderErnaehrungPage() {
           <tr><td>Koffein</td><td>Morgens, max. bis 12:00–13:00</td><td>Nach 14:00 (HWZ 5h → stört Schlaf)</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 
@@ -2019,6 +2027,7 @@ function renderCuttenPage() {
     </div>
   </div>
 
+  <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
   <table class="data-table" style="margin-bottom:24px;">
     <thead><tr><th>Szenario</th><th>Zu reduzieren</th><th>Methode</th><th>Zeitrahmen</th><th>Risiko</th></tr></thead>
     <tbody>
@@ -2028,6 +2037,7 @@ function renderCuttenPage() {
       <tr><td>>8 kg über Klasse</td><td>Klasse wechseln</td><td>Nächsthöhere Klasse</td><td>—</td><td style="color:var(--red)">Leistungsverlust</td></tr>
     </tbody>
   </table>
+  </div>
 
   <div class="section-header"><div class="section-label">Tool</div><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--white);">WETTKAMPF-PREP <span style="color:var(--gold);">RECHNER</span></div></div>
   <div class="calc-box" style="margin-bottom:24px;">
@@ -2609,6 +2619,7 @@ function renderSupplementsPage() {
 
   <div class="info-box info-warn"><span>!</span><div><strong>Priorität:</strong> 1. Schlaf → 2. Ernährung → 3. Training → 4. erst dann Supplements. Keine Ergänzung kompensiert Defizite in den ersten drei.</div></div>
 
+  <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
   <table class="data-table" style="margin-bottom:32px;">
     <thead><tr><th>Supplement</th><th>Dosis & Timing</th><th>Wirkung für Boxer</th><th>Evidenz</th><th>Priorität</th></tr></thead>
     <tbody>
@@ -2625,6 +2636,7 @@ function renderSupplementsPage() {
       }).join('')}
     </tbody>
   </table>
+  </div>
 
   <div class="info-box info-tip"><span>*</span><div><strong>Kreatin + Wettkampf:</strong> 1–2 kg Wassereinlagerung. 4–6 Wochen vor Wiegen pausieren. Kraftgewinn bleibt mehrere Wochen erhalten.</div></div>`;
 }

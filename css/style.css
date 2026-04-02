@@ -382,10 +382,6 @@ body::before {
   gap: 12px;
 }
 .account-grid .form-group { margin-bottom: 0; }
-@media (max-width: 480px) {
-  .ob-container { padding: 32px 24px 28px; margin: 12px; }
-  .account-grid { grid-template-columns: 1fr; }
-}
 
 /* ===== APP LAYOUT ===== */
 #app-screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
@@ -792,21 +788,6 @@ body::before {
   margin: -8px 0 16px 0;
 }
 
-@media (max-width: 700px) {
-  .topbar { flex-wrap: wrap; height: auto; padding: 8px 16px; gap: 4px; }
-  .topbar-nav { order: 3; width: 100%; padding-top: 4px; border-top: 1px solid #1a1a1a; }
-  .topbar-right { gap: 8px; }
-  .nav-hub-btn, .nav-btn { font-size: 11px; height: 40px; padding: 0 8px; }
-  .nav-drop { position: fixed; left: 0; right: 0; top: auto; border-radius: 0; }
-  .share-pill { display: none; }
-  .dash-header { flex-direction: column; }
-  .dash-fight-input { align-items: flex-start; }
-  .dash-profil { flex-direction: column; align-items: center; }
-  .dash-radar-col { width: 100%; max-width: 280px; }
-  .dash-profil { flex-direction: column; align-items: center; }
-  .dash-radar-col { width: 100%; max-width: 280px; }
-  .pd-title { font-size: 17px; }
-}
 
 /* ===== TAGS / PILLS ===== */
 .tag {
@@ -2074,12 +2055,6 @@ body::before {
 }
 .test-card-input:focus { border-color: var(--red); }
 .test-card-input::placeholder { color: #333; }
-@media (max-width: 700px) {
-  .tests-hero { grid-template-columns: 1fr; }
-  .tests-radar-wrap { margin-bottom: 10px; }
-  .test-card { grid-template-columns: 1fr; }
-  .test-card-right { flex-direction: row; align-items: baseline; gap: 12px; }
-}
 
 /* ===== MENTAL PAGE ===== */
 
@@ -2348,25 +2323,7 @@ body::before {
   line-height: 1.9;
 }
 
-@media (max-width: 700px) {
-  .mt-acc-num { font-size: 22px; }
-  .mt-acc-title { font-size: 17px; }
-  .mt-acc-inner { padding-left: 20px; }
-  .mt-ego-fields { grid-template-columns: 1fr; }
-  .mt-hero-quote { font-size: 22px; }
-  .mt-daily { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 480px) {
-  .mt-daily { grid-template-columns: 1fr; }
-  .mt-acc-sub { display: none; }
-}
 
-/* Fight detail responsive */
-@media (max-width: 800px) {
-  .fight-detail-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
 
 /* ===== PROGRESSIVE DISCLOSURE SECTIONS ===== */
 .pd-section {
@@ -2594,18 +2551,6 @@ body::before {
   color: var(--red); letter-spacing: 4px; white-space: nowrap;
 }
 
-/* Mobile */
-@media (max-width: 600px) {
-  .si-hero { padding: 40px 0 30px; }
-  .si-step { flex-direction: column; gap: 8px; padding: 24px 0; }
-  .si-step-num { font-size: 36px; min-width: auto; }
-  .si-clusters { grid-template-columns: repeat(2, 1fr); }
-  .si-barrel { height: 160px; padding: 0 8px; }
-  .si-barrel-stave span { font-size: 6px; }
-  .si-barrel-animate .si-barrel-stave { height: 130px; }
-  .si-barrel-animate .si-stave-weak { height: 55px; }
-  .si-barrel-animate::after { bottom: 55px; }
-}
 
 /* ===== SÄULEN CARDS (Redesigned) ===== */
 .saeulen-cards-wrap { max-width: 860px; margin: 0 auto; }
@@ -2667,13 +2612,6 @@ body::before {
 }
 .sc-card:hover .sc-card-arrow { color: #555; transform: translateX(3px); }
 
-@media (max-width: 600px) {
-  .sc-card-left { min-width: 44px; padding: 16px 10px; }
-  .sc-card-num { font-size: 22px; }
-  .sc-card-title { font-size: 17px; }
-  .sc-card-desc { font-size: 11px; }
-  .sc-card-body { padding: 14px 14px 12px 0; }
-}
 
 /* Legacy compat */
 .saeule-card { cursor: pointer; transition: transform .15s, box-shadow .15s; }
@@ -2740,26 +2678,6 @@ body::before {
 .routine-label { font-size: 13px; color: var(--light); }
 .routine-now { background: rgba(232,0,13,.06); border-radius: 4px; padding: 8px; border-left: 3px solid var(--red); }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
-  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-  .week-grid { grid-template-columns: 1fr; }
-  .phase-cycle { grid-template-columns: 1fr 1fr; }
-  .hrv-grid { grid-template-columns: 1fr; }
-  .form-row, .form-row.triple { grid-template-columns: 1fr; }
-}
-@media (max-width: 600px) {
-  .topbar { padding: 0 12px; }
-  .page { padding: 20px 14px; }
-  .nav-btn { padding: 0 8px; font-size: 11px; }
-  .stat-num { font-size: 36px; }
-  .calc-inputs { grid-template-columns: 1fr; }
-  .ex-detail-page { grid-template-columns: 1fr; }
-  .ex-detail-right { position: static; flex-direction: row; flex-wrap: wrap; justify-content: center; }
-  .search-input { width: 100px; }
-  .search-input:focus { width: 160px; }
-  .search-results { width: 280px; }
-}
 
 /* ===== GOAL FILTER BAR ===== */
 .goal-filter-bar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px; padding:16px; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:8px; }
@@ -2892,14 +2810,189 @@ body::before {
   color: #999;
 }
 
-@media (max-width:600px) {
-  .goal-filter-bar { gap:4px; padding:10px; }
-  .goal-filter-btn { font-size:11px; padding:5px 8px; }
-  .med-goal-card { flex-wrap:wrap; gap:8px; padding:12px; }
-  .med-goal-sub { display:none; }
-  .med-fund-grid { grid-template-columns:1fr; }
-  .supp-article { padding: 0 4px; }
+/* ===== BASE RESPONSIVE IMPROVEMENTS ===== */
+body { overflow-x: hidden; }
+img, iframe, canvas, video { max-width: 100%; height: auto; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { min-width: 400px; }
+
+/* ===== RESPONSIVE: TABLET (max-width: 768px) ===== */
+@media (max-width: 768px) {
+
+  /* --- Navigation --- */
+  .topbar { flex-wrap: wrap; height: auto; padding: 8px 16px; gap: 4px; }
+  .topbar-nav { order: 3; width: 100%; padding-top: 4px; border-top: 1px solid #1a1a1a; flex-wrap: wrap; }
+  .nav-hub-btn, .nav-btn { font-size: 11px; height: 40px; padding: 0 8px; }
+  .nav-drop { position: fixed; left: 0; right: 0; top: auto; border-radius: 0; }
+  .topbar-right { gap: 8px; }
+  .share-pill { display: none; }
+  .search-input { width: 120px; }
+  .search-input:focus { width: 180px; }
+  .search-results { width: 300px; }
+
+  /* --- Dashboard --- */
+  .dash-header { flex-direction: column; }
+  .dash-fight-input { align-items: flex-start; }
+  .dash-profil { flex-direction: column; align-items: center; }
+  .dash-radar-col { width: 100%; max-width: 280px; }
+  .dash-scores-col { width: 100%; }
+
+  /* --- Cards & Grids --- */
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .card { padding: 16px 0; }
+  .form-row, .form-row.triple { flex-direction: column; grid-template-columns: 1fr; }
+
+  /* --- Pages --- */
+  .page { padding: 20px 14px; }
+  .page-title { font-size: clamp(28px, 6vw, 40px); }
+
+  /* --- Wochenplan --- */
+  .week-grid { grid-template-columns: 1fr; }
+  .day-col { min-height: auto; }
+
+  /* --- Tests --- */
+  .tests-hero { grid-template-columns: 1fr; }
+  .tests-radar-wrap { margin-bottom: 10px; }
+  .tests-wrap { max-width: 100%; }
+  .test-card { grid-template-columns: 1fr; }
+  .test-card-right { flex-direction: row; align-items: baseline; gap: 12px; width: 100%; }
+
+  /* --- Ernährung --- */
+  .ern-nav { flex-wrap: wrap; }
+  .ern-nav button { font-size: 11px; padding: 6px 10px; }
+  .calc-inputs { grid-template-columns: 1fr; }
+
+  /* --- Supplements --- */
   .supp-article-layout { grid-template-columns: 1fr; }
   .supp-sidebar { position: static; }
   .supp-sidebar-img { height: 220px; }
+
+  /* --- Mental --- */
+  .mt-ego-fields { grid-template-columns: 1fr; }
+  .mt-daily { grid-template-columns: 1fr 1fr; }
+  .mt-acc-inner { padding-left: 20px; }
+  .mt-acc-num { font-size: 22px; }
+  .mt-acc-title { font-size: 17px; }
+  .mt-hero-quote { font-size: 22px; }
+
+  /* --- Säulen --- */
+  .si-clusters { grid-template-columns: 1fr; }
+  .sc-grid { grid-template-columns: 1fr; }
+  .si-barrel-wrap { margin: 32px auto; }
+  .si-barrel { height: 160px; padding: 0 8px; }
+  .si-barrel-stave span { font-size: 7px; }
+  .si-barrel-animate .si-barrel-stave { height: 130px; }
+  .si-barrel-animate .si-stave-weak { height: 55px; }
+  .si-barrel-animate::after { bottom: 55px; }
+  .si-hero { padding: 40px 0 30px; }
+  .si-step { flex-direction: column; gap: 8px; padding: 24px 0; }
+  .si-step-num { font-size: 36px; min-width: auto; }
+  .sc-card-left { min-width: 44px; padding: 16px 10px; }
+  .sc-card-num { font-size: 22px; }
+  .sc-card-title { font-size: 17px; }
+  .sc-card-desc { font-size: 11px; }
+  .sc-card-body { padding: 14px 14px 12px 0; }
+
+  /* --- Regeneration --- */
+  .hrv-grid { grid-template-columns: 1fr; }
+
+  /* --- Rechner --- */
+  .calc-results { grid-template-columns: 1fr 1fr; }
+
+  /* --- Account --- */
+  .account-grid { grid-template-columns: 1fr; }
+
+  /* --- Modals --- */
+  .modal-overlay.active { align-items: flex-start; }
+  .modal { width: 100%; max-width: 100%; height: 100vh; border-radius: 0; overflow-y: auto; margin: 0; }
+
+  /* --- Fight detail --- */
+  .fight-detail-grid { grid-template-columns: 1fr !important; }
+
+  /* --- Periodisierung --- */
+  .phase-cycle { grid-template-columns: 1fr 1fr; }
+
+  /* --- FAQ --- */
+  .faq-q { font-size: 14px; }
+
+  /* --- Onboarding --- */
+  .ob-container { padding: 32px 24px 28px; margin: 12px; }
+
+  /* --- Progressive Disclosure --- */
+  .pd-title { font-size: 17px; }
+
+  /* --- Exercise detail --- */
+  .ex-detail-page { grid-template-columns: 1fr; }
+  .ex-detail-right { position: static; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+
+  /* --- Mediathek --- */
+  .goal-filter-bar { gap: 4px; padding: 10px; }
+  .goal-filter-btn { font-size: 11px; padding: 5px 8px; }
+  .med-goal-card { flex-wrap: wrap; gap: 8px; padding: 12px; }
+  .med-goal-sub { display: none; }
+  .med-fund-grid { grid-template-columns: 1fr; }
+  .supp-article { padding: 0 4px; }
 }
+
+/* ===== RESPONSIVE: MOBILE (max-width: 480px) ===== */
+@media (max-width: 480px) {
+
+  /* --- Navigation --- */
+  .topbar-logo { font-size: 20px; }
+  .nav-btn, .nav-hub-btn { font-size: 10px; padding: 0 6px; }
+  .topbar { padding: 6px 10px; }
+  .search-input { width: 100px; }
+  .search-input:focus { width: 140px; }
+  .search-results { width: 260px; }
+
+  /* --- Stats --- */
+  .stat-num { font-size: 36px; }
+
+  /* --- Mental --- */
+  .mt-daily { grid-template-columns: 1fr; }
+  .mt-acc-sub { display: none; }
+
+  /* --- Smaller paddings --- */
+  .page { padding: 14px 10px; }
+  .card { padding: 12px 0; }
+  .prog-section { padding: 18px; }
+  .calc-box { padding: 18px; }
+  .log-form-card { padding: 18px; }
+  .modal { padding: 20px; }
+  .fight-countdown { padding: 18px; }
+  .ob-container { padding: 24px 16px 20px; margin: 8px; }
+
+  /* --- RPG name --- */
+  .rpg-name { font-size: 32px; }
+
+  /* --- Phase cycle --- */
+  .phase-cycle { grid-template-columns: 1fr; }
+  .phase-block { padding: 16px; }
+
+  /* --- Grid refinements --- */
+  .grid-4 { grid-template-columns: 1fr; }
+  .calc-results { grid-template-columns: 1fr; }
+
+  /* --- Säulen further reduction --- */
+  .si-clusters { grid-template-columns: 1fr; }
+  .si-barrel-stave span { font-size: 6px; }
+
+  /* --- Account --- */
+  .account-grid { grid-template-columns: 1fr; }
+
+  /* --- Tests --- */
+  .test-card-value { font-size: 32px; }
+
+  /* --- Exercise detail --- */
+  .ex-detail-title { font-size: 28px; }
+
+  /* --- Wochenplan --- */
+  .week-controls { gap: 6px; }
+  .wk-btn { font-size: 11px; padding: 6px 10px; }
+
+  /* --- Log entries --- */
+  .log-entry-card { padding: 14px; gap: 12px; }
+  .log-entry-date { font-size: 24px; }
+}
+
