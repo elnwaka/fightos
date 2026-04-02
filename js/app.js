@@ -63,7 +63,7 @@ function doRegister() {
   users[user] = { pass, onboardingDone: false, created: new Date().toISOString() };
   localStorage.setItem('fos_users', JSON.stringify(users));
   // Init user data
-  const data = { fights: [], log: [], hrv: [], fightDate: '', weekPlan: {} };
+  const data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
   localStorage.setItem('fos_data_' + user, JSON.stringify(data));
   msg.className = 'auth-msg success'; msg.textContent = 'Account erstellt! Logge dich ein.';
   switchAuthTab('login');
@@ -409,7 +409,11 @@ function obComplete() {
   // Set fight date if provided
   const data = getData();
   if (data) {
-    if (obData.fightDate) data.fightDate = obData.fightDate;
+    if (!data.upcomingFights) data.upcomingFights = [];
+    if (obData.fightDate) {
+      data.fightDate = obData.fightDate;
+      data.upcomingFights = [{ date: obData.fightDate, label: '' }];
+    }
     data.weekPlan = generateSmartWeekPlan();
     saveData(data);
   }
@@ -456,7 +460,7 @@ function getData() {
   if (!currentUser) return null;
   const raw = localStorage.getItem('fos_data_' + currentUser);
   if (raw) return JSON.parse(raw);
-  const data = { fights: [], log: [], hrv: [], fightDate: '', weekPlan: getDefaultWeekPlan() };
+  const data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: getDefaultWeekPlan() };
   localStorage.setItem('fos_data_' + currentUser, JSON.stringify(data));
   return data;
 }
@@ -503,9 +507,25 @@ function showPage(pageId) {
 }
 
 // ===== FIGHT DATE SYSTEM =====
+
+// Sync data.fightDate to the nearest future date from upcomingFights
+function syncPrimaryFightDate(data) {
+  if (!data.upcomingFights) data.upcomingFights = [];
+  // Remove past fights (more than 2 days ago) from upcomingFights
+  const cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate() - 2);
+  data.upcomingFights = data.upcomingFights.filter(f => new Date(f.date + 'T00:00:00') >= cutoff);
+  // Sort by date ascending
+  data.upcomingFights.sort((a, b) => a.date.localeCompare(b.date));
+  // Set primary to nearest
+  if (data.upcomingFights.length > 0) {
+    data.fightDate = data.upcomingFights[0].date;
+  }
+}
+
 function updateFightDate() {
   const data = getData();
   if (!data) return;
+  if (!data.upcomingFights) data.upcomingFights = [];
   const dateVal = document.getElementById('fight-date-input').value;
   // Reject dates more than 365 days in the future
   if (dateVal) {
@@ -515,8 +535,86 @@ function updateFightDate() {
       return;
     }
   }
+  const oldPrimary = data.fightDate;
   data.fightDate = dateVal;
+  // Also update or add in upcomingFights (replace first entry or add)
+  if (dateVal) {
+    const existing = data.upcomingFights.find(f => f.date === dateVal);
+    if (!existing) {
+      // If upcomingFights had a primary entry, replace it; otherwise add new
+      const oldIdx = data.upcomingFights.findIndex(f => f.date === oldPrimary);
+      if (oldIdx >= 0) {
+        data.upcomingFights[oldIdx].date = dateVal;
+      } else {
+        data.upcomingFights.unshift({ date: dateVal, label: '' });
+      }
+    }
+    syncPrimaryFightDate(data);
+  } else {
+    // Cleared the input — remove all upcoming fights
+    data.upcomingFights = [];
+    data.fightDate = '';
+  }
+  // Enforce max 5
+  if (data.upcomingFights.length > 5) data.upcomingFights = data.upcomingFights.slice(0, 5);
   saveData(data); // Save first so generateSmartWeekPlan reads the new date
+  data.weekPlan = generateSmartWeekPlan();
+  saveData(data);
+  renderFightCountdown();
+  renderDashStats();
+  renderHinweise();
+  renderWeekPlan();
+}
+
+function addUpcomingFight() {
+  const data = getData();
+  if (!data) return;
+  if (!data.upcomingFights) data.upcomingFights = [];
+  if (data.upcomingFights.length >= 5) {
+    alert('Maximal 5 Kämpfe gleichzeitig möglich.');
+    return;
+  }
+  const label = prompt('Bezeichnung (z.B. "Meisterschaft Tag 2"):', '') || '';
+  const dateStr = prompt('Datum (YYYY-MM-DD):', '');
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    if (dateStr !== null) alert('Ungültiges Datumsformat. Bitte YYYY-MM-DD verwenden.');
+    return;
+  }
+  const diff = Math.ceil((new Date(dateStr + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000);
+  if (diff > 365) {
+    alert('Kampfdatum darf max. 365 Tage in der Zukunft liegen.');
+    return;
+  }
+  // Avoid duplicate dates
+  if (data.upcomingFights.find(f => f.date === dateStr)) {
+    alert('Dieses Datum ist bereits eingetragen.');
+    return;
+  }
+  data.upcomingFights.push({ date: dateStr, label: label });
+  syncPrimaryFightDate(data);
+  // Enforce max 5
+  if (data.upcomingFights.length > 5) data.upcomingFights = data.upcomingFights.slice(0, 5);
+  saveData(data);
+  data.weekPlan = generateSmartWeekPlan();
+  saveData(data);
+  renderFightCountdown();
+  renderDashStats();
+  renderHinweise();
+  renderWeekPlan();
+}
+
+function removeUpcomingFight(dateStr) {
+  const data = getData();
+  if (!data) return;
+  if (!data.upcomingFights) data.upcomingFights = [];
+  data.upcomingFights = data.upcomingFights.filter(f => f.date !== dateStr);
+  if (data.upcomingFights.length > 0) {
+    syncPrimaryFightDate(data);
+  } else {
+    data.fightDate = '';
+  }
+  document.getElementById('fight-date-input').value = data.fightDate || '';
+  saveData(data);
   data.weekPlan = generateSmartWeekPlan();
   saveData(data);
   renderFightCountdown();
@@ -528,8 +626,18 @@ function updateFightDate() {
 function clearFightDate() {
   const data = getData();
   if (!data) return;
-  data.fightDate = '';
-  document.getElementById('fight-date-input').value = '';
+  if (!data.upcomingFights) data.upcomingFights = [];
+  if (data.upcomingFights.length > 1) {
+    // Remove only the primary (first) fight, shift next to primary
+    data.upcomingFights.shift();
+    syncPrimaryFightDate(data);
+    document.getElementById('fight-date-input').value = data.fightDate;
+  } else {
+    // Clear everything
+    data.upcomingFights = [];
+    data.fightDate = '';
+    document.getElementById('fight-date-input').value = '';
+  }
   saveData(data);
   data.weekPlan = generateSmartWeekPlan();
   saveData(data);
@@ -551,15 +659,22 @@ function getFightPhase(daysUntil) {
 function renderFightCountdown() {
   const data = getData();
   if (!data) return;
+  if (!data.upcomingFights) data.upcomingFights = [];
+  if (data.upcomingFights.length > 0) syncPrimaryFightDate(data);
   const display = document.getElementById('fight-countdown-display');
   const input = document.getElementById('fight-date-input');
   if (data.fightDate) input.value = data.fightDate;
+
+  const upcomingListHTML = buildUpcomingFightsHTML(data);
+  const addBtnHTML = (data.upcomingFights.length < 5)
+    ? '<div style="margin-top:10px;"><button onclick="addUpcomingFight()" style="background:none;border:1px dashed #888;color:#888;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:\'Space Mono\',monospace;">+ Weiteren Kampf hinzuf\u00fcgen</button></div>'
+    : '';
 
   if (!data.fightDate) {
     display.innerHTML = `
       <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;letter-spacing:2px;">KEIN KAMPF GEPLANT</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">NORMALES TRAINING</div>
-      <div style="font-size:12px;color:#666;margin-top:12px;">Kein Kampf geplant \u2014 trage ein Datum ein und dein kompletter Plan passt sich automatisch an.</div>`;
+      <div style="font-size:12px;color:#666;margin-top:12px;">Kein Kampf geplant \u2014 trage ein Datum ein und dein kompletter Plan passt sich automatisch an.</div>` + addBtnHTML;
     return;
   }
 
@@ -568,33 +683,56 @@ function renderFightCountdown() {
   const diff = Math.ceil((fightDay - today) / 86400000);
   const phase = getFightPhase(diff);
 
+  let mainHTML = '';
   if (diff < -2) {
-    display.innerHTML = `
+    mainHTML = `
       <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">Letzter Kampf: ${formatDate(data.fightDate)}</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">NORMALES TRAINING</div>
       <div style="font-size:12px;color:#666;margin-top:12px;">Trage den nächsten Kampf ein wenn er feststeht.</div>`;
   } else if (diff < 0) {
-    display.innerHTML = `
+    mainHTML = `
       <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">Kampf war am ${formatDate(data.fightDate)}</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">RECOVERY</div>
       <div style="font-size:12px;color:#666;margin-top:12px;">24–48h leichte Regeneration, dann zurück ins Training.</div>`;
   } else if (diff === 0) {
-    display.innerHTML = `
+    mainHTML = `
       <div class="fight-countdown-num" style="color:var(--red);">HEUTE</div>
       <div class="fight-countdown-label">KAMPFTAG</div>
       <div class="phase-badge phase-kampf" style="margin-top:12px;">FIGHT DAY</div>`;
   } else if (diff === 1) {
-    display.innerHTML = `
+    mainHTML = `
       <div class="fight-countdown-num" style="color:var(--gold);">MORGEN</div>
       <div class="fight-countdown-label">KAMPF · ${formatDate(data.fightDate)}</div>
       <div class="phase-badge phase-taper" style="margin-top:12px;">NUR LEICHT HEUTE</div>`;
   } else {
-    display.innerHTML = `
+    mainHTML = `
       <div class="fight-countdown-num">${diff}</div>
       <div class="fight-countdown-label">TAGE BIS ZUM KAMPF · ${formatDate(data.fightDate)}</div>
       <div class="phase-badge ${phase.cls}" style="margin-top:12px;">${phase.name}</div>
       ${diff <= 4 ? '<div style="font-size:12px;color:#888;margin-top:8px;">Schärfungsphase: Training leicht anpassen, kein neues hartes Sparring mehr.</div>' : '<div style="font-size:12px;color:#666;margin-top:8px;">Normales Training. Erst 3–4 Tage vor Kampf leicht anpassen.</div>'}`;
   }
+
+  display.innerHTML = mainHTML + upcomingListHTML + addBtnHTML;
+}
+
+function buildUpcomingFightsHTML(data) {
+  if (!data.upcomingFights || data.upcomingFights.length <= 1) return '';
+  const additional = data.upcomingFights.slice(1);
+  if (additional.length === 0) return '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const rows = additional.map(function(f) {
+    const d = Math.ceil((new Date(f.date + 'T00:00:00') - today) / 86400000);
+    const daysLabel = d === 0 ? 'HEUTE' : d === 1 ? 'MORGEN' : d > 0 ? d + ' Tage' : 'vorbei';
+    const labelStr = f.label ? (' \u00b7 ' + f.label) : '';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+      '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#aaa;">' + formatDate(f.date) + labelStr + ' <span style="color:#888;">(' + daysLabel + ')</span></span>' +
+      '<button onclick="removeUpcomingFight(\'' + f.date + '\')" style="background:none;border:none;color:#888;cursor:pointer;font-size:13px;padding:2px 6px;" title="Kampf entfernen">&times;</button>' +
+    '</div>';
+  }).join('');
+  return '<div style="margin-top:14px;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">' +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#666;letter-spacing:1.5px;margin-bottom:6px;">WEITERE K\u00c4MPFE</div>' +
+    rows +
+  '</div>';
 }
 
 // ===== DASHBOARD STATS — MEASURABLE PERFORMANCE PROFILE =====
@@ -1383,6 +1521,22 @@ function updateBenchmark(id, val) {
 function openFightModal() {
   document.getElementById('fight-modal').classList.add('active');
   document.getElementById('fight-log-date').value = new Date().toISOString().split('T')[0];
+  // Inject round notes, video link, opponent weaknesses fields
+  if (!document.getElementById('fight-log-round1')) {
+    var submitBtn = document.querySelector('#fight-modal .submit-btn');
+    if (submitBtn) {
+      var ef = document.createElement('div');
+      ef.id = 'fight-extra-fields';
+      ef.innerHTML = '<div style="margin-bottom:16px;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:10px;letter-spacing:1px;">RUNDEN-NOTIZEN</div><div style="margin-bottom:10px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Runde 1</label><textarea id="fight-log-round1" rows="2" placeholder="Notizen zu Runde 1..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea></div><div style="margin-bottom:10px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Runde 2</label><textarea id="fight-log-round2" rows="2" placeholder="Notizen zu Runde 2..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea></div><div style="margin-bottom:10px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Runde 3</label><textarea id="fight-log-round3" rows="2" placeholder="Notizen zu Runde 3..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea></div></div><div class="form-group-inline" style="margin-bottom:16px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Video-Link (optional)</label><input type="url" id="fight-log-video" placeholder="https://..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;box-sizing:border-box;"></div><div class="form-group-inline" style="margin-bottom:16px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Gegner-Schw\u00e4chen</label><textarea id="fight-log-weaknesses" rows="2" placeholder="z.B. Schwache Deckung rechts, langsame F\u00fchrhand..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea></div>';
+      submitBtn.parentNode.insertBefore(ef, submitBtn);
+    }
+  } else {
+    document.getElementById('fight-log-round1').value = '';
+    document.getElementById('fight-log-round2').value = '';
+    document.getElementById('fight-log-round3').value = '';
+    document.getElementById('fight-log-video').value = '';
+    document.getElementById('fight-log-weaknesses').value = '';
+  }
 }
 function closeFightModal() { document.getElementById('fight-modal').classList.remove('active'); }
 
@@ -1390,6 +1544,11 @@ function addFightLog() {
   const data = getData();
   if (!data) return;
   if (!data.fights) data.fights = [];
+  var r1 = document.getElementById('fight-log-round1') ? document.getElementById('fight-log-round1').value.trim() : '';
+  var r2 = document.getElementById('fight-log-round2') ? document.getElementById('fight-log-round2').value.trim() : '';
+  var r3 = document.getElementById('fight-log-round3') ? document.getElementById('fight-log-round3').value.trim() : '';
+  var vidLink = document.getElementById('fight-log-video') ? document.getElementById('fight-log-video').value.trim() : '';
+  var weakn = document.getElementById('fight-log-weaknesses') ? document.getElementById('fight-log-weaknesses').value.trim() : '';
   data.fights.unshift({
     date: document.getElementById('fight-log-date').value,
     opponent: document.getElementById('fight-log-opponent').value || 'Unbekannt',
@@ -1398,12 +1557,24 @@ function addFightLog() {
     style: document.getElementById('fight-log-style').value,
     type: document.getElementById('fight-log-type').value,
     good: document.getElementById('fight-log-good').value,
-    improve: document.getElementById('fight-log-improve').value
+    improve: document.getElementById('fight-log-improve').value,
+    rounds: [
+      { round: 1, notes: r1 },
+      { round: 2, notes: r2 },
+      { round: 3, notes: r3 }
+    ],
+    videoLink: vidLink,
+    opponentWeaknesses: weakn
   });
   saveData(data);
   closeFightModal();
   renderFightLog();
   renderDashStats();
+}
+
+function toggleFightRounds(idx) {
+  var el = document.getElementById('fight-rounds-' + idx);
+  if (el) { el.style.display = el.style.display === 'none' ? 'block' : 'none'; }
 }
 
 function renderFightLog() {
@@ -1414,8 +1585,19 @@ function renderFightLog() {
   el.innerHTML = data.fights.map((f, i) => {
     const color = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
     const label = f.result === 'S' ? 'SIEG' : f.result === 'N' ? 'NIEDERLAGE' : 'UNENTSCHIEDEN';
-    const meta = [label, f.method, f.style, f.type].filter(Boolean).join(' · ');
-    return `<div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #151515;">
+    const meta = [label, f.method, f.style, f.type].filter(Boolean).join(' \u00b7 ');
+    // Round notes (collapsible) — backward compatible
+    var hasRoundNotes = f.rounds && f.rounds.some(function(r) { return r.notes; });
+    var roundsHtml = '';
+    if (hasRoundNotes) {
+      var roundItems = f.rounds.filter(function(r) { return r.notes; }).map(function(r) {
+        return '<div style="margin-bottom:4px;"><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);font-weight:700;">R' + r.round + '</span> <span style="font-family:\'DM Sans\',sans-serif;font-size:11px;color:#aaa;">' + r.notes + '</span></div>';
+      }).join('');
+      roundsHtml = '<div style="margin-top:6px;"><span onclick="toggleFightRounds(' + i + ')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);cursor:pointer;user-select:none;">&#9654; Runden-Notizen</span><div id="fight-rounds-' + i + '" style="display:none;margin-top:4px;padding:6px 8px;background:#111;border-radius:4px;border-left:2px solid var(--blue);">' + roundItems + '</div></div>';
+    }
+    var videoHtml = f.videoLink ? '<a href="' + f.videoLink + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:4px;font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);text-decoration:none;background:#111;padding:2px 8px;border-radius:3px;border:1px solid #252525;">&#9654; Video</a>' : '';
+    var weaknessHtml = f.opponentWeaknesses ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:11px;color:var(--red);margin-top:4px;">\u26A0 ' + f.opponentWeaknesses + '</div>' : '';
+    return `<div style="display:flex;align-items:flex-start;gap:16px;padding:12px 0;border-bottom:1px solid #151515;">
       <div style="min-width:40px;text-align:center;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${color};">${label.charAt(0)}</div>
         <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;">${formatDate(f.date)}</div>
@@ -1423,8 +1605,11 @@ function renderFightLog() {
       <div style="flex:1;">
         <div style="font-size:14px;font-weight:600;color:var(--white);">vs. ${f.opponent}</div>
         <div style="font-size:11px;color:#666;">${meta}</div>
-        ${f.good ? `<div style="font-size:11px;color:var(--green);margin-top:4px;">✓ ${f.good}</div>` : ''}
-        ${f.improve ? `<div style="font-size:11px;color:var(--gold);margin-top:2px;">↑ ${f.improve}</div>` : ''}
+        ${f.good ? `<div style="font-size:11px;color:var(--green);margin-top:4px;">\u2713 ${f.good}</div>` : ''}
+        ${f.improve ? `<div style="font-size:11px;color:var(--gold);margin-top:2px;">\u2191 ${f.improve}</div>` : ''}
+        ${weaknessHtml}
+        ${roundsHtml}
+        ${videoHtml}
       </div>
       <button class="delete-btn" onclick="deleteFight(${i})">×</button>
     </div>`;
@@ -1573,9 +1758,9 @@ function generateSmartWeekPlan() {
 
   // S&C rotation: alternate between sessions A, B, C across free days
   const scSessions = [
-    { title: 'S&C A: Trap Bar DL + Hip Thrust + Pull-Ups', exercises: [{id:'trap-bar-deadlift',label:'Trap Bar DL'},{id:'hip-thrust',label:'Hip Thrust'},{id:'pull-ups',label:'Pull-Ups'}] },
-    { title: 'S&C B: Power Clean + Bankdrücken + Jump Squat', exercises: [{id:'power-clean',label:'Power Clean'},{id:'bench-press',label:'Bankdrücken'},{id:'jump-squat',label:'Jump Squat'}] },
-    { title: 'S&C C: Landmine Press + Med Ball + Pallof Press', exercises: [{id:'landmine-press',label:'Landmine Press'},{id:'med-ball-rotation',label:'Med Ball Rotation'},{id:'pallof-press',label:'Pallof Press'}] }
+    { title: 'S&C A — POWER: Trap Bar DL 4×3 @85% + Weighted Pull-Ups 3×5 + Med Ball Rotational Slams 3×6 + BFR Finisher', exercises: [{id:'trap-bar-deadlift',label:'Trap Bar DL 4×3 @85%'},{id:'weighted-pull-ups',label:'Weighted Pull-Ups 3×5'},{id:'med-ball-rotational-slams',label:'Med Ball Rotational Slams 3×6 (each side)'},{id:'bfr-finisher',label:'BFR: Curls + Tricep Pushdown'}] },
+    { title: 'S&C B — EXPLOSIVE: Hang Power Clean 4×3 + Bent-Over Row 3×6 + Jump Squat 3×5 + Rotational Med Ball Chest Pass 3×6 + BFR Finisher', exercises: [{id:'hang-power-clean',label:'Hang Power Clean 4×3'},{id:'bent-over-row',label:'Bent-Over Row 3×6'},{id:'jump-squat',label:'Jump Squat 3×5'},{id:'rotational-med-ball-chest-pass',label:'Rotational Med Ball Chest Pass 3×6 (each side)'},{id:'bfr-finisher',label:'BFR: Curls + Tricep Pushdown'}] },
+    { title: 'S&C C — COMBAT STRENGTH: Landmine Press 3×5 + Single-Arm Cable Row 3×8 + Med Ball Scoop Toss 3×6 + Pallof Press w/ Rotation 3×8 + BFR Finisher', exercises: [{id:'landmine-press',label:'Landmine Press 3×5 (each arm)'},{id:'single-arm-cable-row',label:'Single-Arm Cable Row 3×8 (each arm)'},{id:'med-ball-scoop-toss',label:'Med Ball Scoop Toss 3×6'},{id:'pallof-press-rotation',label:'Pallof Press w/ Rotation 3×8 (each side)'},{id:'bfr-finisher',label:'BFR: Curls + Tricep Pushdown'}] }
   ];
   let scIdx = 0;
 
@@ -2251,7 +2436,7 @@ function buildDailyRoutineHTML() {
     } else {
       // Normaler freier Tag: S&C erlaubt
       const scTime = timeAdd(wakeTime, 0, 20);
-      routine.push({ time: scTime, label: 'S&C: Trap Bar DL + Jump Squats + Power Clean', color: 'var(--red)' });
+      routine.push({ time: scTime, label: 'S&C: Power / Explosive / Combat Strength (Rotation)', color: 'var(--red)' });
       routine.push({ time: timeAdd(scTime, 0, 40), label: 'BFR Finisher (Arme / Beine)', color: 'var(--red)' });
       routine.push({ time: timeAdd(scTime, 0, 50), label: 'Nackentraining 10 Min.', color: 'var(--red)' });
       if (!isWeekend) {
@@ -2654,8 +2839,26 @@ function saveAccountPage() {
   // Update fight date + regenerate week plan
   const data = getData();
   if (data) {
+    if (!data.upcomingFights) data.upcomingFights = [];
     const newFight = document.getElementById('acc-fightdate').value || '';
-    data.fightDate = newFight;
+    if (newFight) {
+      // Update primary in upcomingFights or add it
+      if (data.upcomingFights.length > 0) {
+        data.upcomingFights[0].date = newFight;
+      } else {
+        data.upcomingFights.push({ date: newFight, label: '' });
+      }
+      syncPrimaryFightDate(data);
+    } else {
+      // Cleared — remove primary, shift if others exist
+      if (data.upcomingFights.length > 1) {
+        data.upcomingFights.shift();
+        syncPrimaryFightDate(data);
+      } else {
+        data.upcomingFights = [];
+        data.fightDate = '';
+      }
+    }
     data.weekPlan = generateSmartWeekPlan();
     saveData(data);
   }
@@ -2737,6 +2940,102 @@ function renderTestsPage() {
       ${weakest ? `<div class="tests-weakest">Schwächstes Glied: <strong>${weakest.label} (${weakest.val}%)</strong> — das Fass-Prinzip: Dein Gesamtniveau wird von der schwächsten Säule begrenzt.</div>` : ''}
     </div>
   </div>`;
+
+  // --- DEIN FORTSCHRITT section ---
+  let progressHTML = '';
+  {
+    const SPARK_CHARS = '\u2581\u2582\u2583\u2585\u2586\u2587';
+    const eightWeeksMs = 8 * 7 * 86400000;
+    const cutoff = new Date(Date.now() - eightWeeksMs);
+    const progressItems = [];
+
+    BENCHMARKS.forEach(b => {
+      const hist = data.benchmarkHistory[b.id] || [];
+      if (hist.length < 2) return;
+
+      const current = hist[hist.length - 1];
+      // Find entry closest to 8 weeks ago, or use earliest
+      let refEntry = hist[0];
+      for (let i = hist.length - 1; i >= 0; i--) {
+        if (new Date(hist[i].date) <= cutoff) { refEntry = hist[i]; break; }
+      }
+      if (refEntry === current) refEntry = hist[0]; // fallback to earliest if only recent entries
+
+      const curVal = current.value;
+      const refVal = refEntry.value;
+      const diff = curVal - refVal;
+      const absDiff = Math.abs(diff);
+      const pctChange = refVal !== 0 ? Math.round(Math.abs(diff / refVal) * 100) : 0;
+      const improved = b.inverse ? diff < 0 : diff > 0;
+      const declined = b.inverse ? diff > 0 : diff < 0;
+      const color = improved ? 'var(--green)' : declined ? 'var(--red)' : '#555';
+      const arrow = improved ? '\u2191' : declined ? '\u2193' : '\u2192';
+
+      // Sparkline using block characters
+      const vals = hist.map(h => h.value);
+      const minV = Math.min(...vals), maxV = Math.max(...vals);
+      const range = maxV - minV || 1;
+      const sparkline = vals.map(v => {
+        let idx = Math.round(((v - minV) / range) * (SPARK_CHARS.length - 1));
+        if (b.inverse) idx = SPARK_CHARS.length - 1 - idx;
+        return SPARK_CHARS[idx];
+      }).join('');
+
+      progressItems.push({
+        name: b.name,
+        unit: b.unit,
+        curVal, refVal, diff, absDiff, pctChange, improved, declined, color, arrow, sparkline,
+        clusterColor: b.color
+      });
+    });
+
+    if (progressItems.length > 0) {
+      // Overall summary
+      const improvementPcts = progressItems.filter(p => p.pctChange > 0);
+      const improvedCount = progressItems.filter(p => p.improved).length;
+      const avgPct = improvementPcts.length ? Math.round(improvementPcts.reduce((a, p) => a + (p.improved ? p.pctChange : -p.pctChange), 0) / improvementPcts.length) : 0;
+      let summaryText;
+      if (improvedCount > 0 && avgPct > 0) {
+        summaryText = 'Deine Leistung hat sich im Schnitt um <strong style="color:var(--green);">' + avgPct + '%</strong> verbessert (' + improvedCount + '/' + progressItems.length + ' Tests \u2191)';
+      } else if (avgPct < 0) {
+        summaryText = 'Achtung: Deine Leistung ist im Schnitt um <strong style="color:var(--red);">' + Math.abs(avgPct) + '%</strong> gesunken';
+      } else {
+        summaryText = 'Deine Werte sind stabil geblieben \u2014 weiter dranbleiben!';
+      }
+
+      progressHTML = '<div class="tests-cluster" style="margin-bottom:20px;">'
+        + '<div class="tests-cluster-header">'
+        + '<span class="tests-cluster-title" style="color:var(--gold);">DEIN FORTSCHRITT</span>'
+        + '<span class="tests-cluster-avg" style="color:#888;">Vergleich mit vor 8 Wochen</span>'
+        + '</div>'
+        + '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#aaa;padding:10px 14px 6px;border-bottom:1px solid #1a1a1a;">'
+        + summaryText
+        + '</div>'
+        + progressItems.map(p =>
+          '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #111;font-family:\'Space Mono\',monospace;font-size:12px;">'
+          + '<div style="flex:1;min-width:0;">'
+          + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:1px;color:#ccc;">' + p.name + '</div>'
+          + '<div style="color:#666;font-size:11px;margin-top:2px;">' + p.refVal + ' \u2192 ' + p.curVal + ' ' + p.unit + '</div>'
+          + '</div>'
+          + '<div style="text-align:center;padding:0 12px;font-size:11px;color:#555;letter-spacing:1px;" title="Verlauf">' + p.sparkline + '</div>'
+          + '<div style="text-align:right;min-width:90px;">'
+          + '<span style="color:' + p.color + ';font-weight:bold;font-size:14px;">' + p.arrow + ' ' + (p.absDiff % 1 === 0 ? p.absDiff : p.absDiff.toFixed(1)) + ' ' + p.unit + '</span>'
+          + '<div style="color:' + p.color + ';font-size:11px;">' + p.pctChange + '%</div>'
+          + '</div>'
+          + '</div>'
+        ).join('')
+        + '</div>';
+    } else {
+      progressHTML = '<div class="tests-cluster" style="margin-bottom:20px;">'
+        + '<div class="tests-cluster-header">'
+        + '<span class="tests-cluster-title" style="color:var(--gold);">DEIN FORTSCHRITT</span>'
+        + '</div>'
+        + '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;padding:14px;text-align:center;">'
+        + 'Trage regelm\u00e4\u00dfig Werte ein um deinen Fortschritt zu sehen'
+        + '</div>'
+        + '</div>';
+    }
+  }
 
   // Cluster sections with test cards
   const clusters = ['Maximalkraft', 'Explosivität', 'Ausdauer', 'Körper'];
@@ -2868,6 +3167,7 @@ function renderTestsPage() {
     </div>
     <div class="tests-wrap">
       ${heroHTML}
+      ${progressHTML}
       ${benchHTML}
     </div>
     <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;">
