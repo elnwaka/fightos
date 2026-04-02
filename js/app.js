@@ -2013,7 +2013,7 @@ function openFightDetail(idx) {
   const label = f.result === 'S' ? 'SIEG' : f.result === 'N' ? 'NIEDERLAGE' : 'UNENTSCHIEDEN';
   const ytId = getYouTubeId(f.videoLink);
 
-  // Ensure rounds array exists
+  // Ensure rounds + ratings exist
   if (!f.rounds || f.rounds.length < 3) {
     f.rounds = [
       { round: 1, notes: (f.rounds && f.rounds[0]) ? f.rounds[0].notes : '' },
@@ -2021,11 +2021,19 @@ function openFightDetail(idx) {
       { round: 3, notes: (f.rounds && f.rounds[2]) ? f.rounds[2].notes : '' }
     ];
   }
+  if (!f.ratings) f.ratings = {};
+  if (!f.keyMoments) f.keyMoments = '';
+  if (!f.nextSteps) f.nextSteps = '';
 
-  // Meta pills
-  const pills = [formatDate(f.date), f.method, f.style, f.type].filter(Boolean).map(t =>
-    '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;background:#0e0e0e;padding:3px 10px;border-radius:3px;">' + t + '</span>'
-  ).join('');
+  // Self-rating categories
+  const ratingCats = [
+    { key: 'jab', label: 'JAB' },
+    { key: 'defense', label: 'DECKUNG' },
+    { key: 'footwork', label: 'FUSSARBEIT' },
+    { key: 'power', label: 'SCHLAGKRAFT' },
+    { key: 'cardio', label: 'KONDITION' },
+    { key: 'mental', label: 'MENTAL' }
+  ];
 
   // Video section
   let videoHTML;
@@ -2034,7 +2042,7 @@ function openFightDetail(idx) {
       <div style="width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;box-shadow:0 0 40px rgba(232,0,13,.08);">
         <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&playsinline=1" style="width:100%;height:100%;border:none;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
       </div>
-      <div style="display:flex;gap:16px;margin-top:10px;">
+      <div style="display:flex;gap:16px;margin-top:8px;">
         <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;text-decoration:none;">Auf YouTube öffnen ↗</a>
         <span onclick="showVideoInput(${idx})" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;cursor:pointer;">Video ändern</span>
       </div>
@@ -2050,69 +2058,143 @@ function openFightDetail(idx) {
       <div id="video-input-area" style="margin-top:10px;"></div>`;
   }
 
-  // Editable field helper
-  function editField(fieldName, val, placeholder, accentColor) {
-    const escaped = (val || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    const display = val || '<span style="color:#222;">' + placeholder + '</span>';
-    return `<div id="fd-${fieldName}" onclick="makeFightFieldEditable(${idx},'${fieldName}',this)" style="font-size:14px;color:#888;line-height:1.7;min-height:24px;cursor:text;padding:4px 0;">${display}</div>`;
-  }
+  // Sidebar: Self-ratings (6 categories, 1-5 clickable dots)
+  const ratingsHTML = ratingCats.map(c => {
+    const val = f.ratings[c.key] || 0;
+    const dots = [1,2,3,4,5].map(n =>
+      `<span onclick="setFightRating(${idx},'${c.key}',${n})" style="display:inline-block;width:16px;height:16px;border-radius:50%;margin-right:4px;cursor:pointer;transition:all .15s;${n <= val ? 'background:var(--red);' : 'background:#1a1a1a;border:1px solid #222;'}" onmouseenter="this.style.transform='scale(1.2)'" onmouseleave="this.style.transform='scale(1)'"></span>`
+    ).join('');
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;letter-spacing:1px;min-width:80px;">${c.label}</span>
+      <div>${dots}</div>
+    </div>`;
+  }).join('');
+
+  // Average rating
+  const ratedVals = ratingCats.map(c => f.ratings[c.key] || 0).filter(v => v > 0);
+  const avgRating = ratedVals.length ? (ratedVals.reduce((a,b) => a+b,0) / ratedVals.length).toFixed(1) : '—';
+
+  // Round winner badges
+  const roundWinnerHTML = [1,2,3].map(r => {
+    const w = f.rounds[r-1] ? (f.rounds[r-1].winner || '') : '';
+    return `<div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#333;">R${r}</span>
+      ${['ich','gegner','unklar'].map(v => `<span onclick="setRoundWinner(${idx},${r-1},'${v}')" style="font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border-radius:3px;cursor:pointer;transition:all .15s;${w === v ? (v==='ich'?'background:var(--green);color:#000;':'background:var(--red);color:#fff;') : 'background:#111;color:#333;'}">${v === 'ich' ? 'ICH' : v === 'gegner' ? 'ER' : '?'}</span>`).join('')}
+    </div>`;
+  }).join('');
 
   el.innerHTML = `
   <!-- BACK -->
-  <div style="padding-bottom:20px;">
+  <div style="padding-bottom:16px;">
     <button onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:11px;color:#444;background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">← Alle Kämpfe</button>
   </div>
 
   <!-- HEADER -->
-  <div style="margin-bottom:32px;">
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,44px);color:${color};letter-spacing:2px;">${label}</span>
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,36px);color:${color};letter-spacing:2px;">${label}</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:#444;">${f.method || ''}</span>
+  </div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--white);letter-spacing:3px;line-height:.9;margin-bottom:10px;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</div>
+  <div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;margin-bottom:28px;">${formatDate(f.date)}${f.style ? ' · ' + f.style : ''}${f.type ? ' · ' + f.type : ''}</div>
+
+  <!-- MAIN: VIDEO LEFT + SIDEBAR RIGHT -->
+  <div style="display:grid;grid-template-columns:${isMobile() ? '1fr' : '1fr 280px'};gap:24px;margin-bottom:36px;" class="fight-detail-grid">
+
+    <!-- LEFT: VIDEO -->
+    <div>${videoHTML}</div>
+
+    <!-- RIGHT: SIDEBAR -->
+    <div>
+      <!-- Self-Rating -->
+      <div style="margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SELBSTBEWERTUNG</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${avgRating !== '—' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:#333;">/5</span></span>
+        </div>
+        ${ratingsHTML}
+      </div>
+
+      <!-- Round Scoring -->
+      <div style="padding-top:16px;border-top:1px solid #111;margin-bottom:20px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:10px;">RUNDEN-SCORING</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">${roundWinnerHTML}</div>
+      </div>
+
+      <!-- Quick Notes -->
+      <div style="padding-top:16px;border-top:1px solid #111;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">KEY MOMENTS</div>
+        <div id="fd-keyMoments" onclick="makeFightFieldEditable(${idx},'keyMoments',this)" style="font-size:13px;color:#666;line-height:1.6;cursor:text;min-height:20px;">${f.keyMoments || '<span style="color:#222;">z.B. R1 2:15 guter Konter, R2 Clinch-Problem...</span>'}</div>
+      </div>
     </div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--white);letter-spacing:3px;line-height:.9;margin-bottom:12px;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;">${pills}</div>
   </div>
 
-  <!-- VIDEO -->
-  <div style="margin-bottom:40px;">
-    ${videoHTML}
-  </div>
-
-  <!-- ANALYSE CARDS -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:40px;">
-    <div style="padding:20px 0;border-bottom:1px solid #1a1a1a;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green);letter-spacing:1.5px;margin-bottom:10px;">WAS LIEF GUT</div>
-      ${editField('good', f.good, 'Klicke hier um Notizen hinzuzufügen...', 'green')}
+  <!-- ANALYSE — full width below -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
+    <div style="padding:16px 0;border-bottom:1px solid #111;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--green);letter-spacing:1px;margin-bottom:8px;">WAS LIEF GUT</div>
+      <div id="fd-good" onclick="makeFightFieldEditable(${idx},'good',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.good || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
-    <div style="padding:20px 0;border-bottom:1px solid #1a1a1a;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red);letter-spacing:1.5px;margin-bottom:10px;">WAS MUSS BESSER WERDEN</div>
-      ${editField('improve', f.improve, 'Klicke hier um Notizen hinzuzufügen...', 'red')}
+    <div style="padding:16px 0;border-bottom:1px solid #111;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red);letter-spacing:1px;margin-bottom:8px;">WAS MUSS BESSER WERDEN</div>
+      <div id="fd-improve" onclick="makeFightFieldEditable(${idx},'improve',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.improve || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
-    <div style="padding:20px 0;border-bottom:1px solid #1a1a1a;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--blue);letter-spacing:1.5px;margin-bottom:10px;">GEGNER-SCHWÄCHEN</div>
-      ${editField('opponentWeaknesses', f.opponentWeaknesses, 'Klicke hier um Notizen hinzuzufügen...', 'blue')}
+    <div style="padding:16px 0;border-bottom:1px solid #111;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">GEGNER-SCHWÄCHEN</div>
+      <div id="fd-opponentWeaknesses" onclick="makeFightFieldEditable(${idx},'opponentWeaknesses',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.opponentWeaknesses || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
   </div>
 
-  <!-- RUNDEN -->
-  <div style="margin-bottom:40px;">
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;letter-spacing:3px;margin-bottom:16px;">RUNDEN-ANALYSE</div>
+  <!-- RUNDEN-ANALYSE -->
+  <div style="margin-bottom:36px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1.5px;margin-bottom:14px;">RUNDEN-ANALYSE</div>
     ${[1,2,3].map(r => {
       const notes = f.rounds[r-1] ? f.rounds[r-1].notes : '';
+      const w = f.rounds[r-1] ? (f.rounds[r-1].winner || '') : '';
+      const dotColor = w === 'ich' ? 'var(--green)' : w === 'gegner' ? 'var(--red)' : '#222';
       return `<div style="display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #111;align-items:flex-start;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--blue);opacity:.3;line-height:1;min-width:32px;">${r}</div>
+        <div style="text-align:center;min-width:36px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#222;line-height:1;">${r}</div>
+          <div style="width:8px;height:8px;border-radius:50%;background:${dotColor};margin:4px auto 0;"></div>
+        </div>
         <div style="flex:1;" id="fd-round${r}" onclick="makeFightFieldEditable(${idx},'round${r}',this)">
-          <div style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;padding:4px 0;">${notes || '<span style="color:#222;">Wie lief diese Runde? Klicke zum Eintragen...</span>'}</div>
+          <div style="font-size:14px;color:#777;line-height:1.7;cursor:text;min-height:24px;">${notes || '<span style="color:#1a1a1a;">Wie lief diese Runde?</span>'}</div>
         </div>
       </div>`;
     }).join('')}
   </div>
 
+  <!-- NÄCHSTE SCHRITTE -->
+  <div style="margin-bottom:36px;padding:20px 0;border-top:1px solid #111;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1.5px;margin-bottom:10px;">WAS ICH NÄCHSTES MAL ANDERS MACHE</div>
+    <div id="fd-nextSteps" onclick="makeFightFieldEditable(${idx},'nextSteps',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.nextSteps || '<span style="color:#222;">Konkrete Maßnahmen für das nächste Training / den nächsten Kampf...</span>'}</div>
+  </div>
+
   <!-- ACTIONS -->
-  <div style="display:flex;flex-wrap:wrap;gap:12px;padding-top:20px;border-top:1px solid #111;">
-    <button onclick="if(confirm('Diesen Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);padding:10px 20px;border-radius:4px;cursor:pointer;min-height:44px;">KAMPF LÖSCHEN</button>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;padding-top:16px;border-top:1px solid #111;">
+    <button onclick="if(confirm('Diesen Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;background:none;border:1px solid #1a1a1a;padding:10px 20px;border-radius:4px;cursor:pointer;min-height:44px;">KAMPF LÖSCHEN</button>
   </div>`;
 
   showPage('fight-detail');
+}
+
+// Rating + Round winner helpers
+function setFightRating(idx, key, val) {
+  var data = getData();
+  if (!data || !data.fights[idx]) return;
+  if (!data.fights[idx].ratings) data.fights[idx].ratings = {};
+  data.fights[idx].ratings[key] = val;
+  saveData(data);
+  openFightDetail(idx);
+}
+
+function setRoundWinner(idx, roundIdx, winner) {
+  var data = getData();
+  if (!data || !data.fights[idx]) return;
+  if (!data.fights[idx].rounds) return;
+  var current = data.fights[idx].rounds[roundIdx].winner;
+  data.fights[idx].rounds[roundIdx].winner = (current === winner) ? '' : winner;
+  saveData(data);
+  openFightDetail(idx);
 }
 
 // Inline video URL input
