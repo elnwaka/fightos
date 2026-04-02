@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FightOS — Elite Boxer Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ AUTH SCREEN ============ -->
+<div id="auth-screen" class="active">
+  <div class="auth-bg"></div>
+  <div class="auth-box">
+    <div class="auth-logo">FIGHT<span>OS</span></div>
+    <div class="auth-sub">Elite Boxer Platform</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Registrieren</button>
+    </div>
+    <div id="auth-login">
+      <div class="form-group">
+        <label class="form-label">Benutzername</label>
+        <input class="form-input" id="login-user" placeholder="Dein Name" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Passwort</label>
+        <input class="form-input" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-red" onclick="doLogin()">EINLOGGEN</button>
+    </div>
+    <div id="auth-register" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Benutzername</label>
+        <input class="form-input" id="reg-user" placeholder="Dein Name" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Passwort</label>
+        <input class="form-input" id="reg-pass" type="password" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button class="btn btn-red" onclick="doRegister()">REGISTRIEREN</button>
+    </div>
+    <div class="auth-msg" id="auth-msg"></div>
+  </div>
+</div>
+
+<!-- ============ ONBOARDING WIZARD ============ -->
+<div id="onboarding-screen">
+  <div class="ob-bg"></div>
+  <div class="ob-container">
+    <div class="ob-logo">FIGHT<span>OS</span></div>
+    <div class="ob-progress">
+      <div class="ob-progress-bar"><div class="ob-progress-fill" id="ob-progress-fill"></div></div>
+      <div class="ob-step-label" id="ob-step-label"></div>
+    </div>
+    <div id="ob-steps"></div>
+    <div class="ob-msg" id="ob-msg"></div>
+    <div class="ob-nav">
+      <button class="ob-btn-back" id="ob-back" onclick="obPrev()">ZURÜCK</button>
+      <button class="ob-btn-next" id="ob-next" onclick="obNext()">WEITER</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SCREEN ============ -->
+<div id="app-screen">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-logo" onclick="showPage('dashboard')">FIGHT<span>OS</span></div>
+    <div class="topbar-nav">
+      <button class="nav-btn active" data-page="dashboard">Übersicht</button>
+      <div class="nav-hub">
+        <button class="nav-hub-btn" style="--hc:var(--red);">Training ▾</button>
+        <div class="nav-drop">
+          <button class="nav-drop-item" data-page="wochenplan">Wochenplan</button>
+          <button class="nav-drop-item" data-page="uebungen">Übungen</button>
+          <button class="nav-drop-item" data-page="tests">Leistungstests</button>
+          <button class="nav-drop-item" data-page="periodisierung">Periodisierung</button>
+        </div>
+      </div>
+      <div class="nav-hub">
+        <button class="nav-hub-btn" style="--hc:var(--green);">Versorgung ▾</button>
+        <div class="nav-drop">
+          <button class="nav-drop-item" data-page="ernaehrung">Ernährung</button>
+          <button class="nav-drop-item" data-page="cutten">Gewicht machen</button>
+          <button class="nav-drop-item" data-page="supplements">Supplements</button>
+          <button class="nav-drop-item" data-page="regeneration">Recovery</button>
+        </div>
+      </div>
+      <div class="nav-hub">
+        <button class="nav-hub-btn" style="--hc:var(--blue);">Wissen ▾</button>
+        <div class="nav-drop">
+          <button class="nav-drop-item" data-page="saeulen">8 Säulen</button>
+          <button class="nav-drop-item" data-page="mental">Mentaltraining</button>
+          <button class="nav-drop-item" data-page="rechner">Rechner</button>
+          <button class="nav-drop-item" data-page="faq">FAQ & Mythen</button>
+        </div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-container">
+        <input type="text" id="global-search" class="search-input" placeholder="Suche..." oninput="handleSearch(this.value)" onfocus="document.getElementById('search-results').style.display='block'" onblur="setTimeout(()=>document.getElementById('search-results').style.display='none',200)">
+        <div id="search-results" class="search-results"></div>
+      </div>
+      <span class="user-pill" id="user-pill" onclick="showPage('account')" style="cursor:pointer;" title="Mein Account"></span>
+      <button class="topbar-icon-btn" onclick="showPage('log')" title="Trainingslog">&#9998;</button>
+      <span class="share-pill" onclick="sharePlan()">Teilen</span>
+      <button class="logout-btn" onclick="doLogout()" title="Logout">⏻</button>
+    </div>
+  </div>
+
+  <!-- ===== PAGE: DASHBOARD ===== -->
+  <div class="page active" id="page-dashboard">
+
+    <!-- DASHBOARD HEADER -->
+    <div class="dash-header">
+      <div>
+        <div class="rpg-name" id="rpg-player-name">FIGHTER</div>
+        <div class="rpg-subtitle" id="rpg-subtitle">Willkommen zurück</div>
+      </div>
+      <div class="dash-fight-input">
+        <label style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey);">NÄCHSTER KAMPF</label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="date" id="fight-date-input" class="form-input" style="width:auto;max-width:160px;padding:6px 10px;font-size:12px;" onchange="updateFightDate()">
+          <button class="submit-btn" style="padding:4px 12px;font-size:11px;" onclick="clearFightDate()">×</button>
+        </div>
+        <div id="fight-countdown-display"></div>
+      </div>
+    </div>
+
+    <!-- PROFIL: Radar + Scores -->
+    <div class="dash-profil">
+      <div class="dash-radar-col">
+        <canvas id="rpg-radar" width="280" height="280"></canvas>
+      </div>
+      <div class="dash-scores-col">
+        <div id="dash-stats"></div>
+      </div>
+    </div>
+
+    <!-- HRV Schnelleingabe -->
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);">HRV AMPEL</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="number" id="hrv-input" class="form-input" style="width:90px;padding:6px 10px;" placeholder="RMSSD" min="1" max="200">
+          <button class="submit-btn" style="padding:6px 14px;font-size:12px;" onclick="logHRV()">Log</button>
+        </div>
+      </div>
+      <div id="hrv-display" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- Hinweise -->
+    <div class="card" style="margin-bottom:20px;" id="dash-hinweise"></div>
+
+    <!-- Benchmark-Kurzstatus -->
+    <div class="card" style="margin-bottom:20px;cursor:pointer;" onclick="showPage('tests')">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);">LEISTUNGS-TESTS</div>
+          <div id="bench-summary" style="font-family:'Space Mono',monospace;font-size:11px;color:#555;margin-top:4px;"></div>
+        </div>
+        <div style="font-size:11px;color:var(--red);font-family:'Space Mono',monospace;">ÖFFNEN →</div>
+      </div>
+    </div>
+
+    <!-- Tagesablauf mit integrierter Checklist -->
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;cursor:pointer;" onclick="toggleSection('daily-combined')">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);">DEIN TAG HEUTE <span class="section-arrow" style="font-size:14px;">&#9662;</span></div>
+        <div id="checklist-score" style="font-family:'Space Mono',monospace;font-size:11px;color:#555;"></div>
+      </div>
+      <div id="daily-combined"></div>
+    </div>
+
+    <!-- Fight Log -->
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;cursor:pointer;" onclick="toggleSection('fight-log-list')">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);">KAMPF-HISTORIE <span class="section-arrow" style="font-size:14px;">▾</span></div>
+        <button class="submit-btn" style="padding:5px 12px;font-size:11px;" onclick="event.stopPropagation();openFightModal()">+ Kampf</button>
+      </div>
+      <div id="fight-log-list"></div>
+    </div>
+
+    <!-- Recent Training -->
+    <div class="card">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:14px;cursor:pointer;" onclick="toggleSection('recent-log')">LETZTE EINHEITEN <span class="section-arrow" style="font-size:14px;">▾</span></div>
+      <div id="recent-log"></div>
+    </div>
+  </div>
+
+  <!-- ===== PAGE: SÄULEN ===== -->
+  <div class="page" id="page-saeulen"></div>
+
+  <!-- ===== PAGE: SÄULE DETAIL ===== -->
+  <div class="page" id="page-saeulen-detail"></div>
+
+  <!-- ===== PAGE: WOCHENPLAN ===== -->
+  <div class="page" id="page-wochenplan"></div>
+
+  <!-- ===== PAGE: ÜBUNGEN ===== -->
+  <div class="page" id="page-uebungen"></div>
+
+  <!-- ===== PAGE: ÜBUNG DETAIL ===== -->
+  <div class="page" id="page-uebung-detail"></div>
+
+
+  <!-- ===== PAGE: ERNÄHRUNG ===== -->
+  <div class="page" id="page-ernaehrung"></div>
+
+  <!-- ===== PAGE: CUTTEN ===== -->
+  <div class="page" id="page-cutten"></div>
+
+  <!-- ===== PAGE: PERIODISIERUNG ===== -->
+  <div class="page" id="page-periodisierung"></div>
+
+  <!-- ===== PAGE: REGENERATION ===== -->
+  <div class="page" id="page-regeneration"></div>
+
+  <!-- ===== PAGE: SUPPLEMENTS ===== -->
+  <div class="page" id="page-supplements"></div>
+
+  <!-- ===== PAGE: SUPPLEMENT DETAIL ===== -->
+  <div class="page" id="page-supplement-detail"></div>
+
+  <!-- ===== PAGE: MENTAL ===== -->
+  <div class="page" id="page-mental"></div>
+
+  <!-- ===== PAGE: RECHNER ===== -->
+  <div class="page" id="page-rechner"></div>
+
+  <!-- ===== PAGE: TESTS ===== -->
+  <div class="page" id="page-tests"></div>
+
+  <!-- ===== PAGE: FAQ ===== -->
+  <div class="page" id="page-faq"></div>
+  <div class="page" id="page-account"></div>
+
+  <!-- ===== PAGE: TRAINING LOG ===== -->
+  <div class="page" id="page-log">
+    <div class="page-header">
+      <div class="page-title">TRAINING <span>LOG</span></div>
+      <div class="page-sub">Dokumentiere jede Einheit</div>
+    </div>
+    <div class="log-form-card">
+      <div class="form-row triple">
+        <div class="form-group-inline">
+          <label>Datum</label>
+          <input type="date" id="log-date">
+        </div>
+        <div class="form-group-inline">
+          <label>Typ</label>
+          <select id="log-type">
+            <option value="kraft">Kraft / S&C</option>
+            <option value="boxen">Boxen</option>
+            <option value="sparring">Sparring</option>
+            <option value="cardio">Cardio</option>
+            <option value="pratzen">Pratzen</option>
+            <option value="technik">Technik</option>
+            <option value="mobility">Mobility</option>
+          </select>
+        </div>
+        <div class="form-group-inline">
+          <label>Dauer (Min.)</label>
+          <input type="number" id="log-duration" placeholder="60" min="1" max="300">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group-inline">
+          <label>RPE (1-10) <span class="tt">i<span class="tt-text"><strong>RPE — Rate of Perceived Exertion</strong> — Wie hart hat sich das Training angefühlt?<br>1–3: Leicht (Aufwärmen)<br>4–5: Moderat (Zone 2)<br>6–7: Hart (Standardtraining)<br>8–9: Sehr hart (Sparring, HIIT)<br>10: Maximum (Wettkampf)</span></span></label>
+          <input type="number" id="log-rpe" placeholder="7" min="1" max="10">
+        </div>
+        <div class="form-group-inline">
+          <label>Gewicht (kg, optional)</label>
+          <input type="number" id="log-weight" placeholder="" step="0.1">
+        </div>
+      </div>
+      <div class="form-group-inline" style="margin-bottom:16px;">
+        <label>Notizen</label>
+        <textarea id="log-notes" rows="2" placeholder="Was war heute besonders?"></textarea>
+      </div>
+      <button class="submit-btn" onclick="addLogEntry()">EINTRAGEN</button>
+    </div>
+    <div class="log-entries" id="log-entries"></div>
+  </div>
+</div>
+
+<!-- ===== MODAL: FIGHT LOG ===== -->
+<div class="modal-overlay" id="fight-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeFightModal()">×</button>
+    <div class="modal-title">KAMPF EINTRAGEN</div>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Datum</label>
+      <input type="date" id="fight-log-date">
+    </div>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Gegner</label>
+      <input type="text" id="fight-log-opponent" placeholder="Name / Verein" style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;">
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline">
+        <label>Ergebnis</label>
+        <select id="fight-log-result">
+          <option value="S">Sieg</option>
+          <option value="N">Niederlage</option>
+          <option value="U">Unentschieden</option>
+        </select>
+      </div>
+      <div class="form-group-inline">
+        <label>Art</label>
+        <select id="fight-log-method">
+          <option value="Punkte">Punkte</option>
+          <option value="RSC">RSC / TKO</option>
+          <option value="KO">KO</option>
+          <option value="Aufgabe">Aufgabe</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline">
+        <label>Gegner-Stil</label>
+        <select id="fight-log-style">
+          <option value="">— Optional —</option>
+          <option value="Ausleger">Ausleger (Orthodox)</option>
+          <option value="Rechtsausleger">Rechtsausleger (Southpaw)</option>
+        </select>
+      </div>
+      <div class="form-group-inline">
+        <label>Gegner-Typ</label>
+        <select id="fight-log-type">
+          <option value="">— Optional —</option>
+          <option value="Distanz">Distanzkämpfer</option>
+          <option value="Infighter">Infighter / Druck</option>
+          <option value="Konter">Konterkämpfer</option>
+          <option value="Allrounder">Allrounder</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Was hat funktioniert?</label>
+      <textarea id="fight-log-good" rows="2" placeholder="z.B. Jab hat gesessen, Distanz gut gehalten..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;resize:vertical;"></textarea>
+    </div>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Was muss besser werden?</label>
+      <textarea id="fight-log-improve" rows="2" placeholder="z.B. Zu oft an Seile gedrängt, Kopfbewegung fehlte..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;resize:vertical;"></textarea>
+    </div>
+    <button class="submit-btn" onclick="addFightLog()">KAMPF SPEICHERN</button>
+  </div>
+</div>
+
+<!-- ===== MODAL: EDIT BLOCK ===== -->
+<div class="modal-overlay" id="block-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBlockModal()">×</button>
+    <div class="modal-title">BLOCK BEARBEITEN</div>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Titel</label>
+      <input type="text" id="block-edit-title" style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;">
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline">
+        <label>Uhrzeit</label>
+        <input type="time" id="block-edit-time" style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;">
+      </div>
+      <div class="form-group-inline">
+        <label>Typ</label>
+        <select id="block-edit-type">
+          <option value="strength">Kraft</option>
+          <option value="boxing">Boxen</option>
+          <option value="cardio">Cardio</option>
+          <option value="recovery">Recovery</option>
+          <option value="meta">Meta / BET</option>
+          <option value="fight">Kampf</option>
+          <option value="off">Ruhe</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:16px;">
+      <button class="submit-btn" onclick="saveBlock()" style="flex:1;">SPEICHERN</button>
+      <button class="submit-btn" onclick="deleteBlock()" style="flex:0;background:#333;padding:12px 20px;">Löschen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: SHARE ===== -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeShareModal()">×</button>
+    <div class="modal-title">PLAN TEILEN</div>
+    <p style="font-size:13px;color:#999;margin-bottom:16px;">Teile deinen Wochenplan, Ziele und Fortschritt mit Freunden. Sie brauchen keinen Account.</p>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Share-Link</label>
+      <input type="text" id="share-link" readonly style="width:100%;background:#141414;border:1px solid #252525;color:var(--gold);padding:11px 14px;font-family:'Space Mono';font-size:11px;border-radius:6px;outline:none;">
+    </div>
+    <div style="display:flex;gap:12px;">
+      <button class="submit-btn" onclick="copyShareLink()" style="flex:1;">Link kopieren</button>
+      <button class="submit-btn" onclick="shareWhatsApp()" style="flex:1;background:#25D366;">WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: SETTINGS ===== -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSettingsModal()">×</button>
+    <div class="modal-title">PROFIL BEARBEITEN</div>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Geburtsjahr</label>
+      <select id="settings-birthyear"></select>
+    </div>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Gewichtsklasse (kg)</label>
+      <select id="settings-weight">
+        <option value="50">50 kg</option><option value="55">55 kg</option>
+        <option value="60">60 kg</option><option value="65">65 kg</option>
+        <option value="70">70 kg</option><option value="75">75 kg</option>
+        <option value="80">80 kg</option><option value="85">85 kg</option>
+        <option value="90">90 kg</option><option value="95">95 kg</option>
+        <option value="100">100 kg</option><option value="100+">100+ kg</option>
+      </select>
+    </div>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Arbeitszeit</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="settings-work-start" type="time" value="08:00" style="flex:1;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;">
+        <span style="color:#555;">bis</span>
+        <input id="settings-work-end" type="time" value="17:00" style="flex:1;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;">
+      </div>
+    </div>
+    <div class="form-group-inline" style="margin-bottom:16px;">
+      <label>Trainingszeiten</label>
+      <div id="settings-week-rows" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+    <button class="submit-btn" onclick="saveSettings()">SPEICHERN</button>
+  </div>
+</div>
+
+
+<script src="js/app.js"></script>
+<script src="js/pages.js"></script>
+<script src="js/calculators.js"></script>
+<script>
+// Init AFTER all scripts loaded
+(function init() {
+  // Populate birthYear selects
+  ['settings-birthyear'].forEach(function(id) {
+    var sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Wählen —</option>';
+    for (var y = 2012; y >= 1970; y--) {
+      sel.innerHTML += '<option value="' + y + '">' + y + '</option>';
+    }
+  });
+  // Nav button click handlers
+  document.querySelectorAll('.nav-btn[data-page]').forEach(function(btn) {
+    btn.onclick = function() { showPage(btn.dataset.page); };
+  });
+  // Hub buttons + dropdown items
+  document.querySelectorAll('.nav-hub').forEach(function(hub) {
+    var hubBtn = hub.querySelector('.nav-hub-btn');
+    // Click hub button to toggle
+    hubBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var wasOpen = hub.classList.contains('open');
+      document.querySelectorAll('.nav-hub').forEach(function(h) { h.classList.remove('open'); });
+      if (!wasOpen) hub.classList.add('open');
+    });
+    // Click dropdown item to navigate
+    hub.querySelectorAll('.nav-drop-item[data-page]').forEach(function(item) {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        showPage(item.dataset.page);
+        document.querySelectorAll('.nav-hub').forEach(function(h) { h.classList.remove('open'); });
+      });
+    });
+  });
+  // Close on outside click
+  document.addEventListener('click', function() {
+    document.querySelectorAll('.nav-hub').forEach(function(h) { h.classList.remove('open'); });
+  });
+  // Enter on auth
+  document.getElementById('login-pass').onkeydown = function(e) { if (e.key==='Enter') doLogin(); };
+  document.getElementById('reg-pass').onkeydown = function(e) { if (e.key==='Enter') doRegister(); };
+  // Default log date
+  var ld = document.getElementById('log-date');
+  if (ld) ld.value = new Date().toISOString().split('T')[0];
+  // Auto-login
+  var saved = localStorage.getItem('fos_current');
+  if (saved) {
+    var users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+    if (users[saved]) {
+      currentUser = saved;
+      if (!users[saved].onboardingDone && !users[saved].weight) {
+        showOnboarding();
+      } else {
+        // Migration for old users
+        if (users[saved].weight && !users[saved].onboardingDone) {
+          users[saved].onboardingDone = true;
+          users[saved].nickname = users[saved].nickname || saved;
+          users[saved].experienceLevel = users[saved].experienceLevel || 'fortgeschritten';
+          users[saved].boxingYears = users[saved].boxingYears || 1;
+          users[saved].height = users[saved].height || 175;
+          users[saved].goal = users[saved].goal || 'fitness';
+          users[saved].fitnessLevel = users[saved].fitnessLevel || 'mittel';
+          localStorage.setItem('fos_users', JSON.stringify(users));
+        }
+        enterApp();
+      }
+    }
+  }
+})();
+</script>
+</body>
+</html>
