@@ -559,7 +559,7 @@ function renderFightCountdown() {
     display.innerHTML = `
       <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;letter-spacing:2px;">KEIN KAMPF GEPLANT</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">NORMALES TRAINING</div>
-      <div style="font-size:12px;color:#666;margin-top:12px;">Trage dein nächstes Kampfdatum ein — Tipps und Ernährung passen sich automatisch an.</div>`;
+      <div style="font-size:12px;color:#666;margin-top:12px;">Kein Kampf geplant \u2014 trage ein Datum ein und dein kompletter Plan passt sich automatisch an.</div>`;
     return;
   }
 
@@ -774,6 +774,19 @@ function renderRadarChart(canvasOrScores, scoresArg) {
     ctx.restore();
   }
 
+  // Check if all scores are null — show empty state message
+  const allNull = keys.every(k => scores[k] === null || scores[k] === undefined);
+  if (allNull) {
+    ctx.save();
+    ctx.font = '14px "Space Mono", monospace';
+    ctx.fillStyle = '#333';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Trage Benchmarks ein', cx, cy);
+    ctx.restore();
+    return;
+  }
+
   // Data polygon
   ctx.beginPath();
   for (let i = 0; i <= n; i++) {
@@ -829,7 +842,7 @@ function logHRV() {
 function renderHRV() {
   const data = getData();
   if (!data || !data.hrv || !data.hrv.length) {
-    document.getElementById('hrv-display').innerHTML = '<div style="font-size:12px;color:#444;">Noch keine HRV-Daten. Trage deinen RMSSD-Wert ein.</div>';
+    document.getElementById('hrv-display').innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine HRV-Daten. Trage morgens deinen RMSSD-Wert ein \u2014 die meisten Pulsuhren zeigen ihn an.</div>';
     return;
   }
   const recent = data.hrv.slice(0, 7);
@@ -856,6 +869,126 @@ function renderHRV() {
         <div style="font-size:12px;color:#888;">${advice}</div>
       </div>
     </div>`;
+
+  renderHRVTrend(data);
+}
+
+function renderHRVTrend(data) {
+  const container = document.getElementById('hrv-display');
+  if (!container) return;
+  const oldCanvas = document.getElementById('hrv-trend-canvas');
+  if (oldCanvas) oldCanvas.remove();
+  const oldLabel = document.getElementById('hrv-trend-label');
+  if (oldLabel) oldLabel.remove();
+
+  const entries = data.hrv || [];
+  if (entries.length < 3) return;
+
+  // Sort by date ascending and take last 30
+  const sorted = entries.slice().sort((a, b) => a.date.localeCompare(b.date));
+  const last30 = sorted.slice(-30);
+  const values = last30.map(e => e.value);
+
+  // Determine trend: compare avg of last chunk vs first chunk
+  const halfLen = Math.max(1, Math.floor(values.length / 2));
+  const chunkSize = Math.min(7, halfLen);
+  const avgFirst = values.slice(0, chunkSize).reduce((s, v) => s + v, 0) / chunkSize;
+  const avgLast = values.slice(-chunkSize).reduce((s, v) => s + v, 0) / chunkSize;
+  const trendDiff = avgLast - avgFirst;
+  let lineColor;
+  if (trendDiff > 2) lineColor = 'var(--green)';
+  else if (trendDiff < -2) lineColor = 'var(--red)';
+  else lineColor = 'var(--gold)';
+
+  // Compute 7-day moving average
+  const ma7 = [];
+  for (let i = 0; i < values.length; i++) {
+    const win = values.slice(Math.max(0, i - 6), i + 1);
+    ma7.push(win.reduce((s, v) => s + v, 0) / win.length);
+  }
+
+  // Create canvas element
+  const canvas = document.createElement('canvas');
+  canvas.id = 'hrv-trend-canvas';
+  canvas.style.width = '100%';
+  canvas.style.height = '80px';
+  canvas.style.display = 'block';
+  canvas.style.marginTop = '12px';
+  canvas.height = 160;
+  container.appendChild(canvas);
+
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * 2);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+  const w = rect.width;
+  const h = 80;
+
+  const allVals = values.concat(ma7);
+  const minV = Math.min(...allVals) - 2;
+  const maxV = Math.max(...allVals) + 2;
+  const range = maxV - minV || 1;
+  const pad = 4;
+
+  function xPos(i) { return pad + (i / Math.max(values.length - 1, 1)) * (w - pad * 2); }
+  function yPos(v) { return pad + (1 - (v - minV) / range) * (h - pad * 2); }
+
+  // Resolve CSS variable for canvas drawing
+  function resolveColor(c) {
+    if (!c.startsWith('var(')) return c;
+    return getComputedStyle(document.documentElement).getPropertyValue(c.slice(4, -1).trim()).trim() || '#888';
+  }
+  const resolved = resolveColor(lineColor);
+
+  // X-axis tick marks
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < values.length; i++) {
+    ctx.beginPath();
+    ctx.moveTo(xPos(i), h - pad);
+    ctx.lineTo(xPos(i), h - pad + 3);
+    ctx.stroke();
+  }
+
+  // 7-day moving average line (semi-transparent)
+  ctx.strokeStyle = resolved;
+  ctx.globalAlpha = 0.25;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < ma7.length; i++) {
+    if (i === 0) ctx.moveTo(xPos(i), yPos(ma7[i]));
+    else ctx.lineTo(xPos(i), yPos(ma7[i]));
+  }
+  ctx.stroke();
+
+  // Main HRV value line
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = resolved;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  for (let i = 0; i < values.length; i++) {
+    if (i === 0) ctx.moveTo(xPos(i), yPos(values[i]));
+    else ctx.lineTo(xPos(i), yPos(values[i]));
+  }
+  ctx.stroke();
+
+  // Dot on the most recent value
+  ctx.beginPath();
+  ctx.arc(xPos(values.length - 1), yPos(values[values.length - 1]), 3, 0, Math.PI * 2);
+  ctx.fillStyle = resolved;
+  ctx.fill();
+
+  // Trend text label below the chart
+  const change30 = values[values.length - 1] - values[0];
+  const sign = change30 >= 0 ? '+' : '';
+  const lblColor = change30 > 0 ? 'var(--green)' : change30 < 0 ? 'var(--red)' : 'var(--gold)';
+  const label = document.createElement('div');
+  label.id = 'hrv-trend-label';
+  label.style.cssText = 'font-family:"Space Mono",monospace;font-size:11px;margin-top:6px;';
+  label.innerHTML = '<span style="color:' + lblColor + ';">Trend: ' + sign + change30.toFixed(1) + ' RMSSD (30 Tage)</span> <span style="color:var(--grey);margin-left:8px;">7-Tage \u00D8 = transparent</span>';
+  container.appendChild(label);
 }
 
 // ===== HINWEISE (merged tips + reminders) =====
@@ -932,10 +1065,55 @@ function renderHinweise() {
   }
 
   items.sort((a, b) => b.priority - a.priority);
-  if (!items.length) { el.innerHTML = ''; return; }
+
+  // --- Getting Started guide for new users ---
+  const gsUsers = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const gsHasWeight = !!(gsUsers[currentUser] && gsUsers[currentUser].weight);
+  const gsHasLog = data.log && data.log.length > 0;
+  const gsHasBench = data.benchmarks && Object.values(data.benchmarks).some(v => v > 0);
+  const gsHasHRV = data.hrv && data.hrv.length > 0;
+  const completedSteps = [gsHasWeight, gsHasBench, gsHasLog, gsHasHRV].filter(Boolean).length;
+
+  let gettingStartedHtml = '';
+  if (completedSteps < 4) {
+    const gsPct = Math.round((completedSteps / 4) * 100);
+    const gsSteps = [
+      { done: gsHasWeight, text: 'Trage dein Körpergewicht ein', action: "showPage('account')" },
+      { done: gsHasBench, text: 'Mache deinen ersten Leistungstest', action: "showPage('tests')" },
+      { done: gsHasLog, text: 'Logge deine erste Trainingseinheit', action: "showPage('wochenplan')" },
+      { done: gsHasHRV, text: 'Trage deine HRV ein', action: "document.getElementById('hrv-input').scrollIntoView({behavior:'smooth'});document.getElementById('hrv-input').focus();" }
+    ];
+    let gsStepsHtml = '';
+    for (const st of gsSteps) {
+      const clickAttr = st.done ? '' : st.action;
+      const rowStyle = st.done ? 'opacity:.5;' : 'cursor:pointer;';
+      const circleColor = st.done ? 'var(--green)' : 'rgba(255,255,255,.2)';
+      const checkMark = st.done ? '&#10003;' : '';
+      const textColor = st.done ? 'var(--green)' : 'var(--white)';
+      const strikeStyle = st.done ? 'text-decoration:line-through;' : '';
+      gsStepsHtml += '<div onclick="' + clickAttr + '" style="display:flex;align-items:center;gap:10px;padding:6px 0;' + rowStyle + '">'
+        + '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid ' + circleColor + ';font-size:10px;color:var(--green);flex-shrink:0;">' + checkMark + '</span>'
+        + '<span style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + textColor + ';line-height:1.4;' + strikeStyle + '">' + st.text + '</span>'
+        + '</div>';
+    }
+    gettingStartedHtml = `
+      <div style="margin-bottom:16px;padding:14px 16px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(245,197,24,.15);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;">DEIN ERSTER SCHRITT</span>
+          <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);">${completedSteps}/4 erledigt</span>
+        </div>
+        <div style="width:100%;height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-bottom:12px;">
+          <div style="width:${gsPct}%;height:100%;background:var(--gold);border-radius:2px;transition:width .3s;"></div>
+        </div>
+        ${gsStepsHtml}
+      </div>`;
+  }
+
+  if (!items.length && !gettingStartedHtml) { el.innerHTML = ''; return; }
 
   el.innerHTML = `
     <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:10px;">HINWEISE</div>
+    ${gettingStartedHtml}
     ${items.slice(0, 5).map(r => `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:6px;padding:7px 12px;border-left:3px solid ${r.color};border-radius:0 4px 4px 0;background:rgba(255,255,255,.015);">
       <span style="font-size:12px;color:${r.color};line-height:1.4;">${r.text}</span>
     </div>`).join('')}`;
@@ -1232,7 +1410,7 @@ function renderFightLog() {
   const data = getData();
   if (!data) return;
   const el = document.getElementById('fight-log-list');
-  if (!data.fights || !data.fights.length) { el.innerHTML = '<div style="font-size:12px;color:#444;">Noch keine Kämpfe eingetragen.</div>'; return; }
+  if (!data.fights || !data.fights.length) { el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine K\u00e4mpfe eingetragen. Nutze \u201c+ Kampf\u201d um deinen ersten Kampf zu dokumentieren.</div>'; return; }
   el.innerHTML = data.fights.map((f, i) => {
     const color = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
     const label = f.result === 'S' ? 'SIEG' : f.result === 'N' ? 'NIEDERLAGE' : 'UNENTSCHIEDEN';
@@ -1335,7 +1513,7 @@ function renderRecentLog() {
   if (!data) return;
   const el = document.getElementById('recent-log');
   if (!el) return;
-  if (!data.log || !data.log.length) { el.innerHTML = '<div style="font-size:12px;color:#444;">Keine Einträge. Gehe zum <a href="#" onclick="showPage(\'log\');return false;" style="color:var(--red);">Training Log</a>.</div>'; return; }
+  if (!data.log || !data.log.length) { el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine Trainingseinheiten. <span style="color:var(--red);cursor:pointer;" onclick="showPage(\'log\')">Erste Session loggen \u2192</span></div>'; return; }
   el.innerHTML = data.log.slice(0, 5).map(e => {
     const color = TYPE_COLORS[e.type] || 'var(--grey)';
     return `<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #151515;">
@@ -1686,6 +1864,7 @@ function renderWeekPlan() {
             <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--gold);">HEUTE</span>' : ''}</div>
             ${dp ? `<div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:${dp.color};margin-top:2px;">${dp.label}</div>` : ''}
           </div>
+          ${(s.weekSchedule[day] && s.weekSchedule[day].type === 'sparring' && blocks.some(b => b.type === 'strength')) ? '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--orange);padding:4px 0;">\u26A0 Schweres S&C + Sparring am gleichen Tag \u2014 erh\u00F6htes Verletzungsrisiko</div>' : ''}
           <div class="day-blocks">
             ${blocks.map((b, bi) => {
               const logKey = day + '_' + bi + '_' + getWeekId();
@@ -2740,16 +2919,11 @@ function renderDailyCombined() {
 
 // ===== DAILY CHECKLIST =====
 const DAILY_ITEMS = [
-  { id:'imt', label:'IMT — 2×30 Atemzüge (PowerBreathe)', always:true },
-  { id:'bet', label:'BET — Stroop-Training 15–25 Min.', always:true },
-  { id:'nacken', label:'Nacken — Isometrie 3×8 Sek. je Richtung', always:true },
-  { id:'zone2', label:'Zone 2 Cardio (Fahrrad/Laufen/Gehen)', always:true },
-  { id:'protein', label:'4–5 Protein-Mahlzeiten (je ≥25g)', always:true },
-  { id:'wasser', label:'3+ Liter Wasser getrunken', always:true },
-  { id:'schlaf', label:'8+ Stunden geschlafen', always:true },
-  { id:'visu', label:'Visualisierung 10 Min. (vor dem Schlafen)', always:true },
-  { id:'hrv', label:'HRV morgens gemessen', always:true },
-  { id:'mobility', label:'Mobility/Foam Rolling 10 Min.', always:true }
+  { id:'protein', label:'Protein-Ziel erreicht', always:true },
+  { id:'schlaf', label:'8h Schlaf', always:true },
+  { id:'training', label:'Training absolviert', always:true },
+  { id:'wasser', label:'3L+ Wasser', always:true },
+  { id:'mobility', label:'Mobility/Stretching', always:true }
 ];
 
 function getChecklistKey() {
