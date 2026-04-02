@@ -10,7 +10,7 @@ function calcMakrosErn() {
   const vol = document.getElementById('ern-vol')?.value || 'mittel';
   const job = document.getElementById('ern-job')?.value || 'sitz';
 
-  const proteinG = { aufbau: 2.2, wettkampf: 2.0, cutten: 2.6, maintain: 2.0 }[phase];
+  const proteinG = { aufbau: 2.2, wettkampf: 2.2, cutten: 2.6, maintain: 2.0 }[phase];
   const khG = { aufbau: 5.5, wettkampf: 4.5, cutten: 3.0, maintain: 4.0 }[phase];
   const fatG = { aufbau: 1.1, wettkampf: 1.0, cutten: 0.8, maintain: 1.0 }[phase];
   const volMult = { mittel: 1.0, hoch: 1.1, 'sehr-hoch': 1.2 }[vol];
@@ -114,7 +114,7 @@ function calcWettkampfPrep() {
   } else if (perWeek <= 0.8) {
     status = 'Nachhaltiges Cutten möglich';
     color = 'var(--green)';
-    plan = `${perWeek.toFixed(2)} kg/Woche. Defizit: ~${Math.round(perWeek * 1100)} kcal/Tag. Protein auf 2.4–3.0g/kg. Keine Leistungseinbußen.`;
+    plan = `${perWeek.toFixed(2)} kg/Woche. Defizit: ~${Math.round(perWeek * 1100)} kcal/Tag. Protein auf 2.6g/kg. Keine Leistungseinbußen.`;
   } else if (perWeek <= 1.2) {
     status = 'Aggressives Cutten nötig';
     color = 'var(--gold)';

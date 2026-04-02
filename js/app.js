@@ -506,7 +506,16 @@ function showPage(pageId) {
 function updateFightDate() {
   const data = getData();
   if (!data) return;
-  data.fightDate = document.getElementById('fight-date-input').value;
+  const dateVal = document.getElementById('fight-date-input').value;
+  // Reject dates more than 365 days in the future
+  if (dateVal) {
+    const diff = Math.ceil((new Date(dateVal + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000);
+    if (diff > 365) {
+      alert('Kampfdatum darf max. 365 Tage in der Zukunft liegen.');
+      return;
+    }
+  }
+  data.fightDate = dateVal;
   saveData(data); // Save first so generateSmartWeekPlan reads the new date
   data.weekPlan = generateSmartWeekPlan();
   saveData(data);
@@ -534,7 +543,7 @@ function clearFightDate() {
 function getFightPhase(daysUntil) {
   if (daysUntil <= 0) return { name: 'RECOVERY', label: 'Regeneration', cls: 'phase-aufbau', color: 'var(--green)' };
   if (daysUntil <= 2) return { name: 'KAMPFTAG', label: 'Kampf-Modus', cls: 'phase-kampf', color: 'var(--red)' };
-  if (daysUntil <= 4) return { name: 'SCHÄRFEN', label: 'Schärfen', cls: 'phase-taper', color: 'var(--blue)' };
+  if (daysUntil <= 3) return { name: 'SCHÄRFEN', label: 'Schärfen', cls: 'phase-taper', color: 'var(--blue)' };
   // Everything else = normal training with smart load management
   return { name: 'TRAINING', label: 'Normales Training', cls: 'phase-aufbau', color: 'var(--green)' };
 }
@@ -801,7 +810,12 @@ function renderRadarChart(canvasOrScores, scoresArg) {
 // ===== HRV =====
 function logHRV() {
   const val = parseInt(document.getElementById('hrv-input').value);
-  if (!val || val < 1 || val > 200) return;
+  if (!val || isNaN(val) || val < 1 || val > 200) {
+    if (val !== undefined && val !== null && !isNaN(val) && (val < 1 || val > 200)) {
+      alert('HRV-Wert muss zwischen 1 und 200 liegen.');
+    }
+    return;
+  }
   const data = getData();
   if (!data) return;
   if (!data.hrv) data.hrv = [];
@@ -1163,6 +1177,14 @@ function updateBenchmark(id, val) {
   if (!data.benchmarks) data.benchmarks = {};
   if (!data.benchmarkHistory) data.benchmarkHistory = {};
   const numVal = parseFloat(val) || 0;
+
+  // Input validation — reject negative and unreasonably high values
+  if (numVal < 0) return;
+  const benchLimits = { deadlift: 500, pullups: 50, cmj: 100, punch_freq: 150, cooper: 5000, bodyfat: 40 };
+  const benchMins = { bodyfat: 3 };
+  if (benchLimits[id] !== undefined && numVal > benchLimits[id]) return;
+  if (benchMins[id] !== undefined && numVal > 0 && numVal < benchMins[id]) return;
+
   const oldVal = data.benchmarks[id] || 0;
   data.benchmarks[id] = numVal;
   // Track history — only log if value actually changed
@@ -1173,7 +1195,9 @@ function updateBenchmark(id, val) {
     if (data.benchmarkHistory[id].length > 50) data.benchmarkHistory[id] = data.benchmarkHistory[id].slice(-50);
   }
   saveData(data);
+  // Re-render dashboard stats + radar so changes reflect immediately
   renderDashStats();
+  renderRadarChart(calcProfileScores(data));
   renderTestsPage();
 }
 
@@ -1243,12 +1267,19 @@ function addLogEntry() {
   const data = getData();
   if (!data) return;
   if (!data.log) data.log = [];
+  const rawWeight = document.getElementById('log-weight').value;
+  let weightVal = parseFloat(rawWeight) || null;
+  // Validate weight if provided
+  if (weightVal !== null && (weightVal < 30 || weightVal > 200)) {
+    alert('Gewicht muss zwischen 30 und 200 kg liegen.');
+    return;
+  }
   const entry = {
     date: document.getElementById('log-date').value,
     type: document.getElementById('log-type').value,
     duration: parseInt(document.getElementById('log-duration').value) || 0,
     rpe: parseInt(document.getElementById('log-rpe').value) || 0,
-    weight: parseFloat(document.getElementById('log-weight').value) || null,
+    weight: weightVal,
     notes: document.getElementById('log-notes').value
   };
   if (!entry.date || !entry.duration) return;
@@ -1593,10 +1624,15 @@ const TYPE_CLASS = { strength: 'strength', boxing: 'boxing', cardio: 'cardio', r
 function renderWeekPlan() {
   const data = getData();
   if (!data) return;
-  // Always regenerate to reflect current fight date and day-of-week
-  const plan = generateSmartWeekPlan();
-  data.weekPlan = plan;
-  saveData(data);
+  // Only regenerate if no saved plan exists or if fight date / schedule changed
+  const s = getUserSchedule();
+  const planKey = (data.fightDate || '') + '|' + JSON.stringify(s.weekSchedule);
+  if (!data.weekPlan || data._weekPlanKey !== planKey) {
+    data.weekPlan = generateSmartWeekPlan();
+    data._weekPlanKey = planKey;
+    saveData(data);
+  }
+  const plan = data.weekPlan;
   const el = document.getElementById('page-wochenplan');
 
   // Calculate fight phase per day for header badges

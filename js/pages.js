@@ -357,7 +357,7 @@ BET konfrontiert dein Gehirn mit kognitiven Aufgaben (${tt('Stroop-Test','Farbw�
 Dein Körper ist wie ein Rennwagen: Das beste Chassis (Kraft), der beste Motor (Ausdauer) und der beste Fahrer (Technik) bringen nichts mit dem falschen Treibstoff. Als Boxer musst du explosiv und ausdauernd gleichzeitig sein, Muskelmasse aufbauen aber in deiner Gewichtsklasse bleiben, und dich von brutalem Training erholen — oft 2× am Tag. Die ISSN Position Stand (2025) bestätigt: Ernährung entscheidet über Trainingsqualität, Erholung und Kampfleistung in Kampfsportarten.<br><br>
 
 <strong style="font-size:15px;">MAKRONÄHRSTOFFE IM BOXEN</strong><br>
-• <strong>Protein (2.0–2.4g/kg):</strong> Repariert Muskelfasern nach dem Training. Die ${tt('MPS','Muskelproteinsynthese — der Prozess, durch den dein Körper beschädigte Muskelproteine repariert und neue aufbaut. Wird durch Training + Protein getriggert. Peak: 24–48h nach dem Training.')} braucht mindestens <strong>2.5g ${tt('Leucin','Die wichtigste Aminosäure für Muskelaufbau. Leucin aktiviert den mTOR-Signalweg, der die Muskelproteinsynthese startet. Mindestens 2.5g pro Mahlzeit nötig — das „Leucin-Schwellenwert-Konzept".')}</strong> pro Mahlzeit (Morton et al. 2018). 4–5 Protein-Boli über den Tag verteilt sind optimal.<br><br>
+• <strong>Protein (Empfehlung: 2.2g/kg):</strong> Repariert Muskelfasern nach dem Training. Die ${tt('MPS','Muskelproteinsynthese — der Prozess, durch den dein Körper beschädigte Muskelproteine repariert und neue aufbaut. Wird durch Training + Protein getriggert. Peak: 24–48h nach dem Training.')} braucht mindestens <strong>2.5g ${tt('Leucin','Die wichtigste Aminosäure für Muskelaufbau. Leucin aktiviert den mTOR-Signalweg, der die Muskelproteinsynthese startet. Mindestens 2.5g pro Mahlzeit nötig — das „Leucin-Schwellenwert-Konzept".')}</strong> pro Mahlzeit (Morton et al. 2018). 4–5 Protein-Boli über den Tag verteilt sind optimal.<br><br>
 
 • <strong>Kohlenhydrate (4–8g/kg):</strong> Dein Gehirn und deine Muskeln laufen auf ${tt('Glykogen','Die Speicherform von Kohlenhydraten in Muskeln und Leber. Deine Muskeln speichern ~400g, die Leber ~100g. Bei leerem Glykogen sinkt die Leistung drastisch — du schlägst schwächer und reagierst langsamer.')}. Nach hartem Training sind deine Speicher zu 40–60% leer. KH-Timing ist entscheidend: 5–6h vor dem Abendtraining das Mittagessen als Glykogen-Loader nutzen. Post-Training: schnelle KH für Regeneration. Burke et al. (2011) zeigten: optimiertes KH-Timing → <strong>8–12% mehr Leistung</strong>.<br><br>
 
@@ -1449,8 +1449,9 @@ function renderErnaehrungPage() {
     <div class="card-title">PROTEIN — DER BAUSTOFF</div>
     <div class="card-body" style="line-height:1.8;">
       <strong>Wie viel?</strong><br>
-      <strong style="color:var(--blue);">2.0–2.4g pro kg Körpergewicht pro Tag.</strong> Bei ${userW}kg = ${Math.round(userW*2.0)}–${Math.round(userW*2.4)}g Protein/Tag.<br>
-      Beim Cutten sogar 2.4–3.0g/kg um Muskelverlust zu verhindern.<br><br>
+      Die Wissenschaft zeigt einen optimalen Bereich von 2.0–2.4g/kg — wir empfehlen als klaren Richtwert:<br>
+      <strong style="color:var(--blue);">2.2g pro kg Körpergewicht pro Tag.</strong> Bei ${userW}kg = ${Math.round(userW*2.2)}g Protein/Tag.<br>
+      Beim Cutten: <strong>2.6g/kg</strong> (bei ${userW}kg = ${Math.round(userW*2.6)}g) um Muskelverlust zu verhindern.<br><br>
 
       <strong>Warum so viel?</strong><br>
       Boxtraining ist extrem katabol — Sparring, Sandsackarbeit und Krafttraining verursachen massive Gewebeschäden. Dein Körper braucht Aminosäuren (aus Protein) um alles zu reparieren. Zu wenig Protein = dein Körper baut Muskeln ab statt auf.<br><br>
@@ -1997,7 +1998,7 @@ function renderCuttenPage() {
       <div class="card-title">NACHHALTIGES CUTTEN</div>
       <div class="card-body">
         <strong>Kaloriendefizit:</strong> 300–500 kcal/Tag unter ${tt('TDEE','Total Daily Energy Expenditure — dein gesamter täglicher Kalorienverbrauch inklusive Grundumsatz + Arbeit + Training. Nutze den Makro-Rechner auf der Ernährungs-Seite um deinen TDEE zu berechnen.')}. Nicht mehr!<br><br>
-        <strong>Protein erhöhen:</strong> 2.4–3.0g/kg (schützt Muskel)<br><br>
+        <strong>Protein erhöhen:</strong> 2.6g/kg (schützt Muskel)<br><br>
         <strong>KH reduzieren, nicht eliminieren:</strong> 2.5–4.0g/kg. Unter 2g/kg = Leistungseinbruch<br><br>
         <strong>Fett: min. 0.5g/kg</strong> (Hormone, Gelenke)<br><br>
         <strong>Timing:</strong> Trainingsnahe Mahlzeiten NICHT reduzieren. Sparen bei nicht-trainingsnahen.
@@ -2067,13 +2068,13 @@ function renderPeriodisierungPage() {
   <div id="peri-s1" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);margin:0 0 16px;border-bottom:2px solid var(--red);padding-bottom:8px;">PHASEN-ZYKLUS</div>
   <div class="phase-cycle">
     <div class="phase-block ${currentPhase==='training'?'current':''}" style="background:#0f1f0a;">
-      <div class="phase-week" style="color:var(--green);">5+ TAGE</div>
+      <div class="phase-week" style="color:var(--green);">4+ TAGE</div>
       <div class="phase-name">NORMALES TRAINING</div>
       <div class="phase-bar" style="background:var(--green);width:90%;"></div>
       <div class="phase-details">Volles Programm<br>S&C: 3× Morgen<br>Sparring: hart<br>Ausdauer: Zone 2 + SIT<br>BET/IMT/Nacken: täglich</div>
     </div>
     <div class="phase-block ${currentPhase==='schaerfen'?'current':''}" style="background:#0a0f1f;">
-      <div class="phase-week" style="color:var(--blue);">3–4 TAGE</div>
+      <div class="phase-week" style="color:var(--blue);">2–3 TAGE</div>
       <div class="phase-name">SCHÄRFEN</div>
       <div class="phase-bar" style="background:var(--blue);width:60%;"></div>
       <div class="phase-details">Volumen: −30%<br>Intensität: 100%<br>S&C: 1× leicht<br>Sparring: taktisch/leicht<br>Kurze explosive Reize</div>
@@ -2956,7 +2957,7 @@ const faqData = [
   { q:'Verbessere ich mich in der Wettkampfphase?',
     a:'<strong>Ja!</strong> Im Amateur-Boxen trainierst du DURCH die Wettkampfphase — es gibt kein monatelanges Camp wie bei Profis.<br><br>1. <strong>Ring-Erfahrung:</strong> Jeder Kampf = stärkstes Lernen überhaupt. Kein Sparring ersetzt echte Kämpfe<br>2. <strong>Kampfanalyse:</strong> Nach jedem Kampf 3 Stärken + 3 Verbesserungen notieren → gezielt trainieren<br>3. <strong>Technik schleifen:</strong> Zwischen den Kämpfen Schwächen gezielt an Pratzen und im konditionalem Sparring trainieren<br>4. <strong>Auxiliary weiter:</strong> IMT, Nacken, BET, Visualisierung — alles täglich ohne Erholungsbedarf<br>5. <strong>S&C erhalten:</strong> 2–3× Morgentraining reicht für Kraft-Erhalt, PRs nur in kampffreien Wochen'},
   { q:'Wie wichtig ist Ernährung wirklich?',
-    a:'<strong>Entscheidend.</strong> Häufigste Defizite:<br><br>• <strong>Zu wenig Protein:</strong> Durchschnitt ~1.0g/kg, Bedarf 2.0–2.4g/kg — das Doppelte!<br>• <strong>Falsches Timing:</strong> Großes Frühstück, kaum Mittag, Riesenportion abends = kein Glykogen<br>• <strong>Dehydration:</strong> 2% = 20% weniger Ausdauer<br>• <strong>Nährstoffmängel:</strong> Vitamin D, Magnesium, Zink<br><br>Test: Tracke 3 Tage mit MyFitnessPal. Die meisten sind erschüttert.'},
+    a:'<strong>Entscheidend.</strong> Häufigste Defizite:<br><br>• <strong>Zu wenig Protein:</strong> Durchschnitt ~1.0g/kg, Bedarf 2.2g/kg — mehr als das Doppelte!<br>• <strong>Falsches Timing:</strong> Großes Frühstück, kaum Mittag, Riesenportion abends = kein Glykogen<br>• <strong>Dehydration:</strong> 2% = 20% weniger Ausdauer<br>• <strong>Nährstoffmängel:</strong> Vitamin D, Magnesium, Zink<br><br>Test: Tracke 3 Tage mit MyFitnessPal. Die meisten sind erschüttert.'},
   { q:'Nur 30 Minuten — was bringt am meisten?',
     a:'<strong>Priorisiere:</strong><br>1. HRV messen (5 Min.)<br>2. IMT (5 Min.) — höchster Return on Time<br>3. Overcoming Isometrics (10 Min.) — max. ZNS-Aktivierung<br>4. Jump Squats 4×4 (10 Min.)<br><br><strong>30 konsistente Minuten täglich schlagen 3 Stunden 3×/Woche.</strong> Konsistenz ist der unterschätzte Vorteil.'},
   { q:'Niedriger HRV — trotzdem trainieren?',
