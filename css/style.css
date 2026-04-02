@@ -2362,8 +2362,8 @@ body::before {
 }
 
 /* Fight detail responsive */
-@media (max-width: 600px) {
-  #page-fight-detail [style*="grid-template-columns: 1fr 1fr"] {
+@media (max-width: 800px) {
+  .fight-detail-grid {
     grid-template-columns: 1fr !important;
   }
 }
