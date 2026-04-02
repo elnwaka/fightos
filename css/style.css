@@ -2361,6 +2361,13 @@ body::before {
   .mt-acc-sub { display: none; }
 }
 
+/* Fight detail responsive */
+@media (max-width: 600px) {
+  #page-fight-detail [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* ===== PROGRESSIVE DISCLOSURE SECTIONS ===== */
 .pd-section {
   border-bottom: 1px solid #1a1a1a;

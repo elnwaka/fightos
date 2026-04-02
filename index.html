@@ -70,6 +70,7 @@
     <div class="topbar-logo" onclick="showPage('dashboard')">FIGHT<span>OS</span></div>
     <div class="topbar-nav">
       <button class="nav-btn active" data-page="dashboard">Übersicht</button>
+      <button class="nav-btn" data-page="fights">Kämpfe</button>
       <div class="nav-hub">
         <button class="nav-hub-btn" style="--hc:var(--red);">Training ▾</button>
         <div class="nav-drop">
@@ -178,9 +179,9 @@
 
     <!-- Fight Log -->
     <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;cursor:pointer;" onclick="toggleSection('fight-log-list')">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);">KAMPF-HISTORIE <span class="section-arrow" style="font-size:14px;">▾</span></div>
-        <button class="submit-btn" style="padding:5px 12px;font-size:11px;" onclick="event.stopPropagation();openFightModal()">+ Kampf</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);cursor:pointer;" onclick="showPage('fights')">KÄMPFE <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--red);">ÖFFNEN →</span></div>
+        <button class="submit-btn" style="padding:5px 12px;font-size:11px;" onclick="openFightModal()">+ Kampf</button>
       </div>
       <div id="fight-log-list"></div>
     </div>
@@ -191,6 +192,12 @@
       <div id="recent-log"></div>
     </div>
   </div>
+
+  <!-- ===== PAGE: KÄMPFE ===== -->
+  <div class="page" id="page-fights"></div>
+
+  <!-- ===== PAGE: KAMPF DETAIL ===== -->
+  <div class="page" id="page-fight-detail"></div>
 
   <!-- ===== PAGE: SÄULEN ===== -->
   <div class="page" id="page-saeulen"></div>

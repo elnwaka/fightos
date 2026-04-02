@@ -503,6 +503,8 @@ function showPage(pageId) {
   if (pageId === 'dashboard') renderDashboard();
   if (pageId === 'tests') renderTestsPage();
   if (pageId === 'account') renderAccountPage();
+  if (pageId === 'fights') renderFightsPage();
+  if (pageId === 'fight-detail') navPage = 'fights';
   window.scrollTo(0, 0);
 }
 
@@ -1623,6 +1625,210 @@ function deleteFight(i) {
   saveData(data);
   renderFightLog();
   renderDashStats();
+}
+
+// ===== YOUTUBE EMBED HELPER =====
+function getYouTubeId(url) {
+  if (!url) return null;
+  var m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+// ===== KÄMPFE PAGE =====
+function renderFightsPage() {
+  const data = getData();
+  if (!data) return;
+  const el = document.getElementById('page-fights');
+  const fights = data.fights || [];
+  const wins = fights.filter(f => f.result === 'S').length;
+  const losses = fights.filter(f => f.result === 'N').length;
+  const draws = fights.filter(f => f.result === 'U').length;
+  const kos = fights.filter(f => f.result === 'S' && (f.method === 'KO' || f.method === 'RSC')).length;
+  const koRate = wins > 0 ? Math.round((kos / wins) * 100) : 0;
+
+  // Opponent style breakdown
+  const styleStats = {};
+  fights.forEach(f => {
+    const t = f.type || 'Unbekannt';
+    if (!styleStats[t]) styleStats[t] = { total: 0, wins: 0 };
+    styleStats[t].total++;
+    if (f.result === 'S') styleStats[t].wins++;
+  });
+
+  // Record bar
+  const total = fights.length || 1;
+  const wPct = (wins / total * 100).toFixed(0);
+  const lPct = (losses / total * 100).toFixed(0);
+
+  el.innerHTML = `
+  <div class="page-header">
+    <div class="page-title">MEINE <span>KÄMPFE</span></div>
+    <div class="page-sub">Dein komplettes Kampfarchiv — Analyse, Video, Runden-Notizen.</div>
+  </div>
+
+  <!-- RECORD OVERVIEW -->
+  <div style="display:flex;gap:32px;flex-wrap:wrap;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid #1a1a1a;">
+    <div style="flex:1;min-width:200px;">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:12px;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--white);line-height:1;">${wins}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#333;">–</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${losses > 0 ? 'var(--red)' : '#333'};line-height:1;">${losses}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#333;">–</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--gold);line-height:1;">${draws}</span>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#444;letter-spacing:2px;margin-bottom:12px;">SIEGE – NIEDERLAGEN – UNENTSCHIEDEN</div>
+      <div style="height:6px;background:#111;border-radius:3px;overflow:hidden;max-width:300px;">
+        <div style="display:flex;height:100%;">
+          <div style="width:${wPct}%;background:var(--green);"></div>
+          <div style="width:${lPct}%;background:var(--red);"></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:24px;">
+      <div style="text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--white);">${fights.length}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;color:#444;letter-spacing:2px;">KÄMPFE</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--red);">${koRate}%</div>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;color:#444;letter-spacing:2px;">KO-RATE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GEGNER-TYP ANALYSE -->
+  ${Object.keys(styleStats).length > 1 ? `
+  <div style="margin-bottom:28px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">GEGNER-ANALYSE</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      ${Object.entries(styleStats).map(([type, s]) => {
+        const winRate = Math.round((s.wins / s.total) * 100);
+        const barColor = winRate >= 60 ? 'var(--green)' : winRate >= 40 ? 'var(--gold)' : 'var(--red)';
+        return `<div style="flex:1;min-width:120px;padding:12px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);">${type}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:#555;">${s.total} Kämpfe · ${winRate}% Winrate</div>
+          <div style="height:3px;background:#111;border-radius:2px;margin-top:6px;"><div style="width:${winRate}%;height:100%;background:${barColor};border-radius:2px;"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>` : ''}
+
+  <!-- FIGHT LIST -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">ALLE KÄMPFE</div>
+    <button class="submit-btn" style="padding:6px 14px;font-size:12px;" onclick="openFightModal()">+ KAMPF EINTRAGEN</button>
+  </div>
+  <div id="fights-page-list"></div>`;
+
+  // Render fight cards
+  const listEl = document.getElementById('fights-page-list');
+  if (!fights.length) {
+    listEl.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#444;padding:20px 0;text-align:center;">Noch keine Kämpfe. Trage deinen ersten Kampf ein.</div>';
+    return;
+  }
+
+  listEl.innerHTML = fights.map((f, i) => {
+    const color = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
+    const label = f.result === 'S' ? 'SIEG' : f.result === 'N' ? 'NIEDERLAGE' : 'UNENTSCHIEDEN';
+    const hasVideo = !!getYouTubeId(f.videoLink);
+    return `<div onclick="openFightDetail(${i})" style="display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid #111;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
+      <div style="width:48px;height:48px;border-radius:50%;border:2px solid ${color};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${color};">${f.result}</span>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#555;">${formatDate(f.date)} · ${label} · ${f.method || ''}${f.type ? ' · ' + f.type : ''}</div>
+      </div>
+      ${hasVideo ? '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--blue);border:1px solid rgba(41,121,255,.3);padding:3px 8px;border-radius:3px;">VIDEO</div>' : ''}
+      <div style="font-size:14px;color:#333;">→</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== KAMPF DETAIL =====
+function openFightDetail(idx) {
+  const data = getData();
+  if (!data || !data.fights || !data.fights[idx]) return;
+  const f = data.fights[idx];
+  const el = document.getElementById('page-fight-detail');
+  const color = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
+  const label = f.result === 'S' ? 'SIEG' : f.result === 'N' ? 'NIEDERLAGE' : 'UNENTSCHIEDEN';
+  const ytId = getYouTubeId(f.videoLink);
+
+  el.innerHTML = `
+  <button onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:11px;color:#555;background:none;border:none;cursor:pointer;padding:0 0 16px;letter-spacing:1px;">← ZURÜCK ZU KÄMPFE</button>
+
+  <!-- FIGHT HEADER -->
+  <div style="margin-bottom:24px;">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:${color};letter-spacing:3px;margin-bottom:4px;">${label} · ${f.method || ''}</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,56px);color:var(--white);letter-spacing:2px;line-height:.9;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</div>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;margin-top:6px;">${formatDate(f.date)}${f.style ? ' · ' + f.style : ''}${f.type ? ' · ' + f.type : ''}</div>
+  </div>
+
+  <!-- VIDEO (if exists) -->
+  ${ytId ? `
+  <div style="margin-bottom:28px;">
+    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;background:#000;">
+      <iframe src="https://www.youtube.com/embed/${ytId}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>` : `
+  <div style="margin-bottom:28px;padding:32px;background:#0a0a0a;border:1px dashed #1a1a1a;border-radius:8px;text-align:center;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#222;margin-bottom:8px;">KEIN VIDEO</div>
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#333;">Füge einen YouTube-Link hinzu um dein Kampfvideo hier zu sehen.</div>
+    <button onclick="editFightVideo(${idx})" style="margin-top:12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:6px 16px;border-radius:4px;cursor:pointer;">+ VIDEO HINZUFÜGEN</button>
+  </div>`}
+
+  <!-- ANALYSE GRID -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+    <!-- Was lief gut -->
+    <div style="padding:16px;background:#0a0a0a;border-left:3px solid var(--green);border-radius:0 6px 6px 0;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--green);letter-spacing:1px;margin-bottom:8px;">WAS HAT FUNKTIONIERT</div>
+      <div style="font-size:14px;color:#aaa;line-height:1.6;">${f.good || '<span style="color:#333;">Nicht eingetragen</span>'}</div>
+    </div>
+    <!-- Was muss besser werden -->
+    <div style="padding:16px;background:#0a0a0a;border-left:3px solid var(--gold);border-radius:0 6px 6px 0;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px;margin-bottom:8px;">WAS MUSS BESSER WERDEN</div>
+      <div style="font-size:14px;color:#aaa;line-height:1.6;">${f.improve || '<span style="color:#333;">Nicht eingetragen</span>'}</div>
+    </div>
+  </div>
+
+  <!-- GEGNER SCHWÄCHEN -->
+  ${f.opponentWeaknesses ? `
+  <div style="padding:16px;background:#0a0a0a;border-left:3px solid var(--red);border-radius:0 6px 6px 0;margin-bottom:28px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red);letter-spacing:1px;margin-bottom:8px;">GEGNER-SCHWÄCHEN</div>
+    <div style="font-size:14px;color:#aaa;line-height:1.6;">${f.opponentWeaknesses}</div>
+  </div>` : ''}
+
+  <!-- RUNDEN -->
+  ${f.rounds && f.rounds.some(r => r.notes) ? `
+  <div style="margin-bottom:28px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;margin-bottom:14px;">RUNDE FÜR RUNDE</div>
+    ${f.rounds.filter(r => r.notes).map(r => `
+    <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #111;">
+      <div style="width:40px;height:40px;border-radius:50%;background:#111;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--blue);">${r.round}</span>
+      </div>
+      <div style="font-size:14px;color:#aaa;line-height:1.6;padding-top:8px;">${r.notes}</div>
+    </div>`).join('')}
+  </div>` : ''}
+
+  <!-- ACTIONS -->
+  <div style="display:flex;gap:10px;padding-top:16px;border-top:1px solid #1a1a1a;">
+    <button onclick="editFightVideo(${idx})" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);padding:8px 16px;border-radius:4px;cursor:pointer;">${ytId ? 'VIDEO ÄNDERN' : '+ VIDEO'}</button>
+    <button onclick="if(confirm('Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);padding:8px 16px;border-radius:4px;cursor:pointer;">LÖSCHEN</button>
+  </div>`;
+
+  showPage('fight-detail');
+}
+
+function editFightVideo(idx) {
+  var url = prompt('YouTube-Link eingeben:');
+  if (url === null) return;
+  var data = getData();
+  if (!data || !data.fights[idx]) return;
+  data.fights[idx].videoLink = url.trim();
+  saveData(data);
+  openFightDetail(idx);
 }
 
 // ===== TRAINING LOG =====
