@@ -1572,6 +1572,9 @@ function addFightLog() {
   closeFightModal();
   renderFightLog();
   renderDashStats();
+  // Navigate to the new fight's detail page
+  if (typeof renderFightsPage === 'function') renderFightsPage();
+  openFightDetail(0);
 }
 
 function toggleFightRounds(idx) {
@@ -1583,39 +1586,23 @@ function renderFightLog() {
   const data = getData();
   if (!data) return;
   const el = document.getElementById('fight-log-list');
-  if (!data.fights || !data.fights.length) { el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine K\u00e4mpfe eingetragen. Nutze \u201c+ Kampf\u201d um deinen ersten Kampf zu dokumentieren.</div>'; return; }
-  el.innerHTML = data.fights.map((f, i) => {
+  if (!el) return;
+  if (!data.fights || !data.fights.length) {
+    el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine Kämpfe. <span style="color:var(--red);cursor:pointer;" onclick="openFightModal()">Ersten Kampf eintragen →</span></div>';
+    return;
+  }
+  // Show last 5 fights as compact clickable list
+  el.innerHTML = data.fights.slice(0, 5).map((f, i) => {
     const color = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
-    const label = f.result === 'S' ? 'SIEG' : f.result === 'N' ? 'NIEDERLAGE' : 'UNENTSCHIEDEN';
-    const meta = [label, f.method, f.style, f.type].filter(Boolean).join(' \u00b7 ');
-    // Round notes (collapsible) — backward compatible
-    var hasRoundNotes = f.rounds && f.rounds.some(function(r) { return r.notes; });
-    var roundsHtml = '';
-    if (hasRoundNotes) {
-      var roundItems = f.rounds.filter(function(r) { return r.notes; }).map(function(r) {
-        return '<div style="margin-bottom:4px;"><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);font-weight:700;">R' + r.round + '</span> <span style="font-family:\'DM Sans\',sans-serif;font-size:11px;color:#aaa;">' + r.notes + '</span></div>';
-      }).join('');
-      roundsHtml = '<div style="margin-top:6px;"><span onclick="toggleFightRounds(' + i + ')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);cursor:pointer;user-select:none;">&#9654; Runden-Notizen</span><div id="fight-rounds-' + i + '" style="display:none;margin-top:4px;padding:6px 8px;background:#111;border-radius:4px;border-left:2px solid var(--blue);">' + roundItems + '</div></div>';
-    }
-    var videoHtml = f.videoLink ? '<a href="' + f.videoLink + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:4px;font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);text-decoration:none;background:#111;padding:2px 8px;border-radius:3px;border:1px solid #252525;">&#9654; Video</a>' : '';
-    var weaknessHtml = f.opponentWeaknesses ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:11px;color:var(--red);margin-top:4px;">\u26A0 ' + f.opponentWeaknesses + '</div>' : '';
-    return `<div style="display:flex;align-items:flex-start;gap:16px;padding:12px 0;border-bottom:1px solid #151515;">
-      <div style="min-width:40px;text-align:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${color};">${label.charAt(0)}</div>
-        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;">${formatDate(f.date)}</div>
+    return `<div onclick="openFightDetail(${i})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #111;cursor:pointer;" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${color};width:28px;text-align:center;">${f.result}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;color:var(--white);">vs. ${f.opponent || 'Unbekannt'}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#444;">${formatDate(f.date)} · ${f.method || ''}</div>
       </div>
-      <div style="flex:1;">
-        <div style="font-size:14px;font-weight:600;color:var(--white);">vs. ${f.opponent}</div>
-        <div style="font-size:11px;color:#666;">${meta}</div>
-        ${f.good ? `<div style="font-size:11px;color:var(--green);margin-top:4px;">\u2713 ${f.good}</div>` : ''}
-        ${f.improve ? `<div style="font-size:11px;color:var(--gold);margin-top:2px;">\u2191 ${f.improve}</div>` : ''}
-        ${weaknessHtml}
-        ${roundsHtml}
-        ${videoHtml}
-      </div>
-      <button class="delete-btn" onclick="deleteFight(${i})">×</button>
+      <div style="font-size:12px;color:#333;">→</div>
     </div>`;
-  }).join('');
+  }).join('') + (data.fights.length > 5 ? `<div onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--red);padding:10px 0;cursor:pointer;text-align:center;">Alle ${data.fights.length} Kämpfe anzeigen →</div>` : '');
 }
 
 function deleteFight(i) {
