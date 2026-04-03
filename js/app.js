@@ -10,6 +10,7 @@ function isMobile() { return window.innerWidth < 768; }
 let currentUser = null;
 let editingBlock = null;
 var currentFightsTab = 'kaempfe';
+var activePrepId = null; // ID of prep being edited, null = overview
 
 // ===== BENCHMARK CONSTANTS =====
 const BENCH_LEVEL_THRESHOLDS = [
@@ -2253,21 +2254,52 @@ function makeFightFieldEditable(idx, field, container) {
 
 function getDefaultPrep() {
   return {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
     step: 1,
+    createdAt: new Date().toISOString(),
+    completed: false,
+    completedAt: null,
     opponent: { name: '', club: '', stance: '', type: '', height: '', reach: '', strengths: '', weaknesses: '', videoLink: '', notes: '' },
     gameplan: { r1: '', r2: '', r3: '', planB: '', combo1: '', combo2: '', combo3: '' },
     mentalChecklist: { alterEgo: false, triggerWords: false, visualization: false, breathing: false, videoStudied: false, comboDrilled: false },
     packingList: { mundschutz: false, bandagen: false, wettkampfpass: false, boxschuhe: false, kleidung: false, handtuch: false, wasser: false, essen: false, musik: false, seil: false },
-    triggerWords: { technik: '', motivation: '', krisen: '' }
+    triggerWords: { technik: '', motivation: '', krisen: '' },
+    fightDayNotes: ''
   };
+}
+
+// Migrate old single nextFightPrep to new preparations array
+function migratePreps(data) {
+  if (!data.preparations) data.preparations = [];
+  if (data.nextFightPrep) {
+    var old = data.nextFightPrep;
+    if (!old.id) old.id = Date.now().toString(36) + 'migrated';
+    if (!old.createdAt) old.createdAt = new Date().toISOString();
+    if (old.opponent && old.opponent.name) {
+      data.preparations.unshift(old);
+    }
+    delete data.nextFightPrep;
+    saveData(data);
+  }
+  return data.preparations;
+}
+
+function getActivePrep(data) {
+  var preps = migratePreps(data);
+  if (!activePrepId) return null;
+  for (var i = 0; i < preps.length; i++) {
+    if (preps[i].id === activePrepId) return preps[i];
+  }
+  return null;
 }
 
 function savePrepField(path, value) {
   var data = getData();
   if (!data) return;
-  if (!data.nextFightPrep) data.nextFightPrep = getDefaultPrep();
+  var prep = getActivePrep(data);
+  if (!prep) return;
   var keys = path.split('.');
-  var obj = data.nextFightPrep;
+  var obj = prep;
   for (var i = 0; i < keys.length - 1; i++) {
     if (!obj[keys[i]]) obj[keys[i]] = {};
     obj = obj[keys[i]];
@@ -2279,9 +2311,10 @@ function savePrepField(path, value) {
 function togglePrepCheck(path) {
   var data = getData();
   if (!data) return;
-  if (!data.nextFightPrep) data.nextFightPrep = getDefaultPrep();
+  var prep = getActivePrep(data);
+  if (!prep) return;
   var keys = path.split('.');
-  var obj = data.nextFightPrep;
+  var obj = prep;
   for (var i = 0; i < keys.length - 1; i++) {
     if (!obj[keys[i]]) obj[keys[i]] = {};
     obj = obj[keys[i]];
@@ -2294,19 +2327,89 @@ function togglePrepCheck(path) {
 function advancePrepStep(step) {
   var data = getData();
   if (!data) return;
-  if (!data.nextFightPrep) data.nextFightPrep = getDefaultPrep();
-  data.nextFightPrep.step = step;
+  var prep = getActivePrep(data);
+  if (!prep) return;
+  prep.step = step;
   saveData(data);
   renderFightsTab2Refresh();
 }
 
-function resetPrep() {
-  if (!confirm('Vorbereitung zuruecksetzen? Alle Eingaben gehen verloren.')) return;
+function deletePrep(id) {
+  if (!confirm('Vorbereitung loeschen? Alle Eingaben gehen verloren.')) return;
   var data = getData();
   if (!data) return;
-  data.nextFightPrep = getDefaultPrep();
+  migratePreps(data);
+  data.preparations = data.preparations.filter(function(p) { return p.id !== id; });
   saveData(data);
+  if (activePrepId === id) activePrepId = null;
   renderFightsTab2Refresh();
+}
+
+function resetPrep() {
+  if (!activePrepId) return;
+  deletePrep(activePrepId);
+}
+
+function createNewPrep() {
+  var data = getData();
+  if (!data) return;
+  migratePreps(data);
+  var newPrep = getDefaultPrep();
+  data.preparations.unshift(newPrep);
+  saveData(data);
+  activePrepId = newPrep.id;
+  renderFightsTab2Refresh();
+}
+
+function openPrep(id) {
+  activePrepId = id;
+  renderFightsTab2Refresh();
+}
+
+function backToOverview() {
+  activePrepId = null;
+  renderFightsTab2Refresh();
+}
+
+function completePrep() {
+  var data = getData();
+  if (!data) return;
+  var prep = getActivePrep(data);
+  if (!prep) return;
+  prep.completed = true;
+  prep.completedAt = new Date().toISOString();
+  saveData(data);
+  activePrepId = null;
+  renderFightsTab2Refresh();
+}
+
+function reopenPrep(id) {
+  var data = getData();
+  if (!data) return;
+  var preps = migratePreps(data);
+  for (var i = 0; i < preps.length; i++) {
+    if (preps[i].id === id) {
+      preps[i].completed = false;
+      preps[i].completedAt = null;
+      break;
+    }
+  }
+  saveData(data);
+  activePrepId = id;
+  renderFightsTab2Refresh();
+}
+
+function calcPrepReadiness(prep) {
+  var opp = prep.opponent || {};
+  var gp = prep.gameplan || {};
+  var mc = prep.mentalChecklist || {};
+  var pl = prep.packingList || {};
+  var filledOpp = [opp.name, opp.stance, opp.type, opp.strengths, opp.weaknesses].filter(Boolean).length;
+  var filledGP = [gp.r1, gp.r2, gp.r3, gp.planB, gp.combo1].filter(Boolean).length;
+  var checkedMental = [mc.alterEgo, mc.triggerWords, mc.visualization, mc.breathing, mc.videoStudied, mc.comboDrilled].filter(Boolean).length;
+  var checkedPack = ['mundschutz', 'bandagen', 'wettkampfpass', 'boxschuhe', 'kleidung', 'handtuch', 'wasser', 'essen', 'musik', 'seil'].filter(function(k) { return pl[k]; }).length;
+  var total = filledOpp + filledGP + checkedMental + checkedPack;
+  return { pct: Math.round(total / 26 * 100), opp: filledOpp, gp: filledGP, mental: checkedMental, pack: checkedPack };
 }
 
 function renderFightsTab2Refresh() {
@@ -2317,11 +2420,135 @@ function renderFightsTab2Refresh() {
 function renderPrepTabContent() {
   var data = getData();
   if (!data) return '';
-  if (!data.nextFightPrep) {
-    data.nextFightPrep = getDefaultPrep();
-    saveData(data);
+  migratePreps(data);
+  var preps = data.preparations || [];
+
+  var cardStyle = 'background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:20px;margin-bottom:16px;';
+  var headingStyle = 'font-family:"Bebas Neue",sans-serif;color:var(--white);letter-spacing:1px;';
+  var btnPrimary = 'font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;';
+
+  // If a prep is open, show the wizard
+  if (activePrepId) {
+    return renderPrepWizard(data);
   }
-  var prep = data.nextFightPrep;
+
+  // === OVERVIEW ===
+  var html = '';
+
+  // New prep button
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">' +
+    '<div>' +
+      '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">VORBEREITUNGEN</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;">Alle Kampfvorbereitungen auf einen Blick.</div>' +
+    '</div>' +
+    '<button style="' + btnPrimary + '" onclick="createNewPrep()">+ NEUE VORBEREITUNG</button>' +
+  '</div>';
+
+  if (preps.length === 0) {
+    html += '<div style="' + cardStyle + 'text-align:center;padding:60px 20px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:48px;color:#1a1a1a;margin-bottom:12px;">0</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#444;margin-bottom:24px;">Noch keine Vorbereitungen erstellt.</div>' +
+      '<button style="' + btnPrimary + '" onclick="createNewPrep()">ERSTE VORBEREITUNG STARTEN</button>' +
+    '</div>';
+    return html;
+  }
+
+  // Active preps
+  var active = preps.filter(function(p) { return !p.completed; });
+  var completed = preps.filter(function(p) { return p.completed; });
+
+  if (active.length > 0) {
+    html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:2px;margin-bottom:12px;">AKTIV (' + active.length + ')</div>';
+    active.forEach(function(p) {
+      html += renderPrepCard(p, data);
+    });
+  }
+
+  if (completed.length > 0) {
+    html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:2px;margin-bottom:12px;margin-top:24px;">ABGESCHLOSSEN (' + completed.length + ')</div>';
+    completed.forEach(function(p) {
+      html += renderPrepCard(p, data);
+    });
+  }
+
+  return html;
+}
+
+function renderPrepCard(prep, data) {
+  var cardStyle = 'background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:20px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;';
+  var opp = prep.opponent || {};
+  var r = calcPrepReadiness(prep);
+  var readyColor = r.pct === 100 ? 'var(--green)' : r.pct >= 70 ? 'var(--gold)' : 'var(--red)';
+  var title = opp.name || 'Unbekannter Gegner';
+  var subtitle = [opp.club, opp.type, opp.stance].filter(Boolean).join(' \u2022 ');
+  var dateStr = '';
+  if (prep.createdAt) {
+    var d = new Date(prep.createdAt);
+    dateStr = d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  var statusBorder = prep.completed ? 'var(--green)' : readyColor;
+  var statusLabel = prep.completed ? 'ABGESCHLOSSEN' : 'SCHRITT ' + (prep.step || 1) + '/5';
+  var statusColor = prep.completed ? 'var(--green)' : '#555';
+
+  var html = '<div style="' + cardStyle + 'border-left:3px solid ' + statusBorder + ';" ';
+  html += 'onmouseenter="this.style.borderColor=\'' + statusBorder + '\'" onmouseleave="this.style.borderColor=\'#1a1a1a\';this.style.borderLeftColor=\'' + statusBorder + '\'">';
+
+  html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
+  html += '<div style="flex:1;cursor:pointer;" onclick="openPrep(\'' + prep.id + '\')">';
+  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">';
+  html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);letter-spacing:1px;">' + title.replace(/</g, '&lt;') + '</div>';
+  if (prep.completed) {
+    html += '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--green);border:1px solid var(--green);padding:2px 6px;border-radius:3px;letter-spacing:1px;">DONE</span>';
+  }
+  html += '</div>';
+  if (subtitle) {
+    html += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;margin-bottom:10px;">' + subtitle.replace(/</g, '&lt;') + '</div>';
+  }
+
+  // Mini readiness bar
+  html += '<div style="display:flex;align-items:center;gap:12px;">';
+  html += '<div style="flex:1;max-width:200px;height:4px;background:#111;border-radius:2px;overflow:hidden;"><div style="width:' + r.pct + '%;height:100%;background:' + readyColor + ';border-radius:2px;"></div></div>';
+  html += '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:' + readyColor + ';">' + r.pct + '%</span>';
+  html += '</div>';
+
+  // Detail chips
+  html += '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">';
+  var chips = [
+    { label: 'GEGNER', val: r.opp, max: 5 },
+    { label: 'GAMEPLAN', val: r.gp, max: 5 },
+    { label: 'MENTAL', val: r.mental, max: 6 },
+    { label: 'EQUIPMENT', val: r.pack, max: 10 }
+  ];
+  chips.forEach(function(c) {
+    var done = c.val === c.max;
+    html += '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:' + (done ? 'var(--green)' : '#444') + ';background:#111;padding:3px 8px;border-radius:3px;letter-spacing:1px;">' + (done ? '\u2713 ' : '') + c.label + ' ' + c.val + '/' + c.max + '</span>';
+  });
+  html += '</div>';
+
+  html += '</div>'; // close left side
+
+  // Right side: date + actions
+  html += '<div style="text-align:right;flex-shrink:0;margin-left:16px;">';
+  html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;margin-bottom:8px;">' + dateStr + '</div>';
+  html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + statusColor + ';letter-spacing:1px;margin-bottom:12px;">' + statusLabel + '</div>';
+
+  if (prep.completed) {
+    html += '<button onclick="event.stopPropagation();reopenPrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;background:none;border:1px solid #252525;padding:4px 10px;border-radius:3px;cursor:pointer;margin-bottom:4px;display:block;width:100%;">BEARBEITEN</button>';
+  }
+  html += '<button onclick="event.stopPropagation();deletePrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;background:none;border:none;cursor:pointer;letter-spacing:1px;">LOESCHEN</button>';
+  html += '</div>';
+
+  html += '</div>'; // close flex row
+  html += '</div>'; // close card
+
+  return html;
+}
+
+function renderPrepWizard(data) {
+  var prep = getActivePrep(data);
+  if (!prep) { activePrepId = null; return renderPrepTabContent(); }
+
   var step = prep.step || 1;
   var fights = data.fights || [];
 
@@ -2332,6 +2559,13 @@ function renderPrepTabContent() {
   var cardStyle = 'background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:20px;margin-bottom:16px;';
   var btnPrimary = 'font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;';
   var btnSecondary = 'font-family:"Space Mono",monospace;font-size:11px;letter-spacing:1px;padding:10px 20px;background:transparent;color:#555;border:1px solid #252525;border-radius:4px;cursor:pointer;';
+
+  // Back to overview
+  var oppName = (prep.opponent && prep.opponent.name) ? prep.opponent.name : 'Neue Vorbereitung';
+  var backHTML = '<div style="margin-bottom:20px;">' +
+    '<button onclick="backToOverview()" style="' + btnSecondary + 'padding:6px 14px;font-size:10px;">\u2190 ALLE VORBEREITUNGEN</button>' +
+    '<div style="' + headingStyle + 'font-size:22px;margin-top:12px;">' + oppName.replace(/</g, '&lt;') + '</div>' +
+  '</div>';
 
   // Progress bar
   var stepLabels = ['GEGNER', 'GAMEPLAN', 'MENTAL', 'EQUIPMENT', 'FIGHT DAY'];
@@ -2369,7 +2603,7 @@ function renderPrepTabContent() {
     if (currentStep < 5) {
       html += '<button style="' + btnPrimary + '" onclick="advancePrepStep(' + (currentStep + 1) + ')">WEITER \u2192</button>';
     } else {
-      html += '<button style="' + btnPrimary + 'background:var(--green);" onclick="resetPrep()">VORBEREITUNG ABSCHLIESSEN</button>';
+      html += '<button style="' + btnPrimary + 'background:var(--green);" onclick="completePrep()">VORBEREITUNG ABSCHLIESSEN</button>';
     }
     html += '</div>';
     return html;
@@ -2556,14 +2790,40 @@ function renderPrepTabContent() {
       contentHTML += '</div></div>';
     });
 
-    contentHTML += '</div>' + navButtons(5);
+    contentHTML += '</div>';
+
+    // Fight Day Notes
+    contentHTML += '<div style="' + cardStyle + 'margin-top:16px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">EIGENE NOTIZEN</div>' +
+      '<textarea style="' + textareaStyle + '" oninput="savePrepField(\'fightDayNotes\', this.value)" placeholder="Persoenliche Notizen fuer den Kampftag...">' + (prep.fightDayNotes || '') + '</textarea>' +
+    '</div>';
+
+    // Readiness Overview
+    var r = calcPrepReadiness(prep);
+    var readyColor = r.pct === 100 ? 'var(--green)' : r.pct >= 70 ? 'var(--gold)' : 'var(--red)';
+
+    contentHTML += '<div style="' + cardStyle + 'margin-top:16px;border-color:' + readyColor + '30;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">READINESS CHECK</div>' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:' + readyColor + ';">' + r.pct + '%</div>' +
+      '</div>' +
+      '<div style="height:6px;background:#111;border-radius:3px;overflow:hidden;margin-bottom:16px;"><div style="width:' + r.pct + '%;height:100%;background:' + readyColor + ';border-radius:3px;transition:width .3s;"></div></div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + (r.opp >= 4 ? 'var(--green)' : '#555') + ';letter-spacing:1px;">' + (r.opp >= 4 ? '\u2713' : '\u25CB') + ' GEGNER ' + r.opp + '/5</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + (r.gp >= 4 ? 'var(--green)' : '#555') + ';letter-spacing:1px;">' + (r.gp >= 4 ? '\u2713' : '\u25CB') + ' GAMEPLAN ' + r.gp + '/5</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + (r.mental === 6 ? 'var(--green)' : '#555') + ';letter-spacing:1px;">' + (r.mental === 6 ? '\u2713' : '\u25CB') + ' MENTAL ' + r.mental + '/6</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + (r.pack === 10 ? 'var(--green)' : '#555') + ';letter-spacing:1px;">' + (r.pack === 10 ? '\u2713' : '\u25CB') + ' EQUIPMENT ' + r.pack + '/10</div>' +
+      '</div>' +
+    '</div>';
+
+    contentHTML += navButtons(5);
   }
 
-  var resetHTML = '<div style="text-align:center;margin-top:20px;">' +
-    '<button onclick="resetPrep()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;background:none;border:none;cursor:pointer;letter-spacing:1px;">VORBEREITUNG ZUR\u00dcCKSETZEN</button>' +
+  var deleteHTML = '<div style="text-align:center;margin-top:20px;">' +
+    '<button onclick="deletePrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;background:none;border:none;cursor:pointer;letter-spacing:1px;">VORBEREITUNG L\u00d6SCHEN</button>' +
   '</div>';
 
-  return progressHTML + contentHTML + resetHTML;
+  return backHTML + progressHTML + contentHTML + deleteHTML;
 }
 
 // ===== TRAINING LOG =====
