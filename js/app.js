@@ -2108,37 +2108,26 @@ function openFightDetail(idx) {
 
   // Timestamp markers
   var markers = f.timestamps || [];
-  var markerTags = [
-    { key: 'guter-angriff', label: 'Guter Angriff', color: 'var(--green)' },
-    { key: 'treffer-kassiert', label: 'Treffer kassiert', color: 'var(--red)' },
-    { key: 'gute-defense', label: 'Gute Defense', color: 'var(--blue)' },
-    { key: 'taktik', label: 'Taktik/Muster', color: 'var(--gold)' },
-    { key: 'fehler', label: 'Fehler', color: 'var(--orange)' },
-    { key: 'sonstiges', label: 'Sonstiges', color: '#555' }
-  ];
   var timestampsHTML = '<div style="display:flex;flex-direction:column;height:100%;">' +
-    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">MARKIERUNGEN</div>' +
-    '<div style="display:flex;gap:6px;margin-bottom:12px;">' +
-      '<button onclick="addTimestampNow(' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:6px 10px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;" title="Aktuelle Video-Zeit einfuegen">JETZT</button>' +
-      '<input id="ts-input" type="text" placeholder="1:30 guter Konter rechts" style="flex:1;padding:6px 10px;background:#111;border:1px solid #1a1a1a;color:#ccc;font-family:\'DM Sans\',sans-serif;font-size:12px;border-radius:4px;outline:none;box-sizing:border-box;" onkeydown="if(event.key===\'Enter\')addTimestamp(' + idx + ')">' +
+    '<button onclick="markNow(' + idx + ')" style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;padding:14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;margin-bottom:12px;transition:opacity .15s;" onmousedown="this.style.opacity=\'0.7\'" onmouseup="this.style.opacity=\'1\'">MARKIEREN</button>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+      '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;letter-spacing:1px;">' + markers.length + ' MARKIERUNG' + (markers.length !== 1 ? 'EN' : '') + '</span>' +
     '</div>' +
-    '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:#222;margin-bottom:12px;">Format: 1:30 Text — oder druecke JETZT + tippe</div>' +
-    '<div id="ts-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px;">';
+    '<div id="ts-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;">';
 
   markers.sort(function(a, b) { return a.time - b.time; });
   if (markers.length === 0) {
-    timestampsHTML += '<div style="text-align:center;padding:20px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Keine Markierungen</div>';
+    timestampsHTML += '<div style="text-align:center;padding:24px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Druecke MARKIEREN waehrend<br>du den Kampf schaust</div>';
   } else {
     markers.forEach(function(m, mi) {
-      var mins = Math.floor(m.time / 60);
-      var secs = m.time % 60;
-      var timeStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
-      var tag = _tsMarkerTags.find(function(t) { return t.key === m.tag; });
-      var tagColor = tag ? tag.color : '#555';
-      timestampsHTML += '<div style="display:flex;align-items:flex-start;gap:8px;padding:8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
-        '<span onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;" title="Hinspulen">' + timeStr + '</span>' +
-        '<div style="flex:1;min-width:0;font-family:\'DM Sans\',sans-serif;font-size:12px;color:#aaa;line-height:1.4;word-break:break-word;">' + (m.text || '').replace(/</g, '&lt;') + '</div>' +
-        '<span onclick="deleteTimestamp(' + idx + ',' + mi + ')" style="font-size:12px;color:#222;cursor:pointer;padding:0 4px;">\u00d7</span>' +
+      var tagColor = _tsTagColors[m.tag] || '#555';
+      timestampsHTML += '<div id="ts-item-' + mi + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
+        '<span id="ts-time-' + mi + '" onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;">' + formatTs(m.time) + '</span>' +
+        '<input id="ts-text-' + mi + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '" placeholder="Beschreibung..." ' +
+          'onblur="updateTimestampText(' + idx + ',' + mi + ',this.value)" ' +
+          'onkeydown="if(event.key===\'Enter\')this.blur()" ' +
+          'style="flex:1;padding:4px 6px;background:transparent;border:none;border-bottom:1px solid #111;color:#aaa;font-family:\'DM Sans\',sans-serif;font-size:12px;outline:none;min-width:0;">' +
+        '<span onclick="deleteTimestamp(' + idx + ',' + mi + ')" style="font-size:14px;color:#222;cursor:pointer;padding:0 2px;line-height:1;">\u00d7</span>' +
       '</div>';
     });
   }
@@ -2377,33 +2366,7 @@ function setRoundWinner(idx, roundIdx, winner) {
 }
 
 // ===== TIMESTAMP SYSTEM =====
-var _tsMarkerTags = [
-  { key: 'guter-angriff', label: 'Angriff', color: 'var(--green)' },
-  { key: 'treffer-kassiert', label: 'Treffer', color: 'var(--red)' },
-  { key: 'gute-defense', label: 'Defense', color: 'var(--blue)' },
-  { key: 'taktik', label: 'Taktik', color: 'var(--gold)' },
-  { key: 'fehler', label: 'Fehler', color: 'var(--orange)' },
-  { key: 'sonstiges', label: 'Sonstiges', color: '#555' }
-];
-
-function parseTimestampInput(text) {
-  // Parse "1:30 guter Konter" or "1.30 guter Konter" or "90 guter Konter"
-  var match = text.match(/^(\d{1,2})[:\.](\d{1,2})\s+(.+)/);
-  if (match) return { time: parseInt(match[1]) * 60 + parseInt(match[2]), text: match[3].trim() };
-  var match2 = text.match(/^(\d{1,3})\s+(.+)/);
-  if (match2) return { time: parseInt(match2[1]), text: match2[2].trim() };
-  return null;
-}
-
-function autoDetectTag(text) {
-  var t = text.toLowerCase();
-  if (/treffer|kassiert|getroffen|hit|schlag.*(kassiert|bekommen)/.test(t)) return 'treffer-kassiert';
-  if (/angriff|kombi|cross|hook|jab|uppercut|schlag|treffer.*gelandet|gut.*geschlagen/.test(t)) return 'guter-angriff';
-  if (/defense|deckung|block|ausweich|parr|abwehr|slip|roll/.test(t)) return 'gute-defense';
-  if (/taktik|muster|pattern|gewohnheit|immer|wiederhol|tender/.test(t)) return 'taktik';
-  if (/fehler|offen|schlecht|problem|falsch|verpasst/.test(t)) return 'fehler';
-  return 'sonstiges';
-}
+var _tsCurrentFightIdx = null;
 
 function getCurrentVideoTime() {
   if (window._fightPlayer && typeof window._fightPlayer.getCurrentTime === 'function') {
@@ -2412,42 +2375,59 @@ function getCurrentVideoTime() {
   return 0;
 }
 
-function addTimestamp(idx) {
-  var input = document.getElementById('ts-input');
-  if (!input) return;
-  var raw = input.value.trim();
-  if (!raw) return;
+function formatTs(sec) {
+  var m = Math.floor(sec / 60);
+  var s = sec % 60;
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
 
-  var parsed = parseTimestampInput(raw);
-  var totalSec, text;
-  if (parsed) {
-    totalSec = parsed.time;
-    text = parsed.text;
-  } else {
-    // No timestamp in text — use current video time
-    totalSec = getCurrentVideoTime();
-    text = raw;
-  }
+function autoDetectTag(text) {
+  if (!text) return 'sonstiges';
+  var t = text.toLowerCase();
+  if (/treffer|kassiert|getroffen|hit|schlag.*(kassiert|bekommen)/.test(t)) return 'treffer-kassiert';
+  if (/angriff|kombi|cross|hook|jab|uppercut|schlag|gut/.test(t)) return 'guter-angriff';
+  if (/defense|deckung|block|ausweich|parr|slip|roll/.test(t)) return 'gute-defense';
+  if (/taktik|muster|pattern|gewohnheit|immer/.test(t)) return 'taktik';
+  if (/fehler|offen|schlecht|problem|falsch/.test(t)) return 'fehler';
+  return 'sonstiges';
+}
 
-  var tag = autoDetectTag(text);
+var _tsTagColors = {
+  'guter-angriff': 'var(--green)', 'treffer-kassiert': 'var(--red)',
+  'gute-defense': 'var(--blue)', 'taktik': 'var(--gold)',
+  'fehler': 'var(--orange)', 'sonstiges': '#555'
+};
+
+// JETZT drücken = sofort Marker setzen
+function markNow(idx) {
+  var sec = getCurrentVideoTime();
   var data = getData();
   if (!data || !data.fights[idx]) return;
   if (!data.fights[idx].timestamps) data.fights[idx].timestamps = [];
-  data.fights[idx].timestamps.push({ time: totalSec, text: text, tag: tag, created: new Date().toISOString() });
+  data.fights[idx].timestamps.push({ time: sec, text: '', tag: 'sonstiges', created: new Date().toISOString() });
   saveData(data);
-  input.value = '';
+  _tsCurrentFightIdx = idx;
   renderTimestampList(idx);
+  // Focus the new marker's text for immediate typing
+  setTimeout(function() {
+    var newIdx = data.fights[idx].timestamps.length - 1;
+    var el = document.getElementById('ts-text-' + newIdx);
+    if (el) el.focus();
+  }, 50);
 }
 
-function addTimestampNow(idx) {
-  var sec = getCurrentVideoTime();
-  var input = document.getElementById('ts-input');
-  if (input) {
-    var mins = Math.floor(sec / 60);
-    var secs = sec % 60;
-    input.value = mins + ':' + (secs < 10 ? '0' : '') + secs + ' ';
-    input.focus();
-  }
+function updateTimestampText(idx, tsIdx, value) {
+  var data = getData();
+  if (!data || !data.fights[idx]) return;
+  if (!data.fights[idx].timestamps || !data.fights[idx].timestamps[tsIdx]) return;
+  data.fights[idx].timestamps[tsIdx].text = value.trim();
+  data.fights[idx].timestamps[tsIdx].tag = autoDetectTag(value);
+  saveData(data);
+  // Update border color live
+  var el = document.getElementById('ts-item-' + tsIdx);
+  if (el) el.style.borderLeftColor = _tsTagColors[data.fights[idx].timestamps[tsIdx].tag] || '#555';
+  var timeEl = document.getElementById('ts-time-' + tsIdx);
+  if (timeEl) timeEl.style.color = _tsTagColors[data.fights[idx].timestamps[tsIdx].tag] || '#555';
 }
 
 function deleteTimestamp(idx, tsIdx) {
@@ -2468,20 +2448,19 @@ function renderTimestampList(idx) {
   markers.sort(function(a, b) { return a.time - b.time; });
 
   if (markers.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:20px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Keine Markierungen.<br>Tippe z.B. "1:30 guter Konter"</div>';
+    el.innerHTML = '<div style="text-align:center;padding:24px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Druecke JETZT waehrend<br>du den Kampf schaust</div>';
     return;
   }
 
   el.innerHTML = markers.map(function(m, mi) {
-    var mins = Math.floor(m.time / 60);
-    var secs = m.time % 60;
-    var timeStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
-    var tag = _tsMarkerTags.find(function(t) { return t.key === m.tag; });
-    var tagColor = tag ? tag.color : '#555';
-    return '<div style="display:flex;align-items:flex-start;gap:8px;padding:8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
-      '<span onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;padding-top:1px;" title="Zu ' + timeStr + ' spulen">' + timeStr + '</span>' +
-      '<div style="flex:1;min-width:0;font-family:\'DM Sans\',sans-serif;font-size:12px;color:#aaa;line-height:1.4;word-break:break-word;">' + (m.text || '').replace(/</g, '&lt;') + '</div>' +
-      '<span onclick="deleteTimestamp(' + idx + ',' + mi + ')" style="font-size:12px;color:#222;cursor:pointer;padding:0 4px;" title="Loeschen">\u00d7</span>' +
+    var tagColor = _tsTagColors[m.tag] || '#555';
+    return '<div id="ts-item-' + mi + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
+      '<span id="ts-time-' + mi + '" onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;">' + formatTs(m.time) + '</span>' +
+      '<input id="ts-text-' + mi + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '" placeholder="Beschreibung..." ' +
+        'onblur="updateTimestampText(' + idx + ',' + mi + ',this.value)" ' +
+        'onkeydown="if(event.key===\'Enter\')this.blur()" ' +
+        'style="flex:1;padding:4px 6px;background:transparent;border:none;border-bottom:1px solid #111;color:#aaa;font-family:\'DM Sans\',sans-serif;font-size:12px;outline:none;min-width:0;">' +
+      '<span onclick="deleteTimestamp(' + idx + ',' + mi + ')" style="font-size:14px;color:#222;cursor:pointer;padding:0 2px;line-height:1;">\u00d7</span>' +
     '</div>';
   }).join('');
 }
