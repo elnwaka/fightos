@@ -455,8 +455,9 @@ function enterApp() {
   }
   // Init pages content
   if (typeof renderAllPages === 'function') renderAllPages();
-  renderDashboard();
   renderLogEntries();
+  // Navigate to page from URL hash (or dashboard if none)
+  showPage(getPageFromHash());
 }
 
 // NOTE: Auto-login + event listeners are in index.html init script
@@ -477,7 +478,9 @@ function saveData(data) {
   localStorage.setItem('fos_data_' + currentUser, JSON.stringify(data));
 }
 
-// ===== NAVIGATION =====
+// ===== NAVIGATION + HASH ROUTING =====
+var _skipHashUpdate = false;
+
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -517,7 +520,27 @@ function showPage(pageId) {
   if (document.activeElement && document.activeElement.tagName !== 'BODY') {
     document.activeElement.blur();
   }
+  // Update URL hash
+  if (!_skipHashUpdate) {
+    location.hash = pageId === 'dashboard' ? '' : pageId;
+  }
 }
+
+function getPageFromHash() {
+  var hash = location.hash.replace('#', '').replace('/', '');
+  if (!hash) return 'dashboard';
+  // Validate: only allow known pages
+  var valid = ['dashboard','fights','wochenplan','uebungen','tests','log','periodisierung',
+    'ernaehrung','cutten','supplements','regeneration','saeulen','mental','rechner','faq','account'];
+  return valid.indexOf(hash) !== -1 ? hash : 'dashboard';
+}
+
+window.addEventListener('hashchange', function() {
+  if (!currentUser) return;
+  _skipHashUpdate = true;
+  showPage(getPageFromHash());
+  _skipHashUpdate = false;
+});
 
 // ===== FIGHT DATE SYSTEM =====
 
