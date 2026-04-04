@@ -440,6 +440,8 @@ function enterApp() {
   document.getElementById('auth-screen').classList.remove('active');
   document.getElementById('app-screen').classList.add('active');
   document.getElementById('user-pill').textContent = getDisplayName();
+  // Prevent any input from stealing focus on load
+  setTimeout(function() { document.activeElement && document.activeElement.blur(); }, 150);
   // Cleanup old completed blocks (keep only current week)
   const data = getData();
   if (data && data.completedBlocks) {
@@ -511,6 +513,10 @@ function showPage(pageId) {
   if (pageId === 'fights') renderFightsPage();
   if (pageId === 'fight-detail') navPage = 'fights';
   window.scrollTo(0, 0);
+  // Remove focus from any input to prevent blinking caret
+  if (document.activeElement && document.activeElement.tagName !== 'BODY') {
+    document.activeElement.blur();
+  }
 }
 
 // ===== FIGHT DATE SYSTEM =====
