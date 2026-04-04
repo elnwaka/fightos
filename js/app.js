@@ -981,13 +981,18 @@ function logHRV() {
   if (data.hrv.length > 90) data.hrv.pop();
   saveData(data);
   document.getElementById('hrv-input').value = '';
+  document.getElementById('hrv-input').placeholder = '\u2713 ' + val;
+  setTimeout(function() {
+    var inp = document.getElementById('hrv-input');
+    if (inp && inp.placeholder.indexOf('\u2713') === 0) inp.placeholder = 'RMSSD';
+  }, 2000);
   renderHRV();
 }
 
 function renderHRV() {
   const data = getData();
   if (!data || !data.hrv || !data.hrv.length) {
-    document.getElementById('hrv-display').innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine HRV-Daten. Trage morgens deinen RMSSD-Wert ein \u2014 die meisten Pulsuhren zeigen ihn an.</div>';
+    document.getElementById('hrv-display').innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine Daten. RMSSD findest du in deiner Pulsuhr-App (Garmin, Whoop, Polar). Hoher Wert = erholt, niedriger Wert = muede. Trage ihn morgens ein.</div>';
     return;
   }
   const recent = data.hrv.slice(0, 7);
@@ -1494,6 +1499,24 @@ function applyPD(pageId, prefix, openFirst) {
   });
 }
 
+function saveBatchBenchmarks() {
+  var BENCHMARKS = getBenchmarks();
+  var count = 0;
+  BENCHMARKS.forEach(function(b) {
+    var el = document.getElementById('batch-' + b.id);
+    if (el && el.value && parseFloat(el.value) > 0) {
+      updateBenchmark(b.id, el.value);
+      count++;
+    }
+  });
+  var confirm = document.getElementById('batch-confirm');
+  if (confirm) {
+    confirm.textContent = '\u2713 ' + count + ' Tests gespeichert';
+    confirm.style.display = 'inline';
+    setTimeout(function() { confirm.style.display = 'none'; }, 3000);
+  }
+}
+
 function updateBenchmark(id, val) {
   const data = getData();
   if (!data) return;
@@ -1528,22 +1551,12 @@ function updateBenchmark(id, val) {
 function openFightModal() {
   document.getElementById('fight-modal').classList.add('active');
   document.getElementById('fight-log-date').value = new Date().toISOString().split('T')[0];
-  // Inject round notes, video link, opponent weaknesses fields
-  if (!document.getElementById('fight-log-round1')) {
-    var submitBtn = document.querySelector('#fight-modal .submit-btn');
-    if (submitBtn) {
-      var ef = document.createElement('div');
-      ef.id = 'fight-extra-fields';
-      ef.innerHTML = '<div style="margin-bottom:16px;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:10px;letter-spacing:1px;">RUNDEN-NOTIZEN</div><div style="margin-bottom:10px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Runde 1</label><textarea id="fight-log-round1" rows="2" placeholder="Notizen zu Runde 1..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea></div><div style="margin-bottom:10px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Runde 2</label><textarea id="fight-log-round2" rows="2" placeholder="Notizen zu Runde 2..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea></div><div style="margin-bottom:10px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Runde 3</label><textarea id="fight-log-round3" rows="2" placeholder="Notizen zu Runde 3..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea></div></div><div class="form-group-inline" style="margin-bottom:16px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Video-Link (optional)</label><input type="url" id="fight-log-video" placeholder="https://..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;box-sizing:border-box;"></div><div class="form-group-inline" style="margin-bottom:16px;"><label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Gegner-Schw\u00e4chen</label><textarea id="fight-log-weaknesses" rows="2" placeholder="z.B. Schwache Deckung rechts, langsame F\u00fchrhand..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:\'DM Sans\';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea></div>';
-      submitBtn.parentNode.insertBefore(ef, submitBtn);
-    }
-  } else {
-    document.getElementById('fight-log-round1').value = '';
-    document.getElementById('fight-log-round2').value = '';
-    document.getElementById('fight-log-round3').value = '';
-    document.getElementById('fight-log-video').value = '';
-    document.getElementById('fight-log-weaknesses').value = '';
-  }
+  // Reset all extra fields (now static in DOM)
+  var fields = ['fight-log-round1', 'fight-log-round2', 'fight-log-round3', 'fight-log-video', 'fight-log-weaknesses', 'fight-log-good', 'fight-log-improve'];
+  fields.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
 }
 function closeFightModal() { document.getElementById('fight-modal').classList.remove('active'); }
 
@@ -1787,7 +1800,7 @@ function renderFightsTab1(contentEl, data) {
   </div>
   <div id="fights-timeline-list">
     ${fights.length === 0
-      ? '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#444;padding:20px 0;text-align:center;">Noch keine Kämpfe. Trage deinen ersten Kampf ein.</div>'
+      ? '<div style="text-align:center;padding:40px 0;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#1a1a1a;">0 K\u00c4MPFE</div><div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#444;margin:8px 0 16px;">Trage deinen ersten Kampf ein und baue dein Kampfarchiv auf.</div><button class="submit-btn" style="padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ ERSTEN KAMPF EINTRAGEN</button></div>'
       : timelineRows}
   </div>`;
 }
@@ -1801,7 +1814,13 @@ function renderFightsTab3(contentEl, data) {
 
   // Guard: need at least 3 fights
   if (fights.length < 3) {
-    contentEl.innerHTML = '<div style="padding:40px 0;text-align:center;font-family:\'Space Mono\',monospace;font-size:12px;color:#444;">Trage mindestens 3 K\u00e4mpfe ein um Muster zu erkennen.</div>';
+    contentEl.innerHTML = '<div style="padding:60px 20px;text-align:center;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:36px;color:#1a1a1a;margin-bottom:8px;">ANALYSE</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#444;margin-bottom:20px;">Ab 3 K\u00e4mpfen erkennt FightOS Muster in deinen St\u00e4rken und Schw\u00e4chen.</div>' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + fights.length + '/3 K\u00e4mpfe eingetragen</div>' +
+      '<div style="width:120px;height:4px;background:#111;border-radius:2px;margin:12px auto;overflow:hidden;"><div style="width:' + Math.round(fights.length / 3 * 100) + '%;height:100%;background:var(--red);border-radius:2px;"></div></div>' +
+      '<button class="submit-btn" style="margin-top:16px;padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ KAMPF EINTRAGEN</button>' +
+    '</div>';
     return;
   }
 
@@ -2826,6 +2845,30 @@ function renderPrepWizard(data) {
   return backHTML + progressHTML + contentHTML + deleteHTML;
 }
 
+// ===== QUICK LOG (Dashboard) =====
+function quickLog() {
+  var data = getData();
+  if (!data) return;
+  if (!data.log) data.log = [];
+  var type = document.getElementById('qlog-type').value;
+  var duration = parseInt(document.getElementById('qlog-duration').value) || 0;
+  var rpe = parseInt(document.getElementById('qlog-rpe').value) || 0;
+  if (!duration) { alert('Dauer eingeben!'); return; }
+  var today = new Date().toISOString().split('T')[0];
+  data.log.unshift({ date: today, type: type, duration: duration, rpe: rpe, weight: null, notes: '' });
+  saveData(data);
+  document.getElementById('qlog-duration').value = '';
+  document.getElementById('qlog-rpe').value = '';
+  var confirm = document.getElementById('qlog-confirm');
+  var labels = { boxen:'Boxen', sparring:'Sparring', kraft:'Kraft', cardio:'Cardio', mobility:'Mobility' };
+  confirm.textContent = '\u2713 ' + (labels[type] || type) + ' \u2014 ' + duration + ' Min.';
+  confirm.style.display = 'block';
+  setTimeout(function() { confirm.style.display = 'none'; }, 3000);
+  renderRecentLog();
+  renderDashStats();
+  if (typeof renderLogEntries === 'function') renderLogEntries();
+}
+
 // ===== TRAINING LOG =====
 function addLogEntry() {
   const data = getData();
@@ -2858,8 +2901,8 @@ function addLogEntry() {
   renderRecentLog();
 }
 
-const TYPE_COLORS = { kraft: 'var(--blue)', boxen: 'var(--red)', sparring: 'var(--red)', cardio: 'var(--green)', pratzen: 'var(--orange)', technik: 'var(--gold)', mobility: 'var(--purple)' };
-const TYPE_LABELS = { kraft: 'Kraft / S&C', boxen: 'Boxen', sparring: 'Sparring', cardio: 'Cardio', pratzen: 'Pratzen', technik: 'Technik', mobility: 'Mobility' };
+const TYPE_COLORS = { kraft: 'var(--blue)', boxen: 'var(--red)', sparring: 'var(--red)', cardio: 'var(--green)', pratzen: 'var(--red)', technik: 'var(--red)', mobility: 'var(--purple)' };
+const TYPE_LABELS = { kraft: 'Kraft', boxen: 'Boxen', sparring: 'Sparring', cardio: 'Cardio', pratzen: 'Boxen', technik: 'Boxen', mobility: 'Mobility / Recovery' };
 
 function renderLogEntries() {
   const data = getData();
@@ -3246,7 +3289,7 @@ function renderWeekPlan() {
         const dp = dayPhases[day];
         const isToday = di === todayDow;
         return `<div class="day-col${isToday ? ' day-today' : ''}">
-          <div class="day-header">
+          <div class="day-header" onclick="toggleDayCol(this)">
             <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--gold);">HEUTE</span>' : ''}</div>
             ${dp ? `<div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:${dp.color};margin-top:2px;">${dp.label}</div>` : ''}
           </div>
@@ -3282,6 +3325,12 @@ function regenerateWeekPlan() {
   data.weekPlan = generateSmartWeekPlan();
   saveData(data);
   renderWeekPlan();
+}
+
+function toggleDayCol(el) {
+  if (!isMobile()) return;
+  var col = el.closest('.day-col');
+  if (col) col.classList.toggle('day-expanded');
 }
 
 function editBlock(day, idx) {
@@ -4430,6 +4479,32 @@ function renderTestsPage() {
     </div>`;
   }).join('');
 
+  // Batch input form
+  const batchHTML = `<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:20px;margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;cursor:pointer;" onclick="var c=document.getElementById('batch-test-form');c.style.display=c.style.display==='none'?'block':'none';">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">ALLE TESTS AUF EINMAL EINTRAGEN</div>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--red);letter-spacing:1px;">AUFKLAPPEN ▾</span>
+    </div>
+    <div id="batch-test-form" style="display:none;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+        ${BENCHMARKS.map(b => {
+          const curVal = data.benchmarks[b.id] || '';
+          return `<div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-family:'Space Mono',monospace;font-size:10px;color:#555;letter-spacing:1px;">${b.name.toUpperCase()}</label>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input type="number" id="batch-${b.id}" class="form-input" style="flex:1;padding:8px 10px;font-size:13px;" placeholder="${curVal || b.target}" value="${curVal}" step="any">
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;">${b.unit}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;">
+        <button class="submit-btn" style="padding:10px 24px;font-size:13px;" onclick="saveBatchBenchmarks()">ALLE SPEICHERN</button>
+        <span id="batch-confirm" style="display:none;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);"></span>
+      </div>
+    </div>
+  </div>`;
+
   el.innerHTML = `
     <div class="page-header">
       <div class="page-title">LEISTUNGS<span>TESTS</span></div>
@@ -4437,6 +4512,7 @@ function renderTestsPage() {
     </div>
     <div class="tests-wrap">
       ${heroHTML}
+      ${batchHTML}
       ${progressHTML}
       ${benchHTML}
     </div>

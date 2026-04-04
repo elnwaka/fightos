@@ -32,6 +32,7 @@ function calcMakrosErn() {
     <div class="calc-result-card"><div class="calc-result-val" style="color:#7eb4ff">${p}g</div><div class="calc-result-unit">Protein</div><div class="calc-result-desc">${proteinG}g/kg · ${perMeal}g/Mahlzeit</div></div>
     <div class="calc-result-card"><div class="calc-result-val" style="color:#6dffa7">${k}g</div><div class="calc-result-unit">Kohlenhydrate</div><div class="calc-result-desc">${khG}g/kg</div></div>
     <div class="calc-result-card"><div class="calc-result-val" style="color:#ffb47a">${f}g</div><div class="calc-result-unit">Fett</div><div class="calc-result-desc">${fatG}g/kg</div></div>`;
+  el.innerHTML += '<div style="grid-column:1/-1;text-align:center;margin-top:12px;"><button class="calc-btn" style="background:var(--green);padding:10px 24px;" onclick="saveNutritionPlan()">ALS MEIN PLAN SPEICHERN</button><div id="ern-save-confirm" style="display:none;font-family:\'Space Mono\',monospace;font-size:11px;color:var(--green);margin-top:8px;"></div></div>';
 
   const s = typeof getUserSchedule === 'function' ? getUserSchedule() : { workStart:'08:00', workEnd:'17:00', trainingTime:'18:00' };
   const today = typeof getTodaySchedule === 'function' ? getTodaySchedule() : { time: s.trainingTime, type: 'boxen' };
@@ -60,6 +61,33 @@ function calcMakrosErn() {
         <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border-radius:4px;"><span style="color:var(--light)">${mealTimes.recovery} Recovery</span><span style="color:#7eb4ff">${Math.round(p*0.21)}g P (Casein)</span><span style="color:#6dffa7">${Math.round(k*0.12)}g KH</span></div>
       </div>
     </div>`;
+}
+
+// ===== ERNÄHRUNGS-PLAN SPEICHERN =====
+function saveNutritionPlan() {
+  var data = typeof getData === 'function' ? getData() : null;
+  if (!data) return;
+  var w = parseFloat(document.getElementById('ern-weight').value) || 75;
+  var phase = document.getElementById('ern-phase').value || 'aufbau';
+  var vol = document.getElementById('ern-vol').value || 'mittel';
+  var job = document.getElementById('ern-job').value || 'sitz';
+  var proteinG = { aufbau: 2.2, wettkampf: 2.2, cutten: 2.6, maintain: 2.0 }[phase];
+  var khG = { aufbau: 5.5, wettkampf: 4.5, cutten: 3.0, maintain: 4.0 }[phase];
+  var fatG = { aufbau: 1.1, wettkampf: 1.0, cutten: 0.8, maintain: 1.0 }[phase];
+  var volMult = { mittel: 1.0, hoch: 1.1, 'sehr-hoch': 1.2 }[vol];
+  var jobMult = { sitz: 1.0, steh: 1.05, schwer: 1.12 }[job];
+  data.nutritionPlan = {
+    savedAt: new Date().toISOString(),
+    weight: w,
+    phase: phase,
+    kcal: Math.round(w * proteinG * volMult * 4 + w * khG * volMult * jobMult * 4 + w * fatG * 9),
+    protein: Math.round(w * proteinG * volMult),
+    carbs: Math.round(w * khG * volMult * jobMult),
+    fat: Math.round(w * fatG)
+  };
+  if (typeof saveData === 'function') saveData(data);
+  var el = document.getElementById('ern-save-confirm');
+  if (el) { el.textContent = '\u2713 Plan gespeichert! Sichtbar auf dem Dashboard.'; el.style.display = 'block'; }
 }
 
 // ===== HF-ZONEN RECHNER =====

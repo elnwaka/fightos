@@ -77,13 +77,14 @@
           <button class="nav-drop-item" data-page="wochenplan">Wochenplan</button>
           <button class="nav-drop-item" data-page="uebungen">Übungen</button>
           <button class="nav-drop-item" data-page="tests">Leistungstests</button>
+          <button class="nav-drop-item" data-page="log">Trainingslog</button>
           <button class="nav-drop-item" data-page="periodisierung">Periodisierung</button>
         </div>
       </div>
       <div class="nav-hub">
-        <button class="nav-hub-btn" style="--hc:var(--green);">Versorgung ▾</button>
+        <button class="nav-hub-btn" style="--hc:var(--green);">Ernährung ▾</button>
         <div class="nav-drop">
-          <button class="nav-drop-item" data-page="ernaehrung">Ernährung</button>
+          <button class="nav-drop-item" data-page="ernaehrung">Makros & Mahlzeiten</button>
           <button class="nav-drop-item" data-page="cutten">Gewicht machen</button>
           <button class="nav-drop-item" data-page="supplements">Supplements</button>
           <button class="nav-drop-item" data-page="regeneration">Recovery</button>
@@ -114,11 +115,12 @@
   <!-- ===== PAGE: DASHBOARD ===== -->
   <div class="page active" id="page-dashboard">
 
-    <!-- DASHBOARD HEADER -->
-    <div class="dash-header">
-      <div>
+    <!-- HERO: Kampf-Countdown (groß, prominent) -->
+    <div class="dash-hero" id="dash-hero">
+      <div class="dash-hero-left">
         <div class="rpg-name" id="rpg-player-name">FIGHTER</div>
         <div class="rpg-subtitle" id="rpg-subtitle">Willkommen zurück</div>
+        <div id="fight-countdown-display" style="margin-top:8px;"></div>
       </div>
       <div class="dash-fight-input">
         <label style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey);">NÄCHSTER KAMPF</label>
@@ -126,70 +128,98 @@
           <input type="date" id="fight-date-input" class="form-input" style="width:auto;max-width:160px;padding:6px 10px;font-size:12px;" onchange="updateFightDate()">
           <button class="submit-btn" style="padding:4px 12px;font-size:11px;" onclick="clearFightDate()">×</button>
         </div>
-        <div id="fight-countdown-display"></div>
       </div>
     </div>
 
-    <!-- PROFIL: Radar + Scores -->
-    <div class="dash-profil">
-      <div class="dash-radar-col">
-        <canvas id="rpg-radar" width="280" height="280"></canvas>
-      </div>
-      <div class="dash-scores-col">
-        <div id="dash-stats"></div>
-      </div>
-    </div>
-
-    <!-- HRV Schnelleingabe -->
-    <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-        <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);">HRV AMPEL</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <input type="number" id="hrv-input" class="form-input" style="width:90px;padding:6px 10px;" placeholder="RMSSD" min="1" max="200">
-          <button class="submit-btn" style="padding:6px 14px;font-size:12px;" onclick="logHRV()">Log</button>
+    <!-- HEUTE: Tagesblock + Quick-Log + HRV in einer Zeile -->
+    <div class="dash-heute">
+      <!-- Tagesablauf -->
+      <div class="dash-heute-main">
+        <div class="card" style="margin-bottom:0;height:100%;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;cursor:pointer;" onclick="toggleSection('daily-combined')">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);">DEIN TAG HEUTE <span class="section-arrow" style="font-size:14px;">&#9662;</span></div>
+            <div id="checklist-score" style="font-family:'Space Mono',monospace;font-size:11px;color:#555;"></div>
+          </div>
+          <div id="daily-combined"></div>
         </div>
       </div>
-      <div id="hrv-display" style="margin-top:12px;"></div>
-    </div>
-
-    <!-- Hinweise -->
-    <div class="card" style="margin-bottom:20px;" id="dash-hinweise"></div>
-
-    <!-- Benchmark-Kurzstatus -->
-    <div class="card" style="margin-bottom:20px;cursor:pointer;" onclick="showPage('tests')">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);">LEISTUNGS-TESTS</div>
-          <div id="bench-summary" style="font-family:'Space Mono',monospace;font-size:11px;color:#555;margin-top:4px;"></div>
+      <!-- Quick-Log + HRV Sidebar -->
+      <div class="dash-heute-side">
+        <!-- Quick Training Log -->
+        <div class="card" style="margin-bottom:12px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);margin-bottom:12px;">QUICK LOG</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <select id="qlog-type" class="form-select" style="padding:8px 10px;font-size:12px;">
+              <option value="boxen">Boxen</option>
+              <option value="sparring">Sparring</option>
+              <option value="kraft">Kraft</option>
+              <option value="cardio">Cardio</option>
+              <option value="mobility">Mobility</option>
+            </select>
+            <div style="display:flex;gap:6px;">
+              <input type="number" id="qlog-duration" class="form-input" style="flex:1;padding:8px 10px;font-size:12px;" placeholder="Min." min="1" max="300">
+              <input type="number" id="qlog-rpe" class="form-input" style="width:55px;padding:8px 10px;font-size:12px;" placeholder="RPE" min="1" max="10">
+            </div>
+            <button class="submit-btn" style="padding:8px 14px;font-size:12px;width:100%;" onclick="quickLog()">EINTRAGEN</button>
+          </div>
+          <div id="qlog-confirm" style="display:none;font-family:'Space Mono',monospace;font-size:10px;color:var(--green);margin-top:8px;text-align:center;"></div>
         </div>
-        <div style="font-size:11px;color:var(--red);font-family:'Space Mono',monospace;">ÖFFNEN →</div>
+        <!-- HRV kompakt -->
+        <div class="card" style="margin-bottom:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);">HRV</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input type="number" id="hrv-input" class="form-input" style="width:70px;padding:6px 8px;font-size:12px;" placeholder="RMSSD" min="1" max="200">
+              <button class="submit-btn" style="padding:6px 10px;font-size:11px;" onclick="logHRV()">Log</button>
+            </div>
+          </div>
+          <div id="hrv-display"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Tagesablauf mit integrierter Checklist -->
-    <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;cursor:pointer;" onclick="toggleSection('daily-combined')">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);">DEIN TAG HEUTE <span class="section-arrow" style="font-size:14px;">&#9662;</span></div>
-        <div id="checklist-score" style="font-family:'Space Mono',monospace;font-size:11px;color:#555;"></div>
-      </div>
-      <div id="daily-combined"></div>
-    </div>
+    <!-- Hinweise (nur wenn vorhanden) -->
+    <div class="card" style="margin-bottom:16px;" id="dash-hinweise"></div>
 
-    <!-- Fight Log -->
-    <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);cursor:pointer;" onclick="showPage('fights')">KÄMPFE <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--red);">ÖFFNEN →</span></div>
-        <button class="submit-btn" style="padding:5px 12px;font-size:11px;" onclick="openFightModal()">+ Kampf</button>
+    <!-- Zwei Spalten: Profil + Kämpfe/Training -->
+    <div class="dash-bottom-grid">
+      <!-- Links: Profil Radar -->
+      <div>
+        <div class="dash-profil" style="margin-bottom:16px;">
+          <div class="dash-radar-col">
+            <canvas id="rpg-radar" width="280" height="280"></canvas>
+          </div>
+          <div class="dash-scores-col">
+            <div id="dash-stats"></div>
+          </div>
+        </div>
+        <!-- Benchmark-Kurzstatus -->
+        <div class="card" style="cursor:pointer;" onclick="showPage('tests')">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);">LEISTUNGS-TESTS</div>
+              <div id="bench-summary" style="font-family:'Space Mono',monospace;font-size:11px;color:#555;margin-top:4px;"></div>
+            </div>
+            <div style="font-size:11px;color:var(--red);font-family:'Space Mono',monospace;">ÖFFNEN →</div>
+          </div>
+        </div>
       </div>
-      <div id="fight-log-list"></div>
-    </div>
-
-    <!-- Recent Training -->
-    <div class="card">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:14px;cursor:pointer;" onclick="toggleSection('recent-log')">LETZTE EINHEITEN <span class="section-arrow" style="font-size:14px;">▾</span></div>
-      <div id="recent-log"></div>
+      <!-- Rechts: Kämpfe + Training -->
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);cursor:pointer;" onclick="showPage('fights')">KÄMPFE <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--red);">ÖFFNEN →</span></div>
+            <button class="submit-btn" style="padding:4px 10px;font-size:10px;" onclick="openFightModal()">+ Kampf</button>
+          </div>
+          <div id="fight-log-list"></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);cursor:pointer;" onclick="showPage('log')">LETZTE EINHEITEN <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--red);">ALLE →</span></div>
+          </div>
+          <div id="recent-log"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -261,13 +291,11 @@
         <div class="form-group-inline">
           <label>Typ</label>
           <select id="log-type">
-            <option value="kraft">Kraft / S&C</option>
             <option value="boxen">Boxen</option>
             <option value="sparring">Sparring</option>
+            <option value="kraft">Kraft</option>
             <option value="cardio">Cardio</option>
-            <option value="pratzen">Pratzen</option>
-            <option value="technik">Technik</option>
-            <option value="mobility">Mobility</option>
+            <option value="mobility">Mobility / Recovery</option>
           </select>
         </div>
         <div class="form-group-inline">
@@ -354,6 +382,32 @@
     <div class="form-group-inline" style="margin-bottom:16px;">
       <label>Was muss besser werden?</label>
       <textarea id="fight-log-improve" rows="2" placeholder="z.B. Zu oft an Seile gedrängt, Kopfbewegung fehlte..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;resize:vertical;"></textarea>
+    </div>
+    <!-- Runden-Notizen (statisch statt dynamisch injiziert) -->
+    <div id="fight-extra-fields">
+      <div style="margin-bottom:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);margin-bottom:10px;letter-spacing:1px;">RUNDEN-NOTIZEN</div>
+        <div style="margin-bottom:10px;">
+          <label style="font-family:'Space Mono',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Runde 1</label>
+          <textarea id="fight-log-round1" rows="2" placeholder="Notizen zu Runde 1..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-family:'Space Mono',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Runde 2</label>
+          <textarea id="fight-log-round2" rows="2" placeholder="Notizen zu Runde 2..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-family:'Space Mono',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Runde 3</label>
+          <textarea id="fight-log-round3" rows="2" placeholder="Notizen zu Runde 3..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+        </div>
+      </div>
+      <div class="form-group-inline" style="margin-bottom:16px;">
+        <label style="font-family:'Space Mono',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Video-Link (YouTube, Vimeo oder direkter Link)</label>
+        <input type="url" id="fight-log-video" placeholder="https://..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;box-sizing:border-box;">
+      </div>
+      <div class="form-group-inline" style="margin-bottom:16px;">
+        <label style="font-family:'Space Mono',monospace;font-size:11px;color:#888;display:block;margin-bottom:4px;">Gegner-Schwächen</label>
+        <textarea id="fight-log-weaknesses" rows="2" placeholder="z.B. Schwache Deckung rechts, langsame Führhand..." style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+      </div>
     </div>
     <button class="submit-btn" onclick="addFightLog()">KAMPF SPEICHERN</button>
   </div>

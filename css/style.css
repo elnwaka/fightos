@@ -659,13 +659,13 @@ body::before {
 .grid-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px; }
 
 /* ===== DASHBOARD ===== */
-.dash-header {
+.dash-hero {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
   padding: 24px 0;
   background: transparent;
   border: none;
@@ -673,13 +673,28 @@ body::before {
   border-radius: 0;
   position: relative;
 }
-.dash-header::before {
+.dash-hero::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 2px;
   background: linear-gradient(90deg, var(--red), var(--gold), var(--red));
   opacity: .5;
+}
+.dash-hero-left { flex: 1; min-width: 0; }
+.dash-heute {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.dash-heute-main { min-width: 0; }
+.dash-heute-side { display: flex; flex-direction: column; }
+.dash-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
 }
 .rpg-name {
   font-family: 'Bebas Neue', sans-serif;
@@ -2831,8 +2846,10 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .search-results { width: 300px; }
 
   /* --- Dashboard --- */
-  .dash-header { flex-direction: column; }
+  .dash-hero { flex-direction: column; }
   .dash-fight-input { align-items: flex-start; }
+  .dash-heute { grid-template-columns: 1fr; }
+  .dash-bottom-grid { grid-template-columns: 1fr; }
   .dash-profil { flex-direction: column; align-items: center; }
   .dash-radar-col { width: 100%; max-width: 280px; }
   .dash-scores-col { width: 100%; }
@@ -2847,9 +2864,27 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .page { padding: 20px 14px; }
   .page-title { font-size: clamp(28px, 6vw, 40px); }
 
-  /* --- Wochenplan --- */
-  .week-grid { grid-template-columns: 1fr; }
+  /* --- Wochenplan Akkordeon auf Mobile --- */
+  .week-grid { grid-template-columns: 1fr; gap: 4px; }
   .day-col { min-height: auto; }
+  .day-col .day-blocks { display: none; }
+  .day-col .add-block-btn { display: none; }
+  .day-col.day-today .day-blocks { display: flex; }
+  .day-col.day-today .add-block-btn { display: block; }
+  .day-col.day-expanded .day-blocks { display: flex; }
+  .day-col.day-expanded .add-block-btn { display: block; }
+  .day-header { cursor: pointer; }
+  .day-header::after {
+    content: '▸';
+    font-size: 14px;
+    color: #444;
+    position: absolute;
+    right: 10px;
+    top: 12px;
+  }
+  .day-header { position: relative; }
+  .day-col.day-today .day-header::after,
+  .day-col.day-expanded .day-header::after { content: '▾'; color: var(--gold); }
 
   /* --- Tests --- */
   .tests-hero { grid-template-columns: 1fr; }
