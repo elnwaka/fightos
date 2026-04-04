@@ -2061,12 +2061,12 @@ function openFightDetail(idx) {
     { key: 'mental', label: 'MENTAL' }
   ];
 
-  // Video section
+  // Video section — with YouTube API for seeking
   let videoHTML;
   if (ytId) {
     videoHTML = `
       <div style="width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;box-shadow:0 0 40px rgba(232,0,13,.08);">
-        <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&playsinline=1" style="width:100%;height:100%;border:none;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+        <iframe id="fight-yt-player" src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}" style="width:100%;height:100%;border:none;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
       </div>
       <div style="display:flex;gap:16px;margin-top:8px;">
         <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;text-decoration:none;">Auf YouTube öffnen ↗</a>
@@ -2083,6 +2083,59 @@ function openFightDetail(idx) {
       </div>
       <div id="video-input-area" style="margin-top:10px;"></div>`;
   }
+
+  // Timestamp markers
+  var markers = f.timestamps || [];
+  var markerTags = [
+    { key: 'guter-angriff', label: 'Guter Angriff', color: 'var(--green)' },
+    { key: 'treffer-kassiert', label: 'Treffer kassiert', color: 'var(--red)' },
+    { key: 'gute-defense', label: 'Gute Defense', color: 'var(--blue)' },
+    { key: 'taktik', label: 'Taktik/Muster', color: 'var(--gold)' },
+    { key: 'fehler', label: 'Fehler', color: 'var(--orange)' },
+    { key: 'sonstiges', label: 'Sonstiges', color: '#555' }
+  ];
+  var timestampsHTML = '<div style="display:flex;flex-direction:column;height:100%;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">SZENEN-MARKIERUNGEN</div>' +
+    '<div style="font-family:\'DM Sans\',sans-serif;font-size:11px;color:#333;margin-bottom:12px;">Markiere wichtige Stellen — klicke auf eine Marke um hinzuspulen.</div>' +
+    '<div id="ts-add-area" style="margin-bottom:16px;">' +
+      '<div style="display:flex;gap:6px;margin-bottom:8px;">' +
+        '<input id="ts-min" type="number" min="0" max="59" placeholder="Min" style="width:50px;padding:6px 8px;background:#111;border:1px solid #1a1a1a;color:#fff;font-family:\'Space Mono\',monospace;font-size:12px;border-radius:4px;outline:none;text-align:center;">' +
+        '<span style="color:#333;font-size:16px;line-height:32px;">:</span>' +
+        '<input id="ts-sec" type="number" min="0" max="59" placeholder="Sek" style="width:50px;padding:6px 8px;background:#111;border:1px solid #1a1a1a;color:#fff;font-family:\'Space Mono\',monospace;font-size:12px;border-radius:4px;outline:none;text-align:center;">' +
+      '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">' +
+        markerTags.map(function(t) {
+          return '<span id="ts-tag-' + t.key + '" onclick="selectTimestampTag(\'' + t.key + '\')" style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:3px;cursor:pointer;background:#111;color:#444;border:1px solid #1a1a1a;transition:all .15s;">' + t.label + '</span>';
+        }).join('') +
+      '</div>' +
+      '<input id="ts-text" type="text" placeholder="Was passiert hier?" style="width:100%;padding:6px 10px;background:#111;border:1px solid #1a1a1a;color:#ccc;font-family:\'DM Sans\',sans-serif;font-size:12px;border-radius:4px;outline:none;box-sizing:border-box;margin-bottom:8px;" onkeydown="if(event.key===\'Enter\')addTimestamp(' + idx + ')">' +
+      '<button onclick="addTimestamp(' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;letter-spacing:1px;width:100%;">+ MARKIERUNG</button>' +
+    '</div>' +
+    '<div id="ts-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px;">';
+
+  markers.sort(function(a, b) { return a.time - b.time; });
+  markers.forEach(function(m, mi) {
+    var mins = Math.floor(m.time / 60);
+    var secs = m.time % 60;
+    var timeStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
+    var tag = markerTags.find(function(t) { return t.key === m.tag; });
+    var tagColor = tag ? tag.color : '#555';
+    var tagLabel = tag ? tag.label : '';
+    timestampsHTML += '<div style="display:flex;align-items:flex-start;gap:8px;padding:8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
+      '<span onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;padding-top:1px;" title="Zu ' + timeStr + ' spulen">' + timeStr + '</span>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#aaa;line-height:1.4;word-break:break-word;">' + (m.text || '').replace(/</g, '&lt;') + '</div>' +
+        (tagLabel ? '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:' + tagColor + ';margin-top:2px;">' + tagLabel + '</div>' : '') +
+      '</div>' +
+      '<span onclick="deleteTimestamp(' + idx + ',' + mi + ')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#222;cursor:pointer;padding:2px 4px;" title="Loeschen">\u00d7</span>' +
+    '</div>';
+  });
+
+  if (markers.length === 0) {
+    timestampsHTML += '<div style="text-align:center;padding:20px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Noch keine Markierungen.<br>Schau den Kampf und markiere wichtige Szenen.</div>';
+  }
+
+  timestampsHTML += '</div></div>';
 
   // Sidebar: Self-ratings (6 categories, 1-5 clickable dots)
   const ratingsHTML = ratingCats.map(c => {
@@ -2123,34 +2176,33 @@ function openFightDetail(idx) {
   <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--white);letter-spacing:3px;line-height:.9;margin-bottom:10px;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</div>
   <div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;margin-bottom:28px;">${formatDate(f.date)}${f.style ? ' · ' + f.style : ''}${f.type ? ' · ' + f.type : ''}</div>
 
-  <!-- MAIN: VIDEO LEFT + SIDEBAR RIGHT -->
-  <div style="display:grid;grid-template-columns:${isMobile() ? '1fr' : '1fr 280px'};gap:24px;margin-bottom:36px;" class="fight-detail-grid">
-
+  <!-- MAIN: VIDEO LEFT + TIMESTAMPS RIGHT -->
+  <div style="display:grid;grid-template-columns:${isMobile() ? '1fr' : '1fr 320px'};gap:24px;margin-bottom:24px;" class="fight-detail-grid">
     <!-- LEFT: VIDEO -->
     <div>${videoHTML}</div>
+    <!-- RIGHT: TIMESTAMPS -->
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;${isMobile() ? '' : 'max-height:480px;display:flex;flex-direction:column;'}">${timestampsHTML}</div>
+  </div>
 
-    <!-- RIGHT: SIDEBAR -->
-    <div>
-      <!-- Self-Rating -->
-      <div style="margin-bottom:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SELBSTBEWERTUNG</span>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${avgRating !== '—' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:#333;">/5</span></span>
-        </div>
-        ${ratingsHTML}
+  <!-- BEWERTUNG + SCORING — full width row -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
+    <!-- Self-Rating -->
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SELBSTBEWERTUNG</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${avgRating !== '—' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:#333;">/5</span></span>
       </div>
-
-      <!-- Round Scoring -->
-      <div style="padding-top:16px;border-top:1px solid #111;margin-bottom:20px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:10px;">RUNDEN-SCORING</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">${roundWinnerHTML}</div>
-      </div>
-
-      <!-- Quick Notes -->
-      <div style="padding-top:16px;border-top:1px solid #111;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">KEY MOMENTS</div>
-        <div id="fd-keyMoments" onclick="makeFightFieldEditable(${idx},'keyMoments',this)" style="font-size:13px;color:#666;line-height:1.6;cursor:text;min-height:20px;">${f.keyMoments || '<span style="color:#222;">z.B. R1 2:15 guter Konter, R2 Clinch-Problem...</span>'}</div>
-      </div>
+      ${ratingsHTML}
+    </div>
+    <!-- Round Scoring -->
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:10px;">RUNDEN-SCORING</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">${roundWinnerHTML}</div>
+    </div>
+    <!-- Key Moments -->
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">KEY MOMENTS</div>
+      <div id="fd-keyMoments" onclick="makeFightFieldEditable(${idx},'keyMoments',this)" style="font-size:13px;color:#666;line-height:1.6;cursor:text;min-height:20px;">${f.keyMoments || '<span style="color:#222;">z.B. R1 2:15 guter Konter, R2 Clinch-Problem...</span>'}</div>
     </div>
   </div>
 
@@ -2289,6 +2341,69 @@ function setRoundWinner(idx, roundIdx, winner) {
   data.fights[idx].rounds[roundIdx].winner = (current === winner) ? '' : winner;
   saveData(data);
   openFightDetail(idx);
+}
+
+// ===== TIMESTAMP SYSTEM =====
+var _selectedTimestampTag = 'sonstiges';
+
+function selectTimestampTag(key) {
+  _selectedTimestampTag = key;
+  var tags = ['guter-angriff','treffer-kassiert','gute-defense','taktik','fehler','sonstiges'];
+  var colors = { 'guter-angriff':'var(--green)', 'treffer-kassiert':'var(--red)', 'gute-defense':'var(--blue)', 'taktik':'var(--gold)', 'fehler':'var(--orange)', 'sonstiges':'#555' };
+  tags.forEach(function(t) {
+    var el = document.getElementById('ts-tag-' + t);
+    if (el) {
+      if (t === key) {
+        el.style.background = colors[t]; el.style.color = '#000'; el.style.borderColor = colors[t];
+      } else {
+        el.style.background = '#111'; el.style.color = '#444'; el.style.borderColor = '#1a1a1a';
+      }
+    }
+  });
+}
+
+function addTimestamp(idx) {
+  var minEl = document.getElementById('ts-min');
+  var secEl = document.getElementById('ts-sec');
+  var textEl = document.getElementById('ts-text');
+  var mins = parseInt(minEl.value) || 0;
+  var secs = parseInt(secEl.value) || 0;
+  var text = textEl.value.trim();
+  if (!text) { textEl.style.borderColor = 'var(--red)'; setTimeout(function() { textEl.style.borderColor = '#1a1a1a'; }, 1500); return; }
+  var totalSec = mins * 60 + secs;
+  var data = getData();
+  if (!data || !data.fights[idx]) return;
+  if (!data.fights[idx].timestamps) data.fights[idx].timestamps = [];
+  data.fights[idx].timestamps.push({ time: totalSec, text: text, tag: _selectedTimestampTag, created: new Date().toISOString() });
+  saveData(data);
+  minEl.value = ''; secEl.value = ''; textEl.value = '';
+  _selectedTimestampTag = 'sonstiges';
+  openFightDetail(idx);
+}
+
+function deleteTimestamp(idx, tsIdx) {
+  var data = getData();
+  if (!data || !data.fights[idx]) return;
+  if (!data.fights[idx].timestamps) return;
+  data.fights[idx].timestamps.splice(tsIdx, 1);
+  saveData(data);
+  openFightDetail(idx);
+}
+
+function seekVideo(seconds) {
+  var iframe = document.getElementById('fight-yt-player');
+  if (!iframe) return;
+  iframe.contentWindow.postMessage(JSON.stringify({
+    event: 'command',
+    func: 'seekTo',
+    args: [seconds, true]
+  }), '*');
+  iframe.contentWindow.postMessage(JSON.stringify({
+    event: 'command',
+    func: 'playVideo',
+    args: []
+  }), '*');
+  iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 // Video Analysis save
