@@ -527,11 +527,10 @@ function showPage(pageId) {
 }
 
 function getPageFromHash() {
-  var hash = location.hash.replace('#', '').replace('/', '');
+  var hash = location.hash.replace('#', '').replace(/^\//, '');
   if (!hash) return 'dashboard';
-  // Validate: only allow known pages
-  var valid = ['dashboard','fights','wochenplan','uebungen','tests','log','periodisierung',
-    'ernaehrung','cutten','supplements','regeneration','saeulen','mental','rechner','faq','account'];
+  var valid = ['dashboard','fights','fight-detail','wochenplan','uebungen','uebung-detail','tests','log','periodisierung',
+    'ernaehrung','cutten','supplements','supplement-detail','regeneration','saeulen','saeulen-detail','mental','rechner','faq','account'];
   return valid.indexOf(hash) !== -1 ? hash : 'dashboard';
 }
 
