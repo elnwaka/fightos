@@ -22,7 +22,8 @@
   --trans: 0.18s ease;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; caret-color: transparent; }
+input:focus, textarea:focus, select:focus, [contenteditable]:focus { caret-color: var(--white); }
 html { scroll-behavior: smooth; }
 body {
   background: var(--black);
