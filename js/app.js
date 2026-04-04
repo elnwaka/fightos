@@ -2066,7 +2066,7 @@ function openFightDetail(idx) {
   if (ytId) {
     videoHTML = `
       <div style="width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;box-shadow:0 0 40px rgba(232,0,13,.08);">
-        <iframe id="fight-yt-player" src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}" style="width:100%;height:100%;border:none;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+        <iframe id="fight-yt-player" src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&playsinline=1&enablejsapi=1" style="width:100%;height:100%;border:none;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
       </div>
       <div style="display:flex;gap:16px;margin-top:8px;">
         <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;text-decoration:none;">Auf YouTube öffnen ↗</a>
@@ -2393,16 +2393,10 @@ function deleteTimestamp(idx, tsIdx) {
 function seekVideo(seconds) {
   var iframe = document.getElementById('fight-yt-player');
   if (!iframe) return;
-  iframe.contentWindow.postMessage(JSON.stringify({
-    event: 'command',
-    func: 'seekTo',
-    args: [seconds, true]
-  }), '*');
-  iframe.contentWindow.postMessage(JSON.stringify({
-    event: 'command',
-    func: 'playVideo',
-    args: []
-  }), '*');
+  // Rebuild iframe src with start parameter — works everywhere
+  var src = iframe.src.replace(/[&?]start=\d+/g, '').replace(/[&?]autoplay=\d/g, '');
+  var sep = src.indexOf('?') === -1 ? '?' : '&';
+  iframe.src = src + sep + 'start=' + seconds + '&autoplay=1';
   iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
