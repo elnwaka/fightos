@@ -2066,24 +2066,7 @@ function openFightDetail(idx) {
   if (ytId) {
     videoHTML = `
       <div style="width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;box-shadow:0 0 40px rgba(232,0,13,.08);">
-        <div id="fight-yt-container"></div>
-        <script>
-          if (!window.YT) {
-            var tag = document.createElement('script');
-            tag.src = 'https://www.youtube.com/iframe_api';
-            document.head.appendChild(tag);
-          }
-          function _initFightPlayer() {
-            window._fightPlayer = new YT.Player('fight-yt-container', {
-              videoId: '${ytId}',
-              width: '100%',
-              height: '100%',
-              playerVars: { rel: 0, modestbranding: 1, playsinline: 1 }
-            });
-          }
-          if (window.YT && window.YT.Player) _initFightPlayer();
-          else window.onYouTubeIframeAPIReady = _initFightPlayer;
-        </script>
+        <div id="fight-yt-container" style="width:100%;height:100%;"></div>
       </div>
       <div style="display:flex;gap:16px;margin-top:8px;">
         <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;text-decoration:none;">Auf YouTube öffnen ↗</a>
@@ -2338,6 +2321,31 @@ function openFightDetail(idx) {
   </div>`;
 
   showPage('fight-detail');
+
+  // Init YouTube player after DOM is set
+  if (ytId) {
+    function _initFightPlayer() {
+      if (document.getElementById('fight-yt-container')) {
+        window._fightPlayer = new YT.Player('fight-yt-container', {
+          videoId: ytId,
+          width: '100%',
+          height: '100%',
+          playerVars: { rel: 0, modestbranding: 1, playsinline: 1 }
+        });
+      }
+    }
+    if (window.YT && window.YT.Player) {
+      _initFightPlayer();
+    } else {
+      if (!document.getElementById('yt-api-script')) {
+        var tag = document.createElement('script');
+        tag.id = 'yt-api-script';
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+      }
+      window.onYouTubeIframeAPIReady = _initFightPlayer;
+    }
+  }
 }
 
 // Rating + Round winner helpers
