@@ -2154,6 +2154,74 @@ function openFightDetail(idx) {
     </div>
   </div>
 
+  <!-- GEFÜHRTE VIDEO-ANALYSE -->
+  <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:24px;margin-bottom:36px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);letter-spacing:1.5px;">VIDEO-ANALYSE</div>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#333;letter-spacing:1px;">${f.videoAnalysis ? Object.keys(f.videoAnalysis).filter(k => f.videoAnalysis[k]).length + '/15 BEANTWORTET' : '0/15 BEANTWORTET'}</span>
+    </div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:#444;margin-bottom:20px;">Schau dir den Kampf an und beantworte die Fragen Runde fuer Runde. Nimm dir Zeit — ehrliche Analyse macht dich besser.</div>
+
+    ${[1,2,3].map(r => {
+      const va = (f.videoAnalysis && f.videoAnalysis['r'+r]) || {};
+      const roundColor = r === 1 ? 'var(--blue)' : r === 2 ? 'var(--gold)' : 'var(--red)';
+      const questions = r === 1 ? [
+        { key: 'distance', q: 'Wer hat die Distanz kontrolliert?', ph: 'Ich / Gegner / Wechselnd — beschreibe warum' },
+        { key: 'jab', q: 'Wie war dein Jab?', ph: 'Schnell genug? Hat er getroffen? Hat der Gegner ihn gelesen?' },
+        { key: 'firstImpression', q: 'Was hast du in den ersten 30 Sekunden ueber den Gegner gelernt?', ph: 'Stance, Tempo, Aggressivitaet, schwache Seite...' },
+        { key: 'ringPosition', q: 'Wo hast du gestanden? Mitte oder Seile?', ph: 'Wenn Seile — wann und warum bist du dort gelandet?' },
+        { key: 'adjustment', q: 'Hast du etwas angepasst waehrend der Runde?', ph: 'z.B. Distanz geaendert, mehr Koerper, Tempo hoch...' }
+      ] : r === 2 ? [
+        { key: 'combos', q: 'Welche Kombinationen haben funktioniert?', ph: 'z.B. Jab-Cross-Hook, 1-2 Koerper, Aufwaerts...' },
+        { key: 'gegnermuster', q: 'Welche Muster hat der Gegner gezeigt?', ph: 'z.B. senkt linke Hand nach Cross, geht immer rechts raus...' },
+        { key: 'defense', q: 'Wie bist du getroffen worden?', ph: 'Welche Schlaege? Von welcher Seite? Wann warst du offen?' },
+        { key: 'tempo', q: 'Wer hat das Tempo bestimmt?', ph: 'Warst du aktiv oder hast du reagiert? Wolltest du das?' },
+        { key: 'bodywork', q: 'Wie war die Koerperarbeit?', ph: 'Genug zum Koerper geschlagen? Hat der Gegner den Koerper attackiert?' }
+      ] : [
+        { key: 'energy', q: 'Wie war deine Kondition?', ph: 'Muede? Schlaege noch mit Power? Atemnot?' },
+        { key: 'clinch', q: 'Wie hast du den Clinch gemanagt?', ph: 'Zu viel geclinct? Konnte der Gegner rausfighten?' },
+        { key: 'finish', q: 'Hast du den Kampf dominiert oder ueberlebt?', ph: 'Letzte 30 Sek: Hast du Gas gegeben oder durchgehalten?' },
+        { key: 'gameplan', q: 'Hat dein Gameplan funktioniert?', ph: 'Was vom Plan hast du umgesetzt? Was nicht und warum?' },
+        { key: 'lesson', q: 'Die wichtigste Lektion aus dieser Runde?', ph: 'Eine Sache die du beim naechsten Mal anders machst' }
+      ];
+
+      const answeredCount = questions.filter(q => va[q.key]).length;
+      const isComplete = answeredCount === 5;
+
+      return '<div style="margin-bottom:20px;' + (r > 1 ? 'padding-top:20px;border-top:1px solid #111;' : '') + '">' +
+        '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">' +
+          '<div style="width:32px;height:32px;border-radius:50%;background:' + (isComplete ? 'var(--green)' : roundColor) + ';display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:' + (isComplete ? '#000' : '#fff') + ';">' + (isComplete ? '\\u2713' : r) + '</div>' +
+          '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">RUNDE ' + r + '</div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;">' + answeredCount + '/5</div></div>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:12px;">' +
+          questions.map(function(q) {
+            return '<div>' +
+              '<label style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + roundColor + ';letter-spacing:1px;display:block;margin-bottom:4px;">' + q.q.replace(/</g,'&lt;') + '</label>' +
+              '<textarea style="width:100%;padding:10px 12px;background:#111;border:1px solid ' + (va[q.key] ? '#1a3a1a' : '#1a1a1a') + ';color:#ccc;font-family:\'DM Sans\',sans-serif;font-size:13px;border-radius:4px;outline:none;resize:vertical;min-height:48px;box-sizing:border-box;" placeholder="' + q.ph.replace(/"/g,'&quot;') + '" onblur="saveVideoAnalysis(' + idx + ',' + r + ',\'' + q.key + '\',this.value)">' + (va[q.key] || '').replace(/</g,'&lt;') + '</textarea>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
+      '</div>';
+    }).join('')}
+
+    <div id="va-summary-${idx}" style="margin-top:16px;padding-top:16px;border-top:1px solid #1a1a1a;">
+      ${(function() {
+        var va = f.videoAnalysis || {};
+        var total = 0;
+        for (var r = 1; r <= 3; r++) {
+          var rd = va['r'+r] || {};
+          var keys = Object.keys(rd);
+          for (var k = 0; k < keys.length; k++) { if (rd[keys[k]]) total++; }
+        }
+        if (total === 0) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#222;text-align:center;">Beantworte die Fragen oben um deine Analyse zu starten.</div>';
+        if (total < 10) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;text-align:center;">' + total + '/15 — Mach weiter, je ehrlicher desto besser.</div>';
+        if (total < 15) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);text-align:center;">' + total + '/15 — Fast fertig. Fuell die letzten Fragen aus.</div>';
+        return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--green);text-align:center;">\\u2713 ANALYSE KOMPLETT — Gute Arbeit. Nutze die Erkenntnisse im Training.</div>';
+      })()}
+    </div>
+  </div>
+
   <!-- ANALYSE — full width below -->
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
     <div style="padding:16px 0;border-bottom:1px solid #111;">
@@ -2221,6 +2289,16 @@ function setRoundWinner(idx, roundIdx, winner) {
   data.fights[idx].rounds[roundIdx].winner = (current === winner) ? '' : winner;
   saveData(data);
   openFightDetail(idx);
+}
+
+// Video Analysis save
+function saveVideoAnalysis(idx, round, key, value) {
+  var data = getData();
+  if (!data || !data.fights[idx]) return;
+  if (!data.fights[idx].videoAnalysis) data.fights[idx].videoAnalysis = {};
+  if (!data.fights[idx].videoAnalysis['r' + round]) data.fights[idx].videoAnalysis['r' + round] = {};
+  data.fights[idx].videoAnalysis['r' + round][key] = value.trim();
+  saveData(data);
 }
 
 // Inline video URL input
