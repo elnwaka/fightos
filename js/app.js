@@ -2095,44 +2095,30 @@ function openFightDetail(idx) {
     { key: 'sonstiges', label: 'Sonstiges', color: '#555' }
   ];
   var timestampsHTML = '<div style="display:flex;flex-direction:column;height:100%;">' +
-    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">SZENEN-MARKIERUNGEN</div>' +
-    '<div style="font-family:\'DM Sans\',sans-serif;font-size:11px;color:#333;margin-bottom:12px;">Markiere wichtige Stellen — klicke auf eine Marke um hinzuspulen.</div>' +
-    '<div id="ts-add-area" style="margin-bottom:16px;">' +
-      '<div style="display:flex;gap:6px;margin-bottom:8px;">' +
-        '<input id="ts-min" type="number" min="0" max="59" placeholder="Min" style="width:50px;padding:6px 8px;background:#111;border:1px solid #1a1a1a;color:#fff;font-family:\'Space Mono\',monospace;font-size:12px;border-radius:4px;outline:none;text-align:center;">' +
-        '<span style="color:#333;font-size:16px;line-height:32px;">:</span>' +
-        '<input id="ts-sec" type="number" min="0" max="59" placeholder="Sek" style="width:50px;padding:6px 8px;background:#111;border:1px solid #1a1a1a;color:#fff;font-family:\'Space Mono\',monospace;font-size:12px;border-radius:4px;outline:none;text-align:center;">' +
-      '</div>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">' +
-        markerTags.map(function(t) {
-          return '<span id="ts-tag-' + t.key + '" onclick="selectTimestampTag(\'' + t.key + '\')" style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:3px;cursor:pointer;background:#111;color:#444;border:1px solid #1a1a1a;transition:all .15s;">' + t.label + '</span>';
-        }).join('') +
-      '</div>' +
-      '<input id="ts-text" type="text" placeholder="Was passiert hier?" style="width:100%;padding:6px 10px;background:#111;border:1px solid #1a1a1a;color:#ccc;font-family:\'DM Sans\',sans-serif;font-size:12px;border-radius:4px;outline:none;box-sizing:border-box;margin-bottom:8px;" onkeydown="if(event.key===\'Enter\')addTimestamp(' + idx + ')">' +
-      '<button onclick="addTimestamp(' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;letter-spacing:1px;width:100%;">+ MARKIERUNG</button>' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">MARKIERUNGEN</div>' +
+    '<div style="display:flex;gap:6px;margin-bottom:12px;">' +
+      '<button onclick="addTimestampNow(' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:6px 10px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;" title="Aktuelle Video-Zeit einfuegen">JETZT</button>' +
+      '<input id="ts-input" type="text" placeholder="1:30 guter Konter rechts" style="flex:1;padding:6px 10px;background:#111;border:1px solid #1a1a1a;color:#ccc;font-family:\'DM Sans\',sans-serif;font-size:12px;border-radius:4px;outline:none;box-sizing:border-box;" onkeydown="if(event.key===\'Enter\')addTimestamp(' + idx + ')">' +
     '</div>' +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:#222;margin-bottom:12px;">Format: 1:30 Text — oder druecke JETZT + tippe</div>' +
     '<div id="ts-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px;">';
 
   markers.sort(function(a, b) { return a.time - b.time; });
-  markers.forEach(function(m, mi) {
-    var mins = Math.floor(m.time / 60);
-    var secs = m.time % 60;
-    var timeStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
-    var tag = markerTags.find(function(t) { return t.key === m.tag; });
-    var tagColor = tag ? tag.color : '#555';
-    var tagLabel = tag ? tag.label : '';
-    timestampsHTML += '<div style="display:flex;align-items:flex-start;gap:8px;padding:8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
-      '<span onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;padding-top:1px;" title="Zu ' + timeStr + ' spulen">' + timeStr + '</span>' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#aaa;line-height:1.4;word-break:break-word;">' + (m.text || '').replace(/</g, '&lt;') + '</div>' +
-        (tagLabel ? '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:' + tagColor + ';margin-top:2px;">' + tagLabel + '</div>' : '') +
-      '</div>' +
-      '<span onclick="deleteTimestamp(' + idx + ',' + mi + ')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#222;cursor:pointer;padding:2px 4px;" title="Loeschen">\u00d7</span>' +
-    '</div>';
-  });
-
   if (markers.length === 0) {
-    timestampsHTML += '<div style="text-align:center;padding:20px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Noch keine Markierungen.<br>Schau den Kampf und markiere wichtige Szenen.</div>';
+    timestampsHTML += '<div style="text-align:center;padding:20px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Keine Markierungen</div>';
+  } else {
+    markers.forEach(function(m, mi) {
+      var mins = Math.floor(m.time / 60);
+      var secs = m.time % 60;
+      var timeStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
+      var tag = _tsMarkerTags.find(function(t) { return t.key === m.tag; });
+      var tagColor = tag ? tag.color : '#555';
+      timestampsHTML += '<div style="display:flex;align-items:flex-start;gap:8px;padding:8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
+        '<span onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;" title="Hinspulen">' + timeStr + '</span>' +
+        '<div style="flex:1;min-width:0;font-family:\'DM Sans\',sans-serif;font-size:12px;color:#aaa;line-height:1.4;word-break:break-word;">' + (m.text || '').replace(/</g, '&lt;') + '</div>' +
+        '<span onclick="deleteTimestamp(' + idx + ',' + mi + ')" style="font-size:12px;color:#222;cursor:pointer;padding:0 4px;">\u00d7</span>' +
+      '</div>';
+    });
   }
 
   timestampsHTML += '</div></div>';
@@ -2369,41 +2355,77 @@ function setRoundWinner(idx, roundIdx, winner) {
 }
 
 // ===== TIMESTAMP SYSTEM =====
-var _selectedTimestampTag = 'sonstiges';
+var _tsMarkerTags = [
+  { key: 'guter-angriff', label: 'Angriff', color: 'var(--green)' },
+  { key: 'treffer-kassiert', label: 'Treffer', color: 'var(--red)' },
+  { key: 'gute-defense', label: 'Defense', color: 'var(--blue)' },
+  { key: 'taktik', label: 'Taktik', color: 'var(--gold)' },
+  { key: 'fehler', label: 'Fehler', color: 'var(--orange)' },
+  { key: 'sonstiges', label: 'Sonstiges', color: '#555' }
+];
 
-function selectTimestampTag(key) {
-  _selectedTimestampTag = key;
-  var tags = ['guter-angriff','treffer-kassiert','gute-defense','taktik','fehler','sonstiges'];
-  var colors = { 'guter-angriff':'var(--green)', 'treffer-kassiert':'var(--red)', 'gute-defense':'var(--blue)', 'taktik':'var(--gold)', 'fehler':'var(--orange)', 'sonstiges':'#555' };
-  tags.forEach(function(t) {
-    var el = document.getElementById('ts-tag-' + t);
-    if (el) {
-      if (t === key) {
-        el.style.background = colors[t]; el.style.color = '#000'; el.style.borderColor = colors[t];
-      } else {
-        el.style.background = '#111'; el.style.color = '#444'; el.style.borderColor = '#1a1a1a';
-      }
-    }
-  });
+function parseTimestampInput(text) {
+  // Parse "1:30 guter Konter" or "1.30 guter Konter" or "90 guter Konter"
+  var match = text.match(/^(\d{1,2})[:\.](\d{1,2})\s+(.+)/);
+  if (match) return { time: parseInt(match[1]) * 60 + parseInt(match[2]), text: match[3].trim() };
+  var match2 = text.match(/^(\d{1,3})\s+(.+)/);
+  if (match2) return { time: parseInt(match2[1]), text: match2[2].trim() };
+  return null;
+}
+
+function autoDetectTag(text) {
+  var t = text.toLowerCase();
+  if (/treffer|kassiert|getroffen|hit|schlag.*(kassiert|bekommen)/.test(t)) return 'treffer-kassiert';
+  if (/angriff|kombi|cross|hook|jab|uppercut|schlag|treffer.*gelandet|gut.*geschlagen/.test(t)) return 'guter-angriff';
+  if (/defense|deckung|block|ausweich|parr|abwehr|slip|roll/.test(t)) return 'gute-defense';
+  if (/taktik|muster|pattern|gewohnheit|immer|wiederhol|tender/.test(t)) return 'taktik';
+  if (/fehler|offen|schlecht|problem|falsch|verpasst/.test(t)) return 'fehler';
+  return 'sonstiges';
+}
+
+function getCurrentVideoTime() {
+  if (window._fightPlayer && typeof window._fightPlayer.getCurrentTime === 'function') {
+    return Math.floor(window._fightPlayer.getCurrentTime());
+  }
+  return 0;
 }
 
 function addTimestamp(idx) {
-  var minEl = document.getElementById('ts-min');
-  var secEl = document.getElementById('ts-sec');
-  var textEl = document.getElementById('ts-text');
-  var mins = parseInt(minEl.value) || 0;
-  var secs = parseInt(secEl.value) || 0;
-  var text = textEl.value.trim();
-  if (!text) { textEl.style.borderColor = 'var(--red)'; setTimeout(function() { textEl.style.borderColor = '#1a1a1a'; }, 1500); return; }
-  var totalSec = mins * 60 + secs;
+  var input = document.getElementById('ts-input');
+  if (!input) return;
+  var raw = input.value.trim();
+  if (!raw) return;
+
+  var parsed = parseTimestampInput(raw);
+  var totalSec, text;
+  if (parsed) {
+    totalSec = parsed.time;
+    text = parsed.text;
+  } else {
+    // No timestamp in text — use current video time
+    totalSec = getCurrentVideoTime();
+    text = raw;
+  }
+
+  var tag = autoDetectTag(text);
   var data = getData();
   if (!data || !data.fights[idx]) return;
   if (!data.fights[idx].timestamps) data.fights[idx].timestamps = [];
-  data.fights[idx].timestamps.push({ time: totalSec, text: text, tag: _selectedTimestampTag, created: new Date().toISOString() });
+  data.fights[idx].timestamps.push({ time: totalSec, text: text, tag: tag, created: new Date().toISOString() });
   saveData(data);
-  minEl.value = ''; secEl.value = ''; textEl.value = '';
-  _selectedTimestampTag = 'sonstiges';
-  openFightDetail(idx);
+  input.value = '';
+  renderTimestampList(idx);
+}
+
+function addTimestampNow(idx) {
+  var sec = getCurrentVideoTime();
+  var input = document.getElementById('ts-input');
+  if (input) {
+    var mins = Math.floor(sec / 60);
+    var secs = sec % 60;
+    input.value = mins + ':' + (secs < 10 ? '0' : '') + secs + ' ';
+    input.focus();
+  }
 }
 
 function deleteTimestamp(idx, tsIdx) {
@@ -2412,7 +2434,34 @@ function deleteTimestamp(idx, tsIdx) {
   if (!data.fights[idx].timestamps) return;
   data.fights[idx].timestamps.splice(tsIdx, 1);
   saveData(data);
-  openFightDetail(idx);
+  renderTimestampList(idx);
+}
+
+function renderTimestampList(idx) {
+  var el = document.getElementById('ts-list');
+  if (!el) return;
+  var data = getData();
+  if (!data || !data.fights[idx]) return;
+  var markers = data.fights[idx].timestamps || [];
+  markers.sort(function(a, b) { return a.time - b.time; });
+
+  if (markers.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Keine Markierungen.<br>Tippe z.B. "1:30 guter Konter"</div>';
+    return;
+  }
+
+  el.innerHTML = markers.map(function(m, mi) {
+    var mins = Math.floor(m.time / 60);
+    var secs = m.time % 60;
+    var timeStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
+    var tag = _tsMarkerTags.find(function(t) { return t.key === m.tag; });
+    var tagColor = tag ? tag.color : '#555';
+    return '<div style="display:flex;align-items:flex-start;gap:8px;padding:8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
+      '<span onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;padding-top:1px;" title="Zu ' + timeStr + ' spulen">' + timeStr + '</span>' +
+      '<div style="flex:1;min-width:0;font-family:\'DM Sans\',sans-serif;font-size:12px;color:#aaa;line-height:1.4;word-break:break-word;">' + (m.text || '').replace(/</g, '&lt;') + '</div>' +
+      '<span onclick="deleteTimestamp(' + idx + ',' + mi + ')" style="font-size:12px;color:#222;cursor:pointer;padding:0 4px;" title="Loeschen">\u00d7</span>' +
+    '</div>';
+  }).join('');
 }
 
 function seekVideo(seconds) {
