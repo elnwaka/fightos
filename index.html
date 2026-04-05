@@ -149,13 +149,14 @@
         <div class="card" style="margin-bottom:12px;">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);margin-bottom:12px;">QUICK LOG</div>
           <div style="display:flex;flex-direction:column;gap:8px;">
-            <select id="qlog-type" class="form-select" style="padding:8px 10px;font-size:12px;">
+            <select id="qlog-type" class="form-select" style="padding:8px 10px;font-size:12px;" onchange="updateQlogSaeulen()">
               <option value="boxen">Boxen</option>
               <option value="sparring">Sparring</option>
               <option value="kraft">Kraft</option>
               <option value="cardio">Cardio</option>
               <option value="mobility">Mobility</option>
             </select>
+            <div id="qlog-saeulen" style="display:flex;gap:3px;align-items:center;"></div>
             <div style="display:flex;gap:6px;">
               <input type="number" id="qlog-duration" class="form-input" style="flex:1;padding:8px 10px;font-size:12px;" placeholder="Min." min="1" max="300">
               <input type="number" id="qlog-rpe" class="form-input" style="width:55px;padding:8px 10px;font-size:12px;" placeholder="RPE" min="1" max="10">

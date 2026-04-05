@@ -456,6 +456,8 @@ function enterApp() {
   // Init pages content
   if (typeof renderAllPages === 'function') renderAllPages();
   renderLogEntries();
+  // Init Quick-Log Säulen display
+  if (typeof updateQlogSaeulen === 'function') updateQlogSaeulen();
   // Navigate to page from URL hash (or dashboard if none)
   showPage(getPageFromHash());
 }
@@ -940,6 +942,17 @@ function renderDashStats() {
           </div>
         </div>
       </div>
+      ${(function() {
+        var weakKey = null, weakVal = 999;
+        RADAR_AXES.forEach(function(a) {
+          if (scores[a.key] !== null && scores[a.key] < weakVal) { weakVal = scores[a.key]; weakKey = a.key; }
+        });
+        if (!weakKey || weakVal >= 70) return '';
+        var weakAxis = RADAR_AXES.find(function(a) { return a.key === weakKey; });
+        return '<div style="margin-top:8px;padding:8px 10px;background:' + weakAxis.hex + '11;border:1px solid ' + weakAxis.hex + '33;border-radius:4px;">' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:' + weakAxis.hex + ';letter-spacing:1px;">FOKUS: ' + weakAxis.label + ' (' + weakVal + '%)</div>' +
+        '</div>';
+      })()}
     </div>`;
 
   renderRadarChart(scores);
@@ -3197,6 +3210,18 @@ function renderPrepWizard(data) {
 }
 
 // ===== QUICK LOG (Dashboard) =====
+function updateQlogSaeulen() {
+  var el = document.getElementById('qlog-saeulen');
+  if (!el) return;
+  var type = document.getElementById('qlog-type').value;
+  var saeulen = TYPE_SAEULEN[type] || [];
+  var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNÄHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITÄT'];
+  var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
+  el.innerHTML = saeulen.map(function(si) {
+    return '<span style="font-family:\'Space Mono\',monospace;font-size:8px;padding:2px 5px;border-radius:2px;background:' + saeulenColors[si] + '22;color:' + saeulenColors[si] + ';letter-spacing:0.5px;">' + saeulenLabels[si] + '</span>';
+  }).join('');
+}
+
 function quickLog() {
   var data = getData();
   if (!data) return;
@@ -3679,19 +3704,43 @@ function renderWeekPlan() {
         const blocks = plan[day] || [];
         const dp = dayPhases[day];
         const isToday = di === todayDow;
+        // Day Säulen coverage
+        var daySaeulen = {};
+        blocks.forEach(function(b) {
+          var bs = BLOCK_SAEULEN[b.type];
+          if (bs) bs.forEach(function(si) { daySaeulen[si] = true; });
+        });
+        var saeulenColors8 = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
+        var daySaeulenDots = Object.keys(daySaeulen).map(function(si) {
+          return '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + saeulenColors8[si] + ';"></span>';
+        }).join('');
+
         return `<div class="day-col${isToday ? ' day-today' : ''}">
           <div class="day-header" onclick="toggleDayCol(this)">
-            <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--gold);">HEUTE</span>' : ''}</div>
-            ${dp ? `<div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:${dp.color};margin-top:2px;">${dp.label}</div>` : ''}
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--gold);">HEUTE</span>' : ''}</div>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:#333;">${blocks.length}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:4px;">
+              ${dp ? `<span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:${dp.color};">${dp.label}</span>` : ''}
+              <span style="display:flex;gap:2px;margin-left:auto;">${daySaeulenDots}</span>
+            </div>
           </div>
-          ${(s.weekSchedule[day] && s.weekSchedule[day].type === 'sparring' && blocks.some(b => b.type === 'strength')) ? '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--orange);padding:4px 0;">\u26A0 Schweres S&C + Sparring am gleichen Tag \u2014 erh\u00F6htes Verletzungsrisiko</div>' : ''}
+          ${(s.weekSchedule[day] && s.weekSchedule[day].type === 'sparring' && blocks.some(b => b.type === 'strength')) ? '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--orange);padding:4px 8px;">\u26A0 S&C + Sparring = Verletzungsrisiko</div>' : ''}
           <div class="day-blocks">
             ${blocks.map((b, bi) => {
               const logKey = day + '_' + bi + '_' + getWeekId();
               const done = isBlockLogged(logKey);
+              var blockSaeulen = BLOCK_SAEULEN[b.type] || [];
+              var blockDots = blockSaeulen.map(function(si) {
+                return '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + saeulenColors8[si] + ';"></span>';
+              }).join('');
               return `<div class="day-block ${TYPE_CLASS[b.type] || 'meta'}${done ? ' block-done' : ''}" onclick="editBlock('${day}',${bi})" title="Klicke zum Bearbeiten">
               <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="font-family:'Space Mono',monospace;font-size:11px;opacity:.7;">${b.time}</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-family:'Space Mono',monospace;font-size:11px;opacity:.7;">${b.time}</span>
+                  <span style="display:flex;gap:2px;">${blockDots}</span>
+                </div>
                 ${isToday || done ? `<button class="block-check-btn${done ? ' checked' : ''}" onclick="event.stopPropagation();toggleBlockDone('${day}',${bi},'${b.type}','${b.title.replace(/'/g,'\\&#39;')}')" title="${done ? 'Erledigt' : 'Als erledigt markieren'}">${done ? '✓' : '○'}</button>` : ''}
               </div>
               ${b.title}
