@@ -3610,12 +3610,49 @@ function generateSmartWeekPlan() {
     if ((ws[day] || {}).type === 'sparring') sparringDayIndices.push(di);
   });
 
-  // Bodyweight S&C fuer Boxer ohne Gym
-  var bwSessions = [
-    { title: 'Koerpergewicht A: Liegestuetze + Klimmzuege + Core', hint: '4x max Liegestuetze, 4x max Klimmzuege (Tuerrahmen/Spielplatz), 3x30s Plank', exercises: [] },
-    { title: 'Koerpergewicht B: Kniebeugen + Ausfallschritte + Dips', hint: '4x20 Kniebeugen, 3x12 Ausfallschritte je Seite, 4x max Dips (Stuhl/Bank)', exercises: [] },
-    { title: 'Koerpergewicht C: Spruenge + Liegestuetze explosiv + Core', hint: '4x5 Sprungkniebeugen, 4x5 explosive Liegestuetze, 3x10 Beinheben', exercises: [{id:'jump-squat',label:'Jump Squat'},{id:'explosive-pushup',label:'Explosive Push-Up'}] }
+  // Bodyweight S&C — Anfaenger vs Fortgeschritten
+  var bwSessions = isAnfaenger ? [
+    { title: 'Koerpergewicht A: Oberkörper', hint: '3x Knie-Liegestuetze (oder normale wenn du 10+ schaffst), 3x Schraegzuege am Tisch, 3x20s Plank. Ziel: Kraft aufbauen damit deine Schlaege sitzen.', exercises: [] },
+    { title: 'Koerpergewicht B: Beine + Core', hint: '3x15 Kniebeugen, 3x10 Ausfallschritte je Seite, 3x10 Beinheben liegend. Ziel: Stabilere Beinarbeit im Ring.', exercises: [] },
+    { title: 'Koerpergewicht C: Ganzkörper', hint: '3x10 Liegestuetze, 3x15 Kniebeugen, 3x20s Seitstütz je Seite. Ziel: Grundkraft fuer alle Bewegungen im Ring.', exercises: [] }
+  ] : [
+    { title: 'Koerpergewicht A: Push + Core', hint: '4x max Liegestuetze, 4x max Klimmzuege (Tuerrahmen/Spielplatz), 3x30s Plank, 3x10 Beinheben. Staerkt Schlagkraft und Clinch.', exercises: [] },
+    { title: 'Koerpergewicht B: Beine + Explosivitaet', hint: '4x20 Kniebeugen, 3x12 Ausfallschritte je Seite, 4x max Dips (Stuhl/Bank). Staerkere Beine = mehr Power.', exercises: [] },
+    { title: 'Koerpergewicht C: Explosiv', hint: '4x5 Sprungkniebeugen, 4x5 explosive Liegestuetze, 3x10 Beinheben. Schnellkraft fuer explosive Schlaege.', exercises: [{id:'jump-squat',label:'Jump Squat'},{id:'explosive-pushup',label:'Explosive Push-Up'}] }
   ];
+
+  // IMT-Label je nach Geraet
+  var imtTitle = gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege durch die Nase';
+  var imtHint = gym !== 'none' ? 'PowerBreathe oder aehnliches Geraet, progressiver Widerstand' : 'Langsam durch die Nase einatmen (4 Sek.), kurz halten, langsam ausatmen (6 Sek.). Kein Geraet noetig.';
+
+  // Nacken nur fuer Fortgeschritten+
+  var doNacken = !isAnfaenger;
+
+  // Ruhetag-Varianten (rotieren)
+  var restDayVariants = [
+    { title: 'Ruhetag: Spaziergang + Dehnung', hint: '20-30 Min. lockerer Spaziergang draussen + 10 Min. Dehnung. Koerper erholen lassen.' },
+    { title: 'Ruhetag: Leichtes Schwimmen oder Radfahren', hint: '20-30 Min. locker, kein Leistungsdruck. Gut fuer Gelenke und Durchblutung.' },
+    { title: 'Ruhetag: Yoga / Mobility Flow', hint: '15-20 Min. fliessende Dehnuebungen. YouTube: "Yoga fuer Kampfsportler" als Anleitung.' },
+    { title: 'Kompletter Ruhetag', hint: 'Heute nichts. Schlaf, Essen, Erholung. Dein Koerper wird im Schlaf staerker, nicht im Training.' }
+  ];
+  var restIdx = 0;
+
+  // 4-Wochen-Progression (1=Build, 2=Build+, 3=Peak, 4=Deload)
+  var weekNum = 1;
+  if (data && data.weekPlanGenerated) {
+    var weeksSince = Math.floor((Date.now() - new Date(data.weekPlanGenerated).getTime()) / (7*86400000));
+    weekNum = (weeksSince % 4) + 1;
+  }
+  var volumeMult = weekNum === 4 ? 0.6 : weekNum === 3 ? 1.1 : 1.0;
+  var weekLabel = weekNum === 1 ? 'AUFBAU' : weekNum === 2 ? 'AUFBAU+' : weekNum === 3 ? 'PEAK' : 'DELOAD';
+
+  // Motivations-Hints pro Block-Typ
+  var whyHints = {
+    strength: 'Kraft aufbauen → haertere Schlaege + stabilerer Clinch',
+    cardio: 'Kondition verbessern → in Runde 3 noch Druck machen',
+    recovery: 'Erholung → du wirst im Schlaf staerker, nicht im Training',
+    boxing: 'Vereinstraining → dein Trainer gibt den Inhalt vor'
+  };
 
   DAY_NAMES.forEach((day, di) => {
     const d = ws[day] || { time: null, type: 'frei' };
@@ -3651,7 +3688,7 @@ function generateSmartWeekPlan() {
     // KAMPF-MODUS — 1–2 Tage vor Kampf
     // =============================================
     } else if (phase === 'kampfmodus') {
-      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: 'IMT — 30 Atemzuege (leicht)', hint: 'Atemmuskel-Training: langsam und tief gegen Widerstand einatmen', type: 'meta',
+      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: imtTitle + ' (leicht)', hint: imtHint, type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
       blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Leichte Mobility 15 Min.', hint: 'Hueften, Schultern, T-Spine — locker bleiben', type: 'recovery',
         exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
@@ -3663,7 +3700,7 @@ function generateSmartWeekPlan() {
     // SCHÄRFEN — 3–4 Tage vor Kampf
     // =============================================
     } else if (phase === 'schaerfen') {
-      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: 'IMT — 30 Atemzuege', hint: 'Atemmuskel-Training: langsam und tief gegen Widerstand einatmen', type: 'meta',
+      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: imtTitle, hint: imtHint, type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
 
       if (isSparringDay) {
@@ -3689,7 +3726,7 @@ function generateSmartWeekPlan() {
     // RECOVERY — Nach dem Kampf
     // =============================================
     } else if (phase === 'recovery') {
-      blocks.push({ time: isWeekend ? '09:00' : morningTime, title: 'IMT — 30 Atemzuege (leicht)', hint: 'Atemmuskel-Training: langsam und tief gegen Widerstand einatmen', type: 'meta',
+      blocks.push({ time: isWeekend ? '09:00' : morningTime, title: imtTitle + ' (leicht)', hint: imtHint, type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
       blocks.push({ time: isWeekend ? '09:15' : timeAdd(morningTime, 0, 10), title: 'Sanfte Mobility 15 Min.', hint: 'Lockeres Dehnen, kein Krafttraining — Koerper erholen lassen', type: 'recovery',
         exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
@@ -3701,7 +3738,7 @@ function generateSmartWeekPlan() {
     // =============================================
     } else {
       // --- MORGENS (alle Tage) ---
-      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: 'IMT — 30 Atemzuege', hint: 'Atemmuskel-Training: langsam und tief gegen Widerstand einatmen', type: 'meta',
+      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: imtTitle, hint: imtHint, type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
 
       if (isSparringDay) {
@@ -3717,9 +3754,9 @@ function generateSmartWeekPlan() {
         var nackenEx = hasNacken ? [{id:'iso-nacken',label:'Iso Nacken'},{id:'nacken-flexion',label:'Nacken Flexion'}] : [];
         if (gym === 'none') {
           // Kein Gym: Morgens Liegestuetze + Core + evtl. Nacken
-          blocks.push({ time: timeAdd(isWeekend ? '08:10' : morningTime, 0, 10), title: 'Morgens: Liegestuetze + Core 15 Min.', hint: '3x max Liegestuetze, 3x30s Plank, 3x10 Beinheben' + (hasNacken ? ' + Nacken-Isometrie 4 Richtungen' : ''), type: 'strength',
+          blocks.push({ time: timeAdd(isWeekend ? '08:10' : morningTime, 0, 10), title: 'Morgens: Liegestuetze + Core 15 Min.', hint: (isAnfaenger ? '3x Knie-Liegestuetze (oder normale), 3x20s Plank, 3x10 Beinheben' : '3x max Liegestuetze, 3x30s Plank, 3x10 Beinheben') + '. ' + whyHints.strength, type: 'strength',
             exercises: hasNacken ? nackenEx : [] });
-        } else if (hasNacken) {
+        } else if (hasNacken && doNacken) {
           blocks.push({ time: timeAdd(isWeekend ? '08:10' : morningTime, 0, 10), title: 'Overcoming Isometrics + Nacken (~20 Min.)', hint: 'Max. Kraft gegen unbeweglichen Widerstand + Nackentraining zur KO-Praevention', type: 'strength',
             exercises: [{id:'overcoming-iso',label:'Overcoming Iso'}, ...nackenEx] });
         }
@@ -3767,7 +3804,7 @@ function generateSmartWeekPlan() {
             var bw = bwSessions[scIdx % bwSessions.length]; scIdx++;
             blocks.push({ time: scTime, title: bw.title, hint: bw.hint, type: 'strength', exercises: bw.exercises });
           }
-          if (hasNacken) {
+          if (hasNacken && doNacken) {
             blocks.push({ time: timeAdd(scTime, 0, 45), title: 'Nackentraining 10 Min.', hint: 'Isometrisch: Stirn, Hinterkopf, Seiten — je 3x10 Sek. halten', type: 'strength',
               exercises: [{id:'iso-nacken',label:'Iso Nacken'},{id:'nacken-flexion',label:'Nacken Flexion'}] });
           }
@@ -3784,10 +3821,13 @@ function generateSmartWeekPlan() {
               exercises: [{id:'zone2',label:'Zone 2'}] });
           }
         } else {
-          // Max S&C erreicht — nur leichte Bewegung
-          blocks.push({ time: isWeekend ? '10:00' : timeAdd(morningTime, 0, 10), title: 'Ruhetag — leichte Bewegung', hint: 'Spaziergang, Dehnung, oder komplette Ruhe. Dein Koerper braucht Erholung.', type: 'recovery' });
-          blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio ' + cardioLabel, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140', type: 'cardio',
-            exercises: [{id:'zone2',label:'Zone 2'}] });
+          // Max S&C erreicht — Ruhetag mit Varianz
+          var rv = restDayVariants[restIdx % restDayVariants.length]; restIdx++;
+          blocks.push({ time: isWeekend ? '10:00' : timeAdd(morningTime, 0, 10), title: rv.title, hint: rv.hint, type: 'recovery' });
+          if (rv.title.indexOf('Komplett') === -1) {
+            blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio ' + cardioLabel, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140. ' + whyHints.cardio, type: 'cardio',
+              exercises: [{id:'zone2',label:'Zone 2'}] });
+          }
         }
         blocks.push({ time: isWeekend ? '17:00' : timeAdd(s.workEnd, 1, 30), title: 'Mobility + Foam Rolling 15 Min.', hint: 'Faszienrolle: Oberschenkel, Hueftbeuger, T-Spine + statisches Stretching', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'thoracic-rotation',label:'Thoracic Rotation'}] });
@@ -3871,6 +3911,8 @@ function renderWeekPlan() {
     <div class="page-header">
       <div class="page-title">WOCHEN<span>PLAN</span></div>
       <div class="page-sub">Dein Plan passt sich an dein Level, Equipment und Kampfdatum an.</div>
+      <div style="margin-top:8px;"><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${weekNum===4?'var(--green)':weekNum===3?'var(--red)':'var(--blue)'};letter-spacing:1px;">WOCHE ${weekNum}: ${weekLabel}</span>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;margin-left:8px;">${weekNum===1?'Grundlagen aufbauen':weekNum===2?'Volumen steigern':weekNum===3?'Intensitaet hoch, Volumen runter':weekNum===4?'Erholung — halbes Volumen':''}${volumeMult<1?' · Volumen x'+volumeMult:''}</span></div>
     </div>
     ${(function() {
       var hints = [];
@@ -3974,6 +4016,7 @@ function regenerateWeekPlan() {
   const data = getData();
   if (!data) return;
   data.weekPlan = generateSmartWeekPlan();
+  if (!data.weekPlanGenerated) data.weekPlanGenerated = new Date().toISOString();
   saveData(data);
   renderWeekPlan();
 }
@@ -4429,7 +4472,7 @@ function buildDailyRoutineHTML() {
 
   if (yesterdayWasSparring && isFreeDay) {
     // === TAG NACH SPARRING ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'IMT — 30 Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege', color: 'var(--red)' });
     routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Erholungstag: Leichte Mobility 15 Min.', color: 'var(--purple)' });
     routine.push({ time: isWeekend ? '14:00' : timeAdd(today.workEnd, 0, 30), label: 'Zone 2 Cardio 20-30 Min. (Regeneration)', color: 'var(--green)' });
     routine.push({ time: isWeekend ? '17:00' : timeAdd(today.workEnd, 1, 30), label: 'Mobility + Foam Rolling 15 Min.', color: 'var(--purple)' });
@@ -4437,7 +4480,7 @@ function buildDailyRoutineHTML() {
 
   } else if (isSparringDay) {
     // === SPARRING TAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'IMT — 30 Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege', color: 'var(--red)' });
     routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Leichte Mobility 10 Min.', color: 'var(--purple)' });
     routine.push({ time: timeBefore(today.time, 0, 15), label: 'Vor dem Verein: Aufwaermen', color: 'var(--gold)' });
     routine.push({ time: today.time, label: 'Sparring im Verein', color: 'var(--red)' });
@@ -4446,14 +4489,16 @@ function buildDailyRoutineHTML() {
 
   } else if (isBoxingDay) {
     // === BOXTAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'IMT — 30 Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege', color: 'var(--red)' });
     if (gym === 'none') {
-      routine.push({ time: timeAdd(wakeTime, 0, 15), label: 'Liegestuetze + Core 15 Min.', color: 'var(--red)' });
-    } else {
+      routine.push({ time: timeAdd(wakeTime, 0, 15), label: isAnfaenger ? 'Knie-Liegestuetze + Core 15 Min.' : 'Liegestuetze + Core 15 Min.', color: 'var(--red)' });
+    } else if (!isAnfaenger) {
       routine.push({ time: timeAdd(wakeTime, 0, 15), label: 'Overcoming Isometrics + Nacken (~20 Min.)', color: 'var(--red)' });
+    } else {
+      routine.push({ time: timeAdd(wakeTime, 0, 15), label: 'Liegestuetze + Core 15 Min.', color: 'var(--red)' });
     }
     if (!isWeekend) {
-      routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'IMT — 30 Atemzuege (2. Session)', color: 'var(--gold)' });
+      routine.push({ time: timeAdd(lunchTime, 0, 25), label: gym !== 'none' ? 'IMT — 30 Atemzuege (2. Session)' : 'Atemuebung — 30 Atemzuege (2. Session)', color: 'var(--gold)' });
     }
     routine.push({ time: timeBefore(today.time, 0, 15), label: 'Vor dem Verein: Aufwaermen + Face Pulls', color: 'var(--gold)' });
     routine.push({ time: today.time, label: typeLabel + ' im Verein', color: 'var(--red)' });
@@ -4461,7 +4506,7 @@ function buildDailyRoutineHTML() {
 
   } else if (isFreeDay) {
     // === FREIER TAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'IMT — 30 Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege', color: 'var(--red)' });
 
     if (tomorrowIsSparring) {
       routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Leichte Mobility 15 Min. (morgen Sparring!)', color: 'var(--purple)' });
