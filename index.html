@@ -257,11 +257,39 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       <span>Tests</span>
     </button>
-    <button class="btab" data-page="account" onclick="showPage('account')">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Profil</span>
+    <button class="btab" data-page="more" onclick="toggleMobileMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      <span>Mehr</span>
     </button>
   </nav>
+
+  <!-- MOBILE MENU (Mehr-Tab) -->
+  <div id="mobile-menu" style="display:none;position:fixed;inset:0;z-index:450;background:rgba(0,0,0,.85);animation:fadeIn .2s ease;">
+    <div style="position:absolute;bottom:60px;left:0;right:0;background:var(--black);border-top:1px solid #1a1a1a;border-radius:16px 16px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px));max-height:70vh;overflow-y:auto;">
+      <div style="width:40px;height:4px;background:#333;border-radius:2px;margin:0 auto 16px;"></div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;color:#333;letter-spacing:2px;padding:8px 12px;">TRAINING</div>
+        <button class="mm-item" onclick="mobileNav('wochenplan')">Wochenplan</button>
+        <button class="mm-item" onclick="mobileNav('log')">Trainingslog</button>
+        <button class="mm-item" onclick="mobileNav('tests')">Leistungstests</button>
+        <button class="mm-item" onclick="mobileNav('uebungen')">Übungen</button>
+        <button class="mm-item" onclick="mobileNav('periodisierung')">Periodisierung</button>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;color:#333;letter-spacing:2px;padding:12px 12px 8px;">ERNÄHRUNG & RECOVERY</div>
+        <button class="mm-item" onclick="mobileNav('ernaehrung')">Makros & Mahlzeiten</button>
+        <button class="mm-item" onclick="mobileNav('cutten')">Gewicht machen</button>
+        <button class="mm-item" onclick="mobileNav('supplements')">Supplements</button>
+        <button class="mm-item" onclick="mobileNav('regeneration')">Recovery</button>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;color:#333;letter-spacing:2px;padding:12px 12px 8px;">WISSEN</div>
+        <button class="mm-item" onclick="mobileNav('saeulen')">8 Säulen</button>
+        <button class="mm-item" onclick="mobileNav('mental')">Mentaltraining</button>
+        <button class="mm-item" onclick="mobileNav('rechner')">Rechner</button>
+        <button class="mm-item" onclick="mobileNav('faq')">FAQ & Mythen</button>
+        <div style="height:1px;background:#1a1a1a;margin:8px 0;"></div>
+        <button class="mm-item" onclick="mobileNav('account')">Mein Account</button>
+        <button class="mm-item" style="color:var(--red);" onclick="document.getElementById('mobile-menu').style.display='none';doLogout()">Logout</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ===== PAGE: DASHBOARD ===== -->
   <div class="page active" id="page-dashboard">

@@ -6033,6 +6033,22 @@ function formatDate(str) {
   return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+// ===== MOBILE MENU =====
+function toggleMobileMenu() {
+  var menu = document.getElementById('mobile-menu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  // Klick auf Overlay schließt
+  menu.onclick = function(e) {
+    if (e.target === menu) menu.style.display = 'none';
+  };
+}
+
+function mobileNav(page) {
+  document.getElementById('mobile-menu').style.display = 'none';
+  showPage(page);
+}
+
 // ===== THEME TOGGLE =====
 function toggleTheme() {
   var html = document.documentElement;
