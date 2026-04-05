@@ -2569,15 +2569,10 @@ function openFightDetail(idx) {
       </div>
       ${ratingsHTML}
     </div>
-    <!-- Round Scoring -->
+    <!-- Runden-Scoring (kompakt neben Selbstbewertung) -->
     <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:10px;">RUNDEN-SCORING</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:10px;">WER HAT GEWONNEN?</div>
       <div style="display:flex;flex-direction:column;gap:6px;">${roundWinnerHTML}</div>
-    </div>
-    <!-- Key Moments -->
-    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">KEY MOMENTS</div>
-      <div id="fd-keyMoments" onclick="makeFightFieldEditable(${idx},'keyMoments',this)" style="font-size:13px;color:#666;line-height:1.6;cursor:text;min-height:20px;">${f.keyMoments || '<span style="color:#222;">z.B. R1 2:15 guter Konter, R2 Clinch-Problem...</span>'}</div>
     </div>
   </div>
 
@@ -2663,25 +2658,6 @@ function openFightDetail(idx) {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">GEGNER-SCHWÄCHEN</div>
       <div id="fd-opponentWeaknesses" onclick="makeFightFieldEditable(${idx},'opponentWeaknesses',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.opponentWeaknesses || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
-  </div>
-
-  <!-- RUNDEN-ANALYSE -->
-  <div style="margin-bottom:36px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1.5px;margin-bottom:14px;">RUNDEN-ANALYSE</div>
-    ${[1,2,3].map(r => {
-      const notes = f.rounds[r-1] ? f.rounds[r-1].notes : '';
-      const w = f.rounds[r-1] ? (f.rounds[r-1].winner || '') : '';
-      const dotColor = w === 'ich' ? 'var(--green)' : w === 'gegner' ? 'var(--red)' : '#222';
-      return `<div style="display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #111;align-items:flex-start;">
-        <div style="text-align:center;min-width:36px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#222;line-height:1;">${r}</div>
-          <div style="width:8px;height:8px;border-radius:50%;background:${dotColor};margin:4px auto 0;"></div>
-        </div>
-        <div style="flex:1;" id="fd-round${r}" onclick="makeFightFieldEditable(${idx},'round${r}',this)">
-          <div style="font-size:14px;color:#777;line-height:1.7;cursor:text;min-height:24px;">${notes || '<span style="color:#1a1a1a;">Wie lief diese Runde?</span>'}</div>
-        </div>
-      </div>`;
-    }).join('')}
   </div>
 
   <!-- NÄCHSTE SCHRITTE -->
