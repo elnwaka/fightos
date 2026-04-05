@@ -2109,7 +2109,7 @@ function openFightDetail(idx) {
   // Timestamp markers
   var markers = f.timestamps || [];
   var timestampsHTML = '<div style="display:flex;flex-direction:column;height:100%;">' +
-    '<button onclick="markNow(' + idx + ')" style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;padding:14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;margin-bottom:12px;transition:opacity .15s;" onmousedown="this.style.opacity=\'0.7\'" onmouseup="this.style.opacity=\'1\'">MARKIEREN</button>' +
+    '<button onclick="markNow(' + idx + ')" style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;padding:14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;margin-bottom:12px;transition:opacity .15s;" onmousedown="this.style.opacity=\'0.7\'" onmouseup="this.style.opacity=\'1\'">+ SZENE</button>' +
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
       '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;letter-spacing:1px;">' + markers.length + ' MARKIERUNG' + (markers.length !== 1 ? 'EN' : '') + '</span>' +
     '</div>' +
@@ -2117,7 +2117,7 @@ function openFightDetail(idx) {
 
   markers.sort(function(a, b) { return a.time - b.time; });
   if (markers.length === 0) {
-    timestampsHTML += '<div style="text-align:center;padding:24px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Druecke MARKIEREN waehrend<br>du den Kampf schaust</div>';
+    timestampsHTML += '<div style="text-align:center;padding:24px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Druecke + SZENE waehrend<br>du den Kampf schaust</div>';
   } else {
     markers.forEach(function(m, mi) {
       var tagColor = _tsTagColors[m.tag] || '#555';
@@ -2415,27 +2415,31 @@ function markNow(idx) {
   }, 50);
 }
 
-function updateTimestampText(idx, tsIdx, value) {
+function updateTimestampById(idx, markerId, value) {
   var data = getData();
   if (!data || !data.fights[idx]) return;
-  if (!data.fights[idx].timestamps || !data.fights[idx].timestamps[tsIdx]) return;
-  data.fights[idx].timestamps[tsIdx].text = value.trim();
-  data.fights[idx].timestamps[tsIdx].tag = autoDetectTag(value);
-  saveData(data);
-  // Update border color live
-  var mid = data.fights[idx].timestamps[tsIdx].id || tsIdx;
-  var newColor = _tsTagColors[data.fights[idx].timestamps[tsIdx].tag] || '#555';
-  var el = document.getElementById('ts-item-' + mid);
-  if (el) el.style.borderLeftColor = newColor;
-  var timeEl = document.getElementById('ts-time-' + mid);
-  if (timeEl) timeEl.style.color = newColor;
+  var ts = data.fights[idx].timestamps;
+  if (!ts) return;
+  for (var i = 0; i < ts.length; i++) {
+    if (ts[i].id === markerId) {
+      ts[i].text = value.trim();
+      ts[i].tag = autoDetectTag(value);
+      saveData(data);
+      var newColor = _tsTagColors[ts[i].tag] || '#555';
+      var el = document.getElementById('ts-item-' + markerId);
+      if (el) el.style.borderLeftColor = newColor;
+      var timeEl = document.getElementById('ts-time-' + markerId);
+      if (timeEl) timeEl.style.color = newColor;
+      return;
+    }
+  }
 }
 
-function deleteTimestamp(idx, tsIdx) {
+function deleteTimestamp(idx, markerId) {
   var data = getData();
   if (!data || !data.fights[idx]) return;
   if (!data.fights[idx].timestamps) return;
-  data.fights[idx].timestamps.splice(tsIdx, 1);
+  data.fights[idx].timestamps = data.fights[idx].timestamps.filter(function(m) { return m.id !== markerId; });
   saveData(data);
   renderTimestampList(idx);
 }
@@ -2453,16 +2457,16 @@ function renderTimestampList(idx) {
     return;
   }
 
-  el.innerHTML = markers.map(function(m, mi) {
-    var mid = m.id || mi;
+  el.innerHTML = markers.map(function(m) {
+    var mid = m.id || '';
     var tagColor = _tsTagColors[m.tag] || '#555';
     return '<div id="ts-item-' + mid + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
       '<span id="ts-time-' + mid + '" onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;">' + formatTs(m.time) + '</span>' +
-      '<input id="ts-text-' + mid + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '" placeholder="Beschreibung..." ' +
-        'onblur="updateTimestampText(' + idx + ',' + mi + ',this.value)" ' +
+      '<input id="ts-text-' + mid + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '" placeholder="Was passiert hier?" ' +
+        'onblur="updateTimestampById(' + idx + ',\'' + mid + '\',this.value)" ' +
         'onkeydown="if(event.key===\'Enter\')this.blur()" ' +
         'style="flex:1;padding:4px 6px;background:transparent;border:none;border-bottom:1px solid #111;color:#aaa;font-family:\'DM Sans\',sans-serif;font-size:12px;outline:none;min-width:0;">' +
-      '<span onclick="deleteTimestamp(' + idx + ',' + mi + ')" style="font-size:14px;color:#222;cursor:pointer;padding:0 2px;line-height:1;">\u00d7</span>' +
+      '<span onclick="deleteTimestamp(' + idx + ',\'' + mid + '\')" style="font-size:14px;color:#333;cursor:pointer;padding:0 4px;line-height:1;" title="Entfernen">\u00d7</span>' +
     '</div>';
   }).join('');
 }
