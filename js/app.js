@@ -3677,7 +3677,7 @@ const BLOCK_SAEULEN = {
   boxing:   [0,2,5],    // Kraft + Kognition + Ring IQ
   cardio:   [1],        // S2: Metabolisch
   recovery: [4,7],      // Regeneration + Mobilität
-  meta:     [2,6],      // Kognition + Mental
+  meta:     [2,6],      // Kognition + Mental (BET etc.)
   fight:    [0,1,2,5,6] // Alle Kampf-relevanten
 };
 
@@ -4150,7 +4150,7 @@ function buildDailyRoutineHTML() {
     if (!isWeekend) {
       routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zone 2 Pendeln', color: 'var(--green)' });
       routine.push({ time: today.workStart, label: 'Arbeit', color: '#555' });
-      routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'IMT — 30 Atemzuege (2. Session)', color: 'var(--gold)' });
+      routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'Optional: BET Stroop 10 Min.', color: 'var(--gold)' });
       routine.push({ time: today.workEnd, label: 'Feierabend', color: '#555' });
     }
     routine.push({ time: timeBefore(today.time, 1, 0), label: 'Pre-Training Snack', color: 'var(--green)' });
@@ -4166,7 +4166,7 @@ function buildDailyRoutineHTML() {
     if (!isWeekend) {
       routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zone 2 Pendeln', color: 'var(--green)' });
       routine.push({ time: today.workStart, label: 'Arbeit', color: '#555' });
-      routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'IMT — 30 Atemzuege (2. Session)', color: 'var(--gold)' });
+      routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'BET Stroop 20 Min.', color: 'var(--gold)' });
       routine.push({ time: today.workEnd, label: 'Feierabend', color: '#555' });
     }
     routine.push({ time: timeBefore(today.time, 1, 0), label: 'Pre-Training Snack', color: 'var(--green)' });
@@ -4197,7 +4197,7 @@ function buildDailyRoutineHTML() {
       if (!isWeekend) {
         routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zone 2 Pendeln', color: 'var(--green)' });
         routine.push({ time: today.workStart, label: 'Arbeit', color: '#555' });
-        routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'IMT — 30 Atemzuege (2. Session)', color: 'var(--gold)' });
+        routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'BET Stroop 20 Min.', color: 'var(--gold)' });
         routine.push({ time: today.workEnd, label: 'Feierabend', color: '#555' });
       }
       routine.push({ time: isWeekend ? '14:00' : timeAdd(today.workEnd, 0, 30), label: 'Zone 2 Cardio 30–45 Min. (Laufen / Rad)', color: 'var(--green)' });

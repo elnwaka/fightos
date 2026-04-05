@@ -334,18 +334,21 @@ Das kubanische Boxsystem und moderne Sportforschung zeigen: Die effektivste Meth
 • <strong>Tempo-Variation:</strong> Runde 1 bei 50%, Runde 2 bei 80%, Runde 3 bei 100% → kognitive Kontrolle über Intensität<br>
 • <strong>Eingeschränktes Sichtfeld:</strong> Sparring nur mit peripherem Sehen (Blick auf Brust fixiert)<br><br>
 
-<strong style="font-size:15px;">KOGNITIVE ERMÜDUNGSRESISTENZ</strong><br>
-Mentale Ermuedung reduziert die physische Leistung — das ist im Kampfsport besonders relevant, weil du gleichzeitig denken UND kaempfen musst. Die beste Methode das zu trainieren ist <strong>Sparring unter Ermuedung</strong>: Erst koerperlich ermueden (Sandsack-Intervalle, Sprints), dann direkt ins Sparring. Dein Gehirn lernt, unter Stress praezise Entscheidungen zu treffen.<br><br>
+<strong style="font-size:15px;">KOGNITIVE ERMÜDUNGSRESISTENZ (BET)</strong> <span style="font-size:10px;color:var(--gold);border:1px solid var(--gold);padding:1px 6px;border-radius:3px;">EXPERIMENTELL</span><br>
+${tt('BET','Brain Endurance Training — kognitives Training unter Ermüdung. Dein Gehirn lernt, bei mentaler Erschöpfung trotzdem präzise zu arbeiten.')} ist ein vielversprechender Zusatz, aber kein Ersatz für boxspezifisches Training. Marcora et al. (2015) zeigten in einer <em>Militärstudie (nicht an Boxern!)</em>: +126% Ausdauer mit BET vs. +42% nur physisch. <strong>Achtung: Diese Studie war an Soldaten</strong> — der Transfer auf den Boxring ist plausibel und wird von GB Boxing genutzt, aber boxspezifische Evidenz fehlt noch. Van Cutsem et al. (2017) bestätigten allgemein: Mentale Ermüdung reduziert physische Leistung um <strong>5–10%</strong>.<br><br>
+
+BET konfrontiert dein Gehirn mit kognitiven Aufgaben (${tt('Stroop-Test','Farbwörter erscheinen in falscher Farbe. Du musst die FARBE benennen, nicht das Wort. Trainiert Impulshemmung und kognitive Belastbarkeit.')}, Rechenaufgaben) WÄHREND oder vor dem Training. Der ${tt('Anteriore cinguläre Cortex','Gehirnregion, die Anstrengung bewertet. Wird durch BET effizienter — wie ein Prozessor-Upgrade für dein Gehirn.')} wird effizienter, dein mentales Erschöpfungslimit verschiebt sich nach oben.<br><br>
 
 <strong style="font-size:15px;">EMPFOHLENES PROGRAMM</strong><br>
-<strong>Im Ring (boxspezifisch belegt):</strong><br>
-• Constraint-Based Sparring: 2–3×/Woche mit wechselnden Aufgaben (s.o.) — Hristovski et al. (2006)<br>
-• Gaze-Anker-Technik: In jedem Sparring auf Brust/Kinn fixieren, NICHT den Fäusten folgen — Ripoll et al. (1995)<br>
-• Kampffilm-Analyse: 15–20 Min./Woche — Gegner-Videos → bewusst Tells suchen — Williams & Elliott (1999)<br>
-• Sparring unter Ermuedung: 3 Runden Sandsack → direkt 2 Runden Sparring<br>
-• Reaktionsdrills mit Partner: Partner zeigt Zahlen/Farben → du reagierst mit spezifischen Kombis<br>
-• Zahlen-Sparring: Trainer ruft Zahlen, Boxer antwortet mit entsprechender Kombi`,
-    tags:[{text:'2–3×/Woche',cls:'tag-gold'},{text:'Im Ring trainierbar',cls:'tag-blue'}]},
+<strong>Im Ring (Priorität 1):</strong><br>
+• Constraint-Based Sparring: 2–3×/Woche mit wechselnden Aufgaben (s.o.)<br>
+• Gaze-Anker-Technik: In jedem Sparring auf Brust/Kinn fixieren, NICHT den Fäusten folgen<br>
+• Kampffilm-Analyse: 15–20 Min./Woche — Gegner-Videos → bewusst Tells suchen<br><br>
+<strong>Zusatztools (Priorität 2):</strong><br>
+• <span style="color:var(--gold);">[Experimentell]</span> Stroboskop-Brille: 1–2×/Woche beim Pratzentraining — Hülsdünker et al. (2019) zeigten +12–18% visuelle Verarbeitung im Labor, aber <strong>Transfer auf den Ring ist noch nicht belegt</strong><br>
+• BET-Protokoll: Stroop-Test-App, 15–25 Min./Tag, progressiv zwischen Trainingseinheiten integrieren<br>
+• Reaktionsdrills: Partner zeigt Zahlen/Farben → du reagierst mit spezifischen Kombis`,
+    tags:[{text:'Täglich · 15–25 Min.',cls:'tag-gold'},{text:'BET + Blicktraining',cls:'tag-blue'}]},
 
   // === SÄULE 06: ERNÄHRUNG & GEWICHTSMANAGEMENT ===
   { name:'ERNÄHRUNG & GEWICHTSMANAGEMENT', category:'Treibstoff', color:'var(--green)',
@@ -2078,7 +2081,7 @@ function renderPeriodisierungPage() {
       <div class="phase-week" style="color:var(--green);">4+ TAGE</div>
       <div class="phase-name">NORMALES TRAINING</div>
       <div class="phase-bar" style="background:var(--green);width:90%;"></div>
-      <div class="phase-details">Volles Programm<br>S&C: 3× Morgen<br>Sparring: hart<br>Ausdauer: Zone 2 + SIT<br>IMT/Nacken: täglich</div>
+      <div class="phase-details">Volles Programm<br>S&C: 3× Morgen<br>Sparring: hart<br>Ausdauer: Zone 2 + SIT<br>BET/IMT/Nacken: täglich</div>
     </div>
     <div class="phase-block ${currentPhase==='schaerfen'?'current':''}" style="background:#0a0f1f;">
       <div class="phase-week" style="color:var(--blue);">2–3 TAGE</div>
@@ -2165,7 +2168,7 @@ function renderPeriodisierungPage() {
       1. <strong>Ring-Erfahrung:</strong> Jeder Kampf = Hochintensitäts-Training mit echten Konsequenzen — das stärkste Lernen überhaupt.<br>
       2. <strong>Kraft-Erhalt:</strong> S&C an trainingsfreien Morgen, 2–3× pro Woche reicht für Erhalt. Kraft-PRs nur in kampffreien Wochen.<br>
       3. <strong>Taktik:</strong> Kampfvideo-Analyse nach jedem Kampf. Was hat funktioniert? Was nicht? Nächstes Training gezielt anpassen.<br>
-      4. <strong>Auxiliary-Training weiterführen:</strong> IMT, Nacken, Constraint-Drills, Videoanalyse — verbessert dich OHNE Erholungsbedarf. Täglich möglich.<br>
+      4. <strong>Auxiliary-Training weiterführen:</strong> IMT, Nacken, BET, visuelles Training — verbessert dich OHNE Erholungsbedarf. Täglich möglich.<br>
       5. <strong>Technische Arbeit:</strong> Zwischen den Kämpfen Technik schleifen — frischer Körper = bessere motorische Anpassung.<br><br>
       <strong>Faustregel:</strong> Trainiere so hart wie möglich, so lange der nächste Kampf noch 5+ Tage weg ist. Danach: nur noch schärfen.
     </div>
@@ -2793,15 +2796,15 @@ function renderMentalPage() {
         {t:'Zwischen den Runden (60 Sek.)', d:'Sek. 0–5: Setzen, Mundschutz raus, Wasser (kleine Schlucke, nicht gurgeln). Sek. 5–10: 2 tiefe Atemzüge, Trainer anschauen. Sek. 10–40: Trainer gibt max. 2 Anweisungen. DU hörst ZU. Nickst. Sek. 40–55: Box-Breathing 2 Zyklen. Augen auf den Gegner — schau wie er sitzt, wie er atmet. Ist er müder als du? Sek. 55–60: Mundschutz rein (= Totem = Alter Ego Switch). Aufstehen. Schultern zurück. Letzte 3 Sek.: Trigger-Wort im Kopf. Gong.'},
         {t:'Nach dem Kampf', d:'Egal ob Sieg oder Niederlage: (1) Duschen, essen, trinken. Körper versorgen. (2) 1 Sache aufschreiben die gut war. 1 Sache aufschreiben die besser werden muss. Nur 1 jeweils — nicht mehr am Kampftag. (3) Trainer und Partner danken. (4) 24h kein Kampfvideo anschauen. Genieße den Sieg oder verarbeite die Niederlage erst emotional, dann analytisch (siehe Sektion 07).'}
       ]},
-    { id:'cognitive-drills', num:'09', title:'KOGNITIVE RING-DRILLS', sub:'Entscheidungsfaehigkeit unter Druck — boxspezifisch', color:'var(--gold)', icon:'🧠',
-      intro:'In Runde 3, wenn dein Kopf muede ist und dein Gegner Druck macht, entscheidet mentale Frische ueber Sieg oder Niederlage. <strong>Die beste Methode: Boxspezifische Drills unter Ermuedung.</strong> Hristovski et al. (2006) zeigten: Elite-Boxer treffen Kampfentscheidungen in unter 200ms. Mori et al. (2020): Experten antizipieren 83.3% korrekt vs. 68.5% bei Novizen. Der Unterschied ist Training unter realistischen Bedingungen — nicht Apps oder Laboruebungen.',
-      why:'Alle Drills basieren auf boxspezifischer Forschung: Hristovski 2006 (Constraint-Based Training), Mori 2020 (Antizipation), Ripoll 1995 (Blickverhalten), Davis 2018 (Kampfanalyse). Kein Labor, kein App-Training — alles im Ring oder am Sandsack trainierbar.',
+    { id:'bet', num:'09', title:'BET PROTOKOLL', sub:'Brain Endurance Training — 6 Wochen', color:'var(--gold)', icon:'🧠',
+      intro:'Brain Endurance Training (BET) trainiert dein Gehirn, <strong>unter kognitiver Erschöpfung sauber zu funktionieren</strong>. In Runde 3, wenn dein Kopf müde ist und dein Gegner Druck macht, entscheidet mentale Frische über Sieg oder Niederlage. BET simuliert diese Ermüdung systematisch im Training.<br><br>Das Konzept: Kognitive Erschöpfung (durch monotone Denkaufgaben) reduziert physische Ausdauer um 10–15%. Wenn du trainierst unter kognitiver Last zu performen, erhöhst du deine Toleranz — und hast in Runde 3 noch mentale Reserven die dein Gegner nicht hat.',
+      why:'Transparenz: Die oft zitierte Militär-Studie (Marcora et al. 2009) wurde an Soldaten durchgeführt, nicht an Boxern. Die Loughborough-Studie zeigte 126% längere Time-to-Exhaustion nach BET. Die Übertragung auf Kampfsport ist plausibel und wird von mehreren olympischen Verbänden (GB Boxing, DFB) genutzt — aber die Studienlage speziell für Boxer ist noch dünn. Das Risiko ist null (du trainierst nur dein Gehirn), das Potenzial groß.',
       steps:[
-        {t:'Constraint-Based Sparring (2-3x/Woche)', d:'Sparring mit wechselnden Einschraenkungen: Nur-Jab, Nur-Konter, Nur Innendistanz, A greift an B weicht aus + 1 Konter. Jede Einschraenkung zwingt dein Gehirn neue Muster zu entwickeln (Hristovski et al. 2006).'},
-        {t:'Zahlen-Sparring + Reaktionsdrills', d:'Trainer ruft Zahlen (1-6), Boxer antwortet mit entsprechender Kombi. Oder: Trainer zeigt Finger, Boxer reagiert. Variante: Rechenaufgabe zwischen Runden. Trainiert Reaktion + Automatisierung unter Druck.'},
-        {t:'Sparring unter Ermuedung', d:'Erst koerperlich ermueden: 3 Runden Sandsack-Intervalle (30 Sek All-Out, 30 Sek Pause), dann direkt 2-3 Runden Sparring. Ziel: Saubere Technik trotz Ermuedung. DAS ist Runde-3-Training.'},
-        {t:'Gaze-Anker-Training (jedes Sparring)', d:'Auf Brust/Kinn des Gegners fixieren, NICHT den Faeusten folgen (Ripoll et al. 1995). Peripheres Sehen erkennt Schlaege ~50ms frueher. Nach 4-6 Wochen automatisch.'},
-        {t:'Kampffilm-Analyse (15-20 Min./Woche)', d:'Eigene Videos + Gegner systematisch analysieren: Muster suchen, Trefferquote zaehlen, Schwachstellen identifizieren. Davis et al. (2018): Gewinner landen weniger Schlaege mit hoeherer Genauigkeit.'}
+        {t:'Woche 1–2: Basis aufbauen', d:'App: Kostenlose Stroop-App (z.B. „Brain Test", „Stroop Effect" oder „Encephalapp Stroop"). 15–20 Min. täglich inkongruente Tests (das Wort „BLAU" steht in roter Farbe → du musst die FARBE nennen, nicht das Wort). Ruhige Umgebung, volle Konzentration, keine Ablenkung. Mittagspause eignet sich gut. Du wirst merken: Nach 15 Min. wird dein Kopf „müde" — genau DAS ist der Trainingseffekt.'},
+        {t:'Woche 3–4: Integration ins Training', d:'20–25 Min. BET pro Session, höhere Schwierigkeit (schnellere Antwortzeit, mehr Varianten). NEU: Kognitive Aufgaben ZWISCHEN Bag-Work-Runden einbauen. Konkret: 3 Min. Sandsack → 60 Sek. Stroop-Test auf Handy → 3 Min. Sandsack → 60 Sek. Stroop. 6–8 Runden. Ziel: Saubere Technik halten obwohl dein Kopf müde ist. Trainingspartner kann auch Rechenaufgaben stellen: „147 minus 7?" zwischen den Runden.'},
+        {t:'Woche 5–6: Ring-Transfer', d:'25–30 Min. BET bei max. Schwierigkeit. Stroop-Antworten ZWISCHEN Sparring-Runden. Oder: Trainer stellt nach jeder Runde eine kognitive Frage (Farbe, Zahl, Rechenaufgabe) bevor er taktische Anweisungen gibt. Ziel: Saubere taktische Entscheidungen trotz maximaler kognitiver Erschöpfung. Das ist der direkte Transfer: In Runde 3 unter Druck noch klar denken können.'},
+        {t:'Premium-Option: SOMA-NPT', d:'SOMA NPT App (~50€/Monat): Wird von DFB, NBA, mehreren olympischen Verbänden und Premier-League-Clubs verwendet. Wissenschaftlich validiert, personalisierte Belastungssteuerung, messbarer Fortschritt. Lohnt sich wenn du regelmäßig kämpfst und es ernst meinst. Kostenlose Alternative: Jede Stroop-App + Disziplin reicht für den Basis-Effekt.'},
+        {t:'Langzeit-Protokoll', d:'Nach 6 Wochen: 3×/Woche Erhaltungsdosis (15 Min. + Integration in 2 Trainingseinheiten). Vor Kämpfen (Kampfwoche): Tägliche BET-Session 20 Min. — schärft die kognitive Ausdauer für den Kampf. BET ist wie Ausdauertraining für dein Gehirn: Konsistenz über Monate schlägt Intensität über Tage. Die meisten Boxer die es probieren hören nach 2 Wochen auf — die die durchhalten haben einen unfairen Vorteil in Runde 3.'}
       ]}
   ];
 
@@ -2974,7 +2977,7 @@ const faqData = [
   { q:'Kreatin — ja oder nein für Boxer?',
     a:'<strong>Ja, mit strategischem Timing.</strong><br><br>• Schnellere PCr-Resynthese zwischen Kombis<br>• +12% Peakpower<br>• Bessere Regeneration zwischen Sparring-Runden<br>• Möglicherweise neuroprotektiv<br><br><strong>Wann NICHT:</strong> 4–6 Wochen vor Wiegen pausieren (1–2 kg Wasser). Nach dem Wiegen wieder starten.'},
   { q:'Wie lange bis Verbesserungen sichtbar?',
-    a:'<strong>2–4 Wochen:</strong> IMT, besserer Schlaf, mehr Energie<br><strong>4–8 Wochen:</strong> Nackendicke messbar, Antizipation besser<br><strong>8–12 Wochen:</strong> Kraft +15–25%, VO₂max sichtbar<br><strong>6 Monate:</strong> Ring-IQ deutlich besser, Runde-3-Dominanz<br><strong>12+ Monate:</strong> Fundamentale Transformation<br><br>Fortschritt ist nicht linear. Plateaus = Adaptation, nicht Stillstand.'},
+    a:'<strong>2–4 Wochen:</strong> IMT, besserer Schlaf, mehr Energie<br><strong>4–8 Wochen:</strong> Nackendicke messbar, BET-Effekte<br><strong>8–12 Wochen:</strong> Kraft +15–25%, VO₂max sichtbar<br><strong>6 Monate:</strong> Ring-IQ deutlich besser, Runde-3-Dominanz<br><strong>12+ Monate:</strong> Fundamentale Transformation<br><br>Fortschritt ist nicht linear. Plateaus = Adaptation, nicht Stillstand.'},
   { q:'Landeskader vs. Nationalkader — was fehlt?',
     a:'<strong>Nicht primär Talent — sondern Struktur:</strong><br><br>• <strong>Trainingsvolumen:</strong> 25–35 Std./Wo vs. 12–15 Std.<br>• <strong>Coaching:</strong> Bundesstützpunkt mit A-Lizenz-Trainern, Physio, Sportpsychologe<br>• <strong>Kämpfe:</strong> 80–150+ vs. 10–30<br>• <strong>Sportförderung:</strong> Bundeswehr/Zoll — bezahlte Stelle + Freistellung<br><br>Weg dahin: Landesverband-Trainer fragen wegen Empfehlung zur Sportfördergruppe.'},
   { q:'Vollzeitjob und Nationalebene — realistisch?',
