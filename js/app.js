@@ -3861,7 +3861,6 @@ function regenerateWeekPlan() {
 }
 
 function toggleDayCol(el) {
-  if (!isMobile()) return;
   var col = el.closest('.day-col');
   if (col) col.classList.toggle('day-expanded');
 }

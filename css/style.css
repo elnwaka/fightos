@@ -1242,9 +1242,9 @@ body::before {
   border-color: var(--red);
 }
 .week-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   margin-bottom: 20px;
 }
 .day-col {
@@ -1252,10 +1252,27 @@ body::before {
   border: 1px solid #1e1e1e;
   border-radius: var(--radius);
   overflow: hidden;
-  min-height: 280px;
   display: flex;
   flex-direction: column;
 }
+.day-col .day-blocks { display: none; }
+.day-col .add-block-btn { display: none; }
+.day-col.day-today .day-blocks,
+.day-col.day-expanded .day-blocks { display: flex; }
+.day-col.day-today .add-block-btn,
+.day-col.day-expanded .add-block-btn { display: block; }
+.day-header { cursor: pointer; position: relative; }
+.day-header::after {
+  content: '▸';
+  font-size: 14px;
+  color: #333;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.day-col.day-today .day-header::after,
+.day-col.day-expanded .day-header::after { content: '▾'; color: var(--gold); }
 .day-col.fight-day { border-color: rgba(232,0,13,.4); }
 .day-header {
   padding: 10px 10px 8px;
@@ -1321,19 +1338,22 @@ body::before {
 .day-col.day-today {
   border-color: rgba(245,197,24,.7);
   box-shadow: 0 0 24px rgba(245,197,24,.12);
-  grid-row: span 1;
-  min-height: 320px;
+  order: -1;
 }
 .day-col.day-today .day-header {
-  background: rgba(245,197,24,.15);
-  padding: 14px 12px 10px;
+  background: rgba(245,197,24,.12);
+  padding: 16px 16px 12px;
 }
 .day-col.day-today .day-name {
-  font-size: 22px;
+  font-size: 24px;
+}
+.day-col.day-today .day-blocks {
+  padding: 12px 16px;
+  gap: 8px;
 }
 .day-col.day-today .day-block {
-  font-size: 12px;
-  padding: 8px 10px;
+  font-size: 13px;
+  padding: 10px 12px;
 }
 .ex-chip {
   display: inline-block;
@@ -2882,27 +2902,7 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .page { padding: 20px 14px; }
   .page-title { font-size: clamp(28px, 6vw, 40px); }
 
-  /* --- Wochenplan Akkordeon auf Mobile --- */
-  .week-grid { grid-template-columns: 1fr; gap: 4px; }
-  .day-col { min-height: auto; }
-  .day-col .day-blocks { display: none; }
-  .day-col .add-block-btn { display: none; }
-  .day-col.day-today .day-blocks { display: flex; }
-  .day-col.day-today .add-block-btn { display: block; }
-  .day-col.day-expanded .day-blocks { display: flex; }
-  .day-col.day-expanded .add-block-btn { display: block; }
-  .day-header { cursor: pointer; }
-  .day-header::after {
-    content: '▸';
-    font-size: 14px;
-    color: #444;
-    position: absolute;
-    right: 10px;
-    top: 12px;
-  }
-  .day-header { position: relative; }
-  .day-col.day-today .day-header::after,
-  .day-col.day-expanded .day-header::after { content: '▾'; color: var(--gold); }
+  /* Wochenplan Mobile — schon global Akkordeon, hier nur Feintuning */
 
   /* --- Tests --- */
   .tests-hero { grid-template-columns: 1fr; }
