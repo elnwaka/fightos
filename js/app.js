@@ -5164,15 +5164,90 @@ function checkAndSaveWeeklySnapshot() {
 
 function renderDashboard() {
   checkAndSaveWeeklySnapshot();
+  var el = document.getElementById('dash-app');
+  if (!el) return;
+  var data = getData();
+  var mobile = isMobile();
+
+  el.innerHTML = '' +
+    // 1. COUNTDOWN
+    '<div id="dash-countdown-hero" style="margin-bottom:20px;"></div>' +
+
+    // 2. HEUTE
+    '<div style="margin-bottom:20px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--white);margin-bottom:14px;">HEUTE</div>' +
+      '<div id="daily-combined"></div>' +
+      '<div id="checklist-score" style="display:none;"></div>' +
+    '</div>' +
+
+    // 3. TRAINING LOGGEN
+    '<div style="margin-bottom:20px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:10px;">TRAINING LOGGEN</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
+        '<select id="qlog-type" class="form-select" style="flex:2;min-width:100px;padding:11px 12px;font-size:15px;border-radius:10px;" onchange="updateQlogSaeulen()">' +
+          '<option value="boxen">Boxen</option><option value="sparring">Sparring</option><option value="kraft">Kraft</option><option value="cardio">Cardio</option><option value="mobility">Mobility</option>' +
+        '</select>' +
+        '<input type="number" id="qlog-duration" class="form-input" style="flex:1;min-width:55px;padding:11px 10px;font-size:15px;border-radius:10px;" placeholder="Min" min="1" max="300">' +
+        '<input type="number" id="qlog-rpe" class="form-input" style="flex:1;min-width:45px;padding:11px 10px;font-size:15px;border-radius:10px;" placeholder="RPE" min="1" max="10">' +
+        '<button class="submit-btn" style="padding:11px 22px;font-size:15px;border-radius:10px;" onclick="quickLog()">LOG</button>' +
+      '</div>' +
+      '<div id="qlog-saeulen" style="display:none;"></div>' +
+      '<div id="qlog-confirm" style="display:none;font-size:14px;color:var(--green);margin-top:8px;text-align:center;"></div>' +
+    '</div>' +
+
+    // 4. HRV
+    '<div style="margin-bottom:20px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:10px;">HRV</div>' +
+      '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<input type="number" id="hrv-input" class="form-input" style="flex:1;padding:11px 12px;font-size:15px;border-radius:10px;" placeholder="RMSSD eingeben" min="1" max="200">' +
+        '<button class="submit-btn" style="padding:11px 22px;font-size:15px;border-radius:10px;" onclick="logHRV()">LOG</button>' +
+      '</div>' +
+      '<div id="hrv-display" style="margin-top:10px;"></div>' +
+    '</div>' +
+
+    // 5. HINWEISE
+    '<div id="dash-hinweise" style="margin-bottom:16px;"></div>' +
+
+    // 6. KÄMPFE
+    '<div style="margin-bottom:20px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);cursor:pointer;" onclick="showPage(\'fights\')">KÄMPFE</div>' +
+        '<button class="submit-btn" style="padding:8px 16px;font-size:13px;border-radius:8px;" onclick="openFightModal()">+ KAMPF</button>' +
+      '</div>' +
+      '<div id="fight-log-list"></div>' +
+    '</div>' +
+
+    // 7. LETZTE EINHEITEN
+    '<div style="margin-bottom:20px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);margin-bottom:14px;cursor:pointer;" onclick="showPage(\'log\')">LETZTE EINHEITEN</div>' +
+      '<div id="recent-log"></div>' +
+    '</div>' +
+
+    // 8. PROFIL (nur Desktop)
+    (mobile ? '' :
+      '<div class="dash-profil" style="margin-top:24px;">' +
+        '<div class="dash-radar-col"><canvas id="rpg-radar" width="320" height="320"></canvas></div>' +
+        '<div class="dash-scores-col"><div id="dash-stats"></div></div>' +
+      '</div>' +
+      '<div id="saeulen-self-rating" style="margin-top:16px;"></div>' +
+      '<div id="bench-summary" style="margin-top:12px;font-family:\'Space Mono\',monospace;font-size:11px;color:#555;cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
+      '<div style="margin-top:16px;display:flex;align-items:center;gap:8px;">' +
+        '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">NÄCHSTER KAMPF</span>' +
+        '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:6px 10px;font-size:12px;" onchange="updateFightDate()">' +
+        '<button class="submit-btn" style="padding:4px 10px;font-size:10px;" onclick="clearFightDate()">×</button>' +
+      '</div>'
+    );
+
+  // Render sub-components
   renderFightCountdown();
   renderDashStats();
   renderHRV();
   renderHinweise();
-  renderBenchSummary();
+  if (!mobile) renderBenchSummary();
   renderDailyCombined();
   renderFightLog();
   renderRecentLog();
-  renderSaeulenSelfRating();
+  if (!mobile) renderSaeulenSelfRating();
 }
 
 // Selbsteinschätzung der 8 Säulen (1-5 Punkte)
