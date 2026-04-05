@@ -502,15 +502,22 @@ function showSaeulenIntro() {
   progressBar.style.cssText = 'position:fixed;top:0;left:0;height:3px;background:var(--red);z-index:10000;transition:width .3s ease;width:0%;';
   el.appendChild(progressBar);
 
-  // Bounce-Pfeil unten — gross, hell, sofort sichtbar
+  // Bounce-Pfeil unten
   var arrow = document.createElement('div');
-  arrow.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M7 10l5 5 5-5"/></svg>';
-  arrow.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:10000;animation:siBounce 1.2s ease .5s infinite;cursor:pointer;padding:12px;border-radius:50%;background:rgba(255,255,255,.06);backdrop-filter:blur(4px);';
+  arrow.id = 'si-arrow';
+  arrow.innerHTML = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M7 10l5 5 5-5" stroke="#fff" stroke-width="2.5"/></svg>';
+  arrow.style.cssText = 'position:fixed;bottom:32px;left:50%;z-index:99999;cursor:pointer;padding:10px;border-radius:50%;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);opacity:0;';
   arrow.onclick = function() {
     var next = slides[1];
     if (next) next.scrollIntoView({ behavior: 'smooth' });
   };
-  el.appendChild(arrow);
+  document.body.appendChild(arrow);
+  // Nach 2s einblenden + bounce starten
+  setTimeout(function() {
+    arrow.style.transition = 'opacity .5s';
+    arrow.style.opacity = '1';
+    arrow.style.animation = 'siBounce 1.2s ease infinite';
+  }, 2000);
 
   // Dot-Navigation rechts
   var dots = document.createElement('div');
@@ -548,7 +555,7 @@ function showSaeulenIntro() {
     slides.forEach(function(s) { obs.observe(s); });
   }
 
-  el.appendChild(dots);
+  document.body.appendChild(dots);
 
   // Aktuelle Slide tracken + UI updaten
   var currentDot = 0;
@@ -600,6 +607,13 @@ function showSaeulenIntro() {
 function closeIntro() {
   var el = document.getElementById('saeulen-intro');
   if (el) el.style.display = 'none';
+  // Pfeil + Dots aufräumen
+  var arrow = document.getElementById('si-arrow');
+  if (arrow && arrow.parentNode) arrow.parentNode.removeChild(arrow);
+  var dots = document.querySelectorAll('[data-si-dot]');
+  if (dots.length && dots[0].parentNode && dots[0].parentNode.parentNode) {
+    dots[0].parentNode.parentNode.removeChild(dots[0].parentNode);
+  }
   var users = JSON.parse(localStorage.getItem('fos_users') || '{}');
   if (users[currentUser]) {
     users[currentUser].seenIntro = true;
