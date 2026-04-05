@@ -1111,7 +1111,7 @@ function renderDashStats() {
       const diff = Math.ceil((new Date(data.fightDate + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000);
       phase = getFightPhase(diff).label.toUpperCase();
     }
-    subEl.textContent = `${wins}S / ${losses}N  ·  ${totalLog} EINHEITEN  ·  WOCHE ${weeks}  ·  ${phase}`;
+    subEl.textContent = `${wins}-${losses}  ·  ${phase}`;
   }
 
   // Calculate scores from real benchmarks
