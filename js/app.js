@@ -472,34 +472,75 @@ function showSaeulenIntro() {
   if (!el) { showPage(getPageFromHash()); return; }
   el.style.display = 'block';
 
-  var pillars = [
-    { name: 'KRAFT, POWER & SCHNELLIGKEIT', desc: 'Maximalkraft, Explosivitaet, Schlagkraft', color: '#e8000d', icon: '1' },
-    { name: 'METABOLISCHE KAPAZITÄT', desc: 'Ausdauer, VO2max, Atemmuskulatur', color: '#2979ff', icon: '2' },
-    { name: 'KOGNITIVE LEISTUNG', desc: 'Reaktion, Antizipation, Entscheidungsfindung', color: '#ab47bc', icon: '3' },
-    { name: 'ERNÄHRUNG & GEWICHT', desc: 'Makros, Timing, Gewicht machen', color: '#4caf50', icon: '4' },
-    { name: 'REGENERATION', desc: 'Schlaf, HRV, Uebertraining vermeiden', color: '#ff6d00', icon: '5' },
-    { name: 'RING IQ & TAKTIK', desc: 'Muster erkennen, Distanz, Gegner lesen', color: '#f5c518', icon: '6' },
-    { name: 'SPORTPSYCHOLOGIE', desc: 'Visualisierung, Alter Ego, Fokus', color: '#00bcd4', icon: '7' },
-    { name: 'MOBILITÄT & PRÄVENTION', desc: 'Nacken, Schulter, Verletzungsschutz', color: '#8bc34a', icon: '8' }
-  ];
+  var scroller = document.getElementById('si-scroll');
+  if (!scroller) return;
 
-  var container = document.getElementById('si-pillars');
-  if (!container) return;
-  container.innerHTML = '';
-
-  pillars.forEach(function(p, i) {
-    var div = document.createElement('div');
-    div.style.cssText = 'display:flex;align-items:center;gap:14px;padding:14px 16px;background:#0a0a0a;border:1px solid #1a1a1a;border-left:3px solid ' + p.color + ';border-radius:6px;opacity:0;transform:translateX(-20px);transition:all .4s ease;';
-    div.innerHTML = '<div style="width:36px;height:36px;border-radius:50%;background:' + p.color + '22;border:1px solid ' + p.color + '44;display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:' + p.color + ';flex-shrink:0;">' + p.icon + '</div>' +
-      '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:' + p.color + ';letter-spacing:1px;">' + p.name + '</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#555;">' + p.desc + '</div></div>';
-    container.appendChild(div);
-
+  // Animate hero fades
+  var fades = document.querySelectorAll('.si-fade');
+  fades.forEach(function(f) {
+    var delay = parseInt(f.getAttribute('data-delay')) || 0;
+    f.style.transition = 'opacity .8s ease, transform .8s ease';
+    f.style.transform = 'translateY(20px)';
     setTimeout(function() {
-      div.style.opacity = '1';
-      div.style.transform = 'translateX(0)';
-    }, 200 + i * 150);
+      f.style.opacity = '1';
+      f.style.transform = 'translateY(0)';
+    }, delay);
   });
+
+  // Auto-scroll through slides
+  var slides = document.querySelectorAll('.si-slide');
+  var currentSlide = 0;
+  var totalSlides = slides.length;
+
+  function animateSlide(idx) {
+    if (idx >= totalSlides) return;
+    var slide = slides[idx];
+
+    // Fade in children
+    var children = slide.querySelectorAll('.si-num,.si-title,.si-body,.si-why,.si-reason');
+    children.forEach(function(c, ci) {
+      c.style.opacity = '0';
+      c.style.transform = 'translateY(30px)';
+      c.style.transition = 'opacity .6s ease, transform .6s ease';
+      setTimeout(function() {
+        c.style.opacity = '1';
+        c.style.transform = 'translateY(0)';
+      }, 200 + ci * 250);
+    });
+  }
+
+  // Start auto-scroll after hero (3.5s)
+  setTimeout(function() {
+    var slideIdx = 1;
+    function scrollNext() {
+      if (slideIdx >= totalSlides) return;
+      var target = slides[slideIdx];
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      animateSlide(slideIdx);
+      slideIdx++;
+      if (slideIdx < totalSlides) {
+        setTimeout(scrollNext, 3000);
+      }
+    }
+    scrollNext();
+  }, 3500);
+
+  // Allow manual scroll — stop auto-scroll on user interaction
+  var userScrolled = false;
+  scroller.addEventListener('wheel', function() { userScrolled = true; }, { once: true });
+  scroller.addEventListener('touchmove', function() { userScrolled = true; }, { once: true });
+
+  // Intersection observer for fade-in on manual scroll
+  if (window.IntersectionObserver) {
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) {
+          animateSlide(Array.from(slides).indexOf(e.target));
+        }
+      });
+    }, { threshold: 0.3 });
+    slides.forEach(function(s) { obs.observe(s); });
+  }
 }
 
 function closeIntro() {
