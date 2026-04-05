@@ -3587,23 +3587,41 @@ function generateSmartWeekPlan() {
     technik: 'Techniktraining', boxen: 'Boxtraining', cardio: 'Cardio'
   };
 
-  // Erfahrungslevel-Anpassung
+  // Erfahrungslevel + Gym-Anpassung
   var expLevel = s.experienceLevel || 'fortgeschritten';
+  var gym = s.gymAccess || 'none';
   var bw = parseInt(s.weight) || 75;
-  // Cardio-Dauer basierend auf Fitness
-  var cardioMin = expLevel === 'anfaenger' ? 20 : 35;
-  var cardioMax = expLevel === 'anfaenger' ? 30 : 50;
+  var isAnfaenger = expLevel === 'anfaenger';
+  // Cardio
+  var cardioMin = isAnfaenger ? 20 : 35;
+  var cardioMax = isAnfaenger ? 30 : 50;
   var cardioLabel = cardioMin + '-' + cardioMax + ' Min.';
-  // S&C Intensität
-  var dlIntensity = expLevel === 'anfaenger' ? '4x5 @70%' : '4x3 @85%';
-  var dlHint = expLevel === 'anfaenger' ? 'Technik lernen, Gewicht langsam steigern' : 'Schwer, aber sauber — kein Muskelversagen';
-  // HIIT-Fähigkeit
-  var canHIIT = expLevel !== 'anfaenger';
-  var hiitCount = 0; // max 2x/Woche
+  // S&C
+  var dlIntensity = isAnfaenger ? '4x5 @70%' : '4x3 @85%';
+  var dlHint = isAnfaenger ? 'Technik lernen, Gewicht langsam steigern' : 'Schwer, aber sauber — kein Muskelversagen';
+  var canHIIT = !isAnfaenger;
+  var hiitCount = 0;
+  // S&C Frequenz: Anfaenger max 2x/Woche, Fortgeschritten max 3x
+  var maxSC = isAnfaenger ? 2 : 3;
+  var scCount = 0;
+  // Sparring-Tage tracken fuer Recovery am naechsten Tag
+  var sparringDayIndices = [];
+  DAY_NAMES.forEach(function(day, di) {
+    if ((ws[day] || {}).type === 'sparring') sparringDayIndices.push(di);
+  });
+
+  // Bodyweight S&C fuer Boxer ohne Gym
+  var bwSessions = [
+    { title: 'Koerpergewicht A: Liegestuetze + Klimmzuege + Core', hint: '4x max Liegestuetze, 4x max Klimmzuege (Tuerrahmen/Spielplatz), 3x30s Plank', exercises: [] },
+    { title: 'Koerpergewicht B: Kniebeugen + Ausfallschritte + Dips', hint: '4x20 Kniebeugen, 3x12 Ausfallschritte je Seite, 4x max Dips (Stuhl/Bank)', exercises: [] },
+    { title: 'Koerpergewicht C: Spruenge + Liegestuetze explosiv + Core', hint: '4x5 Sprungkniebeugen, 4x5 explosive Liegestuetze, 3x10 Beinheben', exercises: [{id:'jump-squat',label:'Jump Squat'},{id:'explosive-pushup',label:'Explosive Push-Up'}] }
+  ];
 
   DAY_NAMES.forEach((day, di) => {
     const d = ws[day] || { time: null, type: 'frei' };
     const nextDay = ws[DAY_NAMES[(di + 1) % 7]] || { time: null, type: 'frei' };
+    const prevDayIdx = (di + 6) % 7;
+    const prevWasSparring = sparringDayIndices.indexOf(prevDayIdx) !== -1;
     const blocks = [];
     const isWeekend = (day === 'sa' || day === 'so');
     const morningTime = timeBefore(s.workStart, 1, 15);
@@ -3718,18 +3736,33 @@ function generateSmartWeekPlan() {
           exercises: [{id:'hip-cars',label:'Hip CARs'}] });
 
       } else if (isFreeDay) {
-        if (nextIsSparring) {
-          // Tag vor Sparring: leicht halten
+        if (prevWasSparring) {
+          // Tag NACH Sparring: Erholung, kein S&C
+          blocks.push({ time: isWeekend ? '09:00' : timeAdd(morningTime, 0, 10), title: 'Erholungstag nach Sparring', hint: 'Kein schweres Training — Koerper und Kopf regenerieren', type: 'recovery' });
+          blocks.push({ time: isWeekend ? '10:00' : timeAdd(morningTime, 0, 30), title: 'Leichte Mobility 15 Min.', hint: 'Locker dehnen, Foam Rolling wenn verfuegbar', type: 'recovery',
+            exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
+          blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 20-30 Min.', hint: 'Lockeres Laufen oder Spaziergang — foerdert Regeneration', type: 'cardio',
+            exercises: [{id:'zone2',label:'Zone 2'}] });
+        } else if (nextIsSparring) {
+          // Tag VOR Sparring: leicht halten
           blocks.push({ time: isWeekend ? '09:00' : timeAdd(morningTime, 0, 10), title: 'Leichte Mobility 15 Min.', hint: 'Morgen ist Sparring — heute Koerper schonen, frueh schlafen', type: 'recovery',
             exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
           blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 30 Min.', hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140', type: 'cardio',
             exercises: [{id:'zone2',label:'Zone 2'}] });
-        } else {
-          // Normaler freier Tag: Kraft + Cardio
-          var sc = scSessions[scIdx % scSessions.length];
-          scIdx++;
+        } else if (scCount < maxSC) {
+          // Normaler freier Tag: S&C (je nach Gym-Zugang) + Cardio
+          scCount++;
           var scTime = isWeekend ? '09:00' : timeAdd(morningTime, 0, 10);
-          blocks.push({ time: scTime, title: sc.title, hint: sc.hint, type: 'strength', exercises: sc.exercises });
+          if (gym === 'full') {
+            var sc = scSessions[scIdx % scSessions.length]; scIdx++;
+            blocks.push({ time: scTime, title: sc.title, hint: sc.hint, type: 'strength', exercises: sc.exercises });
+          } else if (gym === 'basic') {
+            var sc = scSessions[scIdx % scSessions.length]; scIdx++;
+            blocks.push({ time: scTime, title: sc.title, hint: sc.hint + ' (Alternative mit Kurzhanteln wenn kein Trap Bar)', type: 'strength', exercises: sc.exercises });
+          } else {
+            var bw = bwSessions[scIdx % bwSessions.length]; scIdx++;
+            blocks.push({ time: scTime, title: bw.title, hint: bw.hint, type: 'strength', exercises: bw.exercises });
+          }
           if (hasNacken) {
             blocks.push({ time: timeAdd(scTime, 0, 45), title: 'Nackentraining 10 Min.', hint: 'Isometrisch: Stirn, Hinterkopf, Seiten — je 3x10 Sek. halten', type: 'strength',
               exercises: [{id:'iso-nacken',label:'Iso Nacken'},{id:'nacken-flexion',label:'Nacken Flexion'}] });
@@ -3740,12 +3773,17 @@ function generateSmartWeekPlan() {
               exercises: [{id:'hiit-4x4',label:'HIIT 4x4'}] });
           } else if (canHIIT && hiitCount === 1) {
             hiitCount++;
-            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'SIT — Sprint Intervalle', hint: '8-10x 30 Sek. All-Out-Sprint, 3-4 Min. Pause. Trainiert PCr-Resynthese zwischen Kombis. Nie vor Sparring!', type: 'cardio',
+            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'SIT — Sprint Intervalle', hint: '8-10x 30 Sek. All-Out-Sprint, 3-4 Min. Pause. Nie vor Sparring!', type: 'cardio',
               exercises: [{id:'sit-sprints',label:'SIT Sprints'}] });
           } else {
             blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio ' + cardioLabel, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140 (min. 30 Min. fuer volle Wirkung)', type: 'cardio',
               exercises: [{id:'zone2',label:'Zone 2'}] });
           }
+        } else {
+          // Max S&C erreicht — nur leichte Bewegung
+          blocks.push({ time: isWeekend ? '10:00' : timeAdd(morningTime, 0, 10), title: 'Ruhetag — leichte Bewegung', hint: 'Spaziergang, Dehnung, oder komplette Ruhe. Dein Koerper braucht Erholung.', type: 'recovery' });
+          blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio ' + cardioLabel, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140', type: 'cardio',
+            exercises: [{id:'zone2',label:'Zone 2'}] });
         }
         blocks.push({ time: isWeekend ? '17:00' : timeAdd(s.workEnd, 1, 30), title: 'Mobility + Foam Rolling 15 Min.', hint: 'Faszienrolle: Oberschenkel, Hueftbeuger, T-Spine + statisches Stretching', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'thoracic-rotation',label:'Thoracic Rotation'}] });
@@ -4297,6 +4335,7 @@ function getUserSchedule() {
     height: parseInt(u.height) || 175,
     goal: u.goal || 'fitness',
     fitnessLevel: u.fitnessLevel || 'mittel',
+    gymAccess: u.gymAccess || 'none',
     weekSchedule: ws
   };
 }
@@ -4877,6 +4916,14 @@ function renderAccountPage() {
             <label class="form-label">Fitness-Level</label>
             <select class="form-select" id="acc-fitness">${fitOpts}</select>
           </div>
+          <div class="form-group">
+            <label class="form-label">Zugang zu Gym/Hanteln?</label>
+            <select class="form-select" id="acc-gym">
+              <option value="full" ${u.gymAccess==='full'?'selected':''}>Ja, volles Gym</option>
+              <option value="basic" ${u.gymAccess==='basic'?'selected':''}>Basis (Hanteln, Klimmzugstange)</option>
+              <option value="none" ${u.gymAccess==='none'||!u.gymAccess?'selected':''}>Nein, nur Koerpergewicht</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -4933,6 +4980,7 @@ function saveAccountPage() {
   users[currentUser].boxingYears = parseInt(document.getElementById('acc-years').value) || 0;
   users[currentUser].goal = document.getElementById('acc-goal').value;
   users[currentUser].fitnessLevel = document.getElementById('acc-fitness').value;
+  users[currentUser].gymAccess = document.getElementById('acc-gym').value;
   users[currentUser].workStart = document.getElementById('acc-work-start').value;
   users[currentUser].workEnd = document.getElementById('acc-work-end').value;
 
