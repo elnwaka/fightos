@@ -63,6 +63,7 @@
 [data-theme="light"] .day-block.recovery { background: rgba(230,81,0,.08); color: #E65100; border-left-color: #E65100; }
 [data-theme="light"] .day-block.meta { background: rgba(196,144,0,.08); color: #C49000; border-left-color: #C49000; }
 [data-theme="light"] .dash-profil { background: #FFF; border-color: #E0E0E0; }
+[data-theme="light"] .dash-action-card { background: #FFF; border-color: #E0E0E0; }
 [data-theme="light"] canvas { filter: invert(1) hue-rotate(180deg); }
 [data-theme="light"] .rpg-stat-bar { background: #E0E0E0; }
 [data-theme="light"] .user-pill { background: #F0F0F0; color: #111; }
@@ -875,19 +876,17 @@ body::before {
   opacity: .5;
 }
 .dash-hero-left { flex: 1; min-width: 0; }
-.dash-heute {
+.dash-actions {
   display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 16px;
-  margin-bottom: 20px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
 }
-.dash-heute-main { min-width: 0; }
-.dash-heute-side { display: flex; flex-direction: column; }
-.dash-bottom-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 16px;
+.dash-action-card {
+  background: var(--dark2);
+  border: 1px solid #1e1e1e;
+  border-radius: var(--radius);
+  padding: 12px;
 }
 .rpg-name {
   font-family: 'Bebas Neue', sans-serif;
@@ -3106,10 +3105,9 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .search-results { width: 300px; }
 
   /* --- Dashboard --- */
-  .dash-hero { flex-direction: column; }
-  .dash-fight-input { align-items: flex-start; }
-  .dash-heute { grid-template-columns: 1fr; }
-  .dash-bottom-grid { grid-template-columns: 1fr; }
+  .dash-hero { flex-direction: column; gap: 4px; }
+  .dash-actions { grid-template-columns: 1fr 1fr; }
+  .dash-hide-mobile { display: none; }
   .dash-profil { flex-direction: column; align-items: center; }
   .dash-radar-col { width: 100%; max-width: 280px; }
   .dash-scores-col { width: 100%; }
@@ -3245,15 +3243,10 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .calc-results { grid-template-columns: 1fr 1fr; }
 
   /* --- Dashboard Mobile: Nur das Wichtigste --- */
-  .dash-hero { padding: 12px 0; gap: 8px; }
-  .dash-heute { gap: 8px; }
-  .dash-heute-side .card { padding: 10px !important; }
-  .dash-bottom-grid { gap: 8px; }
-  /* Radar + Scores: auf Mobile verstecken, Tests-Seite hat es */
+  .dash-hero { padding: 8px 0; gap: 4px; }
+  .dash-actions { grid-template-columns: 1fr; gap: 6px; }
+  .dash-action-card { padding: 10px; }
   .dash-profil { display: none; }
-  /* Benchmark-Card kompakt */
-  #saeulen-self-rating { display: none; }
-  /* Hinweise kompakter */
   #dash-hinweise { font-size: 12px; }
 
   /* --- Forms --- */
