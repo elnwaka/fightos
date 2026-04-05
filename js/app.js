@@ -725,7 +725,7 @@ function showPage(pageId) {
 function getPageFromHash() {
   var hash = location.hash.replace('#', '').replace(/^\//, '');
   if (!hash) return 'dashboard';
-  var valid = ['dashboard','fights','fight-detail','wochenplan','uebungen','uebung-detail','tests','log','periodisierung',
+  var valid = ['dashboard','fights','fight-detail','wochenplan','block-detail','uebungen','uebung-detail','tests','log','periodisierung',
     'ernaehrung','cutten','supplements','supplement-detail','regeneration','saeulen','saeulen-detail','mental','rechner','faq','account'];
   return valid.indexOf(hash) !== -1 ? hash : 'dashboard';
 }
@@ -3889,7 +3889,7 @@ function renderWeekPlan() {
               var blockDots = blockSaeulen.map(function(si) {
                 return '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + saeulenColors8[si] + ';"></span>';
               }).join('');
-              return `<div class="day-block ${TYPE_CLASS[b.type] || 'meta'}${done ? ' block-done' : ''}" onclick="editBlock('${day}',${bi})" title="Klicke zum Bearbeiten">
+              return `<div class="day-block ${TYPE_CLASS[b.type] || 'meta'}${done ? ' block-done' : ''}" onclick="openBlockDetail('${day}',${bi})" title="Klicke fuer Details">
               <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div style="display:flex;align-items:center;gap:6px;">
                   <span style="font-family:'Space Mono',monospace;font-size:11px;opacity:.7;">${b.time}</span>
@@ -3932,6 +3932,129 @@ function toggleDayCol(el) {
   cols.forEach(function(c) { c.classList.remove('day-active'); });
   col.classList.add('day-active');
   grid.setAttribute('data-active', idx);
+}
+
+// ===== BLOCK DETAIL PAGE =====
+var BLOCK_DETAIL_CONTENT = {
+  'strength': {
+    warmup: 'Foam Rolling 2 Min. (Oberschenkel, Hueftbeuger) → Band Pull-Aparts 2x15 → Face Pulls 3x15 → 2 Aufwaermsaetze mit leichtem Gewicht',
+    cooldown: 'Statisches Stretching: Hueftbeuger 30s, Schultern 30s, Brustdehnung 30s → Handgelenke kreisen',
+    notes: 'Schwere Saetze: 2-3 Min. Pause. Explosive Uebungen: max. Geschwindigkeit, keine Ermuedung. Immer saubere Technik vor mehr Gewicht.'
+  },
+  'boxing': {
+    warmup: 'Seilspringen 3 Min. → Schulterkreise + Armkreise → Shadow Boxing 2 Runden locker → Hueften mobilisieren',
+    cooldown: 'Leichtes Shadow Boxing 1 Runde → Statisches Stretching: Schultern, Hueftbeuger, Handgelenke → Haende auslockern',
+    notes: 'Fokus auf Technik, nicht auf Kraft. Jede Kombi sauber zu Ende bringen. Zwischen den Runden bewusst atmen.'
+  },
+  'cardio': {
+    warmup: '5 Min. locker einlaufen → Dynamisches Stretching: Beinschwingen, Hueftkreise',
+    cooldown: '5 Min. locker auslaufen → Dehnung: Waden, Oberschenkel, Hueftbeuger',
+    notes: 'Zone 2 = du kannst noch reden. HIIT = volle Belastung in den Arbeitsintervallen. Puls kontrollieren wenn moeglich.'
+  },
+  'recovery': {
+    warmup: 'Nicht noetig — direkt mit lockerer Bewegung starten',
+    cooldown: 'Tiefe Bauchatmung 2 Min. (4-4-4-4)',
+    notes: 'Kein Leistungsdruck. Ziel ist Durchblutung und Beweglichkeit, nicht Erschoepfung.'
+  },
+  'meta': {
+    warmup: '',
+    cooldown: '',
+    notes: ''
+  }
+};
+
+function openBlockDetail(day, idx) {
+  var data = getData();
+  if (!data || !data.weekPlan || !data.weekPlan[day]) return;
+  var block = data.weekPlan[day][idx];
+  if (!block) return;
+
+  var el = document.getElementById('page-block-detail');
+  if (!el) return;
+
+  var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNAEHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITAET'];
+  var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
+  var blockSaeulen = BLOCK_SAEULEN[block.type] || [];
+  var typeDetail = BLOCK_DETAIL_CONTENT[block.type] || BLOCK_DETAIL_CONTENT['meta'];
+
+  var DAY_LABEL_MAP = { mo:'Montag', di:'Dienstag', mi:'Mittwoch', do:'Donnerstag', fr:'Freitag', sa:'Samstag', so:'Sonntag' };
+
+  // Übungen aus der Übungsbibliothek holen
+  var exerciseHTML = '';
+  if (block.exercises && block.exercises.length) {
+    exerciseHTML = '<div style="margin-top:24px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">UEBUNGEN</div>';
+    block.exercises.forEach(function(ex) {
+      var exData = typeof getExerciseById === 'function' ? getExerciseById(ex.id) : null;
+      exerciseHTML += '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;margin-bottom:10px;">';
+      exerciseHTML += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+      exerciseHTML += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">' + (ex.label || ex.id).replace(/</g,'&lt;') + '</div>';
+      if (exData) {
+        exerciseHTML += '<span class="ex-chip" onclick="if(typeof openExerciseDetail===\'function\')openExerciseDetail(\'' + ex.id + '\')" style="cursor:pointer;">DETAILS →</span>';
+      }
+      exerciseHTML += '</div>';
+      if (exData) {
+        if (exData.desc) exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;margin-bottom:8px;">' + exData.desc + '</div>';
+        if (exData.sets && exData.sets.length) exerciseHTML += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' + exData.sets.map(function(s) { return '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);background:#1a1a0a;padding:4px 10px;border-radius:4px;">' + s + '</span>'; }).join('') + '</div>';
+        if (exData.tip) exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;line-height:1.5;"><strong style="color:var(--gold);">' + (exData.tipLabel || 'Tipp') + ':</strong> ' + exData.tip + '</div>';
+        if (exData.boxingConnection) exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#444;line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid #111;"><strong style="color:#555;">Boxing:</strong> ' + exData.boxingConnection + '</div>';
+        if (exData.video) exerciseHTML += '<a href="' + exData.video + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-family:\'Space Mono\',monospace;font-size:10px;color:var(--red);text-decoration:none;letter-spacing:1px;">VIDEO ANLEITUNG \u2197</a>';
+      } else {
+        exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;">' + (ex.label || ex.id) + '</div>';
+      }
+      exerciseHTML += '</div>';
+    });
+    exerciseHTML += '</div>';
+  }
+
+  el.innerHTML = '<div style="padding-bottom:16px;">' +
+    '<button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">\u2190 Wochenplan</button>' +
+  '</div>' +
+
+  // Header
+  '<div style="margin-bottom:24px;">' +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;letter-spacing:1px;margin-bottom:4px;">' + (DAY_LABEL_MAP[day] || day).toUpperCase() + ' \u00b7 ' + block.time + '</div>' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(28px,5vw,40px);color:var(--white);letter-spacing:2px;line-height:1;">' + (block.title || '').replace(/</g,'&lt;') + '</div>' +
+    (block.hint ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#666;margin-top:8px;line-height:1.5;">' + block.hint.replace(/</g,'&lt;') + '</div>' : '') +
+    '<div style="display:flex;gap:6px;margin-top:12px;">' +
+      blockSaeulen.map(function(si) {
+        return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:3px;background:' + saeulenColors[si] + '22;color:' + saeulenColors[si] + ';border:1px solid ' + saeulenColors[si] + '44;">' + saeulenLabels[si] + '</span>';
+      }).join('') +
+    '</div>' +
+  '</div>' +
+
+  // Warm-up
+  (typeDetail.warmup ? '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-left:3px solid var(--gold);border-radius:8px;padding:16px;margin-bottom:16px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px;margin-bottom:8px;">WARM-UP</div>' +
+    '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.7;">' + typeDetail.warmup + '</div>' +
+  '</div>' : '') +
+
+  // Übungen
+  exerciseHTML +
+
+  // Cool-down
+  (typeDetail.cooldown ? '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-left:3px solid var(--blue);border-radius:8px;padding:16px;margin-top:16px;margin-bottom:16px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">COOL-DOWN</div>' +
+    '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.7;">' + typeDetail.cooldown + '</div>' +
+  '</div>' : '') +
+
+  // Hinweise
+  (typeDetail.notes ? '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;margin-bottom:16px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">HINWEISE</div>' +
+    '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;line-height:1.7;">' + typeDetail.notes + '</div>' +
+  '</div>' : '') +
+
+  // Bearbeiten-Button
+  '<div style="display:flex;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid #1a1a1a;">' +
+    '<button onclick="editBlockFromDetail(\'' + day + '\',' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;background:none;border:1px solid #252525;padding:10px 20px;border-radius:4px;cursor:pointer;">BEARBEITEN</button>' +
+    '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\');showPage(\'wochenplan\')" class="submit-btn" style="padding:10px 20px;font-size:13px;">ALS ERLEDIGT MARKIEREN</button>' +
+  '</div>';
+
+  showPage('block-detail');
+}
+
+function editBlockFromDetail(day, idx) {
+  editBlock(day, idx);
 }
 
 function editBlock(day, idx) {

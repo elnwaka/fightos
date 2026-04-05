@@ -1289,6 +1289,7 @@ const exercisesSpecial = [
 ];
 
 const allExercises = [...exercisesKraft, ...exercisesAusdauer, ...exercisesArmor, ...exercisesHands, ...exercisesMobility, ...exercisesPowerEndurance, ...exercisesSpecial];
+function getExerciseById(id) { return allExercises.find(function(e) { return e.id === id; }) || null; }
 const exerciseColors = {};
 exercisesKraft.forEach(e => exerciseColors[e.id] = 'var(--blue)');
 exercisesAusdauer.forEach(e => exerciseColors[e.id] = 'var(--green)');
