@@ -3538,6 +3538,41 @@ function generateSmartWeekPlan() {
   const data = getData();
   const plan = {};
 
+  // ===== SÄULEN-ANALYSE: Schwächste Säulen identifizieren =====
+  var pillarScores = {};
+  try { if (data) pillarScores = calcProfileScores(data) || {}; } catch(e) { pillarScores = {}; }
+  var pillarEntries = Object.entries(pillarScores).filter(function(e) { return e[1] !== null; });
+  pillarEntries.sort(function(a, b) { return a[1] - b[1]; });
+  // Schwache Säulen = Score unter 50%, oder die 2 schwächsten wenn alle > 50%
+  var weakPillars = {};
+  var weakInfo = [];
+  if (pillarEntries.length >= 2) {
+    pillarEntries.forEach(function(e) {
+      if (e[1] < 50) { weakPillars[e[0]] = e[1]; weakInfo.push(e); }
+    });
+    // Mindestens die 2 schwächsten markieren, auch wenn > 50%
+    if (weakInfo.length < 2) {
+      weakPillars = {};
+      weakInfo = pillarEntries.slice(0, 2);
+      weakInfo.forEach(function(e) { weakPillars[e[0]] = e[1]; });
+    }
+  }
+  var hasWeakKraft = weakPillars.kraft !== undefined;
+  var hasWeakMetabol = weakPillars.metabol !== undefined;
+  var hasWeakKognitiv = weakPillars.kognitiv !== undefined;
+  var hasWeakErnaehr = weakPillars.ernaehr !== undefined;
+  var hasWeakRecovery = weakPillars.recovery !== undefined;
+  var hasWeakRingIQ = weakPillars.ringiQ !== undefined;
+  var hasWeakPsyche = weakPillars.psyche !== undefined;
+  var hasWeakMobil = weakPillars.mobil !== undefined;
+  // Schwere Schwäche = unter 35%
+  var criticalRecovery = weakPillars.recovery !== undefined && weakPillars.recovery < 35;
+  // Speichere Schwächen-Info für UI-Rendering
+  if (data) {
+    data._weakPillars = weakPillars;
+    data._weakInfo = weakInfo;
+  }
+
   // Calculate fight phase for each day of the current week
   const today = new Date(); today.setHours(0,0,0,0);
   const todayDow = (today.getDay() + 6) % 7; // 0=Mo … 6=So
@@ -3644,7 +3679,12 @@ function generateSmartWeekPlan() {
     weekNum = (weeksSince % 4) + 1;
   }
   var volumeMult = weekNum === 4 ? 0.6 : weekNum === 3 ? 1.1 : 1.0;
+  // Säulen-Anpassung: Bei schwacher Recovery Volumen reduzieren
+  if (criticalRecovery && weekNum !== 4) volumeMult *= 0.85;
   var weekLabel = weekNum === 1 ? 'AUFBAU' : weekNum === 2 ? 'AUFBAU+' : weekNum === 3 ? 'PEAK' : 'DELOAD';
+
+  // Säulen-Anpassung: Bei schwacher Ausdauer mehr HIIT erlauben
+  var maxHIIT = (hasWeakMetabol && canHIIT) ? 3 : 2;
 
   // Motivations-Hints pro Block-Typ
   var whyHints = {
@@ -3760,12 +3800,11 @@ function generateSmartWeekPlan() {
           blocks.push({ time: timeAdd(isWeekend ? '08:10' : morningTime, 0, 10), title: 'Overcoming Isometrics + Nacken (~20 Min.)', hint: 'Max. Kraft gegen unbeweglichen Widerstand + Nackentraining zur KO-Praevention', type: 'strength',
             exercises: [{id:'overcoming-iso',label:'Overcoming Iso'}, ...nackenEx] });
         }
-        // Training-Typ-spezifische Hints
-        var boxHint = '';
-        if (d.type === 'pratzen') boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
-        else if (d.type === 'technik') boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
-        else if (d.type === 'pa') boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
-        else boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
+        // Training-Typ-spezifische Hints + Säulen-Anpassung
+        var boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
+        // Kognitions- und Ring-IQ-Schwäche: Taktische Fokus-Hinweise
+        if (hasWeakKognitiv) boxHint += '. [FOKUS KOGNITION] Bewusst auf Blickverhalten achten: Brustbereich des Gegners fixieren, peripher Schlaege erkennen.';
+        if (hasWeakRingIQ) boxHint += '. [FOKUS RING IQ] Heute gezielt Distanzkontrolle ueben: Jab als Masstab, nach jeder Kombi Winkel wechseln.';
         // IMT 2. Session (mittags — Saeulen sagen 2x taeglich)
         if (!isWeekend) {
           blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'IMT — 30 Atemzuege (2. Session)', hint: '2x taeglich laut Protokoll — progressiver Widerstand alle 2 Wochen', type: 'meta',
@@ -3775,12 +3814,19 @@ function generateSmartWeekPlan() {
         blocks.push({ time: d.time, title: trainingLabel, hint: boxHint, type: 'boxing' });
         blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Nach dem Verein: Dehnung + Handpflege', hint: 'Stretching: Hueftbeuger, Schultern + Handgelenke kreisen, Finger dehnen', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'}] });
+        // Säulen-Booster auf Boxtagen (abends)
+        if (hasWeakPsyche) {
+          blocks.push({ time: timeAdd(d.time, 2, 30), title: 'Visualisierung 10 Min.', hint: '[SCHWAECHE MENTAL] Nach dem Training: Augen schliessen, beste Momente des Trainings nochmal durchgehen. Erfolgreiche Kombis verankern.', type: 'meta' });
+        }
+        if (hasWeakErnaehr) {
+          blocks.push({ time: timeAdd(d.time, 2, 0), title: 'Post-Training Ernaehrung', hint: '[SCHWAECHE ERNAEHRUNG] Jetzt Protein + KH: 30-40g Protein + schnelle Kohlenhydrate innerhalb 30 Min. nach Training. Beispiel: Shake + Banane.', type: 'meta' });
+        }
 
       } else if (isFreeDay) {
         if (prevWasSparring) {
           // Tag NACH Sparring: Erholung, kein S&C
-          blocks.push({ time: isWeekend ? '09:00' : timeAdd(morningTime, 0, 10), title: 'Erholungstag nach Sparring', hint: 'Kein schweres Training — Koerper und Kopf regenerieren', type: 'recovery' });
-          blocks.push({ time: isWeekend ? '10:00' : timeAdd(morningTime, 0, 30), title: 'Leichte Mobility 15 Min.', hint: 'Locker dehnen, Foam Rolling wenn verfuegbar', type: 'recovery',
+          blocks.push({ time: isWeekend ? '09:00' : timeAdd(morningTime, 0, 10), title: 'Erholungstag nach Sparring', hint: 'Kein schweres Training — Koerper und Kopf regenerieren' + (hasWeakRecovery ? '. [SCHWAECHE REGENERATION] Heute Schlaf priorisieren: Ziel 8-9h. Kein Bildschirm 1h vor Bett.' : ''), type: 'recovery' });
+          blocks.push({ time: isWeekend ? '10:00' : timeAdd(morningTime, 0, 30), title: hasWeakMobil ? 'Erweiterte Mobility 25 Min.' : 'Leichte Mobility 15 Min.', hint: (hasWeakMobil ? '[SCHWAECHE MOBILITAET] Laengere Session: ' : '') + 'Locker dehnen, Foam Rolling wenn verfuegbar', type: 'recovery',
             exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
           blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 20-30 Min.', hint: 'Lockeres Laufen oder Spaziergang — foerdert Regeneration', type: 'cardio',
             exercises: [{id:'zone2',label:'Zone 2'}] });
@@ -3795,6 +3841,7 @@ function generateSmartWeekPlan() {
           scCount++;
           var scTime = isWeekend ? '09:00' : timeAdd(morningTime, 0, 10);
           var weekHint = weekNum === 4 ? ' [DELOAD: Halbes Volumen, gleiche Technik]' : weekNum === 3 ? ' [PEAK: Volle Intensitaet, weniger Saetze]' : '';
+          if (hasWeakKraft) weekHint += ' [FOKUS KRAFT: Deine Schlagkraft-Basis ist schwach — heute sauber und schwer arbeiten]';
           if (gym === 'full') {
             var sc = scSessions[scIdx % scSessions.length]; scIdx++;
             blocks.push({ time: scTime, title: sc.title, hint: sc.hint + weekHint, type: 'strength', exercises: sc.exercises });
@@ -3809,17 +3856,25 @@ function generateSmartWeekPlan() {
             blocks.push({ time: timeAdd(scTime, 0, 45), title: 'Nackentraining 10 Min.', hint: 'Isometrisch: Stirn, Hinterkopf, Seiten — je 3x10 Sek. halten', type: 'strength',
               exercises: [{id:'iso-nacken',label:'Iso Nacken'},{id:'nacken-flexion',label:'Nacken Flexion'}] });
           }
+          // Cardio-Auswahl: Bei schwacher Ausdauer aggressiver (mehr HIIT)
           if (canHIIT && hiitCount === 0) {
             hiitCount++;
-            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'HIIT 4x4 Protokoll', hint: '4x4 Min. bei 90-95% Puls, 3 Min. aktive Pause, danach 10 Min. Cool-down', type: 'cardio',
+            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'HIIT 4x4 Protokoll', hint: '4x4 Min. bei 90-95% Puls, 3 Min. aktive Pause, danach 10 Min. Cool-down' + (hasWeakMetabol ? ' [FOKUS: Ausdauer ist deine Schwaeche]' : ''), type: 'cardio',
               exercises: [{id:'hiit-4x4',label:'HIIT 4x4'}] });
-          } else if (canHIIT && hiitCount === 1) {
+          } else if (canHIIT && hiitCount < maxHIIT) {
             hiitCount++;
-            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'SIT — Sprint Intervalle', hint: '8-10x 30 Sek. All-Out-Sprint, 3-4 Min. Pause. Nie vor Sparring!', type: 'cardio',
+            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'SIT — Sprint Intervalle', hint: '8-10x 30 Sek. All-Out-Sprint, 3-4 Min. Pause. Nie vor Sparring!' + (hasWeakMetabol ? ' [FOKUS: Ausdauer-Defizit beheben]' : ''), type: 'cardio',
               exercises: [{id:'sit-sprints',label:'SIT Sprints'}] });
           } else {
             blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio ' + cardioLabel, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140 (min. 30 Min. fuer volle Wirkung)', type: 'cardio',
               exercises: [{id:'zone2',label:'Zone 2'}] });
+          }
+          // Säulen-Booster: Extra-Block fuer schwache Säulen auf freien S&C-Tagen
+          if (hasWeakPsyche) {
+            blocks.push({ time: isWeekend ? '20:00' : timeAdd(s.workEnd, 2, 30), title: 'Visualisierung + Box-Breathing 10 Min.', hint: '[SCHWAECHE MENTAL] Kampf mental durchgehen: Einstieg, erste Kombi, Druck machen. 4-4-4-4 Atmung zum Abschluss.', type: 'meta' });
+          }
+          if (hasWeakKognitiv) {
+            blocks.push({ time: isWeekend ? '16:00' : timeAdd(s.workEnd, 1, 0), title: 'Reaktions-Drill 10 Min.', hint: '[SCHWAECHE KOGNITION] Tennisball-Reaktionsuebung: Ball gegen Wand werfen + fangen, Farbcodes, Nummern-Rufen im Shadow Boxing.', type: 'meta' });
           }
         } else {
           // Max S&C erreicht — Ruhetag mit Varianz
@@ -3829,9 +3884,23 @@ function generateSmartWeekPlan() {
             blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio ' + cardioLabel, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140. ' + whyHints.cardio, type: 'cardio',
               exercises: [{id:'zone2',label:'Zone 2'}] });
           }
+          // Säulen-Booster: Ruhetag fuer schwache Nicht-Koerper-Saeulen nutzen
+          if (hasWeakRingIQ) {
+            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 1, 0), title: 'Kampf-Analyse 15 Min.', hint: '[SCHWAECHE RING IQ] Schau dir einen Profikampf an und notiere: Distanzkontrolle, Timing der Konter, Muster nach Jab. Trainiere dein Auge.', type: 'meta' });
+          }
+          if (hasWeakPsyche) {
+            blocks.push({ time: isWeekend ? '20:00' : timeAdd(s.workEnd, 2, 30), title: 'Visualisierung 10 Min.', hint: '[SCHWAECHE MENTAL] Augen zu, Kampf durchgehen: Ring betreten, erste Runde, Druck-Situationen meistern. Dann 4-4-4-4 Atmung.', type: 'meta' });
+          }
+          if (hasWeakErnaehr) {
+            blocks.push({ time: isWeekend ? '11:00' : timeAdd(s.workStart, 2, 0), title: 'Ernaehrungs-Check', hint: '[SCHWAECHE ERNAEHRUNG] Heute bewusst Protein zaehlen: Ziel 2.2g/kg. Mahlzeiten planen, Snacks vorbereiten. Mach den Makro-Rechner unter Ernaehrung.', type: 'meta' });
+          }
         }
-        blocks.push({ time: isWeekend ? '17:00' : timeAdd(s.workEnd, 1, 30), title: 'Mobility + Foam Rolling 15 Min.', hint: 'Faszienrolle: Oberschenkel, Hueftbeuger, T-Spine + statisches Stretching', type: 'recovery',
-          exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'thoracic-rotation',label:'Thoracic Rotation'}] });
+        // Mobility-Dauer: Bei schwacher Mobilität laenger
+        var mobilDuration = hasWeakMobil ? 25 : 15;
+        var mobilHint = 'Faszienrolle: Oberschenkel, Hueftbeuger, T-Spine + statisches Stretching';
+        if (hasWeakMobil) mobilHint = '[SCHWAECHE MOBILITAET] ' + mobilHint + ' + Schulter-Dislocates, Ankle Mobility, T-Spine Rotation — laengere Session weil Mobilitaet dein Schwachpunkt ist';
+        blocks.push({ time: isWeekend ? '17:00' : timeAdd(s.workEnd, 1, 30), title: 'Mobility + Foam Rolling ' + mobilDuration + ' Min.', hint: mobilHint, type: 'recovery',
+          exercises: hasWeakMobil ? [{id:'hip-cars',label:'Hip CARs'},{id:'thoracic-rotation',label:'Thoracic Rotation'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'},{id:'ankle-mobility',label:'Ankle Mobility'}] : [{id:'hip-cars',label:'Hip CARs'},{id:'thoracic-rotation',label:'Thoracic Rotation'}] });
       }
     }
 
@@ -3873,6 +3942,15 @@ function renderWeekPlan() {
   }
   const plan = data.weekPlan;
   const el = document.getElementById('page-wochenplan');
+
+  // 4-Wochen-Zyklus berechnen
+  var weekNum = 1;
+  if (data.weekPlanGenerated) {
+    var weeksSince = Math.floor((Date.now() - new Date(data.weekPlanGenerated).getTime()) / (7*86400000));
+    weekNum = (weeksSince % 4) + 1;
+  }
+  var volumeMult = weekNum === 4 ? 0.6 : weekNum === 3 ? 1.1 : 1.0;
+  var weekLabel = weekNum === 1 ? 'AUFBAU' : weekNum === 2 ? 'AUFBAU+' : weekNum === 3 ? 'PEAK' : 'DELOAD';
 
   // Calculate fight phase per day for header badges
   const today = new Date(); today.setHours(0,0,0,0);
@@ -3933,6 +4011,39 @@ function renderWeekPlan() {
     <div class="page-header" style="display:none;">
     </div>
     ${phaseHTML}
+    ${(function() {
+      var wp = data._weakPillars || {};
+      var wi = data._weakInfo || [];
+      if (wi.length === 0) return '';
+      var PILLAR_LABELS = { kraft:'KRAFT', metabol:'AUSDAUER', kognitiv:'KOGNITION', ernaehr:'ERNAEHRUNG', recovery:'REGENERATION', ringiQ:'RING IQ', psyche:'MENTAL', mobil:'MOBILITAET' };
+      var PILLAR_COLORS = { kraft:'#e8000d', metabol:'#2979ff', kognitiv:'#ab47bc', ernaehr:'#4caf50', recovery:'#ff6d00', ringiQ:'#f5c518', psyche:'#00bcd4', mobil:'#8bc34a' };
+      var PILLAR_ACTIONS = {
+        kraft: 'S&C-Bloecke betont, Kraftfokus-Hinweise',
+        metabol: 'Mehr HIIT statt Zone 2, extra Cardio-Einheiten',
+        kognitiv: 'Reaktions-Drills + Blickverhalten-Hinweise im Training',
+        ernaehr: 'Ernaehrungs-Checks + Post-Training Protein-Erinnerungen',
+        recovery: 'Volumen reduziert (-15%), Schlaf-Hinweise verstaerkt',
+        ringiQ: 'Kampf-Analysen an Ruhetagen, Taktik-Fokus beim Boxen',
+        psyche: 'Visualisierungs-Bloecke + Box-Breathing abends',
+        mobil: 'Mobility-Sessions von 15 auf 25 Min. verlaengert'
+      };
+      var pills = wi.map(function(e) {
+        var key = e[0], score = e[1];
+        var isCritical = score < 35;
+        return '<span style="font-family:\'Space Mono\',monospace;font-size:11px;padding:4px 10px;border-radius:4px;background:' + PILLAR_COLORS[key] + '22;color:' + PILLAR_COLORS[key] + ';border:1px solid ' + PILLAR_COLORS[key] + '44;">' + PILLAR_LABELS[key] + ' ' + Math.round(score) + '%' + (isCritical ? ' !!!' : '') + '</span>';
+      }).join('');
+      var actions = wi.map(function(e) {
+        return '<div style="font-size:11px;color:#888;line-height:1.5;">→ <span style="color:' + PILLAR_COLORS[e[0]] + ';">' + PILLAR_LABELS[e[0]] + '</span>: ' + PILLAR_ACTIONS[e[0]] + '</div>';
+      }).join('');
+      return '<div style="margin-bottom:16px;padding:14px 16px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;border-left:3px solid var(--red);">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
+          '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:2px;color:var(--red);">FASS-PRINZIP AKTIV</span>' +
+          pills +
+        '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-bottom:8px;">Dein Plan wurde automatisch angepasst um deine schwachen Saeulen zu staerken:</div>' +
+        actions +
+      '</div>';
+    })()}
     ${!data.fightDate ? '<div class="info-box info-tip" style="margin-bottom:20px;"><span>💡</span><div>Trage auf dem Dashboard ein <strong>Kampfdatum</strong> ein — der Wochenplan passt sich automatisch an (Schärfen, Kampf-Modus, Recovery).</div></div>' : ''}
     ${(function() {
       var coveredSet = {};
