@@ -63,8 +63,7 @@ body {
 .si-btn { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; padding:18px 56px; background:var(--red); color:#fff; border:none; border-radius:6px; cursor:pointer; transition:transform .15s,box-shadow .2s; }
 .si-btn:hover { transform:scale(1.03); box-shadow:0 0 30px rgba(232,0,13,.2); }
 .si-btn:active { transform:scale(.97); }
-@keyframes siArrowIn { from { opacity:0; } to { opacity:1; } }
-@keyframes siBounce { 0%,100% { transform:translateX(-50%) translateY(0); } 50% { transform:translateX(-50%) translateY(8px); } }
+@keyframes siBounce { 0%,100% { transform:translateX(-50%) translateY(0); } 50% { transform:translateX(-50%) translateY(12px); } }
 
 /* Noise overlay */
 body::before {

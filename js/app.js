@@ -502,10 +502,10 @@ function showSaeulenIntro() {
   progressBar.style.cssText = 'position:fixed;top:0;left:0;height:3px;background:var(--red);z-index:10000;transition:width .3s ease;width:0%;';
   el.appendChild(progressBar);
 
-  // Bounce-Pfeil unten (verschwindet nach erstem Scroll)
+  // Bounce-Pfeil unten — gross, hell, sofort sichtbar
   var arrow = document.createElement('div');
-  arrow.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>';
-  arrow.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:10000;opacity:0;animation:siArrowIn .5s ease 2s forwards,siBounce 1.5s ease 2.5s infinite;cursor:pointer;';
+  arrow.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M7 10l5 5 5-5"/></svg>';
+  arrow.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:10000;animation:siBounce 1.2s ease .5s infinite;cursor:pointer;padding:12px;border-radius:50%;background:rgba(255,255,255,.06);backdrop-filter:blur(4px);';
   arrow.onclick = function() {
     var next = slides[1];
     if (next) next.scrollIntoView({ behavior: 'smooth' });
