@@ -497,16 +497,34 @@ function showSaeulenIntro() {
     }, 400 + i * 800);
   });
 
-  // Fortschritts-Balken erstellen
+  // Fortschritts-Balken oben
   var progressBar = document.createElement('div');
   progressBar.style.cssText = 'position:fixed;top:0;left:0;height:3px;background:var(--red);z-index:10000;transition:width .3s ease;width:0%;';
   el.appendChild(progressBar);
 
-  // Scroll-Hinweis unten
-  var scrollHint = document.createElement('div');
-  scrollHint.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10000;font-family:"Space Mono",monospace;font-size:11px;color:#333;letter-spacing:2px;animation:fadeSlideIn .5s ease 2.5s both;';
-  scrollHint.textContent = 'SCROLLE NACH UNTEN \u25BE';
-  el.appendChild(scrollHint);
+  // Bounce-Pfeil unten (verschwindet nach erstem Scroll)
+  var arrow = document.createElement('div');
+  arrow.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>';
+  arrow.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:10000;opacity:0;animation:siArrowIn .5s ease 2s forwards,siBounce 1.5s ease 2.5s infinite;cursor:pointer;';
+  arrow.onclick = function() {
+    var next = slides[1];
+    if (next) next.scrollIntoView({ behavior: 'smooth' });
+  };
+  el.appendChild(arrow);
+
+  // Dot-Navigation rechts
+  var dots = document.createElement('div');
+  dots.style.cssText = 'position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:10000;display:flex;flex-direction:column;gap:8px;';
+  var slideColors = ['#fff','#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a','#fff'];
+  for (var di = 0; di < totalSlides; di++) {
+    (function(i) {
+      var dot = document.createElement('div');
+      dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:#222;transition:all .3s;cursor:pointer;';
+      dot.onclick = function() { slides[i].scrollIntoView({ behavior: 'smooth' }); };
+      dot.setAttribute('data-si-dot', i);
+      dots.appendChild(dot);
+    })(di);
+  }
 
   // IntersectionObserver — animiert Slides wenn sie sichtbar werden
   if (window.IntersectionObserver) {
@@ -530,16 +548,51 @@ function showSaeulenIntro() {
     slides.forEach(function(s) { obs.observe(s); });
   }
 
-  // Fortschritts-Balken beim Scrollen updaten
+  el.appendChild(dots);
+
+  // Aktuelle Slide tracken + UI updaten
+  var currentDot = 0;
+  function updateDots(idx) {
+    if (idx === currentDot) return;
+    currentDot = idx;
+    dots.querySelectorAll('[data-si-dot]').forEach(function(d, i) {
+      var color = slideColors[i] || '#555';
+      if (i === idx) {
+        d.style.background = color; d.style.width = '10px'; d.style.height = '10px'; d.style.boxShadow = '0 0 8px ' + color + '60';
+      } else {
+        d.style.background = '#222'; d.style.width = '8px'; d.style.height = '8px'; d.style.boxShadow = 'none';
+      }
+    });
+  }
+  updateDots(0);
+
+  // Scroll-Listener: Progress-Bar + Dots + Arrow ausblenden
   scroller.addEventListener('scroll', function() {
     var scrollTop = scroller.scrollTop;
     var scrollMax = scroller.scrollHeight - scroller.clientHeight;
     var pct = scrollMax > 0 ? Math.round(scrollTop / scrollMax * 100) : 0;
     progressBar.style.width = pct + '%';
-    // Scroll-Hinweis ausblenden nach erstem Scroll
-    if (scrollTop > 50 && scrollHint.parentNode) {
-      scrollHint.style.opacity = '0';
-      setTimeout(function() { if (scrollHint.parentNode) scrollHint.parentNode.removeChild(scrollHint); }, 300);
+
+    // Welche Slide ist aktiv?
+    var activeIdx = 0;
+    slides.forEach(function(s, i) {
+      if (s.offsetTop <= scrollTop + scroller.clientHeight * 0.5) activeIdx = i;
+    });
+    updateDots(activeIdx);
+
+    // Pfeil ausblenden nach erstem Scroll
+    if (scrollTop > 50 && arrow.parentNode) {
+      arrow.style.animation = 'none';
+      arrow.style.opacity = '0';
+      arrow.style.transition = 'opacity .3s';
+      setTimeout(function() { if (arrow.parentNode) arrow.parentNode.removeChild(arrow); }, 300);
+    }
+
+    // Letzte Slide: Dots ausblenden
+    if (activeIdx >= totalSlides - 1) {
+      dots.style.opacity = '0';
+    } else {
+      dots.style.opacity = '1';
     }
   });
 }
