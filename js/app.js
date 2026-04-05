@@ -1159,8 +1159,9 @@ function renderDashStats() {
   renderRadarChart(scores);
 }
 
+var _radarChart = null;
 function renderRadarChart(canvasOrScores, scoresArg) {
-  let canvas, scores;
+  var canvas, scores;
   if (canvasOrScores instanceof HTMLCanvasElement) {
     canvas = canvasOrScores;
     scores = scoresArg;
@@ -1168,100 +1169,65 @@ function renderRadarChart(canvasOrScores, scoresArg) {
     canvas = document.getElementById('rpg-radar');
     scores = canvasOrScores;
   }
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  const cx = w / 2, cy = h / 2;
-  const r = Math.min(cx, cy) - 40;
-  const n = RADAR_AXES.length;
-  const keys = RADAR_AXES.map(a => a.key);
+  if (!canvas || typeof Chart === 'undefined') return;
 
-  ctx.clearRect(0, 0, w, h);
+  var keys = RADAR_AXES.map(function(a) { return a.key; });
+  var labels = RADAR_AXES.map(function(a) { return a.label; });
+  var values = keys.map(function(k) { return scores[k] || 0; });
+  var colors = RADAR_AXES.map(function(a) { return a.hex; });
 
-  // Grid rings with % labels
-  [25, 50, 75, 100].forEach((pct, ri) => {
-    const rr = (r / 4) * (ri + 1);
-    ctx.beginPath();
-    for (let i = 0; i <= n; i++) {
-      const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
-      const x = cx + Math.cos(angle) * rr;
-      const y = cy + Math.sin(angle) * rr;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  // Destroy old chart
+  if (_radarChart) { _radarChart.destroy(); _radarChart = null; }
+
+  // Finde den richtigen Canvas (könnte Tests-Seite oder Dashboard sein)
+  var isTestsRadar = canvas.id === 'tests-radar';
+
+  _radarChart = new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: 'rgba(232,0,13,.12)',
+        borderColor: 'rgba(232,0,13,.7)',
+        borderWidth: 2,
+        pointBackgroundColor: colors,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            stepSize: 25,
+            color: '#333',
+            font: { family: "'Space Mono', monospace", size: 9 },
+            backdropColor: 'transparent'
+          },
+          grid: {
+            color: 'rgba(255,255,255,.06)'
+          },
+          angleLines: {
+            color: 'rgba(255,255,255,.06)'
+          },
+          pointLabels: {
+            color: '#666',
+            font: { family: "'Space Mono', monospace", size: 10, weight: '600' }
+          }
+        }
+      }
     }
-    ctx.strokeStyle = ri === 3 ? 'rgba(255,255,255,.1)' : 'rgba(255,255,255,.04)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    // % label on first axis
-    ctx.fillStyle = '#333';
-    ctx.font = '9px "Space Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText(pct + '%', cx + 4, cy - rr + 3);
   });
-
-  // Axis lines + labels
-  for (let i = 0; i < n; i++) {
-    const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
-    ctx.strokeStyle = 'rgba(255,255,255,.06)';
-    ctx.stroke();
-
-    const lx = cx + Math.cos(angle) * (r + 24);
-    const ly = cy + Math.sin(angle) * (r + 24);
-    ctx.save();
-    ctx.font = '600 9px "Space Mono", monospace';
-    ctx.fillStyle = '#555';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(RADAR_AXES[i].label, lx, ly);
-    ctx.restore();
-  }
-
-  // Check if all scores are null — show empty state message
-  const allNull = keys.every(k => scores[k] === null || scores[k] === undefined);
-  if (allNull) {
-    ctx.save();
-    ctx.font = '14px "Space Mono", monospace';
-    ctx.fillStyle = '#333';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Trage Benchmarks ein', cx, cy);
-    ctx.restore();
-    return;
-  }
-
-  // Data polygon
-  ctx.beginPath();
-  for (let i = 0; i <= n; i++) {
-    const idx = i % n;
-    const angle = (Math.PI * 2 / n) * idx - Math.PI / 2;
-    const val = (scores[keys[idx]] || 0) / 100;
-    const x = cx + Math.cos(angle) * r * val;
-    const y = cy + Math.sin(angle) * r * val;
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  }
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(232,0,13,.12)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(232,0,13,.6)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Data points
-  for (let i = 0; i < n; i++) {
-    const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
-    const raw = scores[keys[i]];
-    const val = (raw || 0) / 100;
-    const x = cx + Math.cos(angle) * r * val;
-    const y = cy + Math.sin(angle) * r * val;
-    ctx.beginPath();
-    ctx.arc(x, y, raw !== null ? 4 : 3, 0, Math.PI * 2);
-    ctx.fillStyle = raw !== null ? RADAR_AXES[i].hex : '#333';
-    ctx.fill();
-    if (raw !== null) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke(); }
-  }
-
 }
 
 // ===== HRV =====
@@ -1957,12 +1923,20 @@ function updateBenchmark(id, val) {
 function openFightModal() {
   document.getElementById('fight-modal').classList.add('active');
   document.getElementById('fight-log-date').value = new Date().toISOString().split('T')[0];
-  // Reset all extra fields (now static in DOM)
-  var fields = ['fight-log-round1', 'fight-log-round2', 'fight-log-round3', 'fight-log-video', 'fight-log-weaknesses', 'fight-log-good', 'fight-log-improve'];
-  fields.forEach(function(id) {
+  document.getElementById('fight-log-opponent').value = '';
+  // Reset extra fields
+  ['fight-log-round1','fight-log-round2','fight-log-round3','fight-log-video','fight-log-weaknesses','fight-log-good','fight-log-improve'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.value = '';
   });
+  // Details zugeklappt starten
+  var toggle = document.getElementById('fight-extra-toggle');
+  if (toggle) toggle.style.display = 'none';
+  // Gegner-Feld fokussieren
+  setTimeout(function() {
+    var opp = document.getElementById('fight-log-opponent');
+    if (opp) opp.focus();
+  }, 200);
 }
 function closeFightModal() { document.getElementById('fight-modal').classList.remove('active'); }
 
