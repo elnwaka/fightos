@@ -1070,9 +1070,10 @@ function calcProfileScores(data) {
     var d = new Date(e.date);
     return (Date.now() - d.getTime()) < 30 * 86400000;
   });
-  if (last30.length > 0) {
+  if (last30.length >= 4) {
     var mobilCount = last30.filter(function(e) { return e.type === 'mobility'; }).length;
-    mobilLog = Math.min(100, Math.round(mobilCount / last30.length * 250)); // ~40% mobility sessions = 100%
+    // 8+ Mobility-Sessions im Monat = 100% (ca. 2x/Woche)
+    mobilLog = Math.min(100, Math.round(mobilCount / 8 * 100));
   }
   const mobil = avg([mobilLog, ratingPct('mobil')]);
 
@@ -4634,8 +4635,8 @@ function estimateBlockDuration(type) {
 }
 
 function mapBlockTypeToLogType(type) {
-  const map = { boxen: 'boxen', sparring: 'sparring', pratzen: 'pratzen', kraft: 'kraft', sc: 'kraft', cardio: 'cardio', meta: 'mobility' };
-  return map[type] || 'boxen';
+  const map = { boxen: 'boxen', sparring: 'sparring', pratzen: 'pratzen', kraft: 'kraft', sc: 'kraft', strength: 'kraft', cardio: 'cardio', recovery: 'mobility', boxing: 'boxen', meta: 'meta' };
+  return map[type] || type;
 }
 
 // ===== SHARING =====
