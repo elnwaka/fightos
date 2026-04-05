@@ -432,8 +432,7 @@ function obComplete() {
 function getDisplayName() {
   const data = getData();
   if (data && data.alterEgo && data.alterEgo.name) return data.alterEgo.name;
-  const s = getUserSchedule();
-  return s.nickname || currentUser;
+  return currentUser || 'Boxer';
 }
 
 function enterApp() {
@@ -5357,10 +5356,6 @@ function renderAccountPage() {
         <div class="account-section-title">PERSÖNLICHE DATEN</div>
         <div class="account-grid">
           <div class="form-group">
-            <label class="form-label">Spitzname</label>
-            <input class="form-input" id="acc-nickname" value="${u.nickname||currentUser}">
-          </div>
-          <div class="form-group">
             <label class="form-label">Geburtsjahr</label>
             <select class="form-select" id="acc-birthyear"><option value="">—</option>${yOpts}</select>
           </div>
@@ -5450,7 +5445,6 @@ function saveAccountPage() {
   const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
   if (!users[currentUser]) return;
 
-  users[currentUser].nickname = document.getElementById('acc-nickname').value.trim() || currentUser;
   users[currentUser].birthYear = document.getElementById('acc-birthyear').value;
   users[currentUser].weight = document.getElementById('acc-weight').value;
   users[currentUser].height = parseInt(document.getElementById('acc-height').value) || 175;
