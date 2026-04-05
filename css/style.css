@@ -1264,11 +1264,22 @@ body::before {
   flex-direction: column;
   transition: all .3s ease;
 }
-/* Collapsed days: hide blocks, show only header */
-.day-col .day-blocks { display: none; }
+/* Collapsed days: compact blocks */
+.day-col .day-blocks { display: flex; }
 .day-col .add-block-btn { display: none; }
-.day-col.day-active .day-blocks { display: flex; }
 .day-col.day-active .add-block-btn { display: block; }
+.day-col:not(.day-active) .day-block {
+  font-size: 10px;
+  padding: 3px 6px;
+  line-height: 1.2;
+}
+.day-col:not(.day-active) .day-block .block-hint,
+.day-col:not(.day-active) .day-block .ex-chip,
+.day-col:not(.day-active) .day-block .block-check-btn,
+.day-col:not(.day-active) .day-block .block-saeulen-dots { display: none; }
+.day-col:not(.day-active) .day-blocks { gap: 2px; padding: 4px; }
+/* Active day: bigger blocks */
+.day-col.day-active .day-blocks { gap: 6px; padding: 8px 10px; }
 .day-header { cursor: pointer; }
 .day-col.fight-day { border-color: rgba(232,0,13,.4); }
 .day-header {
@@ -2917,6 +2928,7 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .week-grid[data-active="5"],
   .week-grid[data-active="6"] { grid-template-columns: 1fr; }
   .day-col { min-height: auto; }
+  .day-col:not(.day-active) .day-blocks { display: none; }
   .day-col:not(.day-active) .day-header > div:last-child { display: flex; }
 
   /* --- Tests --- */

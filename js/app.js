@@ -3831,12 +3831,12 @@ function renderWeekPlan() {
               <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div style="display:flex;align-items:center;gap:6px;">
                   <span style="font-family:'Space Mono',monospace;font-size:11px;opacity:.7;">${b.time}</span>
-                  <span style="display:flex;gap:2px;">${blockDots}</span>
+                  <span class="block-saeulen-dots" style="display:flex;gap:2px;">${blockDots}</span>
                 </div>
                 ${isToday || done ? `<button class="block-check-btn${done ? ' checked' : ''}" onclick="event.stopPropagation();toggleBlockDone('${day}',${bi},'${b.type}','${b.title.replace(/'/g,'\\&#39;')}')" title="${done ? 'Erledigt' : 'Als erledigt markieren'}">${done ? '✓' : '○'}</button>` : ''}
               </div>
               ${b.title}
-              ${b.hint ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:10px;color:#444;margin-top:2px;line-height:1.3;">' + b.hint + '</div>' : ''}
+              ${b.hint ? '<div class="block-hint" style="font-family:\'DM Sans\',sans-serif;font-size:10px;color:#444;margin-top:2px;line-height:1.3;">' + b.hint + '</div>' : ''}
               ${renderExerciseChips(b.exercises)}
             </div>`}).join('')}
           </div>
