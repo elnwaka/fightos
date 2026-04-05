@@ -720,11 +720,16 @@ function showPage(pageId) {
   }
   // Bottom tab bar highlight
   document.querySelectorAll('.btab').forEach(function(b) { b.classList.remove('active'); });
-  var btabPage = navPage;
-  if (['wochenplan','uebungen','log','periodisierung','uebung-detail','block-detail'].indexOf(pageId) !== -1) btabPage = 'wochenplan';
-  if (['fights','fight-detail'].indexOf(pageId) !== -1) btabPage = 'fights';
-  var activeTab = document.querySelector('.btab[data-page="' + btabPage + '"]');
-  if (activeTab) activeTab.classList.add('active');
+  var btabPage = pageId;
+  if (btabPage === 'dashboard') btabPage = 'dashboard';
+  else if (['wochenplan','uebungen','log','periodisierung','uebung-detail','block-detail'].indexOf(btabPage) !== -1) btabPage = 'wochenplan';
+  else if (['fights','fight-detail'].indexOf(btabPage) !== -1) btabPage = 'fights';
+  else if (btabPage === 'tests') btabPage = 'tests';
+  else btabPage = ''; // Keine der 4 Haupt-Tabs → keiner aktiv
+  if (btabPage) {
+    var activeTab = document.querySelector('.btab[data-page="' + btabPage + '"]');
+    if (activeTab) activeTab.classList.add('active');
+  }
   // Scroll reveal on new page
   setTimeout(applyRevealToPage, 100);
   // Update URL hash
