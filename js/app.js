@@ -6030,3 +6030,29 @@ function formatDate(str) {
   const d = new Date(str + 'T00:00:00');
   return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
+
+// ===== PWA SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js')
+      .then(function(reg) {
+        console.log('FightOS SW registered, scope:', reg.scope);
+        setInterval(function() { reg.update(); }, 60 * 60 * 1000);
+      })
+      .catch(function(err) {
+        console.log('SW registration failed:', err);
+      });
+  });
+
+  // Update-Banner
+  navigator.serviceWorker.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+      var banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9999;background:var(--blue);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;animation:fadeSlideIn .3s ease;';
+      banner.innerHTML = '<span style="font-family:\'Space Mono\',monospace;font-size:12px;color:#fff;">Update verfuegbar</span>' +
+        '<button onclick="location.reload()" style="font-family:\'Space Mono\',monospace;font-size:12px;color:#fff;background:rgba(255,255,255,.15);border:none;padding:6px 16px;border-radius:4px;cursor:pointer;letter-spacing:1px;">NEU LADEN</button>';
+      document.body.appendChild(banner);
+      setTimeout(function() { if (banner.parentNode) banner.parentNode.removeChild(banner); }, 10000);
+    }
+  });
+}

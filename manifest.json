@@ -1,0 +1,22 @@
+{
+  "name": "FightOS — Elite Boxer Platform",
+  "short_name": "FightOS",
+  "description": "8-Saeulen Leveling-System fuer Boxer",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080808",
+  "theme_color": "#E8000D",
+  "icons": [
+    {
+      "src": "img/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["sports", "fitness", "health"],
+  "lang": "de",
+  "dir": "ltr"
+}
