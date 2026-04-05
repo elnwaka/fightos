@@ -1824,6 +1824,86 @@ function saveBatchBenchmarks() {
   }
 }
 
+// ===== SPARKLINE CANVAS =====
+function drawSparkline(canvasId, history, color, inverse) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas || !history || history.length < 2) return;
+  var ctx = canvas.getContext('2d');
+  var w = canvas.width, h = canvas.height;
+  var vals = history.map(function(e) { return e.value; });
+  var min = Math.min.apply(null, vals);
+  var max = Math.max.apply(null, vals);
+  var range = max - min || 1;
+  var pad = range * 0.1;
+  min -= pad; max += pad; range = max - min;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Trend: vergleiche erstes und letztes Drittel
+  var firstThird = vals.slice(0, Math.ceil(vals.length / 3));
+  var lastThird = vals.slice(-Math.ceil(vals.length / 3));
+  var firstAvg = firstThird.reduce(function(a,b){return a+b;},0) / firstThird.length;
+  var lastAvg = lastThird.reduce(function(a,b){return a+b;},0) / lastThird.length;
+  var improving = inverse ? lastAvg < firstAvg : lastAvg > firstAvg;
+
+  // Gradient fill
+  var grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, color + '25');
+  grad.addColorStop(1, color + '05');
+
+  // Line
+  ctx.beginPath();
+  for (var i = 0; i < vals.length; i++) {
+    var x = (i / (vals.length - 1)) * w;
+    var y = h - ((vals[i] - min) / range) * h;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Fill under line
+  ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Last point highlight
+  var lastX = w;
+  var lastY = h - ((vals[vals.length - 1] - min) / range) * h;
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Best value dot (gold)
+  var bestIdx = inverse ? vals.indexOf(Math.min.apply(null, vals)) : vals.indexOf(Math.max.apply(null, vals));
+  if (bestIdx !== vals.length - 1) {
+    var bestX = (bestIdx / (vals.length - 1)) * w;
+    var bestY = h - ((vals[bestIdx] - min) / range) * h;
+    ctx.beginPath();
+    ctx.arc(bestX, bestY, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#f5c518';
+    ctx.fill();
+  }
+
+  return improving;
+}
+
+function getBenchTrend(history, inverse) {
+  if (!history || history.length < 2) return { arrow: '', color: '#555', improving: false };
+  var first = history[0].value;
+  var last = history[history.length - 1].value;
+  var diff = last - first;
+  var improving = inverse ? diff < 0 : diff > 0;
+  var arrow = improving ? '\u2191' : diff === 0 ? '\u2192' : '\u2193';
+  var color = improving ? 'var(--green)' : diff === 0 ? '#555' : 'var(--red)';
+  return { arrow: arrow, color: color, improving: improving, diff: Math.abs(diff) };
+}
+
 function updateBenchmark(id, val) {
   const data = getData();
   if (!data) return;
@@ -1843,8 +1923,14 @@ function updateBenchmark(id, val) {
   // Track history — only log if value actually changed
   if (numVal !== oldVal && numVal > 0) {
     if (!data.benchmarkHistory[id]) data.benchmarkHistory[id] = [];
-    data.benchmarkHistory[id].push({ date: new Date().toISOString().split('T')[0], value: numVal });
-    // Keep last 50 entries per benchmark
+    var today = new Date().toISOString().split('T')[0];
+    // Duplikat am gleichen Tag → überschreiben
+    var existingIdx = data.benchmarkHistory[id].findIndex(function(h) { return h.date === today; });
+    if (existingIdx >= 0) {
+      data.benchmarkHistory[id][existingIdx].value = numVal;
+    } else {
+      data.benchmarkHistory[id].push({ date: today, value: numVal });
+    }
     if (data.benchmarkHistory[id].length > 50) data.benchmarkHistory[id] = data.benchmarkHistory[id].slice(-50);
   }
   saveData(data);
@@ -4998,14 +5084,50 @@ function renderBenchSummary() {
   const data = getData();
   if (!data) return;
   const b = data.benchmarks || {};
+  const hist = data.benchmarkHistory || {};
   const BENCH = getBenchmarks();
   const filled = BENCH.filter(x => b[x.id] && b[x.id] > 0).length;
   const scores = calcProfileScores(data);
-  const vals = [scores.kraft, scores.explosiv, scores.ausdauer].filter(v => v !== null);
+  const vals = [scores.kraft, scores.metabol, scores.ernaehr].filter(v => v !== null);
   const avg = vals.length ? Math.round(vals.reduce((a,v) => a+v, 0) / vals.length) : null;
-  el.textContent = avg !== null
-    ? `${filled}/${BENCH.length} Tests · Ø ${avg}% Elite-Level`
-    : `${filled}/${BENCH.length} Tests eingetragen`;
+
+  // Mini Sparklines für Top-3 Benchmarks (meiste History)
+  var ranked = BENCH.filter(function(x) { return hist[x.id] && hist[x.id].length >= 2; })
+    .sort(function(a, bb) { return (hist[bb.id] || []).length - (hist[a.id] || []).length; })
+    .slice(0, 3);
+
+  var summaryText = avg !== null
+    ? filled + '/' + BENCH.length + ' Tests \u00b7 \u00d8 ' + avg + '% Elite-Level'
+    : filled + '/' + BENCH.length + ' Tests eingetragen';
+
+  el.innerHTML = summaryText;
+
+  if (ranked.length > 0) {
+    var sparksDiv = document.createElement('div');
+    sparksDiv.style.cssText = 'display:flex;gap:12px;margin-top:8px;';
+    ranked.forEach(function(bench) {
+      var h = hist[bench.id] || [];
+      var val = b[bench.id] || 0;
+      var trend = getBenchTrend(h, bench.inverse);
+      var daysAgo = h.length ? Math.floor((Date.now() - new Date(h[h.length-1].date).getTime()) / 86400000) : 999;
+      var item = document.createElement('div');
+      item.style.cssText = 'cursor:pointer;';
+      item.onclick = function() { showPage('tests'); };
+      item.innerHTML = '<canvas id="dash-spark-' + bench.id + '" width="80" height="30" style="display:block;"></canvas>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-top:2px;">' + val + ' ' + bench.unit +
+        ' <span style="color:' + trend.color + ';">' + trend.arrow + '</span>' +
+        (daysAgo > 30 ? ' <span style="color:var(--gold);">!</span>' : '') +
+        '</div>';
+      sparksDiv.appendChild(item);
+    });
+    el.parentNode.appendChild(sparksDiv);
+
+    setTimeout(function() {
+      ranked.forEach(function(bench) {
+        drawSparkline('dash-spark-' + bench.id, hist[bench.id], bench.color || '#e8000d', bench.inverse);
+      });
+    }, 50);
+  }
 }
 
 // ===== ACCOUNT PAGE =====
@@ -5426,21 +5548,13 @@ function renderTestsPage() {
           trendHTML = `<span class="test-card-meta-item" style="color:${tColor};">${arrow} ${b.inverse && diff < 0 ? '-' : '+'}${absDiff % 1 === 0 ? absDiff : absDiff.toFixed(1)} ${b.unit}</span>`;
         }
 
-        // Sparkline
+        // Canvas Sparkline
         let sparkHTML = '';
-        if (hist.length >= 3) {
-          const vals = hist.map(h => h.value);
-          const min = Math.min(...vals), max = Math.max(...vals);
-          const range = max - min || 1;
-          const w = 80, h2 = 20;
-          const pts = vals.map((v, i) => {
-            const x = (i / (vals.length - 1)) * w;
-            const y = b.inverse
-              ? (v - min) / range * (h2 - 4) + 2
-              : h2 - ((v - min) / range * (h2 - 4)) - 2;
-            return `${x},${y}`;
-          }).join(' ');
-          sparkHTML = `<svg width="${w}" height="${h2}" style="vertical-align:middle;"><polyline points="${pts}" fill="none" stroke="${b.color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        var sparkId = 'spark-' + b.id;
+        if (hist.length >= 2) {
+          sparkHTML = '<canvas id="' + sparkId + '" width="120" height="40" style="cursor:pointer;vertical-align:middle;" onclick="showBenchDetail(\'' + b.id + '\')"></canvas>';
+        } else if (val > 0) {
+          sparkHTML = '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;">Teste erneut fuer Fortschritt</span>';
         }
 
         // Due for retest?
@@ -5544,7 +5658,94 @@ function renderTestsPage() {
   setTimeout(() => {
     const canvas = document.getElementById('tests-radar');
     if (canvas) renderRadarChart(canvas, scores);
+    // Draw Sparklines
+    BENCHMARKS.forEach(function(b) {
+      var hist = (data.benchmarkHistory || {})[b.id] || [];
+      if (hist.length >= 2) {
+        drawSparkline('spark-' + b.id, hist, b.color || '#e8000d', b.inverse);
+      }
+    });
   }, 50);
+}
+
+// ===== BENCHMARK DETAIL VIEW =====
+function showBenchDetail(benchId) {
+  var data = getData();
+  if (!data) return;
+  var BENCHMARKS = getBenchmarks();
+  var b = BENCHMARKS.find(function(x) { return x.id === benchId; });
+  if (!b) return;
+  var hist = (data.benchmarkHistory || {})[benchId] || [];
+  if (hist.length < 2) return;
+
+  var val = data.benchmarks[benchId] || 0;
+  var first = hist[0].value;
+  var pctChange = first > 0 ? Math.round(((val - first) / first) * 100) : 0;
+  var trend = getBenchTrend(hist, b.inverse);
+  var bestVal = b.inverse ? Math.min.apply(null, hist.map(function(h){return h.value;})) : Math.max.apply(null, hist.map(function(h){return h.value;}));
+  var bestEntry = hist.find(function(h) { return h.value === bestVal; });
+
+  var el = document.getElementById('page-tests');
+  if (!el) return;
+
+  // Overlay
+  var overlay = document.createElement('div');
+  overlay.id = 'bench-detail-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'background:#0a0a0a;border:1px solid #1a1a1a;border-radius:12px;padding:24px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;';
+
+  modal.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--white);letter-spacing:1px;">' + b.name + '</div>' +
+    '<span onclick="document.getElementById(\'bench-detail-overlay\').remove()" style="font-size:24px;color:#333;cursor:pointer;">\u00d7</span>' +
+  '</div>' +
+  '<div style="display:flex;align-items:baseline;gap:16px;margin-bottom:16px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:40px;color:var(--white);">' + val + '<span style="font-size:16px;color:#555;"> ' + b.unit + '</span></div>' +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:14px;color:' + trend.color + ';">' + trend.arrow + ' ' + (b.inverse ? (pctChange < 0 ? '' : '+') : (pctChange > 0 ? '+' : '')) + pctChange + '% seit Start</div>' +
+  '</div>' +
+  '<canvas id="bench-detail-chart" width="560" height="200" style="width:100%;height:200px;margin-bottom:16px;"></canvas>' +
+  '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px;background:#111;border-radius:6px;">' +
+    '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">BESTLEISTUNG</span><br><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--gold);">' + bestVal + ' ' + b.unit + '</span></div>' +
+    '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">AM</span><br><span style="font-family:\'Space Mono\',monospace;font-size:12px;color:#888;">' + (bestEntry ? bestEntry.date : '') + '</span></div>' +
+    '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">EINTRAEGE</span><br><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);">' + hist.length + '</span></div>' +
+  '</div>' +
+  '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:#555;letter-spacing:1px;margin-bottom:8px;">VERLAUF</div>' +
+  '<div style="display:flex;flex-direction:column;gap:4px;">' +
+    hist.slice().reverse().map(function(h, i) {
+      var isBest = h.value === bestVal;
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#111;border-radius:4px;' + (isBest ? 'border-left:2px solid var(--gold);' : '') + '">' +
+        '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">' + h.date + '</span>' +
+        '<span style="font-family:\'Space Mono\',monospace;font-size:13px;color:' + (isBest ? 'var(--gold)' : 'var(--white)') + ';">' + h.value + ' ' + b.unit + (isBest ? ' \u2605' : '') + '</span>' +
+        '<span onclick="deleteBenchEntry(\'' + benchId + '\',\'' + h.date + '\')" style="font-size:12px;color:#222;cursor:pointer;padding:0 4px;" title="Loeschen">\u00d7</span>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  // Draw detail chart
+  setTimeout(function() {
+    drawSparkline('bench-detail-chart', hist, b.color || '#e8000d', b.inverse);
+  }, 50);
+}
+
+function deleteBenchEntry(benchId, date) {
+  var data = getData();
+  if (!data || !data.benchmarkHistory || !data.benchmarkHistory[benchId]) return;
+  data.benchmarkHistory[benchId] = data.benchmarkHistory[benchId].filter(function(h) { return h.date !== date; });
+  // Update current to latest value
+  if (data.benchmarkHistory[benchId].length > 0) {
+    data.benchmarks[benchId] = data.benchmarkHistory[benchId][data.benchmarkHistory[benchId].length - 1].value;
+  } else {
+    data.benchmarks[benchId] = 0;
+  }
+  saveData(data);
+  var overlay = document.getElementById('bench-detail-overlay');
+  if (overlay) overlay.remove();
+  renderTestsPage();
 }
 
 // ===== DAILY COMBINED (Routine + Checklist) =====
