@@ -63,12 +63,37 @@
 [data-theme="light"] .day-block.recovery { background: rgba(230,81,0,.08); color: #E65100; border-left-color: #E65100; }
 [data-theme="light"] .day-block.meta { background: rgba(196,144,0,.08); color: #C49000; border-left-color: #C49000; }
 [data-theme="light"] .dash-profil { background: #FFF; border-color: #E0E0E0; }
+[data-theme="light"] canvas { filter: invert(1) hue-rotate(180deg); }
 [data-theme="light"] .rpg-stat-bar { background: #E0E0E0; }
 [data-theme="light"] .user-pill { background: #F0F0F0; color: #111; }
 [data-theme="light"] .submit-btn { box-shadow: 0 2px 8px rgba(213,0,0,.15); }
 [data-theme="light"] .log-form-card { background: #FFF; border-color: #E0E0E0; }
 [data-theme="light"] .auth-card { background: #FFF; }
+[data-theme="light"] .tests-hero { background: linear-gradient(135deg, #FFF, #F8F8F8); border-color: #E0E0E0; }
 [data-theme="light"] .tests-cluster { border-color: #E0E0E0; }
+[data-theme="light"] .tests-cluster-header { border-bottom-color: #E0E0E0; }
+[data-theme="light"] .tests-axis-bar { background: #E0E0E0; }
+[data-theme="light"] .test-card { background: #FFF; border-color: #E0E0E0; }
+[data-theme="light"] .test-card:hover { border-color: #CCC; }
+[data-theme="light"] .rpg-stat-bar { background: #E0E0E0; }
+[data-theme="light"] .dash-hero { border-bottom-color: #E0E0E0; }
+[data-theme="light"] .dash-hero::before { opacity: 0; }
+[data-theme="light"] .dash-heute-side .card { background: #FFF; border: 1px solid #E0E0E0; border-radius: 8px; }
+[data-theme="light"] .info-box { background: #FAFAFA; border-color: #E0E0E0; }
+[data-theme="light"] .how-step { background: #FAFAFA; }
+[data-theme="light"] .ob-card { background: #FFF; }
+[data-theme="light"] .ob-option { background: #FAFAFA; border-color: #E0E0E0; color: #333; }
+[data-theme="light"] .ob-option.selected { border-color: var(--red); }
+[data-theme="light"] .phase-badge { border-color: currentColor; }
+[data-theme="light"] .ex-chip { background: #F0F0F0; color: #1565C0; border-color: #DDD; }
+[data-theme="light"] .share-pill { background: #F0F0F0; color: var(--red); border-color: #DDD; }
+[data-theme="light"] .account-section { border-color: #E0E0E0; }
+[data-theme="light"] .log-form-card { border-color: #E0E0E0; }
+[data-theme="light"] .log-entry-card { border-bottom-color: #EEE; }
+[data-theme="light"] .routine-item { border-bottom-color: #EEE; }
+[data-theme="light"] .tt-text { background: #FFF; border-color: #DDD; color: #333; box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+[data-theme="light"] #saeulen-intro { background: #FFF; }
+[data-theme="light"] .si-body, [data-theme="light"] .si-reason { color: #555; }
 [data-theme="light"] body::before { display: none; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; caret-color: transparent; }
