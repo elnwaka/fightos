@@ -3649,14 +3649,14 @@ function generateSmartWeekPlan() {
         exercises: [{id:'imt',label:'IMT'}] });
 
       if (isSparringDay) {
-        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Warm-up: Seil + Shadow Boxing', hint: 'Locker warmwerden, kein schweres S&C heute', type: 'boxing' });
+        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Vor dem Verein: Aufwaermen', hint: 'Seilspringen + Schultern mobilisieren — kein schweres S&C vor Sparring', type: 'boxing' });
         blocks.push({ time: d.time, title: 'Taktisches Sparring (-30% Volumen)', hint: 'Weniger Runden, voller Fokus auf Gameplan', type: 'boxing' });
         blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Dehnung + Foam Rolling 15 Min.', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'}] });
       } else if (isBoxingDay) {
         blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Explosive Reize: 3x3 Jump Squats', hint: 'Nervensystem aktivieren — kein Muskelversagen!', type: 'strength',
           exercises: [{id:'jump-squat',label:'Jump Squat'}] });
-        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Warm-up: Seil + Mobility + Face Pulls 3x15', hint: '3 Min. Seil, Schulterkreise, Face Pulls mit Band, 1 Runde Shadow Boxing', type: 'boxing' });
+        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Vor dem Verein: Aufwaermen + Face Pulls', hint: '3 Min. Seil, Face Pulls 3x15 mit Band, Schultern + Hueften mobilisieren', type: 'boxing' });
         blocks.push({ time: d.time, title: trainingLabel + ' (hohe Intensitaet)', hint: 'Volumen reduziert, Schaerfe und Timing schleifen', type: 'boxing' });
       } else {
         blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Explosive Reize: Jump Squats + Lateral Bounds', hint: 'Kurz und knackig — Nervensystem wach halten', type: 'strength',
@@ -3688,10 +3688,10 @@ function generateSmartWeekPlan() {
 
       if (isSparringDay) {
         // SPARRING-TAG: Kein schweres S&C, leicht halten
-        blocks.push({ time: timeBefore(d.time, 0, 20), title: 'Warm-up: Seilspringen + Shadow Boxing', hint: '5 Min. Seil, 2 Runden locker Shadow Boxing, Schultern + Hueften mobilisieren', type: 'boxing',
+        blocks.push({ time: timeBefore(d.time, 0, 20), title: 'Vor dem Verein: Aufwaermen', hint: '5 Min. Seil, Schultern + Hueften mobilisieren, locker warmwerden', type: 'boxing',
           exercises: [{id:'shadow-boxing',label:'Shadow Boxing'}] });
-        blocks.push({ time: d.time, title: 'Sparring', hint: 'Fokus: Gameplan umsetzen, Distanz kontrollieren, nicht wild werden', type: 'boxing' });
-        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Dehnung + Foam Rolling 20 Min.', hint: 'Hueftbeuger, Schultern, Nacken — nach Sparring besonders wichtig', type: 'recovery',
+        blocks.push({ time: d.time, title: 'Sparring im Verein', hint: 'Kein schweres S&C heute — dein Koerper braucht alles fuers Sparring', type: 'boxing' });
+        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Nach dem Verein: Dehnung + Foam Rolling', hint: 'Hueftbeuger, Schultern, Nacken — nach Sparring besonders wichtig', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'ankle-mobility',label:'Ankle Mobility'}] });
 
       } else if (isBoxingDay) {
@@ -3703,18 +3703,18 @@ function generateSmartWeekPlan() {
         }
         // Training-Typ-spezifische Hints
         var boxHint = '';
-        if (d.type === 'pratzen') boxHint = 'Pratzenarbeit: Kombis schleifen, Timing + Distanz mit Trainer';
-        else if (d.type === 'technik') boxHint = 'Technik-Fokus: Einzelne Schlaege und Bewegungen perfektionieren';
-        else if (d.type === 'pa') boxHint = 'Partnerarbeit: Drill-basiert, Angriff-Verteidigung im Wechsel';
-        else boxHint = 'Warm-up → Sandsack/Pratzen → Sparring-Simulation → Cool-down';
+        if (d.type === 'pratzen') boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
+        else if (d.type === 'technik') boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
+        else if (d.type === 'pa') boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
+        else boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
         // IMT 2. Session (mittags — Saeulen sagen 2x taeglich)
         if (!isWeekend) {
           blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'IMT — 30 Atemzuege (2. Session)', hint: '2x taeglich laut Protokoll — progressiver Widerstand alle 2 Wochen', type: 'meta',
             exercises: [{id:'imt',label:'IMT'}] });
         }
-        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Warm-up: Seilspringen + Face Pulls 3x15', hint: '3 Min. Seil, Face Pulls mit Band, Schulterkreise, 1 Runde Shadow Boxing', type: 'boxing' });
+        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Vor dem Verein: Aufwaermen + Face Pulls', hint: '3 Min. Seil, Face Pulls 3x15 mit Band, Schultern mobilisieren', type: 'boxing' });
         blocks.push({ time: d.time, title: trainingLabel, hint: boxHint, type: 'boxing' });
-        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Dehnung + Handpflege 10 Min.', hint: 'Stretching: Hueftbeuger, Schultern + Handgelenke kreisen, Finger dehnen', type: 'recovery',
+        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Nach dem Verein: Dehnung + Handpflege', hint: 'Stretching: Hueftbeuger, Schultern + Handgelenke kreisen, Finger dehnen', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'}] });
 
       } else if (isFreeDay) {
@@ -3942,9 +3942,9 @@ var BLOCK_DETAIL_CONTENT = {
     notes: 'Schwere Saetze: 2-3 Min. Pause. Explosive Uebungen: max. Geschwindigkeit, keine Ermuedung. Immer saubere Technik vor mehr Gewicht.'
   },
   'boxing': {
-    warmup: 'Seilspringen 3 Min. → Schulterkreise + Armkreise → Shadow Boxing 2 Runden locker → Hueften mobilisieren',
-    cooldown: 'Leichtes Shadow Boxing 1 Runde → Statisches Stretching: Schultern, Hueftbeuger, Handgelenke → Haende auslockern',
-    notes: 'Fokus auf Technik, nicht auf Kraft. Jede Kombi sauber zu Ende bringen. Zwischen den Runden bewusst atmen.'
+    warmup: 'VOR dem Vereinstraining: Seilspringen 3 Min. → Schulterkreise → Face Pulls 3x15 mit Band → Hueften mobilisieren',
+    cooldown: 'NACH dem Vereinstraining: Statisches Stretching (Schultern, Hueftbeuger, Handgelenke) → Haende auslockern → Finger dehnen',
+    notes: 'Dein Trainer gibt den Inhalt im Verein vor. FightOS kuemmert sich um alles drumherum: Aufwaermen, Erholung, Kraft, Ernaehrung.'
   },
   'cardio': {
     warmup: '5 Min. locker einlaufen → Dynamisches Stretching: Beinschwingen, Hueftkreise',

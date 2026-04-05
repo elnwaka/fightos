@@ -345,7 +345,7 @@ BET konfrontiert dein Gehirn mit kognitiven Aufgaben (${tt('Stroop-Test','Farbw�
 • Gaze-Anker-Technik: In jedem Sparring auf Brust/Kinn fixieren, NICHT den Fäusten folgen<br>
 • Kampffilm-Analyse: 15–20 Min./Woche — Gegner-Videos → bewusst Tells suchen<br><br>
 <strong>Zusatztools (Priorität 2):</strong><br>
-• <span style="color:var(--gold);">[Experimentell]</span> Stroboskop-Brille: 1–2×/Woche beim Pratzentraining — Hülsdünker et al. (2019) zeigten +12–18% visuelle Verarbeitung im Labor, aber <strong>Transfer auf den Ring ist noch nicht belegt</strong><br>
+• Reaktionsdrills mit Partner: Zahlen rufen → Boxer antwortet mit Kombi. Oder Farb-Karten zeigen → Boxer reagiert. Direkt im Vereinstraining einsetzbar<br>
 • BET-Protokoll: Stroop-Test-App, 15–25 Min./Tag, progressiv zwischen Trainingseinheiten integrieren<br>
 • Reaktionsdrills: Partner zeigt Zahlen/Farben → du reagierst mit spezifischen Kombis`,
     tags:[{text:'Täglich · 15–25 Min.',cls:'tag-gold'},{text:'BET + Blicktraining',cls:'tag-blue'}]},
@@ -1281,7 +1281,7 @@ const exercisesSpecial = [
     video:'https://www.youtube.com/results?search_query=inspiratory+muscle+training+powerbreathe+technique'},
   { id:'shadow-boxing', muscles:['schulter_l','schulter_r','core','quad_l','quad_r'], name:'SHADOW BOXING MIT VISUALISIERUNG', muscle:'Gesamtkoordination + Neurale Bahnung',
     goals:['shoulders','speed','jab'],
-    desc:'5–10 Min. Schattenboxen mit geschlossenen Augen oder im Spiegel. Spezifische Kombis gegen imaginierten Gegner. Erste Person, nicht Zuschauer. Emotion wichtig!',
+    desc:'5–10 Min. Schattenboxen vor dem Spiegel oder freistehend. Spezifische Kombis gegen imaginierten Gegner. In echtem Tempo, mit Fussarbeit und Deckung.',
     sets:['Dauer: <strong>5–10 Min.</strong>','Frequenz: <strong>Täglich</strong>','Kein Equipment'],
     tipLabel:'Wissenschaft', tip:'Visualisierung aktiviert dieselben motorischen Cortex-Areale wie echte Bewegung (MRT-belegt).',
     boxingConnection:'fMRT-Studien belegen: Visualisierung aktiviert dieselben motorischen Cortex-Areale wie echte Bewegung mit ~70% der neuronalen Aktivierung. Schattenboxen mit Visualisierung trainiert die neurale Bahnung von Kombinationen ohne mechanische Belastung. Besonders effektiv in Erste-Person-Perspektive mit emotionaler Beteiligung — die Qualität der Vorstellung bestimmt den Trainingseffekt (Wakefield & Smith, 2012).',
@@ -2804,7 +2804,7 @@ function renderMentalPage() {
         {t:'Woche 1–2: Basis aufbauen', d:'App: Kostenlose Stroop-App (z.B. „Brain Test", „Stroop Effect" oder „Encephalapp Stroop"). 15–20 Min. täglich inkongruente Tests (das Wort „BLAU" steht in roter Farbe → du musst die FARBE nennen, nicht das Wort). Ruhige Umgebung, volle Konzentration, keine Ablenkung. Mittagspause eignet sich gut. Du wirst merken: Nach 15 Min. wird dein Kopf „müde" — genau DAS ist der Trainingseffekt.'},
         {t:'Woche 3–4: Integration ins Training', d:'20–25 Min. BET pro Session, höhere Schwierigkeit (schnellere Antwortzeit, mehr Varianten). NEU: Kognitive Aufgaben ZWISCHEN Bag-Work-Runden einbauen. Konkret: 3 Min. Sandsack → 60 Sek. Stroop-Test auf Handy → 3 Min. Sandsack → 60 Sek. Stroop. 6–8 Runden. Ziel: Saubere Technik halten obwohl dein Kopf müde ist. Trainingspartner kann auch Rechenaufgaben stellen: „147 minus 7?" zwischen den Runden.'},
         {t:'Woche 5–6: Ring-Transfer', d:'25–30 Min. BET bei max. Schwierigkeit. Stroop-Antworten ZWISCHEN Sparring-Runden. Oder: Trainer stellt nach jeder Runde eine kognitive Frage (Farbe, Zahl, Rechenaufgabe) bevor er taktische Anweisungen gibt. Ziel: Saubere taktische Entscheidungen trotz maximaler kognitiver Erschöpfung. Das ist der direkte Transfer: In Runde 3 unter Druck noch klar denken können.'},
-        {t:'Premium-Option: SOMA-NPT', d:'SOMA NPT App (~50€/Monat): Wird von DFB, NBA, mehreren olympischen Verbänden und Premier-League-Clubs verwendet. Wissenschaftlich validiert, personalisierte Belastungssteuerung, messbarer Fortschritt. Lohnt sich wenn du regelmäßig kämpfst und es ernst meinst. Kostenlose Alternative: Jede Stroop-App + Disziplin reicht für den Basis-Effekt.'},
+        {t:'Im Vereinstraining integrieren', d:'Bitte deinen Trainer, zwischen Sandsack-Runden Zahlen oder Farben zu rufen auf die du mit Kombis reagieren musst. Oder: Nach jeder Runde eine Frage beantworten bevor die naechste Anweisung kommt. Kostet nichts und trainiert genau das was du brauchst.'},
         {t:'Langzeit-Protokoll', d:'Nach 6 Wochen: 3×/Woche Erhaltungsdosis (15 Min. + Integration in 2 Trainingseinheiten). Vor Kämpfen (Kampfwoche): Tägliche BET-Session 20 Min. — schärft die kognitive Ausdauer für den Kampf. BET ist wie Ausdauertraining für dein Gehirn: Konsistenz über Monate schlägt Intensität über Tage. Die meisten Boxer die es probieren hören nach 2 Wochen auf — die die durchhalten haben einen unfairen Vorteil in Runde 3.'}
       ]}
   ];
