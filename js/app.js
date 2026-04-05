@@ -3794,15 +3794,16 @@ function generateSmartWeekPlan() {
           // Normaler freier Tag: S&C (je nach Gym-Zugang) + Cardio
           scCount++;
           var scTime = isWeekend ? '09:00' : timeAdd(morningTime, 0, 10);
+          var weekHint = weekNum === 4 ? ' [DELOAD: Halbes Volumen, gleiche Technik]' : weekNum === 3 ? ' [PEAK: Volle Intensitaet, weniger Saetze]' : '';
           if (gym === 'full') {
             var sc = scSessions[scIdx % scSessions.length]; scIdx++;
-            blocks.push({ time: scTime, title: sc.title, hint: sc.hint, type: 'strength', exercises: sc.exercises });
+            blocks.push({ time: scTime, title: sc.title, hint: sc.hint + weekHint, type: 'strength', exercises: sc.exercises });
           } else if (gym === 'basic') {
             var sc = scSessions[scIdx % scSessions.length]; scIdx++;
-            blocks.push({ time: scTime, title: sc.title, hint: sc.hint + ' (Alternative mit Kurzhanteln wenn kein Trap Bar)', type: 'strength', exercises: sc.exercises });
+            blocks.push({ time: scTime, title: sc.title, hint: sc.hint + ' (Alternative mit Kurzhanteln)' + weekHint, type: 'strength', exercises: sc.exercises });
           } else {
-            var bw = bwSessions[scIdx % bwSessions.length]; scIdx++;
-            blocks.push({ time: scTime, title: bw.title, hint: bw.hint, type: 'strength', exercises: bw.exercises });
+            var bwS = bwSessions[scIdx % bwSessions.length]; scIdx++;
+            blocks.push({ time: scTime, title: bwS.title, hint: bwS.hint + weekHint, type: 'strength', exercises: bwS.exercises });
           }
           if (hasNacken && doNacken) {
             blocks.push({ time: timeAdd(scTime, 0, 45), title: 'Nackentraining 10 Min.', hint: 'Isometrisch: Stirn, Hinterkopf, Seiten — je 3x10 Sek. halten', type: 'strength',
@@ -3921,6 +3922,9 @@ function renderWeekPlan() {
       else hints.push('Equipment: Volles Gym');
       hints.push('Level: ' + (s.experienceLevel === 'anfaenger' ? 'Anfaenger' : s.experienceLevel === 'wettkampf' ? 'Wetkaempfer' : 'Fortgeschritten'));
       hints.push('S&C: max ' + (s.experienceLevel === 'anfaenger' ? '2' : '3') + 'x/Woche');
+      // Shift-Work Warnung
+      var wh = parseInt((s.workStart || '08:00').split(':')[0]);
+      if (wh >= 12 || wh < 5) hints.push('\u26A0 Ungewoehnliche Arbeitszeiten — pruefe ob Trainingszeiten passen');
       return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">' +
         hints.map(function(h) { return '<span style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:#111;border:1px solid #1a1a1a;border-radius:4px;color:#555;">' + h + '</span>'; }).join('') +
         '<span onclick="showPage(\'account\')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:transparent;border:1px solid #252525;border-radius:4px;color:var(--red);cursor:pointer;">AENDERN \u2192</span>' +
