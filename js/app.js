@@ -3388,9 +3388,9 @@ function generateSmartWeekPlan() {
 
   // S&C rotation: alternate between sessions A, B, C across free days
   const scSessions = [
-    { title: 'S&C A — POWER: Trap Bar DL 4×3 @85% + Weighted Pull-Ups 3×5 + Med Ball Rotational Slams 3×6 + BFR Finisher', exercises: [{id:'trap-bar-deadlift',label:'Trap Bar DL 4×3 @85%'},{id:'weighted-pull-ups',label:'Weighted Pull-Ups 3×5'},{id:'med-ball-rotational-slams',label:'Med Ball Rotational Slams 3×6 (each side)'},{id:'bfr-finisher',label:'BFR: Curls + Tricep Pushdown'}] },
-    { title: 'S&C B — EXPLOSIVE: Hang Power Clean 4×3 + Bent-Over Row 3×6 + Jump Squat 3×5 + Rotational Med Ball Chest Pass 3×6 + BFR Finisher', exercises: [{id:'hang-power-clean',label:'Hang Power Clean 4×3'},{id:'bent-over-row',label:'Bent-Over Row 3×6'},{id:'jump-squat',label:'Jump Squat 3×5'},{id:'rotational-med-ball-chest-pass',label:'Rotational Med Ball Chest Pass 3×6 (each side)'},{id:'bfr-finisher',label:'BFR: Curls + Tricep Pushdown'}] },
-    { title: 'S&C C — COMBAT STRENGTH: Landmine Press 3×5 + Single-Arm Cable Row 3×8 + Med Ball Scoop Toss 3×6 + Pallof Press w/ Rotation 3×8 + BFR Finisher', exercises: [{id:'landmine-press',label:'Landmine Press 3×5 (each arm)'},{id:'single-arm-cable-row',label:'Single-Arm Cable Row 3×8 (each arm)'},{id:'med-ball-scoop-toss',label:'Med Ball Scoop Toss 3×6'},{id:'pallof-press-rotation',label:'Pallof Press w/ Rotation 3×8 (each side)'},{id:'bfr-finisher',label:'BFR: Curls + Tricep Pushdown'}] }
+    { title: 'KRAFT A — Kreuzheben 4x3 schwer + Klimmzuege 3x5 + Medizinball-Wuerfe 3x6', exercises: [{id:'trap-bar-deadlift',label:'Kreuzheben 4x3'},{id:'weighted-pull-ups',label:'Klimmzuege 3x5'},{id:'med-ball-rotational-slams',label:'Medizinball-Wuerfe 3x6'}] },
+    { title: 'KRAFT B — Umsetzen 4x3 + Rudern 3x6 + Sprungkniebeugen 3x5 + Medizinball-Stoss 3x6', exercises: [{id:'hang-power-clean',label:'Umsetzen 4x3'},{id:'bent-over-row',label:'Rudern 3x6'},{id:'jump-squat',label:'Sprungkniebeugen 3x5'},{id:'rotational-med-ball-chest-pass',label:'Medizinball-Stoss 3x6'}] },
+    { title: 'KRAFT C — Einarm-Druecken 3x5 + Einarm-Rudern 3x8 + Medizinball-Wurf 3x6 + Rumpfstabi 3x8', exercises: [{id:'landmine-press',label:'Einarm-Druecken 3x5'},{id:'single-arm-cable-row',label:'Einarm-Rudern 3x8'},{id:'med-ball-scoop-toss',label:'Medizinball-Wurf 3x6'},{id:'pallof-press-rotation',label:'Rumpfstabi 3x8'}] }
   ];
   let scIdx = 0;
 
@@ -3419,19 +3419,19 @@ function generateSmartWeekPlan() {
     // =============================================
     if (phase === 'kampftag') {
       const fightTime = d.time || '18:00';
-      blocks.push({ time: timeBefore(fightTime, 4, 0), title: 'Letzte große Mahlzeit (KH-Loading)', type: 'meta' });
-      blocks.push({ time: timeBefore(fightTime, 1, 0), title: 'PAPE Warm-Up: Squats 3×3 → 10 Min. Ruhe → Jump Squats', type: 'strength',
+      blocks.push({ time: timeBefore(fightTime, 4, 0), title: 'Letzte grosse Mahlzeit (Reis, Nudeln, Kartoffeln)', type: 'meta' });
+      blocks.push({ time: timeBefore(fightTime, 1, 0), title: 'Aufwaermen: 3x3 Kniebeugen schwer → 10 Min. Pause → 3x3 Spruenge', type: 'strength',
         exercises: [{id:'jump-squat',label:'Jump Squats'}] });
       blocks.push({ time: timeBefore(fightTime, 0, 20), title: 'Shadow Boxing + Pratzen + Box-Breathing', type: 'boxing',
         exercises: [{id:'shadow-boxing',label:'Shadow Boxing'}] });
       blocks.push({ time: fightTime, title: '🥊 KAMPF', type: 'fight' });
-      blocks.push({ time: timeAdd(fightTime, 1, 0), title: 'Post-Kampf: Protein + KH + Elektrolyte', type: 'recovery' });
+      blocks.push({ time: timeAdd(fightTime, 1, 0), title: 'Nach dem Kampf: Eiweiss + Kohlenhydrate + Wasser mit Salz', type: 'recovery' });
 
     // =============================================
     // KAMPF-MODUS — 1–2 Tage vor Kampf
     // =============================================
     } else if (phase === 'kampfmodus') {
-      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: 'IMT — 30 Atemzüge (leicht)', type: 'meta',
+      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: 'Atemtraining — 30 tiefe Atemzuege (leicht)', type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
       blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Leichte Mobility 15 Min.', type: 'recovery',
         exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
@@ -3448,7 +3448,7 @@ function generateSmartWeekPlan() {
     // SCHÄRFEN — 3–4 Tage vor Kampf
     // =============================================
     } else if (phase === 'schaerfen') {
-      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: 'IMT — 30 Atemzüge', type: 'meta',
+      blocks.push({ time: isWeekend ? '08:00' : morningTime, title: 'Atemtraining — 30 tiefe Atemzuege', type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
 
       if (isSparringDay) {
@@ -3459,12 +3459,12 @@ function generateSmartWeekPlan() {
           blocks.push({ time: s.workStart, title: 'Arbeit', type: 'meta' });
           blocks.push({ time: s.workEnd, title: 'Feierabend', type: 'meta' });
         }
-        blocks.push({ time: timeBefore(d.time, 1, 0), title: 'Pre-Training Snack', type: 'meta' });
-        blocks.push({ time: d.time, title: 'Leichtes taktisches Sparring (−30% Volumen)', type: 'boxing' });
-        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Post-Training Essen', type: 'meta' });
+        blocks.push({ time: timeBefore(d.time, 1, 0), title: 'Snack vor dem Training (Banane, Reis oder Brot)', type: 'meta' });
+        blocks.push({ time: d.time, title: 'Leichtes Sparring — nur Taktik, weniger Runden', type: 'boxing' });
+        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Essen nach dem Training (Eiweiss + Kohlenhydrate)', type: 'meta' });
       } else if (isBoxingDay) {
         // Schärfen + Boxtag: kurze explosive Reize
-        blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Explosive Reize: 3×3 Jump Squats', type: 'strength',
+        blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: '3x3 Sprungkniebeugen (explosiv, kein Muskelversagen)', type: 'strength',
           exercises: [{id:'jump-squat',label:'Jump Squat'},{id:'explosive-pushup',label:'Explosive Pushup'}] });
         if (hasNacken) {
           blocks.push({ time: isWeekend ? '08:35' : timeAdd(morningTime, 0, 25), title: 'Nacken Isometrics 8 Min.', type: 'strength',
@@ -3472,21 +3472,21 @@ function generateSmartWeekPlan() {
         }
         if (!isWeekend) {
           blocks.push({ time: s.workStart, title: 'Arbeit', type: 'meta' });
-          blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'BET Stroop 15 Min. (leicht)', type: 'meta' });
+          blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'Gehirntraining: Farb-Reaktionstest 15 Min. (leicht)', type: 'meta' });
           blocks.push({ time: s.workEnd, title: 'Feierabend', type: 'meta' });
         }
-        blocks.push({ time: timeBefore(d.time, 1, 0), title: 'Pre-Training Snack', type: 'meta' });
+        blocks.push({ time: timeBefore(d.time, 1, 0), title: 'Snack vor dem Training (Banane, Reis oder Brot)', type: 'meta' });
         blocks.push({ time: d.time, title: trainingLabel + ' (Intensität hoch, Volumen −30%)', type: 'boxing' });
-        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Post-Training Essen', type: 'meta' });
+        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Essen nach dem Training (Eiweiss + Kohlenhydrate)', type: 'meta' });
       } else {
         // Schärfen + freier Tag: leicht, kurze explosive Reize
-        blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Kurze explosive Reize: Jump Squats 3×3 + Sprünge', type: 'strength',
+        blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: '3x3 Sprungkniebeugen + seitliche Spruenge', type: 'strength',
           exercises: [{id:'jump-squat',label:'Jump Squat'},{id:'lateral-bounds',label:'Lateral Bounds'}] });
         if (!isWeekend) {
           blocks.push({ time: s.workStart, title: 'Arbeit', type: 'meta' });
           blocks.push({ time: s.workEnd, title: 'Feierabend', type: 'meta' });
         }
-        blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Leichtes Zone 2 Cardio 20–30 Min.', type: 'cardio',
+        blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Leichtes Laufen oder Radfahren 20-30 Min. (Puls 120-140)', type: 'cardio',
           exercises: [{id:'zone2',label:'Zone 2'}] });
       }
       blocks.push({ time: isWeekend ? '17:00' : timeAdd(s.workEnd, 1, 30), title: 'Mobility / Foam Rolling 15 Min.', type: 'recovery',
@@ -3496,7 +3496,7 @@ function generateSmartWeekPlan() {
     // RECOVERY — Nach dem Kampf
     // =============================================
     } else if (phase === 'recovery') {
-      blocks.push({ time: isWeekend ? '09:00' : morningTime, title: 'IMT — 30 Atemzüge (leicht)', type: 'meta',
+      blocks.push({ time: isWeekend ? '09:00' : morningTime, title: 'Atemtraining — 30 tiefe Atemzuege (leicht)', type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
       blocks.push({ time: isWeekend ? '09:15' : timeAdd(morningTime, 0, 10), title: 'Sanfte Mobility 15 Min.', type: 'recovery',
         exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'},{id:'thoracic-rotation',label:'Thoracic Rotation'}] });
@@ -3504,67 +3504,67 @@ function generateSmartWeekPlan() {
         blocks.push({ time: s.workStart, title: 'Arbeit', type: 'meta' });
         blocks.push({ time: s.workEnd, title: 'Feierabend', type: 'meta' });
       }
-      blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Leichtes Zone 2 Cardio 20 Min. (Regeneration fördern)', type: 'cardio',
+      blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Leichtes Laufen oder Radfahren 20 Min. (Puls 120-140)', type: 'cardio',
         exercises: [{id:'zone2',label:'Zone 2'}] });
-      blocks.push({ time: isWeekend ? '16:00' : timeAdd(s.workEnd, 1, 30), title: 'Extended Mobility + Foam Rolling 20 Min.', type: 'recovery' });
-      blocks.push({ time: '21:00', title: 'Extra Protein + früh schlafen', type: 'meta' });
+      blocks.push({ time: isWeekend ? '16:00' : timeAdd(s.workEnd, 1, 30), title: 'Dehnung + Faszienrolle 20 Min.', type: 'recovery' });
+      blocks.push({ time: '21:00', title: 'Eiweiss-Snack + frueh schlafen (mind. 8h)', type: 'meta' });
 
     // =============================================
     // NORMALES TRAINING — 5+ Tage vor Kampf
     // =============================================
     } else {
       if (isSparringDay) {
-        blocks.push({ time: isWeekend ? timeBefore(d.time, 2, 0) : morningTime, title: 'IMT — 30 Atemzüge', type: 'meta',
+        blocks.push({ time: isWeekend ? timeBefore(d.time, 2, 0) : morningTime, title: 'Atemtraining — 30 tiefe Atemzuege', type: 'meta',
           exercises: [{id:'imt',label:'IMT'}] });
-        blocks.push({ time: isWeekend ? timeBefore(d.time, 1, 45) : timeAdd(morningTime, 0, 10), title: 'Leichte Mobility 10 Min. (CNS schonen)', type: 'recovery',
+        blocks.push({ time: isWeekend ? timeBefore(d.time, 1, 45) : timeAdd(morningTime, 0, 10), title: 'Leichte Dehnung 10 Min. (kein schweres Training vor Sparring)', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'thoracic-rotation',label:'Thoracic Rotation'}] });
         if (!isWeekend) {
-          blocks.push({ time: timeBefore(s.workStart, 0, 15), title: 'Zur Arbeit (Fahrrad = Zone 2)', type: 'cardio',
+          blocks.push({ time: timeBefore(s.workStart, 0, 15), title: 'Zone 2 Cardio zum Pendeln (Rad, Laufen oder Spaziergang)', type: 'cardio',
             exercises: [{id:'zone2',label:'Zone 2'}] });
           blocks.push({ time: s.workStart, title: 'Arbeit', type: 'meta' });
           blocks.push({ time: s.workEnd, title: 'Feierabend', type: 'meta' });
         }
-        blocks.push({ time: timeBefore(d.time, 1, 0), title: 'Pre-Training Snack (extra Carbs)', type: 'meta' });
+        blocks.push({ time: timeBefore(d.time, 1, 0), title: 'Snack vor dem Training (Banane, Reis, Brot)', type: 'meta' });
         blocks.push({ time: d.time, title: 'Sparring', type: 'boxing' });
-        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Post-Sparring Essen (extra Protein)', type: 'recovery' });
-        blocks.push({ time: timeAdd(d.time, 2, 30), title: 'Erweiterte Mobility + Foam Rolling 20 Min.', type: 'recovery',
+        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Essen nach dem Sparring (Eiweiss + Kohlenhydrate)', type: 'recovery' });
+        blocks.push({ time: timeAdd(d.time, 2, 30), title: 'Dehnung + Faszienrolle 20 Min.', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'ankle-mobility',label:'Ankle Mobility'}] });
 
       } else if (isBoxingDay) {
-        blocks.push({ time: morningTime, title: 'IMT — 30 Atemzüge', type: 'meta',
+        blocks.push({ time: morningTime, title: 'Atemtraining — 30 tiefe Atemzuege', type: 'meta',
           exercises: [{id:'imt',label:'IMT'}] });
         const nackenEx = hasNacken ? [{id:'iso-nacken',label:'Iso Nacken'},{id:'nacken-flexion',label:'Nacken Flexion'}] : [];
-        const scTitle = hasNacken ? 'Overcoming Isometrics + Nacken (~20 Min.)' : 'Overcoming Isometrics (~15 Min.)';
+        const scTitle = hasNacken ? 'Maximales Druecken gegen Wand/Stange + Nackentraining (~20 Min.)' : 'Maximales Druecken gegen Wand/Stange (~15 Min.)';
         blocks.push({ time: timeAdd(morningTime, 0, 10), title: scTitle, type: 'strength',
           exercises: [{id:'overcoming-iso',label:'Overcoming Iso'}, ...nackenEx] });
         if (!isWeekend) {
-          blocks.push({ time: timeBefore(s.workStart, 0, 15), title: 'Zur Arbeit (Fahrrad = Zone 2)', type: 'cardio',
+          blocks.push({ time: timeBefore(s.workStart, 0, 15), title: 'Zone 2 Cardio zum Pendeln (Rad, Laufen oder Spaziergang)', type: 'cardio',
             exercises: [{id:'zone2',label:'Zone 2'}] });
           blocks.push({ time: s.workStart, title: 'Arbeit', type: 'meta' });
-          blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'BET Stroop 20 Min. + IMT', type: 'meta',
+          blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'Gehirntraining: Farb-Reaktionstest 20 Min.', type: 'meta',
             exercises: [{id:'imt',label:'IMT'}] });
           blocks.push({ time: s.workEnd, title: 'Feierabend', type: 'meta' });
         }
-        blocks.push({ time: timeBefore(d.time, 1, 0), title: 'Pre-Training Snack', type: 'meta' });
+        blocks.push({ time: timeBefore(d.time, 1, 0), title: 'Snack vor dem Training (Banane, Reis oder Brot)', type: 'meta' });
         blocks.push({ time: d.time, title: trainingLabel, type: 'boxing' });
-        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Post-Training Essen', type: 'meta' });
+        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Essen nach dem Training (Eiweiss + Kohlenhydrate)', type: 'meta' });
         blocks.push({ time: timeAdd(d.time, 2, 30), title: 'Mobility / Foam Rolling 10 Min.', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'}] });
 
       } else if (isFreeDay) {
-        blocks.push({ time: isWeekend ? '08:00' : morningTime, title: 'IMT — 30 Atemzüge', type: 'meta',
+        blocks.push({ time: isWeekend ? '08:00' : morningTime, title: 'Atemtraining — 30 tiefe Atemzuege', type: 'meta',
           exercises: [{id:'imt',label:'IMT'}] });
 
         if (nextIsSparring) {
           blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Leichte Mobility 15 Min. (morgen Sparring!)', type: 'recovery',
             exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'},{id:'ankle-mobility',label:'Ankle Mobility'}] });
           if (!isWeekend) {
-            blocks.push({ time: timeBefore(s.workStart, 0, 15), title: 'Zur Arbeit (Fahrrad = Zone 2)', type: 'cardio',
+            blocks.push({ time: timeBefore(s.workStart, 0, 15), title: 'Zone 2 Cardio zum Pendeln (Rad, Laufen oder Spaziergang)', type: 'cardio',
               exercises: [{id:'zone2',label:'Zone 2'}] });
             blocks.push({ time: s.workStart, title: 'Arbeit', type: 'meta' });
             blocks.push({ time: s.workEnd, title: 'Feierabend', type: 'meta' });
           }
-          blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Spaziergang 30 Min.', type: 'cardio',
+          blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Lockerer Spaziergang 30 Min.', type: 'cardio',
             exercises: [{id:'zone2',label:'Zone 2'}] });
         } else {
           // Normaler freier Tag: schweres S&C
@@ -3572,21 +3572,21 @@ function generateSmartWeekPlan() {
           scIdx++;
           const scTime = isWeekend ? '08:15' : timeAdd(morningTime, 0, 10);
           blocks.push({ time: scTime, title: sc.title, type: 'strength', exercises: sc.exercises });
-          blocks.push({ time: timeAdd(scTime, 0, 40), title: 'BFR Finisher: Curls + Trizep', type: 'strength',
+          blocks.push({ time: timeAdd(scTime, 0, 40), title: 'Arm-Finisher: Bizeps + Trizeps (3x15 leicht)', type: 'strength',
             exercises: [{id:'bfr',label:'BFR'}] });
           if (hasNacken) {
             blocks.push({ time: timeAdd(scTime, 0, 50), title: 'Nackentraining 10 Min.', type: 'strength',
               exercises: [{id:'iso-nacken',label:'Iso Nacken'},{id:'nacken-flexion',label:'Nacken Flexion'}] });
           }
           if (!isWeekend) {
-            blocks.push({ time: timeBefore(s.workStart, 0, 15), title: 'Zur Arbeit (Fahrrad = Zone 2)', type: 'cardio',
+            blocks.push({ time: timeBefore(s.workStart, 0, 15), title: 'Zone 2 Cardio zum Pendeln (Rad, Laufen oder Spaziergang)', type: 'cardio',
               exercises: [{id:'zone2',label:'Zone 2'}] });
             blocks.push({ time: s.workStart, title: 'Arbeit', type: 'meta' });
-            blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'BET Stroop 20 Min. + IMT', type: 'meta',
+            blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'Gehirntraining: Farb-Reaktionstest 20 Min.', type: 'meta',
               exercises: [{id:'imt',label:'IMT'}] });
             blocks.push({ time: s.workEnd, title: 'Feierabend', type: 'meta' });
           }
-          blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 30–45 Min.', type: 'cardio',
+          blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Lockeres Laufen oder Radfahren 30-45 Min. (Puls 120-140)', type: 'cardio',
             exercises: [{id:'zone2',label:'Zone 2'}] });
         }
 
@@ -4080,44 +4080,44 @@ function buildDailyRoutineHTML() {
 
   if (isSparringDay) {
     // === SPARRING TAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'IMT — 30 Atemzüge', color: 'var(--red)' });
-    routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Leichte Mobility 10 Min. (CNS schonen!)', color: 'var(--purple)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'Atemtraining — 30 tiefe Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Leichte Dehnung 10 Min. (kein schweres Training vor Sparring)', color: 'var(--purple)' });
     if (!isWeekend) {
-      routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zur Arbeit (Fahrrad = Zone 2)', color: 'var(--green)' });
+      routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zone 2 Pendeln (Rad, Laufen oder Spaziergang)', color: 'var(--green)' });
       routine.push({ time: today.workStart, label: 'Arbeit', color: '#555' });
-      routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'Optional: Leichtes BET Stroop 10 Min.', color: 'var(--gold)' });
+      routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'Optional: Gehirntraining Farb-Reaktionstest 10 Min.', color: 'var(--gold)' });
       routine.push({ time: today.workEnd, label: 'Feierabend', color: '#555' });
     }
-    routine.push({ time: timeBefore(today.time, 1, 0), label: 'Pre-Training Snack', color: 'var(--green)' });
+    routine.push({ time: timeBefore(today.time, 1, 0), label: 'Snack vor dem Training (Banane, Reis oder Brot)', color: 'var(--green)' });
     routine.push({ time: today.time, label: 'Sparring', color: 'var(--red)' });
-    routine.push({ time: timeAdd(today.time, 1, 30), label: 'Post-Sparring Essen (extra Protein)', color: 'var(--green)' });
+    routine.push({ time: timeAdd(today.time, 1, 30), label: 'Essen nach dem Sparring (Eiweiss + Kohlenhydrate)', color: 'var(--green)' });
     routine.push({ time: timeAdd(today.time, 2, 30), label: 'Erweiterte Mobility + Foam Rolling 20 Min.', color: 'var(--purple)' });
     warnings.push('Sparring-Tag: Kein schweres S&C heute. CNS-Erholung priorisieren!');
 
   } else if (isBoxingDay) {
     // === BOXTAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'IMT — 30 Atemzüge', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'Atemtraining — 30 tiefe Atemzuege', color: 'var(--red)' });
     routine.push({ time: timeAdd(wakeTime, 0, 15), label: 'Leichte Isometrics + Nackentraining (~20 Min.)', color: 'var(--red)' });
     if (!isWeekend) {
-      routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zur Arbeit (Fahrrad = Zone 2)', color: 'var(--green)' });
+      routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zone 2 Pendeln (Rad, Laufen oder Spaziergang)', color: 'var(--green)' });
       routine.push({ time: today.workStart, label: 'Arbeit', color: '#555' });
-      routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'BET Stroop-Training 20 Min. + IMT', color: 'var(--gold)' });
+      routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'Gehirntraining: Farb-Reaktionstest 20 Min.', color: 'var(--gold)' });
       routine.push({ time: today.workEnd, label: 'Feierabend', color: '#555' });
     }
-    routine.push({ time: timeBefore(today.time, 1, 0), label: 'Pre-Training Snack', color: 'var(--green)' });
+    routine.push({ time: timeBefore(today.time, 1, 0), label: 'Snack vor dem Training (Banane, Reis oder Brot)', color: 'var(--green)' });
     routine.push({ time: today.time, label: typeLabel, color: 'var(--red)' });
-    routine.push({ time: timeAdd(today.time, 1, 30), label: 'Post-Training Essen', color: 'var(--green)' });
+    routine.push({ time: timeAdd(today.time, 1, 30), label: 'Essen nach dem Training (Eiweiss + Kohlenhydrate)', color: 'var(--green)' });
     routine.push({ time: timeAdd(today.time, 2, 30), label: 'Mobility / Foam Rolling 10 Min.', color: 'var(--purple)' });
 
   } else if (isFreeDay) {
     // === FREIER TAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'IMT — 30 Atemzüge', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: 'Atemtraining — 30 tiefe Atemzuege', color: 'var(--red)' });
 
     if (tomorrowIsSparring) {
       // Tag vor Sparring: leicht halten!
       routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Leichte Mobility + Dehnen 15 Min. (morgen Sparring!)', color: 'var(--purple)' });
       if (!isWeekend) {
-        routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zur Arbeit (Fahrrad = Zone 2)', color: 'var(--green)' });
+        routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zone 2 Pendeln (Rad, Laufen oder Spaziergang)', color: 'var(--green)' });
         routine.push({ time: today.workStart, label: 'Arbeit', color: '#555' });
         routine.push({ time: today.workEnd, label: 'Feierabend', color: '#555' });
       }
@@ -4127,12 +4127,12 @@ function buildDailyRoutineHTML() {
       // Normaler freier Tag: S&C erlaubt
       const scTime = timeAdd(wakeTime, 0, 20);
       routine.push({ time: scTime, label: 'S&C: Power / Explosive / Combat Strength (Rotation)', color: 'var(--red)' });
-      routine.push({ time: timeAdd(scTime, 0, 40), label: 'BFR Finisher (Arme / Beine)', color: 'var(--red)' });
+      routine.push({ time: timeAdd(scTime, 0, 40), label: 'Arm-Finisher: Bizeps + Trizeps (3x15 leicht)', color: 'var(--red)' });
       routine.push({ time: timeAdd(scTime, 0, 50), label: 'Nackentraining 10 Min.', color: 'var(--red)' });
       if (!isWeekend) {
-        routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zur Arbeit (Fahrrad = Zone 2)', color: 'var(--green)' });
+        routine.push({ time: timeBefore(today.workStart, 0, 15), label: 'Zone 2 Pendeln (Rad, Laufen oder Spaziergang)', color: 'var(--green)' });
         routine.push({ time: today.workStart, label: 'Arbeit', color: '#555' });
-        routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'BET Stroop-Training 20 Min. + IMT', color: 'var(--gold)' });
+        routine.push({ time: timeAdd(lunchTime, 0, 25), label: 'Gehirntraining: Farb-Reaktionstest 20 Min.', color: 'var(--gold)' });
         routine.push({ time: today.workEnd, label: 'Feierabend', color: '#555' });
       }
       routine.push({ time: isWeekend ? '14:00' : timeAdd(today.workEnd, 0, 30), label: 'Zone 2 Cardio 30–45 Min. (Laufen / Rad)', color: 'var(--green)' });
@@ -4163,7 +4163,7 @@ function buildDailyRoutineHTML() {
 
   // Tomorrow sparring warning (general)
   if (tomorrowIsSparring && !isFreeDay) {
-    warnings.push('Morgen ist Sparring-Tag — heute CNS schonen und früh schlafen!');
+    warnings.push('Morgen ist Sparring-Tag — heute kein schweres Training und frueh schlafen!');
   }
 
   // Sort by time
