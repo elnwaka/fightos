@@ -2404,14 +2404,13 @@ function markNow(idx) {
   var data = getData();
   if (!data || !data.fights[idx]) return;
   if (!data.fights[idx].timestamps) data.fights[idx].timestamps = [];
-  data.fights[idx].timestamps.push({ time: sec, text: '', tag: 'sonstiges', created: new Date().toISOString() });
+  var newId = Date.now().toString(36);
+  data.fights[idx].timestamps.push({ id: newId, time: sec, text: '', tag: 'sonstiges', created: new Date().toISOString() });
   saveData(data);
-  _tsCurrentFightIdx = idx;
   renderTimestampList(idx);
-  // Focus the new marker's text for immediate typing
+  // Focus the new marker by its unique id
   setTimeout(function() {
-    var newIdx = data.fights[idx].timestamps.length - 1;
-    var el = document.getElementById('ts-text-' + newIdx);
+    var el = document.getElementById('ts-text-' + newId);
     if (el) el.focus();
   }, 50);
 }
@@ -2424,10 +2423,12 @@ function updateTimestampText(idx, tsIdx, value) {
   data.fights[idx].timestamps[tsIdx].tag = autoDetectTag(value);
   saveData(data);
   // Update border color live
-  var el = document.getElementById('ts-item-' + tsIdx);
-  if (el) el.style.borderLeftColor = _tsTagColors[data.fights[idx].timestamps[tsIdx].tag] || '#555';
-  var timeEl = document.getElementById('ts-time-' + tsIdx);
-  if (timeEl) timeEl.style.color = _tsTagColors[data.fights[idx].timestamps[tsIdx].tag] || '#555';
+  var mid = data.fights[idx].timestamps[tsIdx].id || tsIdx;
+  var newColor = _tsTagColors[data.fights[idx].timestamps[tsIdx].tag] || '#555';
+  var el = document.getElementById('ts-item-' + mid);
+  if (el) el.style.borderLeftColor = newColor;
+  var timeEl = document.getElementById('ts-time-' + mid);
+  if (timeEl) timeEl.style.color = newColor;
 }
 
 function deleteTimestamp(idx, tsIdx) {
@@ -2453,10 +2454,11 @@ function renderTimestampList(idx) {
   }
 
   el.innerHTML = markers.map(function(m, mi) {
+    var mid = m.id || mi;
     var tagColor = _tsTagColors[m.tag] || '#555';
-    return '<div id="ts-item-' + mi + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
-      '<span id="ts-time-' + mi + '" onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;">' + formatTs(m.time) + '</span>' +
-      '<input id="ts-text-' + mi + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '" placeholder="Beschreibung..." ' +
+    return '<div id="ts-item-' + mid + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
+      '<span id="ts-time-' + mid + '" onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;">' + formatTs(m.time) + '</span>' +
+      '<input id="ts-text-' + mid + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '" placeholder="Beschreibung..." ' +
         'onblur="updateTimestampText(' + idx + ',' + mi + ',this.value)" ' +
         'onkeydown="if(event.key===\'Enter\')this.blur()" ' +
         'style="flex:1;padding:4px 6px;background:transparent;border:none;border-bottom:1px solid #111;color:#aaa;font-family:\'DM Sans\',sans-serif;font-size:12px;outline:none;min-width:0;">' +
