@@ -3096,8 +3096,9 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .form-row, .form-row.triple { flex-direction: column; grid-template-columns: 1fr; }
 
   /* --- Pages --- */
-  .page { padding: 20px 14px; }
+  .page { padding: 16px 12px; padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
   .page-title { font-size: clamp(28px, 6vw, 40px); }
+  .account-wrap { max-width: 100%; }
 
   /* Wochenplan Mobile — vertikal stapeln */
   .week-grid,
@@ -3201,59 +3202,115 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
 
   /* --- Navigation --- */
   .topbar-logo { font-size: 20px; }
-  .nav-btn, .nav-hub-btn { font-size: 10px; padding: 0 6px; }
   .topbar { padding: 6px 10px; }
-  .search-input { width: 100px; }
+  .search-input { width: 80px; font-size: 12px; }
   .search-input:focus { width: 140px; }
-  .search-results { width: 260px; }
+  .search-results { width: calc(100vw - 20px); max-width: 300px; left: 10px; right: 10px; }
 
-  /* --- Stats --- */
-  .stat-num { font-size: 36px; }
+  /* --- Page & Typography --- */
+  .page { padding: 12px 10px; padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+  .page-title { font-size: clamp(24px, 7vw, 36px); }
+  .page-sub { font-size: 11px; }
+  .rpg-name { font-size: 28px; }
 
-  /* --- Mental --- */
-  .mt-daily { grid-template-columns: 1fr; }
-  .mt-acc-sub { display: none; }
-
-  /* --- Smaller paddings --- */
-  .page { padding: 14px 10px; }
+  /* --- Cards & Spacing --- */
   .card { padding: 12px 0; }
-  .prog-section { padding: 18px; }
-  .calc-box { padding: 18px; }
-  .log-form-card { padding: 18px; }
-  .modal { padding: 20px; }
-  .fight-countdown { padding: 18px; }
-  .ob-container { padding: 24px 16px 20px; margin: 8px; }
-
-  /* --- RPG name --- */
-  .rpg-name { font-size: 32px; }
-
-  /* --- Phase cycle --- */
-  .phase-cycle { grid-template-columns: 1fr; }
-  .phase-block { padding: 16px; }
-
-  /* --- Grid refinements --- */
+  .grid-2, .grid-3, .grid-4 { gap: 10px; }
   .grid-4 { grid-template-columns: 1fr; }
-  .calc-results { grid-template-columns: 1fr; }
+  .calc-results { grid-template-columns: 1fr 1fr; }
 
-  /* --- Säulen further reduction --- */
+  /* --- Dashboard --- */
+  .dash-hero { padding: 16px 0; gap: 12px; }
+  .dash-heute { gap: 10px; }
+  .dash-heute-side .card { padding: 12px !important; }
+  .dash-bottom-grid { gap: 10px; }
+  .dash-profil { padding: 14px; gap: 12px; }
+  #rpg-radar { max-width: 200px; }
+
+  /* --- Forms --- */
+  .form-input, .form-select { padding: 10px 12px; font-size: 13px; }
+  .prog-section { padding: 14px; }
+  .calc-box { padding: 14px; }
+  .log-form-card { padding: 14px; }
+  .modal { padding: 16px; }
+  .auth-box { padding: 24px 16px; }
+  .ob-container { padding: 20px 12px 16px; margin: 4px; }
+
+  /* --- Tests --- */
+  .tests-hero { padding: 14px; gap: 14px; }
+  .test-card-value { font-size: 28px; }
+  .stat-num { font-size: 32px; }
+
+  /* --- Wochenplan --- */
+  .week-grid { gap: 2px; }
+  .day-col.day-active .day-header { padding: 10px 10px 8px; }
+  .day-col.day-active .day-name { font-size: 18px; }
+  .day-col.day-active .day-blocks { padding: 6px 8px; }
+  .day-block { font-size: 10px; padding: 4px 6px; }
+  .day-col.day-active .day-block { font-size: 11px; padding: 6px 8px; }
+  .week-controls { gap: 4px; }
+  .wk-btn { font-size: 10px; padding: 4px 8px; }
+
+  /* --- Säulen Intro --- */
+  .si-slide { padding: 24px 16px; }
+  .si-num { font-size: 80px; }
+  .si-title { font-size: clamp(20px, 6vw, 32px); margin-top: -12px; }
+  .si-body { font-size: 13px; margin-top: 14px; }
+  .si-why { font-size: 10px; }
+  .si-reason { font-size: 12px; }
+  .si-btn { padding: 14px 32px; font-size: 16px; letter-spacing: 1px; }
   .si-clusters { grid-template-columns: 1fr; }
   .si-barrel-stave span { font-size: 6px; }
 
   /* --- Account --- */
   .account-grid { grid-template-columns: 1fr; }
+  .account-wrap { max-width: 100%; }
 
-  /* --- Tests --- */
-  .test-card-value { font-size: 32px; }
+  /* --- Mental --- */
+  .mt-daily { grid-template-columns: 1fr; }
+  .mt-acc-sub { display: none; }
+
+  /* --- Phases --- */
+  .phase-cycle { grid-template-columns: 1fr; }
+  .phase-block { padding: 12px; }
+  .fight-countdown { padding: 14px; }
 
   /* --- Exercise detail --- */
-  .ex-detail-title { font-size: 28px; }
-
-  /* --- Wochenplan --- */
-  .week-controls { gap: 6px; }
-  .wk-btn { font-size: 11px; padding: 6px 10px; }
+  .ex-detail-title { font-size: 24px; }
 
   /* --- Log entries --- */
-  .log-entry-card { padding: 14px; gap: 12px; }
-  .log-entry-date { font-size: 24px; }
+  .log-entry-card { padding: 10px; gap: 10px; }
+  .log-entry-date { font-size: 20px; }
+
+  /* --- Bottom Bar Spacing --- */
+  .bottom-bar { padding: 2px 0 calc(2px + env(safe-area-inset-bottom, 0px)); }
+  .btab { padding: 4px 8px; font-size: 8px; }
+  .btab svg { width: 20px; height: 20px; }
+
+  /* --- Data tables --- */
+  .data-table { min-width: auto; font-size: 11px; }
+  .data-table td, .data-table th { padding: 6px 4px; }
+}
+
+/* ===== RESPONSIVE: SMALL MOBILE (max-width: 360px) ===== */
+@media (max-width: 360px) {
+  .page { padding: 10px 8px; }
+  .page-title { font-size: 22px; }
+  .rpg-name { font-size: 24px; }
+  .topbar-logo { font-size: 18px; }
+  .search-input { width: 60px; }
+  .search-input:focus { width: 100px; }
+  .modal { padding: 12px; }
+  .auth-box { padding: 16px 12px; }
+  .si-slide { padding: 16px 12px; }
+  .si-num { font-size: 60px; }
+  .si-title { font-size: 18px; }
+  .si-body { font-size: 12px; }
+  .si-btn { padding: 12px 24px; font-size: 14px; }
+  .tests-hero { padding: 10px; gap: 10px; }
+  .dash-profil { padding: 10px; }
+  #rpg-radar { max-width: 160px; }
+  .btab span { font-size: 7px; }
+  .form-input, .form-select { padding: 8px 10px; font-size: 12px; }
 }
 
