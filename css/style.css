@@ -1318,8 +1318,23 @@ body::before {
 }
 .block-check-btn:hover { border-color: var(--green); color: var(--green); }
 .block-check-btn.checked { border-color: var(--green); background: var(--green); color: var(--black); font-weight: 700; }
-.day-col.day-today { border-color: rgba(245,197,24,.6); box-shadow: 0 0 20px rgba(245,197,24,.08); }
-.day-col.day-today .day-header { background: rgba(245,197,24,.12); }
+.day-col.day-today {
+  border-color: rgba(245,197,24,.7);
+  box-shadow: 0 0 24px rgba(245,197,24,.12);
+  grid-row: span 1;
+  min-height: 320px;
+}
+.day-col.day-today .day-header {
+  background: rgba(245,197,24,.15);
+  padding: 14px 12px 10px;
+}
+.day-col.day-today .day-name {
+  font-size: 22px;
+}
+.day-col.day-today .day-block {
+  font-size: 12px;
+  padding: 8px 10px;
+}
 .ex-chip {
   display: inline-block;
   font-family: 'Space Mono', monospace;
