@@ -3791,7 +3791,7 @@ function renderWeekPlan() {
         }).join('') +
       '</div>';
     })()}
-    <div class="week-grid">
+    <div class="week-grid" data-active="${todayDow}">
       ${DAY_NAMES.map((day, di) => {
         const blocks = plan[day] || [];
         const dp = dayPhases[day];
@@ -3807,7 +3807,7 @@ function renderWeekPlan() {
           return '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + saeulenColors8[si] + ';"></span>';
         }).join('');
 
-        return `<div class="day-col${isToday ? ' day-today' : ''}">
+        return `<div class="day-col${isToday ? ' day-today day-active' : ''}">
           <div class="day-header" onclick="toggleDayCol(this)">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--gold);">HEUTE</span>' : ''}</div>
@@ -3862,7 +3862,14 @@ function regenerateWeekPlan() {
 
 function toggleDayCol(el) {
   var col = el.closest('.day-col');
-  if (col) col.classList.toggle('day-expanded');
+  var grid = el.closest('.week-grid');
+  if (!col || !grid) return;
+  var cols = grid.querySelectorAll('.day-col');
+  var idx = Array.prototype.indexOf.call(cols, col);
+  // Remove active from all, set on clicked
+  cols.forEach(function(c) { c.classList.remove('day-active'); });
+  col.classList.add('day-active');
+  grid.setAttribute('data-active', idx);
 }
 
 function editBlock(day, idx) {
