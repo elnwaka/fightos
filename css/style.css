@@ -139,6 +139,64 @@ body {
 .si-btn:active { transform:scale(.97); }
 @keyframes siBounce { 0%,100% { transform:translateX(-50%) translateY(0); } 50% { transform:translateX(-50%) translateY(12px); } }
 
+/* ===== NATIVE APP FEEL ===== */
+
+/* Bottom Tab Bar (Mobile) */
+.bottom-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 400;
+  background: var(--black);
+  border-top: 1px solid #1a1a1a;
+  padding: 4px 0 calc(4px + env(safe-area-inset-bottom, 0px));
+  justify-content: space-around;
+}
+.btab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: #555;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btab.active { color: var(--red); }
+.btab svg { transition: transform .15s; }
+.btab:active svg { transform: scale(.85); }
+[data-theme="light"] .bottom-bar { background: #FFF; border-top-color: #E0E0E0; }
+
+/* Safe Area Insets */
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.topbar {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* No overscroll bounce */
+html, body { overscroll-behavior: none; }
+html { -webkit-overflow-scrolling: touch; }
+
+/* Touch feedback — press effect on all interactive elements */
+button, .card, .day-block, .nav-btn, .nav-drop-item, .btab, .submit-btn, .log-entry-card {
+  -webkit-tap-highlight-color: transparent;
+}
+button:active, .submit-btn:active { transform: scale(.97); transition-duration: .05s; }
+
+/* Larger touch targets */
+.nav-btn, .nav-hub-btn, .nav-drop-item { min-height: 44px; display: inline-flex; align-items: center; }
+
 /* Noise overlay */
 body::before {
   content: '';
@@ -3008,13 +3066,16 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
 /* ===== RESPONSIVE: TABLET (max-width: 768px) ===== */
 @media (max-width: 768px) {
 
+  /* --- Bottom Tab Bar --- */
+  .bottom-bar { display: flex; }
+  .page { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+
   /* --- Navigation --- */
-  .topbar { flex-wrap: wrap; height: auto; padding: 8px 16px; gap: 4px; }
-  .topbar-nav { order: 3; width: 100%; padding-top: 4px; border-top: 1px solid #1a1a1a; flex-wrap: wrap; }
-  .nav-hub-btn, .nav-btn { font-size: 11px; height: 40px; padding: 0 8px; }
-  .nav-drop { position: fixed; left: 0; right: 0; top: auto; border-radius: 0; }
-  .topbar-right { gap: 8px; }
+  .topbar { flex-wrap: nowrap; height: auto; padding: 8px 12px; gap: 4px; }
+  .topbar-nav { display: none; }
+  .topbar-right { gap: 6px; }
   .share-pill { display: none; }
+  .user-pill { display: none; }
   .search-input { width: 120px; }
   .search-input:focus { width: 180px; }
   .search-results { width: 300px; }

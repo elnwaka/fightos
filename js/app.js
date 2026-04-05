@@ -718,6 +718,13 @@ function showPage(pageId) {
   if (document.activeElement && document.activeElement.tagName !== 'BODY') {
     document.activeElement.blur();
   }
+  // Bottom tab bar highlight
+  document.querySelectorAll('.btab').forEach(function(b) { b.classList.remove('active'); });
+  var btabPage = navPage;
+  if (['wochenplan','uebungen','log','periodisierung','uebung-detail','block-detail'].indexOf(pageId) !== -1) btabPage = 'wochenplan';
+  if (['fights','fight-detail'].indexOf(pageId) !== -1) btabPage = 'fights';
+  var activeTab = document.querySelector('.btab[data-page="' + btabPage + '"]');
+  if (activeTab) activeTab.classList.add('active');
   // Scroll reveal on new page
   setTimeout(applyRevealToPage, 100);
   // Update URL hash
