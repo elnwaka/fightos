@@ -3480,9 +3480,9 @@ function generateSmartWeekPlan() {
 
   // S&C rotation: alternate between sessions A, B, C across free days
   const scSessions = [
-    { title: 'S&C A — POWER: Trap Bar DL 4x3 @85% + Pull-Ups 3x5 + Med Ball Slams 3x6', hint: 'Schweres Kreuzheben + Klimmzuege + explosive Medizinball-Wuerfe', exercises: [{id:'trap-bar-deadlift',label:'Trap Bar DL 4x3'},{id:'weighted-pull-ups',label:'Pull-Ups 3x5'},{id:'med-ball-rotational-slams',label:'Med Ball Slams 3x6'}] },
-    { title: 'S&C B — EXPLOSIVE: Power Clean 4x3 + Row 3x6 + Jump Squat 3x5', hint: 'Umsetzen + Rudern + Sprungkniebeugen + Medizinball-Stoss', exercises: [{id:'hang-power-clean',label:'Power Clean 4x3'},{id:'bent-over-row',label:'Row 3x6'},{id:'jump-squat',label:'Jump Squat 3x5'},{id:'rotational-med-ball-chest-pass',label:'Med Ball Pass 3x6'}] },
-    { title: 'S&C C — COMBAT: Landmine Press 3x5 + Cable Row 3x8 + Pallof Press 3x8', hint: 'Einarm-Druecken + Einarm-Rudern + Rumpfstabilitaet', exercises: [{id:'landmine-press',label:'Landmine Press 3x5'},{id:'single-arm-cable-row',label:'Cable Row 3x8'},{id:'med-ball-scoop-toss',label:'Med Ball Toss 3x6'},{id:'pallof-press-rotation',label:'Pallof Press 3x8'}] }
+    { title: 'S&C A — POWER: Trap Bar DL ' + dlIntensity + ' + Pull-Ups 3x5 + Med Ball Slams 3x6', hint: dlHint + ' + Face Pulls 3x15 als Warm-up', exercises: [{id:'trap-bar-deadlift',label:'Trap Bar DL'},{id:'weighted-pull-ups',label:'Pull-Ups 3x5'},{id:'med-ball-rotational-slams',label:'Med Ball Slams 3x6'}] },
+    { title: 'S&C B — EXPLOSIVE: Power Clean 4x3 + Row 3x6 + Jump Squat 3x5 (' + Math.round(bw*0.35) + 'kg)', hint: 'Jump Squat Gewicht: 30-40% KG = ' + Math.round(bw*0.3) + '-' + Math.round(bw*0.4) + 'kg + Face Pulls 3x15', exercises: [{id:'hang-power-clean',label:'Power Clean 4x3'},{id:'bent-over-row',label:'Row 3x6'},{id:'jump-squat',label:'Jump Squat 3x5'}] },
+    { title: 'S&C C — COMBAT: Landmine Press 3x5 + Cable Row 3x8 + Pallof Press 3x8', hint: 'Einarm-Druecken + Rudern + Rumpfstabi + Face Pulls 3x15', exercises: [{id:'landmine-press',label:'Landmine Press 3x5'},{id:'single-arm-cable-row',label:'Cable Row 3x8'},{id:'pallof-press-rotation',label:'Pallof Press 3x8'}] }
   ];
   let scIdx = 0;
 
@@ -3490,6 +3490,20 @@ function generateSmartWeekPlan() {
     pa: 'Partnerarbeit', pratzen: 'Pratzenarbeit', sparring: 'Sparring',
     technik: 'Techniktraining', boxen: 'Boxtraining', cardio: 'Cardio'
   };
+
+  // Erfahrungslevel-Anpassung
+  var expLevel = s.experienceLevel || 'fortgeschritten';
+  var bw = parseInt(s.weight) || 75;
+  // Cardio-Dauer basierend auf Fitness
+  var cardioMin = expLevel === 'anfaenger' ? 20 : 35;
+  var cardioMax = expLevel === 'anfaenger' ? 30 : 50;
+  var cardioLabel = cardioMin + '-' + cardioMax + ' Min.';
+  // S&C Intensität
+  var dlIntensity = expLevel === 'anfaenger' ? '4x5 @70%' : '4x3 @85%';
+  var dlHint = expLevel === 'anfaenger' ? 'Technik lernen, Gewicht langsam steigern' : 'Schwer, aber sauber — kein Muskelversagen';
+  // HIIT-Fähigkeit
+  var canHIIT = expLevel !== 'anfaenger';
+  var hiitCount = 0; // max 2x/Woche
 
   DAY_NAMES.forEach((day, di) => {
     const d = ws[day] || { time: null, type: 'frei' };
@@ -3546,7 +3560,7 @@ function generateSmartWeekPlan() {
       } else if (isBoxingDay) {
         blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Explosive Reize: 3x3 Jump Squats', hint: 'Nervensystem aktivieren — kein Muskelversagen!', type: 'strength',
           exercises: [{id:'jump-squat',label:'Jump Squat'}] });
-        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Warm-up: Seil + Mobility', type: 'boxing' });
+        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Warm-up: Seil + Mobility + Face Pulls 3x15', hint: '3 Min. Seil, Schulterkreise, Face Pulls mit Band, 1 Runde Shadow Boxing', type: 'boxing' });
         blocks.push({ time: d.time, title: trainingLabel + ' (hohe Intensitaet)', hint: 'Volumen reduziert, Schaerfe und Timing schleifen', type: 'boxing' });
       } else {
         blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Explosive Reize: Jump Squats + Lateral Bounds', hint: 'Kurz und knackig — Nervensystem wach halten', type: 'strength',
@@ -3599,7 +3613,7 @@ function generateSmartWeekPlan() {
         else boxHint = 'Warm-up → Sandsack/Pratzen → Sparring-Simulation → Cool-down';
         blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Warm-up: Seilspringen + Mobility', hint: '3 Min. Seil, Schulterkreise, Hueftmobilisation, 1 Runde Shadow Boxing', type: 'boxing' });
         blocks.push({ time: d.time, title: trainingLabel, hint: boxHint, type: 'boxing' });
-        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Dehnung 10 Min.', hint: 'Statisches Stretching: Hueftbeuger, Schultern, Handgelenke', type: 'recovery',
+        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Dehnung + Handpflege 10 Min.', hint: 'Stretching: Hueftbeuger, Schultern + Handgelenke kreisen, Finger dehnen', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'}] });
 
       } else if (isFreeDay) {
@@ -3619,8 +3633,14 @@ function generateSmartWeekPlan() {
             blocks.push({ time: timeAdd(scTime, 0, 45), title: 'Nackentraining 10 Min.', hint: 'Isometrisch: Stirn, Hinterkopf, Seiten — je 3x10 Sek. halten', type: 'strength',
               exercises: [{id:'iso-nacken',label:'Iso Nacken'},{id:'nacken-flexion',label:'Nacken Flexion'}] });
           }
-          blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 30-45 Min.', hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140', type: 'cardio',
-            exercises: [{id:'zone2',label:'Zone 2'}] });
+          if (canHIIT && hiitCount < 2) {
+            hiitCount++;
+            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'HIIT 4x4 Protokoll + Zone 2 Cool-down', hint: '4x4 Min. bei 90-95% Puls, 3 Min. Pause dazwischen, danach 10 Min. locker auslaufen', type: 'cardio',
+              exercises: [{id:'hiit-4x4',label:'HIIT 4x4'}] });
+          } else {
+            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio ' + cardioLabel, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140 (min. 30 Min. fuer volle Wirkung)', type: 'cardio',
+              exercises: [{id:'zone2',label:'Zone 2'}] });
+          }
         }
         blocks.push({ time: isWeekend ? '17:00' : timeAdd(s.workEnd, 1, 30), title: 'Mobility + Foam Rolling 15 Min.', hint: 'Faszienrolle: Oberschenkel, Hueftbeuger, T-Spine + statisches Stretching', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'thoracic-rotation',label:'Thoracic Rotation'}] });
