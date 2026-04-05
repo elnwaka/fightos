@@ -442,13 +442,18 @@ function enterApp() {
   document.getElementById('user-pill').textContent = getDisplayName();
   // Prevent any input from stealing focus on load
   setTimeout(function() { document.activeElement && document.activeElement.blur(); }, 150);
-  // Cleanup old completed blocks (keep only current week)
+  // Cleanup old completed blocks (keep current + last week) + build completion summary
   const data = getData();
   if (data && data.completedBlocks) {
     const weekId = getWeekId();
+    const lastWeekId = getLastWeekId();
+    // Build last-week completion summary BEFORE cleanup
+    if (!data.lastWeekCompletion || data.lastWeekCompletion.weekId !== lastWeekId) {
+      data.lastWeekCompletion = buildLastWeekCompletion(data, lastWeekId);
+    }
     const cleaned = {};
     for (const [k, v] of Object.entries(data.completedBlocks)) {
-      if (k.endsWith(weekId)) cleaned[k] = v;
+      if (k.endsWith(weekId) || k.endsWith(lastWeekId)) cleaned[k] = v;
     }
     data.completedBlocks = cleaned;
     saveData(data);
@@ -3774,11 +3779,71 @@ function generateSmartWeekPlan() {
 
   // Motivations-Hints pro Block-Typ
   var whyHints = {
-    strength: 'Kraft aufbauen → haertere Schlaege + stabilerer Clinch',
-    cardio: 'Kondition verbessern → in Runde 3 noch Druck machen',
-    recovery: 'Erholung → du wirst im Schlaf staerker, nicht im Training',
-    boxing: 'Vereinstraining → dein Trainer gibt den Inhalt vor'
+    strength: 'Kraft aufbauen \u2192 haertere Schlaege + stabilerer Clinch',
+    cardio: 'Kondition verbessern \u2192 in Runde 3 noch Druck machen',
+    recovery: 'Erholung \u2192 du wirst im Schlaf staerker, nicht im Training',
+    boxing: 'Vereinstraining \u2192 dein Trainer gibt den Inhalt vor'
   };
+
+  // ===== COMPLETION-FEEDBACK: Letzte Woche auswerten =====
+  var lastWeek = data ? data.lastWeekCompletion : null;
+  var feedbackAdjustments = {};
+  var fightSoon = false;
+  if (data && data.fightDate) {
+    var fightDiff = Math.ceil((new Date(data.fightDate + 'T00:00:00') - new Date()) / 86400000);
+    fightSoon = fightDiff <= 5 && fightDiff >= 0;
+  }
+
+  if (lastWeek && !fightSoon && weekNum !== 4) {
+    // Volumen-Anpassung
+    if (lastWeek.completionRate < 0.5) {
+      volumeMult *= 0.80;
+      feedbackAdjustments.volumeReduced = true;
+      feedbackAdjustments.volumeReason = 'Nur ' + Math.round(lastWeek.completionRate * 100) + '% geschafft — Plan war zu voll';
+    } else if (lastWeek.completionRate < 0.7) {
+      volumeMult *= 0.90;
+      feedbackAdjustments.volumeReduced = true;
+      feedbackAdjustments.volumeReason = Math.round(lastWeek.completionRate * 100) + '% geschafft — leicht reduziert';
+    } else if (lastWeek.completionRate > 0.9 && lastWeek.avgRPE < 7 && lastWeek.avgRPE > 0) {
+      volumeMult *= 1.10;
+      feedbackAdjustments.volumeIncreased = true;
+      feedbackAdjustments.volumeReason = Math.round(lastWeek.completionRate * 100) + '% bei RPE ' + lastWeek.avgRPE + ' — kannst mehr';
+    }
+
+    // Typ-spezifisch
+    feedbackAdjustments.typeNotes = [];
+    var bt = lastWeek.byType || {};
+    if (bt.cardio && bt.cardio.planned > 0 && bt.cardio.done / bt.cardio.planned < 0.4) {
+      cardioMin = Math.max(15, Math.round(cardioMin * 0.8));
+      cardioMax = Math.max(20, Math.round(cardioMax * 0.8));
+      cardioLabel = cardioMin + '-' + cardioMax + ' Min.';
+      feedbackAdjustments.typeNotes.push('Cardio gekuerzt (nur ' + bt.cardio.done + '/' + bt.cardio.planned + ' geschafft)');
+    }
+    if (bt.strength && bt.strength.planned > 0 && bt.strength.done / bt.strength.planned > 0.9) {
+      feedbackAdjustments.strengthProgression = true;
+      feedbackAdjustments.typeNotes.push('Kraft-Progression! Gewicht um 2.5-5kg steigern');
+    }
+    if (bt.recovery && bt.recovery.planned > 0 && bt.recovery.done / bt.recovery.planned < 0.3) {
+      feedbackAdjustments.typeNotes.push('Recovery vereinfacht (nur ' + bt.recovery.done + '/' + bt.recovery.planned + ' geschafft)');
+    }
+
+    // Versaeumte Saeulen
+    if (lastWeek.missedSaeulen && lastWeek.missedSaeulen.length > 0) {
+      feedbackAdjustments.missedSaeulen = lastWeek.missedSaeulen;
+    }
+
+    // RPE-Feedback
+    if (lastWeek.avgRPE > 8.5) {
+      feedbackAdjustments.rpeWarning = 'RPE ' + lastWeek.avgRPE + ' — Uebertrainings-Risiko, Volumen reduziert';
+      volumeMult *= 0.90;
+    } else if (lastWeek.avgRPE > 0 && lastWeek.avgRPE < 5) {
+      feedbackAdjustments.rpeLow = 'RPE ' + lastWeek.avgRPE + ' — Intensitaet steigern';
+    }
+  }
+
+  // Speichere fuer UI
+  if (data) data._feedbackAdjustments = feedbackAdjustments;
+  if (data) data._lastWeekRate = lastWeek ? lastWeek.completionRate : null;
 
   DAY_NAMES.forEach((day, di) => {
     const d = ws[day] || { time: null, type: 'frei' };
@@ -3927,6 +3992,8 @@ function generateSmartWeekPlan() {
           scCount++;
           var scTime = isWeekend ? '09:00' : timeAdd(morningTime, 0, 10);
           var weekHint = weekNum === 4 ? ' [DELOAD: Halbes Volumen, gleiche Technik]' : weekNum === 3 ? ' [PEAK: Volle Intensitaet, weniger Saetze]' : '';
+          if (feedbackAdjustments.strengthProgression) weekHint += ' [STEIGERE GEWICHT: +2.5-5kg]';
+          if (feedbackAdjustments.volumeReduced) weekHint += ' [ANGEPASST: Weniger Volumen]';
           if (hasWeakKraft) weekHint += ' [FOKUS KRAFT: Deine Schlagkraft-Basis ist schwach — heute sauber und schwer arbeiten]';
           if (gym === 'full') {
             var sc = scSessions[scIdx % scSessions.length]; scIdx++;
@@ -4016,6 +4083,13 @@ const BLOCK_SAEULEN = {
 };
 
 function renderWeekPlan() {
+  var _wpEl = document.getElementById('page-wochenplan');
+  try { return _renderWeekPlanInner(); } catch(e) {
+    console.error('renderWeekPlan error:', e);
+    if (_wpEl) _wpEl.innerHTML = '<div style="padding:40px;color:var(--red);font-family:Space Mono,monospace;"><div style="font-size:18px;margin-bottom:12px;">FEHLER IM WOCHENPLAN</div><pre style="color:#888;font-size:11px;white-space:pre-wrap;">' + e.message + '\n\n' + (e.stack || '').split('\n').slice(0,5).join('\n') + '</pre><button onclick="location.reload()" style="margin-top:16px;padding:8px 16px;background:var(--red);color:#fff;border:none;cursor:pointer;">SEITE NEU LADEN</button></div>';
+  }
+}
+function _renderWeekPlanInner() {
   const data = getData();
   if (!data) return;
   // Only regenerate if no saved plan exists or if fight date / schedule changed
@@ -4094,8 +4168,30 @@ function renderWeekPlan() {
         '<span onclick="showPage(\'account\')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:transparent;border:1px solid #252525;border-radius:4px;color:var(--red);cursor:pointer;">AENDERN \u2192</span>' +
       '</div>';
     })()}
-    <div class="page-header" style="display:none;">
-    </div>
+    <div class="page-header" style="display:none;"></div>
+    ${(function() {
+      var fb = data._feedbackAdjustments || {};
+      var rate = data._lastWeekRate;
+      if (rate === null || rate === undefined) return '';
+      var pct = Math.round(rate * 100);
+      var rateColor = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : 'var(--red)';
+      var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNAEHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITAET'];
+      var lines = [];
+      if (fb.volumeReduced) lines.push('\u2192 VOLUMEN: Reduziert (' + fb.volumeReason + ')');
+      if (fb.volumeIncreased) lines.push('\u2192 VOLUMEN: Erhoht (' + fb.volumeReason + ')');
+      if (fb.typeNotes) fb.typeNotes.forEach(function(n) { lines.push('\u2192 ' + n); });
+      if (fb.rpeWarning) lines.push('\u26A0 ' + fb.rpeWarning);
+      if (fb.rpeLow) lines.push('\u2192 ' + fb.rpeLow);
+      if (fb.missedSaeulen && fb.missedSaeulen.length) lines.push('\u2192 VERSAEUMT: ' + fb.missedSaeulen.map(function(si){return saeulenLabels[si];}).join(', ') + ' (extra Fokus)');
+      if (lines.length === 0 && pct >= 80) lines.push('\u2713 Gute Woche! Weiter so.');
+      return '<div style="background:#0d0d0d;border:1px solid #1a1a1a;border-left:3px solid var(--blue);border-radius:8px;padding:16px;margin-bottom:16px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+          '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--blue);letter-spacing:2px;">LETZTE WOCHE</span>' +
+          '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:' + rateColor + ';">' + pct + '%</span>' +
+        '</div>' +
+        lines.map(function(l) { return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;margin-bottom:4px;">' + l + '</div>'; }).join('') +
+      '</div>';
+    })()}
     ${phaseHTML}
     ${(function() {
       var wp = data._weakPillars || {};
@@ -4417,6 +4513,79 @@ function getWeekId() {
   d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // Monday
   return d.toISOString().split('T')[0];
+}
+
+function getLastWeekId() {
+  var d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7) - 7);
+  return d.toISOString().split('T')[0];
+}
+
+function buildLastWeekCompletion(data, lastWeekId) {
+  var plan = data.weekPlan;
+  var completed = data.completedBlocks || {};
+  if (!plan) return null;
+
+  var totalBlocks = 0, completedCount = 0;
+  var byType = {};
+  var bySaeule = {};
+  var rpeVals = [];
+
+  // Init Säulen
+  for (var si = 0; si < 8; si++) bySaeule[si] = { planned: 0, done: 0 };
+
+  DAY_NAMES.forEach(function(day) {
+    var blocks = plan[day] || [];
+    blocks.forEach(function(b, bi) {
+      if (b.type === 'meta') return; // Skip meta blocks (Arbeit etc.)
+      totalBlocks++;
+      if (!byType[b.type]) byType[b.type] = { planned: 0, done: 0 };
+      byType[b.type].planned++;
+
+      // Säulen zuordnen
+      var saeulen = BLOCK_SAEULEN[b.type] || [];
+      saeulen.forEach(function(si) { bySaeule[si].planned++; });
+
+      // Check if completed (by type match since indices may shift)
+      var logKey = day + '_' + bi + '_' + lastWeekId;
+      if (completed[logKey]) {
+        completedCount++;
+        byType[b.type].done++;
+        saeulen.forEach(function(si) { bySaeule[si].done++; });
+      }
+    });
+  });
+
+  if (totalBlocks === 0) return null;
+
+  // RPE from logs of that week
+  var monStr = lastWeekId;
+  var sunDate = new Date(lastWeekId + 'T00:00:00');
+  sunDate.setDate(sunDate.getDate() + 6);
+  var sunStr = sunDate.toISOString().split('T')[0];
+  var weekLogs = (data.log || []).filter(function(e) { return e.date >= monStr && e.date <= sunStr; });
+  weekLogs.forEach(function(e) { if (e.rpe && e.rpe > 0) rpeVals.push(parseFloat(e.rpe)); });
+  var avgRPE = rpeVals.length ? Math.round(rpeVals.reduce(function(a,b){return a+b;},0) / rpeVals.length * 10) / 10 : 0;
+
+  // Missed Säulen (< 50%)
+  var missedSaeulen = [];
+  for (var si = 0; si < 8; si++) {
+    if (bySaeule[si].planned > 0 && bySaeule[si].done / bySaeule[si].planned < 0.5) {
+      missedSaeulen.push(si);
+    }
+  }
+
+  return {
+    weekId: lastWeekId,
+    totalBlocks: totalBlocks,
+    completedBlocks: completedCount,
+    completionRate: completedCount / totalBlocks,
+    byType: byType,
+    bySaeule: bySaeule,
+    missedSaeulen: missedSaeulen,
+    avgRPE: avgRPE
+  };
 }
 
 function isBlockLogged(logKey) {
@@ -4984,6 +5153,12 @@ function checkAndSaveWeeklySnapshot() {
   const filledScores = Object.values(scores).filter(v => v !== null);
   const overallScore = filledScores.length ? Math.round(filledScores.reduce((a, b) => a + b, 0) / filledScores.length) : null;
 
+  // Completion data from lastWeekCompletion
+  var lwc = data.lastWeekCompletion || {};
+  var completionRate = lwc.completionRate || 0;
+  var missedSaeulen = lwc.missedSaeulen || [];
+  var bySaeule = lwc.bySaeule || {};
+
   // Create snapshot
   const snapshot = {
     week: lastWeekId,
@@ -4992,6 +5167,9 @@ function checkAndSaveWeeklySnapshot() {
     avgRPE: avgRPE,
     checklistDays: checklistDays,
     overallScore: overallScore,
+    completionRate: completionRate,
+    missedSaeulen: missedSaeulen,
+    bySaeule: bySaeule,
     date: sunStr
   };
 
