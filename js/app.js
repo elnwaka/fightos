@@ -5167,87 +5167,192 @@ function renderDashboard() {
   var el = document.getElementById('dash-app');
   if (!el) return;
   var data = getData();
-  var mobile = isMobile();
+  if (!data) return;
+  var scores = calcProfileScores(data);
+  var filled = Object.values(scores).filter(function(v) { return v !== null; });
+  var overall = filled.length ? Math.round(filled.reduce(function(a,b){return a+b;},0) / filled.length) : null;
 
-  el.innerHTML = '' +
-    // 1. COUNTDOWN
-    '<div id="dash-countdown-hero" style="margin-bottom:20px;"></div>' +
+  // Week completion rings data
+  var weekId = getWeekId();
+  var dayCompletion = DAY_NAMES.map(function(day) {
+    var blocks = (data.weekPlan && data.weekPlan[day]) ? data.weekPlan[day].filter(function(b){return b.type!=='meta';}) : [];
+    var done = 0;
+    blocks.forEach(function(b, bi) {
+      var key = day + '_' + bi + '_' + weekId;
+      if (data.completedBlocks && data.completedBlocks[key]) done++;
+    });
+    return { total: blocks.length, done: done };
+  });
+  var todayDow = (new Date().getDay() + 6) % 7;
+  var totalDone = dayCompletion.reduce(function(s,d){return s+d.done;},0);
+  var totalPlanned = dayCompletion.reduce(function(s,d){return s+d.total;},0);
 
-    // 2. HEUTE
-    '<div style="margin-bottom:20px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--white);margin-bottom:14px;">HEUTE</div>' +
+  // SVG Ring for overall score
+  var ringPct = overall !== null ? overall : 0;
+  var circumference = 2 * Math.PI * 48;
+  var ringOffset = circumference * (1 - ringPct / 100);
+  var ringColor = ringPct >= 70 ? 'var(--green)' : ringPct >= 40 ? 'var(--gold)' : 'var(--red)';
+
+  // Recent completed blocks (last 5)
+  var recentBlocks = [];
+  if (data.completedBlocks) {
+    Object.keys(data.completedBlocks).forEach(function(k) {
+      if (k.endsWith(weekId)) {
+        var cb = data.completedBlocks[k];
+        recentBlocks.push({ key: k, title: cb.title || '', type: cb.type || '', date: cb.date || '' });
+      }
+    });
+    recentBlocks.sort(function(a,b) { return b.date.localeCompare(a.date); });
+    recentBlocks = recentBlocks.slice(0, 5);
+  }
+
+  // Benchmark sparklines (top 3)
+  var hist = data.benchmarkHistory || {};
+  var BENCH = getBenchmarks();
+  var topBench = BENCH.filter(function(b) { return hist[b.id] && hist[b.id].length >= 2; })
+    .sort(function(a,b) { return (hist[b.id]||[]).length - (hist[a.id]||[]).length; }).slice(0, 3);
+
+  // Radar pills
+  var pillsHTML = RADAR_AXES.map(function(a) {
+    var val = scores[a.key];
+    return '<div style="flex-shrink:0;text-align:center;padding:6px 10px;border-radius:20px;background:' + a.hex + '18;border:1px solid ' + a.hex + '30;min-width:50px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:' + a.hex + ';">' + (val !== null ? val : '\u2014') + '</div>' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:#555;letter-spacing:1px;">' + a.label + '</div>' +
+    '</div>';
+  }).join('');
+
+  var DAY_SHORT = ['MO','DI','MI','DO','FR','SA','SO'];
+
+  el.innerHTML =
+    // 1. HERO: Countdown links + Score-Ring rechts
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px;margin-bottom:16px;background:linear-gradient(135deg,rgba(232,0,13,.08),transparent);border:1px solid rgba(232,0,13,.1);border-radius:16px;">' +
+      '<div id="dash-countdown-hero" style="flex:1;"></div>' +
+      '<div style="text-align:center;">' +
+        '<svg width="110" height="110" viewBox="0 0 110 110">' +
+          '<circle cx="55" cy="55" r="48" stroke="#1a1a1a" stroke-width="6" fill="none"/>' +
+          '<circle cx="55" cy="55" r="48" stroke="' + ringColor + '" stroke-width="6" fill="none" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + ringOffset + '" stroke-linecap="round" transform="rotate(-90 55 55)" style="transition:stroke-dashoffset 1s ease;"/>' +
+          '<text x="55" y="50" text-anchor="middle" style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;fill:var(--white);">' + (overall !== null ? overall : '\u2014') + '</text>' +
+          '<text x="55" y="68" text-anchor="middle" style="font-family:\'Space Mono\',monospace;font-size:8px;fill:#555;letter-spacing:2px;">GESAMT</text>' +
+        '</svg>' +
+      '</div>' +
+    '</div>' +
+
+    // 2. RADAR + PILLS
+    '<div style="text-align:center;margin-bottom:16px;">' +
+      '<canvas id="rpg-radar" width="260" height="260" style="max-width:260px;"></canvas>' +
+      '<div style="display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:8px 0;scrollbar-width:none;">' + pillsHTML + '</div>' +
+    '</div>' +
+
+    // 3. DIESE WOCHE (Completion Rings)
+    '<div style="margin-bottom:16px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:12px;">DIESE WOCHE <span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;margin-left:8px;">' + totalDone + '/' + totalPlanned + '</span></div>' +
+      '<div style="display:flex;justify-content:space-between;gap:4px;">' +
+        DAY_SHORT.map(function(d, i) {
+          var dc = dayCompletion[i];
+          var pct = dc.total > 0 ? dc.done / dc.total : 0;
+          var c = 2 * Math.PI * 14;
+          var off = c * (1 - pct);
+          var col = pct >= 1 ? 'var(--green)' : pct > 0 ? 'var(--gold)' : '#1a1a1a';
+          var isToday = i === todayDow;
+          return '<div style="text-align:center;' + (isToday ? 'transform:scale(1.15);' : 'opacity:.7;') + '">' +
+            '<svg width="36" height="36" viewBox="0 0 36 36">' +
+              '<circle cx="18" cy="18" r="14" stroke="#1a1a1a" stroke-width="3" fill="none"/>' +
+              '<circle cx="18" cy="18" r="14" stroke="' + col + '" stroke-width="3" fill="none" stroke-dasharray="' + c + '" stroke-dashoffset="' + off + '" stroke-linecap="round" transform="rotate(-90 18 18)"/>' +
+              (pct >= 1 ? '<text x="18" y="22" text-anchor="middle" style="font-size:14px;fill:var(--green);">\u2713</text>' : '<text x="18" y="22" text-anchor="middle" style="font-family:\'Space Mono\',monospace;font-size:10px;fill:#555;">' + dc.done + '</text>') +
+            '</svg>' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:8px;color:' + (isToday ? 'var(--white)' : '#444') + ';margin-top:2px;">' + d + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>' +
+
+    // 4. HEUTE
+    '<div style="margin-bottom:16px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:12px;">HEUTE</div>' +
       '<div id="daily-combined"></div>' +
       '<div id="checklist-score" style="display:none;"></div>' +
     '</div>' +
 
-    // 3. TRAINING LOGGEN
-    '<div style="margin-bottom:20px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:10px;">TRAINING LOGGEN</div>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
-        '<select id="qlog-type" class="form-select" style="flex:2;min-width:100px;padding:11px 12px;font-size:15px;border-radius:10px;" onchange="updateQlogSaeulen()">' +
-          '<option value="boxen">Boxen</option><option value="sparring">Sparring</option><option value="kraft">Kraft</option><option value="cardio">Cardio</option><option value="mobility">Mobility</option>' +
-        '</select>' +
-        '<input type="number" id="qlog-duration" class="form-input" style="flex:1;min-width:55px;padding:11px 10px;font-size:15px;border-radius:10px;" placeholder="Min" min="1" max="300">' +
-        '<input type="number" id="qlog-rpe" class="form-input" style="flex:1;min-width:45px;padding:11px 10px;font-size:15px;border-radius:10px;" placeholder="RPE" min="1" max="10">' +
-        '<button class="submit-btn" style="padding:11px 22px;font-size:15px;border-radius:10px;" onclick="quickLog()">LOG</button>' +
-      '</div>' +
-      '<div id="qlog-saeulen" style="display:none;"></div>' +
-      '<div id="qlog-confirm" style="display:none;font-size:14px;color:var(--green);margin-top:8px;text-align:center;"></div>' +
-    '</div>' +
-
-    // 4. HRV
-    '<div style="margin-bottom:20px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:10px;">HRV</div>' +
-      '<div style="display:flex;gap:8px;align-items:center;">' +
-        '<input type="number" id="hrv-input" class="form-input" style="flex:1;padding:11px 12px;font-size:15px;border-radius:10px;" placeholder="RMSSD eingeben" min="1" max="200">' +
-        '<button class="submit-btn" style="padding:11px 22px;font-size:15px;border-radius:10px;" onclick="logHRV()">LOG</button>' +
-      '</div>' +
-      '<div id="hrv-display" style="margin-top:10px;"></div>' +
-    '</div>' +
-
     // 5. HINWEISE
-    '<div id="dash-hinweise" style="margin-bottom:16px;"></div>' +
+    '<div id="dash-hinweise"></div>' +
 
-    // 6. KÄMPFE
-    '<div style="margin-bottom:20px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);cursor:pointer;" onclick="showPage(\'fights\')">KÄMPFE</div>' +
-        '<button class="submit-btn" style="padding:8px 16px;font-size:13px;border-radius:8px;" onclick="openFightModal()">+ KAMPF</button>' +
+    // 6. LETZTE AKTIVITÄT (completed blocks + recent log mixed)
+    '<div style="margin-bottom:16px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:12px;">AKTIVITÄT</div>' +
+      (recentBlocks.length > 0 ?
+        recentBlocks.map(function(rb) {
+          var tc = TYPE_COLORS[rb.type] || 'var(--grey)';
+          var d = rb.date ? new Date(rb.date) : null;
+          var timeStr = d ? (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes() : '';
+          return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #111;">' +
+            '<div style="width:4px;height:28px;border-radius:2px;background:' + tc + ';flex-shrink:0;"></div>' +
+            '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--light);">' + (rb.title || rb.type).replace(/</g,'&lt;') + '</div>' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;">' + timeStr + '</div>' +
+            '<div style="font-size:12px;color:var(--green);">\u2713</div>' +
+          '</div>';
+        }).join('') :
+        '<div id="recent-log"></div>'
+      ) +
+    '</div>' +
+
+    // 7. KÄMPFE (kompakt)
+    '<div style="margin-bottom:16px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);cursor:pointer;" onclick="showPage(\'fights\')">KÄMPFE</div>' +
+        '<button class="submit-btn" style="padding:6px 14px;font-size:11px;border-radius:8px;" onclick="openFightModal()">+</button>' +
       '</div>' +
       '<div id="fight-log-list"></div>' +
     '</div>' +
 
-    // 7. LETZTE EINHEITEN
-    '<div style="margin-bottom:20px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);margin-bottom:14px;cursor:pointer;" onclick="showPage(\'log\')">LETZTE EINHEITEN</div>' +
-      '<div id="recent-log"></div>' +
-    '</div>' +
+    // 8. BENCHMARKS (Sparklines — immer sichtbar)
+    (topBench.length > 0 ?
+      '<div style="margin-bottom:16px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:12px;cursor:pointer;" onclick="showPage(\'tests\')">BENCHMARKS</div>' +
+        '<div style="display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">' +
+          topBench.map(function(b) {
+            var h = hist[b.id] || [];
+            var val = data.benchmarks[b.id] || 0;
+            var trend = getBenchTrend(h, b.inverse);
+            return '<div style="flex-shrink:0;min-width:100px;cursor:pointer;" onclick="showPage(\'tests\')">' +
+              '<canvas id="dash-spark-' + b.id + '" width="100" height="36" style="display:block;width:100px;height:36px;"></canvas>' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">' +
+                '<span style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--white);">' + val + '<span style="font-size:9px;color:#444;"> ' + b.unit + '</span></span>' +
+                '<span style="font-size:12px;color:' + trend.color + ';">' + trend.arrow + '</span>' +
+              '</div>' +
+              '<div style="font-family:\'Space Mono\',monospace;font-size:8px;color:#333;letter-spacing:1px;">' + b.name.replace(/\s.*/, '') + '</div>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
+      '</div>'
+    : '') +
 
-    // 8. PROFIL (nur Desktop)
-    (mobile ? '' :
-      '<div class="dash-profil" style="margin-top:24px;">' +
-        '<div class="dash-radar-col"><canvas id="rpg-radar" width="320" height="320"></canvas></div>' +
-        '<div class="dash-scores-col"><div id="dash-stats"></div></div>' +
-      '</div>' +
+    // 9. DESKTOP EXTRAS
+    '<div class="dash-hide-mobile">' +
+      '<div id="dash-stats" style="margin-top:16px;"></div>' +
       '<div id="saeulen-self-rating" style="margin-top:16px;"></div>' +
       '<div id="bench-summary" style="margin-top:12px;font-family:\'Space Mono\',monospace;font-size:11px;color:#555;cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
       '<div style="margin-top:16px;display:flex;align-items:center;gap:8px;">' +
-        '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">NÄCHSTER KAMPF</span>' +
         '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:6px 10px;font-size:12px;" onchange="updateFightDate()">' +
-        '<button class="submit-btn" style="padding:4px 10px;font-size:10px;" onclick="clearFightDate()">×</button>' +
-      '</div>'
-    );
+        '<button class="submit-btn" style="padding:4px 10px;font-size:10px;" onclick="clearFightDate()">\u00d7</button>' +
+      '</div>' +
+    '</div>';
 
   // Render sub-components
   renderFightCountdown();
   renderDashStats();
-  renderHRV();
   renderHinweise();
-  if (!mobile) renderBenchSummary();
   renderDailyCombined();
   renderFightLog();
-  renderRecentLog();
-  if (!mobile) renderSaeulenSelfRating();
+  if (recentBlocks.length === 0) renderRecentLog();
+  renderSaeulenSelfRating();
+
+  // Draw radar + sparklines
+  setTimeout(function() {
+    renderRadarChart(scores);
+    topBench.forEach(function(b) {
+      drawSparkline('dash-spark-' + b.id, hist[b.id], b.color || '#e8000d', b.inverse);
+    });
+  }, 50);
 }
 
 // Selbsteinschätzung der 8 Säulen (1-5 Punkte)
