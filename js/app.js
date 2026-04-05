@@ -779,11 +779,16 @@ function buildUpcomingFightsHTML(data) {
 // ===== DASHBOARD STATS — MEASURABLE PERFORMANCE PROFILE =====
 
 // 3 radar axes — only real, testable performance dimensions
+// 8 SÄULEN = 8 RADAR-ACHSEN (das Fundament der App)
 const RADAR_AXES = [
-  { key:'kraft',       label:'MAXIMALKRAFT',  color:'var(--red)',   hex:'#e8000d' },
-  { key:'explosiv',    label:'EXPLOSIVITÄT',  color:'var(--gold)',  hex:'#f5c518' },
-  { key:'ausdauer',    label:'AUSDAUER',      color:'var(--blue)',  hex:'#2979ff' },
-  { key:'koerper',     label:'KÖRPER',        color:'var(--green)', hex:'#4caf50' }
+  { key:'kraft',    label:'KRAFT',        color:'var(--red)',    hex:'#e8000d', saeulenIdx:0 },
+  { key:'metabol',  label:'AUSDAUER',     color:'var(--blue)',   hex:'#2979ff', saeulenIdx:1 },
+  { key:'kognitiv', label:'KOGNITION',    color:'var(--purple)', hex:'#ab47bc', saeulenIdx:2 },
+  { key:'ernaehr',  label:'ERNÄHRUNG',    color:'var(--green)',  hex:'#4caf50', saeulenIdx:3 },
+  { key:'recovery', label:'REGENERATION', color:'var(--orange)', hex:'#ff6d00', saeulenIdx:4 },
+  { key:'ringiQ',   label:'RING IQ',      color:'var(--gold)',   hex:'#f5c518', saeulenIdx:5 },
+  { key:'psyche',   label:'MENTAL',       color:'#00bcd4',       hex:'#00bcd4', saeulenIdx:6 },
+  { key:'mobil',    label:'MOBILITÄT',    color:'#8bc34a',       hex:'#8bc34a', saeulenIdx:7 }
 ];
 
 function calcProfileScores(data) {
@@ -792,6 +797,10 @@ function calcProfileScores(data) {
   const bw = parseFloat(s.weight) || 75;
   const age = getUserAge() || 25;
   const bfTarget = age < 25 ? 8 : age <= 35 ? 10 : 12;
+  const log = data.log || [];
+  const fights = data.fights || [];
+  const hrv = data.hrv || [];
+  const sr = data.saeulenRatings || {};
 
   function pct(val, target) {
     return val ? Math.min(100, (val / target) * 100) : null;
@@ -805,26 +814,68 @@ function calcProfileScores(data) {
     const filled = tests.filter(t => t !== null);
     return filled.length ? Math.round(filled.reduce((a, v) => a + v, 0) / filled.length) : null;
   }
+  function ratingPct(key) {
+    return sr[key] ? Math.round(sr[key] * 20) : null; // 1-5 → 20-100%
+  }
 
+  // S1: KRAFT — Benchmarks (Deadlift, Klimmzüge, CMJ, Schlagfrequenz)
   const kraft = avg([
     pct(b.deadlift, bw * 2.5),
-    pct(b.pullups, scaleByWeight(bw, PULLUP_TIERS))
-  ]);
-
-  const explosiv = avg([
+    pct(b.pullups, scaleByWeight(bw, PULLUP_TIERS)),
     pct(b.cmj, scaleByWeight(bw, CMJ_TIERS)),
     pct(b.punch_freq, scaleByWeight(bw, PUNCH_TIERS))
   ]);
 
-  const ausdauer = avg([
-    pct(b.cooper, scaleByWeight(bw, COOPER_TIERS))
+  // S2: METABOLISCH — Cooper-Test + Selbsteinschätzung
+  const metabol = avg([
+    pct(b.cooper, scaleByWeight(bw, COOPER_TIERS)),
+    ratingPct('metabol')
   ]);
 
-  const koerper = avg([
-    inversePct(b.bodyfat, bfTarget)
+  // S3: KOGNITION — Selbsteinschätzung (Reaktion, Antizipation, Entscheidung)
+  const kognitiv = ratingPct('kognitiv');
+
+  // S4: ERNÄHRUNG — Bodyfat + Selbsteinschätzung
+  const ernaehr = avg([
+    inversePct(b.bodyfat, bfTarget),
+    ratingPct('ernaehr')
   ]);
 
-  return { kraft, explosiv, ausdauer, koerper };
+  // S5: REGENERATION — HRV-Daten + Selbsteinschätzung
+  var recoveryScore = null;
+  if (hrv.length >= 7) {
+    var recent = hrv.slice(0, 7);
+    var avg7 = recent.reduce(function(s, h) { return s + h.value; }, 0) / recent.length;
+    var greenDays = 0;
+    recent.forEach(function(h) { if (h.value >= avg7 * 0.95) greenDays++; });
+    recoveryScore = Math.round(greenDays / 7 * 100);
+  }
+  const recovery = avg([recoveryScore, ratingPct('recovery')]);
+
+  // S6: RING IQ — Kampferfahrung + Selbsteinschätzung
+  var fightIQ = null;
+  if (fights.length >= 3) {
+    var wins = fights.filter(function(f) { return f.result === 'S'; }).length;
+    fightIQ = Math.round(wins / fights.length * 100);
+  }
+  const ringiQ = avg([fightIQ, ratingPct('ringiQ')]);
+
+  // S7: PSYCHE — Selbsteinschätzung
+  const psyche = ratingPct('psyche');
+
+  // S8: MOBILITÄT — Selbsteinschätzung + Mobility-Training-Häufigkeit
+  var mobilLog = null;
+  var last30 = log.filter(function(e) {
+    var d = new Date(e.date);
+    return (Date.now() - d.getTime()) < 30 * 86400000;
+  });
+  if (last30.length > 0) {
+    var mobilCount = last30.filter(function(e) { return e.type === 'mobility'; }).length;
+    mobilLog = Math.min(100, Math.round(mobilCount / last30.length * 250)); // ~40% mobility sessions = 100%
+  }
+  const mobil = avg([mobilLog, ratingPct('mobil')]);
+
+  return { kraft, metabol, kognitiv, ernaehr, recovery, ringiQ, psyche, mobil };
 }
 
 function renderDashStats() {
@@ -1248,6 +1299,27 @@ function renderHinweise() {
     }
   }
 
+  // --- Schwächste Säule ---
+  var scores = calcProfileScores(data);
+  var saeulenNames = { kraft:'Kraft', metabol:'Ausdauer', kognitiv:'Kognition', ernaehr:'Ernährung', recovery:'Regeneration', ringiQ:'Ring IQ', psyche:'Mental', mobil:'Mobilität' };
+  var saeulenTipps = {
+    kraft: 'Fokus auf S&C: Deadlift, Klimmzüge, explosive Übungen.',
+    metabol: 'Mehr Zone 2 Cardio + HIIT einbauen.',
+    kognitiv: 'Constraint-Sparring, Reaktionsdrills, Schattenboxen mit Fokus auf Antizipation.',
+    ernaehr: 'Makros tracken, Protein auf 2.2g/kg, Mahlzeiten-Timing einhalten.',
+    recovery: 'Schlaf optimieren (8h+), HRV tracken, Regeneration ernst nehmen.',
+    ringiQ: 'Kampfvideos analysieren, Muster erkennen, taktisches Sparring.',
+    psyche: 'Visualisierung üben, Alter Ego aktivieren, Box-Breathing.',
+    mobil: 'Tägliche Mobility-Routine: Hüfte, Schulter, T-Spine.'
+  };
+  var weakest = null, weakestVal = 999;
+  for (var sk in scores) {
+    if (scores[sk] !== null && scores[sk] < weakestVal) { weakestVal = scores[sk]; weakest = sk; }
+  }
+  if (weakest && weakestVal < 70) {
+    items.push({ text: 'Schwächste Säule: ' + saeulenNames[weakest] + ' (' + weakestVal + '%) — ' + saeulenTipps[weakest], color: 'var(--red)', priority: 3 });
+  }
+
   items.sort((a, b) => b.priority - a.priority);
 
   // --- Getting Started guide for new users ---
@@ -1312,7 +1384,7 @@ function getBenchmarks() {
   const bfTarget = age < 25 ? 7 : age <= 35 ? 9 : 11;
   return [
     // LEISTUNGSTESTS — fließen ins Radar
-    { id:'deadlift', name:'Deadlift 1RM', unit:'kg', target:Math.round(bw * 2.5), color:'var(--red)', cluster:'Maximalkraft',
+    { id:'deadlift', name:'Deadlift 1RM', unit:'kg', target:Math.round(bw * 2.5), color:'var(--red)', cluster:'Kraft',
       how:'Trap Bar oder Langhantel · 1RM-Test mit Aufwärmprotokoll',
       howSteps:[
         {t:'Aufwärmen', d:'10 Min. leichtes Cardio + dynamisches Stretching (Hüftkreise, Beinpendel, Katzenbuckel).'},
@@ -1321,7 +1393,7 @@ function getBenchmarks() {
         {t:'Ausführung', d:'Trap Bar: neutraler Griff, Hüfte auf Kniehöhe, Brust raus, Rücken gerade. Hebe explosiv. Konventionell: schulterbreiter Stand, Mixed Grip erlaubt.'},
         {t:'Gültig wenn', d:'Volle Hüftstreckung oben, kontrolliertes Ablassen. Kein Abprallen, kein Hitching (Hochziehen am Oberschenkel). Partner sollte zuschauen.'}
       ], interval:10 },
-    { id:'pullups', name:'Klimmzüge (max)', unit:'Wdh.', target:scaleByWeight(bw, PULLUP_TIERS), color:'var(--red)', cluster:'Maximalkraft',
+    { id:'pullups', name:'Klimmzüge (max)', unit:'Wdh.', target:scaleByWeight(bw, PULLUP_TIERS), color:'var(--red)', cluster:'Kraft',
       how:'Saubere Wdh. bis Versagen · Kinn über Stange',
       howSteps:[
         {t:'Startposition', d:'Schulterbreiter Obergriff (Handflächen weg). Arme komplett gestreckt, Füße vom Boden, kein Schwung.'},
@@ -1330,7 +1402,7 @@ function getBenchmarks() {
         {t:'Zählung', d:'Nur saubere Wdh. zählen. Sobald du die Stange nicht mehr erreichst oder die Form bricht → Stopp. Partner zählt laut mit.'},
         {t:'Tipp', d:'Kreide an den Händen verhindert Abrutschen. Teste immer zur gleichen Tageszeit und ausgeruht (nicht nach dem Training).'}
       ], interval:6 },
-    { id:'cmj', name:'CMJ Sprunghöhe', unit:'cm', target:scaleByWeight(bw, CMJ_TIERS), color:'var(--gold)', cluster:'Explosivität',
+    { id:'cmj', name:'CMJ Sprunghöhe', unit:'cm', target:scaleByWeight(bw, CMJ_TIERS), color:'var(--red)', cluster:'Kraft',
       how:'Counter Movement Jump · MyJump App oder Kreidemarkierung',
       howSteps:[
         {t:'Methode A — MyJump App', d:'Smartphone am Boden aufstellen, App starten. Springe barfuß auf hartem Boden. Die App berechnet die Flugzeit → Sprunghöhe. 3 Versuche, bester zählt.'},
@@ -1339,7 +1411,7 @@ function getBenchmarks() {
         {t:'Regeln', d:'Kein Anlauf, kein Zwischenschritt. Die Gegenbewegung (Counter Movement) ist erlaubt und gewollt — das unterscheidet den CMJ vom Squat Jump.'},
         {t:'Tipp', d:'3-5 Min. dynamisches Aufwärmen + 2-3 Probesprünge bei 80%. Dann 3 maximale Versuche mit je 2 Min. Pause. Bester Wert zählt.'}
       ], interval:8 },
-    { id:'punch_freq', name:'Schlagfrequenz 10s', unit:'Schläge', target:scaleByWeight(bw, PUNCH_TIERS), color:'var(--gold)', cluster:'Explosivität',
+    { id:'punch_freq', name:'Schlagfrequenz 10s', unit:'Schläge', target:scaleByWeight(bw, PUNCH_TIERS), color:'var(--red)', cluster:'Kraft',
       how:'Gerade Führhand am Sandsack · 10 Sekunden maximal',
       howSteps:[
         {t:'Aufbau', d:'Schwerer Sandsack (min. 30 kg). Partner mit Stoppuhr steht seitlich und zählt. Bandagen + Boxhandschuhe (14-16 oz) tragen.'},
@@ -1358,7 +1430,7 @@ function getBenchmarks() {
         {t:'Messung', d:'Nach 12 Min. pfeift der Partner. Bleib stehen wo du bist. Miss die zurückgelegte Distanz auf 10m genau (Markierungen auf der Bahn nutzen). VO₂max ≈ (Distanz − 504) ÷ 44.7.'}
       ], interval:8 },
     // KÖRPERMESSUNGEN
-    { id:'bodyfat', name:'Körperfettanteil', unit:'%', target:bfTarget, color:'var(--green)', cluster:'Körper', inverse:true,
+    { id:'bodyfat', name:'Körperfettanteil', unit:'%', target:bfTarget, color:'var(--green)', cluster:'Ernährung', inverse:true,
       how:'Caliper 7-Falten, Navy-Methode oder DEXA',
       howSteps:[
         {t:'Methode A — Caliper (genaueste tragbare)', d:'7-Punkt-Messung: Brust, Achsel, Trizeps, Subscapular, Bauch, Hüfte, Oberschenkel. Jede Falte 3× messen, Median nehmen. Immer rechte Seite.'},
@@ -1378,8 +1450,8 @@ function renderSaeulenProgress() {
   const el = document.getElementById('saeulen-progress');
   const BENCHMARKS = getBenchmarks();
 
-  const clusters = ['Maximalkraft', 'Explosivität', 'Ausdauer', 'Körper'];
-  const clusterColors = { Maximalkraft:'var(--red)', 'Explosivität':'var(--gold)', Ausdauer:'var(--blue)', 'Körper':'var(--green)' };
+  const clusters = ['Kraft', 'Ausdauer', 'Ernährung'];
+  const clusterColors = { Kraft:'var(--red)', Ausdauer:'var(--blue)', 'Ernährung':'var(--green)' };
 
   el.innerHTML = clusters.map(c => {
     const items = BENCHMARKS.filter(b => b.cluster === c);
@@ -3180,8 +3252,18 @@ function addLogEntry() {
   renderRecentLog();
 }
 
-const TYPE_COLORS = { kraft: 'var(--blue)', boxen: 'var(--red)', sparring: 'var(--red)', cardio: 'var(--green)', pratzen: 'var(--red)', technik: 'var(--red)', mobility: 'var(--purple)' };
+const TYPE_COLORS = { kraft: 'var(--red)', boxen: 'var(--red)', sparring: 'var(--gold)', cardio: 'var(--blue)', pratzen: 'var(--red)', technik: 'var(--red)', mobility: '#8bc34a' };
 const TYPE_LABELS = { kraft: 'Kraft', boxen: 'Boxen', sparring: 'Sparring', cardio: 'Cardio', pratzen: 'Boxen', technik: 'Boxen', mobility: 'Mobility / Recovery' };
+// Mapping: Training-Typ → welche Säulen werden trainiert
+const TYPE_SAEULEN = {
+  kraft:    [0],       // S1: Kraft
+  boxen:    [0,2,5],   // S1: Kraft + S3: Kognition + S6: Ring IQ
+  sparring: [0,1,2,5,6], // Kraft + Ausdauer + Kognition + Ring IQ + Mental
+  cardio:   [1],       // S2: Metabolisch
+  pratzen:  [0,2],     // Kraft + Kognition
+  technik:  [2,5],     // Kognition + Ring IQ
+  mobility: [7,4]      // S8: Mobilität + S5: Regeneration
+};
 
 function renderLogEntries() {
   const data = getData();
@@ -3506,6 +3588,15 @@ function generateSmartWeekPlan() {
 const DAY_NAMES = ['mo', 'di', 'mi', 'do', 'fr', 'sa', 'so'];
 const DAY_LABELS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
 const TYPE_CLASS = { strength: 'strength', boxing: 'boxing', cardio: 'cardio', recovery: 'recovery', meta: 'meta', fight: 'fight', off: 'off' };
+// Wochenplan Block-Typ → Säulen-Indizes
+const BLOCK_SAEULEN = {
+  strength: [0],        // S1: Kraft
+  boxing:   [0,2,5],    // Kraft + Kognition + Ring IQ
+  cardio:   [1],        // S2: Metabolisch
+  recovery: [4,7],      // Regeneration + Mobilität
+  meta:     [2,6],      // Kognition + Mental (BET etc.)
+  fight:    [0,1,2,5,6] // Alle Kampf-relevanten
+};
 
 function renderWeekPlan() {
   const data = getData();
@@ -3562,6 +3653,27 @@ function renderWeekPlan() {
     </div>
     ${phaseHTML}
     ${!data.fightDate ? '<div class="info-box info-tip" style="margin-bottom:20px;"><span>💡</span><div>Trage auf dem Dashboard ein <strong>Kampfdatum</strong> ein — der Wochenplan passt sich automatisch an (Schärfen, Kampf-Modus, Recovery).</div></div>' : ''}
+    ${(function() {
+      var coveredSet = {};
+      DAY_NAMES.forEach(function(day) {
+        (plan[day] || []).forEach(function(b) {
+          var bs = BLOCK_SAEULEN[b.type];
+          if (bs) bs.forEach(function(si) { coveredSet[si] = true; });
+        });
+      });
+      var covered = Object.keys(coveredSet).length;
+      var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNÄHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITÄT'];
+      var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
+      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px;padding:12px 16px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;">' +
+        '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:1px;margin-right:4px;">SÄULEN ' + covered + '/8</span>' +
+        saeulenLabels.map(function(l, i) {
+          var active = coveredSet[i];
+          return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:3px;letter-spacing:0.5px;' +
+            (active ? 'background:' + saeulenColors[i] + '22;color:' + saeulenColors[i] + ';border:1px solid ' + saeulenColors[i] + '44;' : 'background:#111;color:#333;border:1px solid #1a1a1a;') +
+          '">' + l + '</span>';
+        }).join('') +
+      '</div>';
+    })()}
     <div class="week-grid">
       ${DAY_NAMES.map((day, di) => {
         const blocks = plan[day] || [];
@@ -4258,6 +4370,71 @@ function renderDashboard() {
   renderDailyCombined();
   renderFightLog();
   renderRecentLog();
+  renderSaeulenSelfRating();
+}
+
+// Selbsteinschätzung der 8 Säulen (1-5 Punkte)
+function renderSaeulenSelfRating() {
+  var el = document.getElementById('saeulen-self-rating');
+  if (!el) return;
+  var data = getData();
+  if (!data) return;
+  if (!data.saeulenRatings) data.saeulenRatings = {};
+  var sr = data.saeulenRatings;
+
+  var ratingAxes = [
+    { key:'metabol',  label:'Ausdauer',      hint:'Wie ist deine Kondition in Runde 3?' },
+    { key:'kognitiv', label:'Kognition',      hint:'Liest du den Gegner? Reagierst du schnell?' },
+    { key:'ernaehr',  label:'Ernährung',      hint:'Isst du nach Plan? Makros im Griff?' },
+    { key:'recovery', label:'Regeneration',   hint:'Schläfst du genug? Fühlst du dich erholt?' },
+    { key:'ringiQ',   label:'Ring IQ',        hint:'Kontrollierst du Distanz und Timing?' },
+    { key:'psyche',   label:'Mental',         hint:'Bist du vor dem Kampf ruhig und fokussiert?' },
+    { key:'mobil',    label:'Mobilität',      hint:'Bewegst du dich frei? Keine Einschränkungen?' }
+  ];
+
+  var lastUpdated = data.saeulenRatingsDate || '';
+  var daysAgo = lastUpdated ? Math.floor((Date.now() - new Date(lastUpdated).getTime()) / 86400000) : 999;
+  var needsUpdate = daysAgo > 14;
+
+  el.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:pointer;" onclick="var c=document.getElementById(\'sr-form\');c.style.display=c.style.display===\'none\'?\'block\':\'none\'">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SÄULEN-CHECK' +
+      (needsUpdate ? ' <span style="font-size:11px;color:var(--red);">AKTUALISIEREN</span>' : '') +
+    '</div>' +
+    '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;">' +
+      (lastUpdated ? 'Vor ' + daysAgo + ' Tagen' : 'Noch nie bewertet') +
+      ' ▾</span>' +
+  '</div>' +
+  '<div id="sr-form" style="display:' + (needsUpdate ? 'block' : 'none') + ';">' +
+    '<div style="font-family:\'DM Sans\',sans-serif;font-size:11px;color:#444;margin-bottom:12px;">Bewerte dich ehrlich 1-5. Kraft + Ausdauer + Ernährung fliessen auch aus Benchmarks/HRV ein.</div>' +
+    ratingAxes.map(function(a) {
+      var val = sr[a.key] || 0;
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #111;">' +
+        '<div style="min-width:80px;"><div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:1px;">' + a.label.toUpperCase() + '</div></div>' +
+        '<div style="display:flex;gap:3px;">' +
+          [1,2,3,4,5].map(function(n) {
+            var filled = n <= val;
+            var axObj = RADAR_AXES.find(function(r) { return r.key === a.key; });
+            var color = axObj ? axObj.hex : '#555';
+            return '<span onclick="setSaeulenRating(\'' + a.key + '\',' + n + ')" style="display:inline-block;width:18px;height:18px;border-radius:50%;cursor:pointer;transition:all .15s;' +
+              (filled ? 'background:' + color + ';' : 'background:#1a1a1a;border:1px solid #222;') +
+            '" title="' + n + '/5"></span>';
+          }).join('') +
+        '</div>' +
+        '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:10px;color:#333;margin-left:4px;">' + a.hint + '</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
+
+function setSaeulenRating(key, val) {
+  var data = getData();
+  if (!data) return;
+  if (!data.saeulenRatings) data.saeulenRatings = {};
+  data.saeulenRatings[key] = data.saeulenRatings[key] === val ? 0 : val;
+  data.saeulenRatingsDate = new Date().toISOString().split('T')[0];
+  saveData(data);
+  renderSaeulenSelfRating();
+  renderDashStats();
 }
 
 // ===== DASHBOARD BENCH SUMMARY =====
@@ -4636,9 +4813,9 @@ function renderTestsPage() {
   }
 
   // Cluster sections with test cards
-  const clusters = ['Maximalkraft', 'Explosivität', 'Ausdauer', 'Körper'];
-  const clusterColors = { Maximalkraft:'var(--red)', 'Explosivität':'var(--gold)', Ausdauer:'var(--blue)', 'Körper':'var(--green)' };
-  const clusterHex = { Maximalkraft:'#e8000d', 'Explosivität':'#f5c518', Ausdauer:'#2979ff', 'Körper':'#4caf50' };
+  const clusters = ['Kraft', 'Ausdauer', 'Ernährung'];
+  const clusterColors = { Kraft:'var(--red)', Ausdauer:'var(--blue)', 'Ernährung':'var(--green)' };
+  const clusterHex = { Kraft:'#e8000d', Ausdauer:'#2979ff', 'Ernährung':'#4caf50' };
 
   const benchHTML = clusters.map(c => {
     const items = BENCHMARKS.filter(b => b.cluster === c);

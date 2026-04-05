@@ -197,11 +197,11 @@ function initSaeulenIntroObserver() {
 const saeulenExercises = {
   0: { exerciseIds: ['trap-bar-deadlift','jump-squat','hip-thrust','power-clean','bench-press','explosive-pushup','landmine-press','overcoming-iso','single-leg-rdl','med-ball-rotation','bfr'] },
   1: { exerciseIds: ['zone2','hiit-4x4','fartlek','sit-sprints','imt'] },
-  2: { exerciseIds: ['shadow-boxing'] },
-  3: { exerciseIds: ['shadow-boxing'], linkedPage:'periodisierung', linkedLabel:'Periodisierung-Seite' },
-  4: { exerciseIds: ['shadow-boxing'], linkedPage:'mental', linkedLabel:'Mentaltraining-Seite' },
-  5: { exerciseIds: [], linkedPage:'ernaehrung', linkedLabel:'Ernährungs-Seite' },
-  6: { exerciseIds: [], linkedPage:'regeneration', linkedLabel:'Recovery-Seite' },
+  2: { exerciseIds: ['shadow-boxing'], linkedPage:'saeulen', linkedLabel:'Kognitions-Training Details' },
+  3: { exerciseIds: [], linkedPage:'ernaehrung', linkedLabel:'Ernährungs-Seite' },
+  4: { exerciseIds: [], linkedPage:'regeneration', linkedLabel:'Recovery-Seite' },
+  5: { exerciseIds: [], linkedPage:'fights', linkedLabel:'Kampfanalyse & Taktik' },
+  6: { exerciseIds: [], linkedPage:'mental', linkedLabel:'Mentaltraining-Seite' },
   7: { exerciseIds: ['iso-nacken','nacken-flexion'] }
 };
 
