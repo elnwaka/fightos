@@ -53,7 +53,7 @@ body {
 }
 
 /* Säulen Intro */
-.si-slide { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+.si-slide { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 24px; scroll-snap-align:start; }
 .si-center { max-width:520px; text-align:center; }
 .si-num { font-family:'Bebas Neue',sans-serif; font-size:120px; opacity:.15; line-height:.8; }
 .si-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(28px,5vw,42px); letter-spacing:2px; margin-top:-20px; }
