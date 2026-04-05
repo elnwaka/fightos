@@ -3070,12 +3070,16 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .bottom-bar { display: flex; }
   .page { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
 
-  /* --- Navigation --- */
-  .topbar { flex-wrap: nowrap; height: auto; padding: 8px 12px; gap: 4px; }
+  /* --- Navigation Mobile: Minimal --- */
+  .topbar { flex-wrap: nowrap; height: 48px; padding: 0 12px; gap: 4px; }
+  .topbar-logo { font-size: 22px; }
   .topbar-nav { display: none; }
-  .topbar-right { gap: 6px; }
+  .topbar-right { gap: 4px; }
   .share-pill { display: none; }
   .user-pill { display: none; }
+  .search-container { display: none; }
+  .topbar-icon-btn { width: 36px; height: 36px; font-size: 16px; }
+  .logout-btn { font-size: 14px; padding: 4px 8px; }
   .search-input { width: 120px; }
   .search-input:focus { width: 180px; }
   .search-results { width: 300px; }
@@ -3219,13 +3223,17 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .grid-4 { grid-template-columns: 1fr; }
   .calc-results { grid-template-columns: 1fr 1fr; }
 
-  /* --- Dashboard --- */
-  .dash-hero { padding: 16px 0; gap: 12px; }
-  .dash-heute { gap: 10px; }
-  .dash-heute-side .card { padding: 12px !important; }
-  .dash-bottom-grid { gap: 10px; }
-  .dash-profil { padding: 14px; gap: 12px; }
-  #rpg-radar { max-width: 200px; }
+  /* --- Dashboard Mobile: Nur das Wichtigste --- */
+  .dash-hero { padding: 12px 0; gap: 8px; }
+  .dash-heute { gap: 8px; }
+  .dash-heute-side .card { padding: 10px !important; }
+  .dash-bottom-grid { gap: 8px; }
+  /* Radar + Scores: auf Mobile verstecken, Tests-Seite hat es */
+  .dash-profil { display: none; }
+  /* Benchmark-Card kompakt */
+  #saeulen-self-rating { display: none; }
+  /* Hinweise kompakter */
+  #dash-hinweise { font-size: 12px; }
 
   /* --- Forms --- */
   .form-input, .form-select { padding: 10px 12px; font-size: 13px; }
@@ -3236,20 +3244,28 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .auth-box { padding: 24px 16px; }
   .ob-container { padding: 20px 12px 16px; margin: 4px; }
 
-  /* --- Tests --- */
-  .tests-hero { padding: 14px; gap: 14px; }
-  .test-card-value { font-size: 28px; }
-  .stat-num { font-size: 32px; }
+  /* --- Tests Mobile: Kompakt --- */
+  .tests-hero { padding: 12px; gap: 10px; }
+  .tests-radar-wrap { display: none; }
+  .test-card-value { font-size: 24px; }
+  .stat-num { font-size: 28px; }
+  /* Batch-Input auf Mobile verstecken */
+  #batch-test-form { display: none !important; }
 
-  /* --- Wochenplan --- */
+  /* --- Wochenplan Mobile: Nur Plan, wenig Overhead --- */
   .week-grid { gap: 2px; }
   .day-col.day-active .day-header { padding: 10px 10px 8px; }
   .day-col.day-active .day-name { font-size: 18px; }
   .day-col.day-active .day-blocks { padding: 6px 8px; }
   .day-block { font-size: 10px; padding: 4px 6px; }
   .day-col.day-active .day-block { font-size: 11px; padding: 6px 8px; }
+  .day-col:not(.day-active) .day-block .block-hint { display: none; }
+  .day-col.day-active .day-block .block-hint { font-size: 9px; }
   .week-controls { gap: 4px; }
   .wk-btn { font-size: 10px; padding: 4px 8px; }
+  /* Exercise chips im Block: nur auf aktivem Tag */
+  .day-col:not(.day-active) .ex-chip { display: none; }
+  .ex-chip { font-size: 9px; padding: 1px 4px; }
 
   /* --- Säulen Intro --- */
   .si-slide { padding: 24px 16px; }
@@ -3262,9 +3278,11 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .si-clusters { grid-template-columns: 1fr; }
   .si-barrel-stave span { font-size: 6px; }
 
-  /* --- Account --- */
-  .account-grid { grid-template-columns: 1fr; }
+  /* --- Account Mobile --- */
+  .account-grid { grid-template-columns: 1fr; gap: 8px; }
   .account-wrap { max-width: 100%; }
+  .account-section { padding: 12px 0; }
+  .account-section-title { font-size: 14px; }
 
   /* --- Mental --- */
   .mt-daily { grid-template-columns: 1fr; }
@@ -3280,7 +3298,27 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
 
   /* --- Log entries --- */
   .log-entry-card { padding: 10px; gap: 10px; }
-  .log-entry-date { font-size: 20px; }
+  .log-entry-date { font-size: 18px; }
+  .log-entry-notes { font-size: 11px; }
+
+  /* --- Kämpfe Mobile --- */
+  .fight-detail-grid { grid-template-columns: 1fr !important; }
+
+  /* --- Content Pages: Card Bodies hidden by default --- */
+  .card-body { max-height: 120px; overflow: hidden; position: relative; }
+  .card-body::after { content:''; position:absolute; bottom:0; left:0; right:0; height:40px; background:linear-gradient(transparent, var(--black)); pointer-events:none; }
+  [data-theme="light"] .card-body::after { background:linear-gradient(transparent, #F5F5F5); }
+
+  /* --- RPE tooltip auf Mobile entfernen --- */
+  .tt { display: none; }
+
+  /* --- Allgemein: Info-Boxes kompakter --- */
+  .info-box { font-size: 12px; padding: 10px; }
+  .info-box span { font-size: 14px; }
+
+  /* --- Supplements/Ernährung: Bilder und Content kompakt --- */
+  .supp-sidebar-img { display: none; }
+  .ern-nav button { font-size: 10px; padding: 4px 8px; }
 
   /* --- Bottom Bar Spacing --- */
   .bottom-bar { padding: 2px 0 calc(2px + env(safe-area-inset-bottom, 0px)); }
