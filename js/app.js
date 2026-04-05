@@ -475,72 +475,73 @@ function showSaeulenIntro() {
   var scroller = document.getElementById('si-scroll');
   if (!scroller) return;
 
-  // Animate hero fades
-  var fades = document.querySelectorAll('.si-fade');
-  fades.forEach(function(f) {
-    var delay = parseInt(f.getAttribute('data-delay')) || 0;
-    f.style.transition = 'opacity .8s ease, transform .8s ease';
-    f.style.transform = 'translateY(20px)';
+  var slides = document.querySelectorAll('.si-slide');
+  var totalSlides = slides.length;
+
+  // Alle Slides starten unsichtbar
+  slides.forEach(function(s) {
+    var children = s.querySelectorAll('.si-num,.si-title,.si-body,.si-why,.si-reason,.si-fade');
+    children.forEach(function(c) {
+      c.style.opacity = '0';
+      c.style.transform = 'translateY(30px)';
+      c.style.transition = 'opacity .7s ease, transform .7s ease';
+    });
+  });
+
+  // Hero sofort animieren
+  var heroFades = document.querySelectorAll('#si-0 .si-fade');
+  heroFades.forEach(function(f, i) {
     setTimeout(function() {
       f.style.opacity = '1';
       f.style.transform = 'translateY(0)';
-    }, delay);
+    }, 400 + i * 800);
   });
 
-  // Auto-scroll through slides
-  var slides = document.querySelectorAll('.si-slide');
-  var currentSlide = 0;
-  var totalSlides = slides.length;
+  // Fortschritts-Balken erstellen
+  var progressBar = document.createElement('div');
+  progressBar.style.cssText = 'position:fixed;top:0;left:0;height:3px;background:var(--red);z-index:10000;transition:width .3s ease;width:0%;';
+  el.appendChild(progressBar);
 
-  function animateSlide(idx) {
-    if (idx >= totalSlides) return;
-    var slide = slides[idx];
+  // Scroll-Hinweis unten
+  var scrollHint = document.createElement('div');
+  scrollHint.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10000;font-family:"Space Mono",monospace;font-size:11px;color:#333;letter-spacing:2px;animation:fadeSlideIn .5s ease 2.5s both;';
+  scrollHint.textContent = 'SCROLLE NACH UNTEN \u25BE';
+  el.appendChild(scrollHint);
 
-    // Fade in children
-    var children = slide.querySelectorAll('.si-num,.si-title,.si-body,.si-why,.si-reason');
-    children.forEach(function(c, ci) {
-      c.style.opacity = '0';
-      c.style.transform = 'translateY(30px)';
-      c.style.transition = 'opacity .6s ease, transform .6s ease';
-      setTimeout(function() {
-        c.style.opacity = '1';
-        c.style.transform = 'translateY(0)';
-      }, 200 + ci * 250);
-    });
-  }
-
-  // Start auto-scroll after hero (3.5s)
-  setTimeout(function() {
-    var slideIdx = 1;
-    function scrollNext() {
-      if (slideIdx >= totalSlides) return;
-      var target = slides[slideIdx];
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      animateSlide(slideIdx);
-      slideIdx++;
-      if (slideIdx < totalSlides) {
-        setTimeout(scrollNext, 3000);
-      }
-    }
-    scrollNext();
-  }, 3500);
-
-  // Allow manual scroll — stop auto-scroll on user interaction
-  var userScrolled = false;
-  scroller.addEventListener('wheel', function() { userScrolled = true; }, { once: true });
-  scroller.addEventListener('touchmove', function() { userScrolled = true; }, { once: true });
-
-  // Intersection observer for fade-in on manual scroll
+  // IntersectionObserver — animiert Slides wenn sie sichtbar werden
   if (window.IntersectionObserver) {
+    var animated = {};
     var obs = new IntersectionObserver(function(entries) {
       entries.forEach(function(e) {
-        if (e.isIntersecting) {
-          animateSlide(Array.from(slides).indexOf(e.target));
-        }
+        if (!e.isIntersecting) return;
+        var idx = Array.from(slides).indexOf(e.target);
+        if (animated[idx]) return;
+        animated[idx] = true;
+
+        var children = e.target.querySelectorAll('.si-num,.si-title,.si-body,.si-why,.si-reason,.si-fade');
+        children.forEach(function(c, ci) {
+          setTimeout(function() {
+            c.style.opacity = '1';
+            c.style.transform = 'translateY(0)';
+          }, ci * 200);
+        });
       });
-    }, { threshold: 0.3 });
+    }, { threshold: 0.3, root: scroller });
     slides.forEach(function(s) { obs.observe(s); });
   }
+
+  // Fortschritts-Balken beim Scrollen updaten
+  scroller.addEventListener('scroll', function() {
+    var scrollTop = scroller.scrollTop;
+    var scrollMax = scroller.scrollHeight - scroller.clientHeight;
+    var pct = scrollMax > 0 ? Math.round(scrollTop / scrollMax * 100) : 0;
+    progressBar.style.width = pct + '%';
+    // Scroll-Hinweis ausblenden nach erstem Scroll
+    if (scrollTop > 50 && scrollHint.parentNode) {
+      scrollHint.style.opacity = '0';
+      setTimeout(function() { if (scrollHint.parentNode) scrollHint.parentNode.removeChild(scrollHint); }, 300);
+    }
+  });
 }
 
 function closeIntro() {
