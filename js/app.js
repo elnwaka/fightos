@@ -515,6 +515,12 @@ function showPage(pageId) {
   if (pageId === 'account') renderAccountPage();
   if (pageId === 'fights') renderFightsPage();
   if (pageId === 'fight-detail') navPage = 'fights';
+  // Stop YouTube player when leaving fight-detail
+  if (pageId !== 'fight-detail' && window._fightPlayer) {
+    try { window._fightPlayer.pauseVideo(); } catch(e) {}
+    try { window._fightPlayer.destroy(); } catch(e) {}
+    window._fightPlayer = null;
+  }
   window.scrollTo(0, 0);
   // Remove focus from any input to prevent blinking caret
   if (document.activeElement && document.activeElement.tagName !== 'BODY') {
