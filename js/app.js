@@ -3611,7 +3611,12 @@ function generateSmartWeekPlan() {
         else if (d.type === 'technik') boxHint = 'Technik-Fokus: Einzelne Schlaege und Bewegungen perfektionieren';
         else if (d.type === 'pa') boxHint = 'Partnerarbeit: Drill-basiert, Angriff-Verteidigung im Wechsel';
         else boxHint = 'Warm-up → Sandsack/Pratzen → Sparring-Simulation → Cool-down';
-        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Warm-up: Seilspringen + Mobility', hint: '3 Min. Seil, Schulterkreise, Hueftmobilisation, 1 Runde Shadow Boxing', type: 'boxing' });
+        // IMT 2. Session (mittags — Saeulen sagen 2x taeglich)
+        if (!isWeekend) {
+          blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'IMT — 30 Atemzuege (2. Session)', hint: '2x taeglich laut Protokoll — progressiver Widerstand alle 2 Wochen', type: 'meta',
+            exercises: [{id:'imt',label:'IMT'}] });
+        }
+        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Warm-up: Seilspringen + Face Pulls 3x15', hint: '3 Min. Seil, Face Pulls mit Band, Schulterkreise, 1 Runde Shadow Boxing', type: 'boxing' });
         blocks.push({ time: d.time, title: trainingLabel, hint: boxHint, type: 'boxing' });
         blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Dehnung + Handpflege 10 Min.', hint: 'Stretching: Hueftbeuger, Schultern + Handgelenke kreisen, Finger dehnen', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'}] });
@@ -3633,10 +3638,14 @@ function generateSmartWeekPlan() {
             blocks.push({ time: timeAdd(scTime, 0, 45), title: 'Nackentraining 10 Min.', hint: 'Isometrisch: Stirn, Hinterkopf, Seiten — je 3x10 Sek. halten', type: 'strength',
               exercises: [{id:'iso-nacken',label:'Iso Nacken'},{id:'nacken-flexion',label:'Nacken Flexion'}] });
           }
-          if (canHIIT && hiitCount < 2) {
+          if (canHIIT && hiitCount === 0) {
             hiitCount++;
-            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'HIIT 4x4 Protokoll + Zone 2 Cool-down', hint: '4x4 Min. bei 90-95% Puls, 3 Min. Pause dazwischen, danach 10 Min. locker auslaufen', type: 'cardio',
+            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'HIIT 4x4 Protokoll', hint: '4x4 Min. bei 90-95% Puls, 3 Min. aktive Pause, danach 10 Min. Cool-down', type: 'cardio',
               exercises: [{id:'hiit-4x4',label:'HIIT 4x4'}] });
+          } else if (canHIIT && hiitCount === 1) {
+            hiitCount++;
+            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'SIT — Sprint Intervalle', hint: '8-10x 30 Sek. All-Out-Sprint, 3-4 Min. Pause. Trainiert PCr-Resynthese zwischen Kombis. Nie vor Sparring!', type: 'cardio',
+              exercises: [{id:'sit-sprints',label:'SIT Sprints'}] });
           } else {
             blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio ' + cardioLabel, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140 (min. 30 Min. fuer volle Wirkung)', type: 'cardio',
               exercises: [{id:'zone2',label:'Zone 2'}] });

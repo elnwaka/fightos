@@ -334,8 +334,8 @@ Das kubanische Boxsystem und moderne Sportforschung zeigen: Die effektivste Meth
 • <strong>Tempo-Variation:</strong> Runde 1 bei 50%, Runde 2 bei 80%, Runde 3 bei 100% → kognitive Kontrolle über Intensität<br>
 • <strong>Eingeschränktes Sichtfeld:</strong> Sparring nur mit peripherem Sehen (Blick auf Brust fixiert)<br><br>
 
-<strong style="font-size:15px;">KOGNITIVE ERMÜDUNGSRESISTENZ (BET)</strong><br>
-${tt('BET','Brain Endurance Training — kognitives Training unter Ermüdung. Dein Gehirn lernt, bei mentaler Erschöpfung trotzdem präzise zu arbeiten.')} ist ein vielversprechender Zusatz, aber kein Ersatz für boxspezifisches Training. Marcora et al. (2015) zeigten in einer <em>Militärstudie</em>: +126% Ausdauer mit BET vs. +42% nur physisch — allerdings an Soldaten, nicht an Boxern. Der Transfer auf den Boxring ist plausibel, aber noch nicht direkt belegt. Van Cutsem et al. (2017) bestätigten: Mentale Ermüdung reduziert physische Leistung um <strong>5–10%</strong>.<br><br>
+<strong style="font-size:15px;">KOGNITIVE ERMÜDUNGSRESISTENZ (BET)</strong> <span style="font-size:10px;color:var(--gold);border:1px solid var(--gold);padding:1px 6px;border-radius:3px;">EXPERIMENTELL</span><br>
+${tt('BET','Brain Endurance Training — kognitives Training unter Ermüdung. Dein Gehirn lernt, bei mentaler Erschöpfung trotzdem präzise zu arbeiten.')} ist ein vielversprechender Zusatz, aber kein Ersatz für boxspezifisches Training. Marcora et al. (2015) zeigten in einer <em>Militärstudie (nicht an Boxern!)</em>: +126% Ausdauer mit BET vs. +42% nur physisch. <strong>Achtung: Diese Studie war an Soldaten</strong> — der Transfer auf den Boxring ist plausibel und wird von GB Boxing genutzt, aber boxspezifische Evidenz fehlt noch. Van Cutsem et al. (2017) bestätigten allgemein: Mentale Ermüdung reduziert physische Leistung um <strong>5–10%</strong>.<br><br>
 
 BET konfrontiert dein Gehirn mit kognitiven Aufgaben (${tt('Stroop-Test','Farbwörter erscheinen in falscher Farbe. Du musst die FARBE benennen, nicht das Wort. Trainiert Impulshemmung und kognitive Belastbarkeit.')}, Rechenaufgaben) WÄHREND oder vor dem Training. Der ${tt('Anteriore cinguläre Cortex','Gehirnregion, die Anstrengung bewertet. Wird durch BET effizienter — wie ein Prozessor-Upgrade für dein Gehirn.')} wird effizienter, dein mentales Erschöpfungslimit verschiebt sich nach oben.<br><br>
 
@@ -345,7 +345,7 @@ BET konfrontiert dein Gehirn mit kognitiven Aufgaben (${tt('Stroop-Test','Farbw�
 • Gaze-Anker-Technik: In jedem Sparring auf Brust/Kinn fixieren, NICHT den Fäusten folgen<br>
 • Kampffilm-Analyse: 15–20 Min./Woche — Gegner-Videos → bewusst Tells suchen<br><br>
 <strong>Zusatztools (Priorität 2):</strong><br>
-• Stroboskop-Brille: 1–2×/Woche beim Pratzentraining — Hülsdünker et al. (2019) zeigten +12–18% visuelle Verarbeitung, aber der Effekt ist noch nicht eindeutig auf den Boxring übertragbar<br>
+• <span style="color:var(--gold);">[Experimentell]</span> Stroboskop-Brille: 1–2×/Woche beim Pratzentraining — Hülsdünker et al. (2019) zeigten +12–18% visuelle Verarbeitung im Labor, aber <strong>Transfer auf den Ring ist noch nicht belegt</strong><br>
 • BET-Protokoll: Stroop-Test-App, 15–25 Min./Tag, progressiv zwischen Trainingseinheiten integrieren<br>
 • Reaktionsdrills: Partner zeigt Zahlen/Farben → du reagierst mit spezifischen Kombis`,
     tags:[{text:'Täglich · 15–25 Min.',cls:'tag-gold'},{text:'BET + Blicktraining',cls:'tag-blue'}]},
@@ -514,7 +514,7 @@ Die Ecke ist dein taktisches Gehirn zwischen den Runden. Effektive Corner-Kommun
 Boxer belasten ihren Körper extrem einseitig: Tausende Schläge pro Woche, immer in derselben Kampfstellung, repetitive Kopfbewegungen, harte Treffer auf Kopf und Körper. Mao et al. (2023) analysierten die Verletzungsepidemiologie im Boxen: <strong>Hand/Handgelenk (28%), Gesicht/Kopf (23%), Schulter (12%)</strong> sind die häufigsten Verletzungsorte. Ohne gezielte Prävention sind diese Verletzungen nur eine Frage der Zeit.<br><br>
 
 <strong style="font-size:15px;">NACKENTRAINING — KO-PRÄVENTION</strong><br>
-Ein KO entsteht durch die <strong>Rotationsbeschleunigung</strong> des Gehirns im Schädel. Dein Nacken ist die einzige Struktur, die diese Rotation bremsen kann. Die Collins-Studie (2014, <strong>n=6704</strong>) fand: <strong>Jedes zusätzliche Pfund Nackenmuskulatur reduziert das Gehirnerschütterungsrisiko um 5%</strong>. Wichtig: Diese Studie war an Jugendlichen — bei erwachsenen Boxern ist der Effekt wahrscheinlich kleiner, aber die Richtung stimmt (Eckner et al. 2014). Ein angespannter Nacken verbindet den Kopf mit dem Oberkörper (15–30kg ${tt('Effektive Masse','Die Masse, die dem Schlag entgegenwirkt. Mehr effektive Masse = weniger Beschleunigung = weniger KO-Risiko.')}) — 3–6× mehr Masse gegen den Schlag.<br><br>
+Ein KO entsteht durch die <strong>Rotationsbeschleunigung</strong> des Gehirns im Schädel. Dein Nacken ist die einzige Struktur, die diese Rotation bremsen kann. Die Collins-Studie (2014, <strong>n=6704, an Jugendlichen</strong>) fand einen signifikanten Zusammenhang zwischen Nackenmuskulatur und reduziertem Gehirnerschütterungsrisiko. <strong>Bei erwachsenen Boxern ist der genaue Effekt kleiner, aber die Richtung ist klar belegt</strong> (Eckner et al. 2014): Stärkerer Nacken = weniger Kopfbeschleunigung bei Treffern. Ein angespannter Nacken verbindet den Kopf mit dem Oberkörper (15–30kg ${tt('Effektive Masse','Die Masse, die dem Schlag entgegenwirkt. Mehr effektive Masse = weniger Beschleunigung = weniger KO-Risiko.')}) — 3–6× mehr Masse gegen den Schlag.<br><br>
 
 <strong>Erweitertes Nackenprotokoll (3×/Woche, 10–15 Min.):</strong><br>
 • <strong>Isometrie:</strong> 4 Richtungen gegen Hand oder Band, 3×8 Sek. — die Basis<br>
@@ -1129,7 +1129,7 @@ const exercisesAusdauer = [
     desc:'Grundsprung: Handgelenke drehen, Ellbogen eng am Körper, minimal vom Boden abheben. Variationen: Single Leg, Double Under, Boxer Skip, Criss-Cross. 3–10 Runden á 3 Min.',
     sets:['Runden: <strong>3–10 × 3 Min.</strong>','Pause: <strong>30–60 Sek.</strong>','Frequenz: <strong>Jedes Training</strong>'],
     tipLabel:'DIE Boxing-Übung', tip:'Kein Boxtraining ohne Seilspringen. Trainiert Rhythmus, Timing, Waden-Ausdauer und Koordination gleichzeitig. Jedes Profi-Camp weltweit beginnt damit.',
-    boxingConnection:'Seilspringen ist seit über 100 Jahren fester Bestandteil jedes Boxing-Camps — aus gutem Grund. Es trainiert: (1) Waden-Ausdauer für leichtfüßige Beinarbeit über 12 Runden, (2) Schulter-Ausdauer durch konstante Armbewegung, (3) Rhythmus und Timing — fundamentale Boxing-Skills, (4) Koordination zwischen Ober- und Unterkörper. Floyd Mayweather: 30 Min. Seilspringen pro Session als Grundlage seiner legendären Beinarbeit.',
+    boxingConnection:'Seilspringen ist seit über 100 Jahren fester Bestandteil jedes Boxing-Camps — aus gutem Grund. Es trainiert: (1) Waden-Ausdauer für leichtfüßige Beinarbeit über 12 Runden, (2) Schulter-Ausdauer durch konstante Armbewegung, (3) Rhythmus und Timing — fundamentale Boxing-Skills, (4) Koordination zwischen Ober- und Unterkörper. Floyd Mayweather trainierte bis zu 30 Min. Seilspringen pro Session — häufig zitiert, nicht wissenschaftlich dokumentiert.',
     video:'https://www.youtube.com/results?search_query=boxing+jump+rope+tutorial+beginner+to+advanced'}
 ];
 
@@ -1139,7 +1139,7 @@ const exercisesArmor = [
     desc:'Hand gegen Stirn drücken, Kopf hält dagegen. 8–10 Sek. pro Richtung (vorne, hinten, links, rechts). Kein Equipment nötig. Ideal als Desk-Übung und Morgentraining.',
     sets:['Sets: <strong>3 je Richtung</strong>','Hold: <strong>8–10 Sek.</strong>','Frequenz: <strong>3×/Woche</strong>'],
     tipLabel:'WICHTIG', tip:'NIEMALS Nackenbrücken! Cervikale Kompression + Bewegung = Bandscheibenrisiko. Isometrie ist sicherer UND effektiver.',
-    boxingConnection:'+1 Pfund Nackenmuskulatur = 5% weniger KO-Risiko (Collins et al., 2014, n=6704). Die Nackenmuskulatur erhöht die effektive Masse des Kopf-Hals-Segments und reduziert die Rotationsbeschleunigung bei Treffern. Isometrisches Training ist dabei sicherer als dynamische Übungen, da keine cervikale Kompression unter Bewegung entsteht.',
+    boxingConnection:'Signifikanter Zusammenhang zwischen Nackenstaerke und KO-Schutz (Collins et al. 2014, n=6704 — Jugendstudie, Effekt bei Erwachsenen kleiner aber belegt). Die Nackenmuskulatur erhoeht die effektive Masse des Kopf-Hals-Segments und reduziert die Rotationsbeschleunigung bei Treffern. Isometrisches Training ist sicherer als dynamische Uebungen.',
     video:'https://www.youtube.com/results?search_query=isometric+neck+exercises+strengthening+combat'},
   { id:'nacken-flexion', muscles:['nacken'], name:'NACKEN-FLEXION MIT TELLER', muscle:'Sternocleidomastoideus, Scaleni',
     goals:['chin','injury'],
@@ -1239,7 +1239,7 @@ const exercisesPowerEndurance = [
     desc:'30 Sek. All-Out Kombinationen am Sandsack → 30 Sek. aktive Erholung (Beinarbeit). 6–10 Runden. Puls muss in der Arbeit auf >85% HFmax. Qualität der Schläge hoch halten!',
     sets:['Work: <strong>30 Sek. All-Out</strong>','Rest: <strong>30 Sek. aktiv</strong>','Runden: <strong>6–10</strong>'],
     tipLabel:'Boxing Science', tip:'Das ist Kraftausdauer — die Fähigkeit, harte Schläge über die gesamte Kampfdauer zu werfen. Die meisten Boxer verlieren Schlagkraft ab Runde 2.',
-    boxingConnection:'Boxing Science betont: Der größte Unterschied zwischen Elite- und Amateur-Boxern ist nicht die maximale Schlagkraft, sondern die Fähigkeit, diese über 3+ Runden aufrechtzuerhalten. Sandsack-Intervalle trainieren die laktazide Kapazität — die Fähigkeit, trotz steigendem Laktat weiter explosive Schläge zu werfen. Punch-Output sinkt bei untrainierten Boxern um 40% zwischen Runde 1 und 3.',
+    boxingConnection:'Boxing Science betont: Der größte Unterschied zwischen Elite- und Amateur-Boxern ist nicht die maximale Schlagkraft, sondern die Fähigkeit, diese über 3+ Runden aufrechtzuerhalten. Sandsack-Intervalle trainieren die laktazide Kapazität — die Fähigkeit, trotz steigendem Laktat weiter explosive Schläge zu werfen. Punch-Output sinkt bei untrainierten Boxern um ca. 40% zwischen Runde 1 und 3 (Praxiswert aus Trainingsbeobachtung).',
     video:'https://www.youtube.com/results?search_query=heavy+bag+interval+training+boxing+conditioning'},
   { id:'barbell-complex', muscles:['quad_l','quad_r','gluteus','schulter_l','schulter_r','core'], name:'BARBELL COMPLEX', muscle:'Gesamtkörper — Kraftausdauer + metabolische Konditionierung',
     goals:['stamina','power','clinch'],
@@ -1269,8 +1269,8 @@ const exercisesSpecial = [
     goals:['power','jab'],
     desc:'Manschetten am Oberarm, 40–50% Okklusion, 20–30% 1RM. Protokoll: 30-15-15-15 Reps mit 30 Sek. Pause. Erzeugt Hypertrophie bei minimaler mechanischer Last.',
     sets:['Schema: <strong>30/15/15/15</strong>','Last: <strong>20–30% 1RM</strong>','Okklusion: <strong>40–50%</strong>'],
-    tipLabel:'Evidenz', tip:'2025 RCT: Jab +18%, Cross +21% nach 8 Wochen. Ideal in Schärfungsphase — kein Muskelschaden, trotzdem Kraft-Gain.',
-    boxingConnection:'BFR erzeugt lokale metabolische Erschöpfung und Wachstumshormon-Ausschüttung bei nur 20-30% 1RM — kein Muskelschaden, minimale ZNS-Belastung. Ein 2025 RCT an Elite-Boxern (n=30) zeigte nach 8 Wochen: Jab-Kraft +18%, Cross-Kraft +21%. Perfekt für die Schärfungsphase vor Wettkämpfen, wenn schweres Training vermieden werden muss, aber Kraftzuwächse erwünscht sind.',
+    tipLabel:'Evidenz', tip:'Amani-Shalamzari et al. (2025): Jab +18%, Cross +21% nach 8 Wo. (n=30, einzelne Studie). Ideal in Schaerfungsphase.',
+    boxingConnection:'BFR erzeugt lokale metabolische Erschoepfung und Wachstumshormon-Ausschuettung bei nur 20-30% 1RM — kein Muskelschaden, minimale ZNS-Belastung. Amani-Shalamzari et al. (2025, n=30 Elite-Boxer) zeigten nach 8 Wochen: Jab-Kraft +18%, Cross-Kraft +21%. Hinweis: Einzelstudie, weitere Replikation noetig. Perfekt fuer die Schaerfungsphase vor Wettkampf.',
     video:'https://www.youtube.com/results?search_query=blood+flow+restriction+BFR+training+arms+guide'},
   { id:'imt', muscles:['core'], name:'IMT POWERBREATHE', muscle:'Diaphragma, Interkostalmuskulatur',
     goals:['stamina'],
