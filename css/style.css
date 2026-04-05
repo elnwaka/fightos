@@ -25,6 +25,22 @@
 * { margin: 0; padding: 0; box-sizing: border-box; caret-color: transparent; }
 input:focus, textarea:focus, select:focus, [contenteditable]:focus { caret-color: var(--white); }
 html { scroll-behavior: smooth; }
+
+/* Animations */
+@keyframes fadeSlideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeSlideOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-8px); } }
+@keyframes shake { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-5px); } 75% { transform:translateX(5px); } }
+@keyframes growWidth { from { width:0; } }
+@keyframes pulseGlow { 0%,100% { box-shadow:0 0 0 0 rgba(232,0,13,.3); } 50% { box-shadow:0 0 12px 4px rgba(232,0,13,.15); } }
+
+.anim-fade-in { animation: fadeSlideIn .3s ease forwards; }
+.anim-fade-out { animation: fadeSlideOut .3s ease forwards; }
+.anim-shake { animation: shake .3s; }
+.anim-pulse { animation: pulseGlow 2s ease infinite; }
+
+/* Scroll reveal (vanilla, applied by IntersectionObserver) */
+.reveal { opacity:0; transform:translateY(20px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
 body {
   background: var(--black);
   color: var(--light);
@@ -35,6 +51,18 @@ body {
   line-height: 1.7;
   cursor: default;
 }
+
+/* Säulen Intro */
+.si-slide { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+.si-center { max-width:520px; text-align:center; }
+.si-num { font-family:'Bebas Neue',sans-serif; font-size:120px; opacity:.15; line-height:.8; }
+.si-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(28px,5vw,42px); letter-spacing:2px; margin-top:-20px; }
+.si-body { font-family:'DM Sans',sans-serif; font-size:15px; color:#888; line-height:1.8; margin-top:20px; }
+.si-why { font-family:'Space Mono',monospace; font-size:11px; margin-top:20px; letter-spacing:1px; }
+.si-reason { font-family:'DM Sans',sans-serif; font-size:13px; color:#555; margin-top:8px; line-height:1.6; }
+.si-btn { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; padding:18px 56px; background:var(--red); color:#fff; border:none; border-radius:6px; cursor:pointer; transition:transform .15s,box-shadow .2s; }
+.si-btn:hover { transform:scale(1.03); box-shadow:0 0 30px rgba(232,0,13,.2); }
+.si-btn:active { transform:scale(.97); }
 
 /* Noise overlay */
 body::before {
@@ -139,7 +167,7 @@ body::before {
   transition: var(--trans);
 }
 .form-input, textarea, input[type="text"], input[type="number"], input[type="url"], input[type="email"], input[type="password"] { cursor: text; }
-.form-input:focus { border-color: var(--red); box-shadow: 0 0 0 2px rgba(232,0,13,.15); }
+.form-input:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(232,0,13,.12), 0 0 16px rgba(232,0,13,.06); }
 .form-input::placeholder { color: #444; }
 .form-select {
   width: 100%;
@@ -562,8 +590,16 @@ body::before {
   padding: 32px 24px;
   max-width: 1200px;
   margin: 0 auto;
+  opacity: 0;
+  transform: translateY(12px);
 }
-.page.active { display: block; }
+.page.active {
+  display: block;
+  animation: pageIn .35s ease forwards;
+}
+@keyframes pageIn {
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* Page headers */
 .page-header { margin-bottom: 40px; }
@@ -1461,7 +1497,8 @@ body::before {
   cursor: pointer;
   transition: var(--trans);
 }
-.submit-btn:hover { background: #c00010; transform: translateY(-1px); }
+.submit-btn:hover { background: #c00010; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(232,0,13,.25); }
+.submit-btn:active { transform: translateY(0) scale(.97); transition-duration: .08s; }
 
 /* Log entries */
 .log-entries { display: flex; flex-direction: column; gap: 10px; }
@@ -1628,7 +1665,15 @@ body::before {
   align-items: center;
   justify-content: center;
 }
-.modal-overlay.active { display: flex; }
+.modal-overlay.active {
+  display: flex;
+  animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.modal-overlay.active .modal {
+  animation: modalSlideIn .3s ease;
+}
+@keyframes modalSlideIn { from { opacity:0; transform:translateY(20px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
 .modal {
   background: var(--dark2);
   border: 1px solid #2a2a2a;

@@ -572,6 +572,32 @@ function saveData(data) {
   localStorage.setItem('fos_data_' + currentUser, JSON.stringify(data));
 }
 
+// ===== SCROLL REVEAL (Intersection Observer) =====
+var _revealObserver = null;
+function initRevealObserver() {
+  if (_revealObserver || !window.IntersectionObserver) return;
+  _revealObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        _revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+}
+
+function applyRevealToPage() {
+  if (!_revealObserver) initRevealObserver();
+  if (!_revealObserver) return;
+  // Apply to cards, stat bars, test cards etc.
+  document.querySelectorAll('.page.active .card, .page.active .day-col, .page.active .tests-cluster, .page.active .dash-profil').forEach(function(el) {
+    if (!el.classList.contains('reveal') && !el.classList.contains('visible')) {
+      el.classList.add('reveal');
+      _revealObserver.observe(el);
+    }
+  });
+}
+
 // ===== NAVIGATION + HASH ROUTING =====
 var _skipHashUpdate = false;
 
@@ -620,6 +646,8 @@ function showPage(pageId) {
   if (document.activeElement && document.activeElement.tagName !== 'BODY') {
     document.activeElement.blur();
   }
+  // Scroll reveal on new page
+  setTimeout(applyRevealToPage, 100);
   // Update URL hash
   if (!_skipHashUpdate) {
     location.hash = pageId === 'dashboard' ? '' : pageId;
