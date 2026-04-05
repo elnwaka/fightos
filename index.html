@@ -294,80 +294,76 @@
   <!-- ===== PAGE: DASHBOARD ===== -->
   <div class="page active" id="page-dashboard">
 
-    <!-- KAMPF COUNTDOWN — das Erste was man sieht -->
+    <!-- COUNTDOWN -->
     <div id="dash-countdown-hero"></div>
 
-    <!-- HEUTE — was steht an -->
-    <div style="margin-bottom:16px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--white);margin-bottom:12px;">HEUTE</div>
+    <!-- HEUTE -->
+    <div class="app-card">
+      <div class="app-card-header" onclick="toggleSection('daily-combined')">
+        <span>HEUTE</span>
+        <span id="checklist-score" style="font-size:12px;color:#555;"></span>
+      </div>
       <div id="daily-combined"></div>
-      <div id="checklist-score" style="display:none;"></div>
     </div>
 
-    <!-- TRAINING LOGGEN — eine Zeile -->
-    <div style="background:var(--dark2);border:1px solid #1e1e1e;border-radius:var(--radius);padding:14px;margin-bottom:16px;">
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-        <select id="qlog-type" class="form-select" style="flex:1;min-width:90px;padding:10px;font-size:14px;" onchange="updateQlogSaeulen()">
+    <!-- QUICK LOG -->
+    <div class="app-card">
+      <div class="app-card-header">TRAINING LOGGEN</div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;">
+        <select id="qlog-type" class="app-input" onchange="updateQlogSaeulen()">
           <option value="boxen">Boxen</option>
           <option value="sparring">Sparring</option>
           <option value="kraft">Kraft</option>
           <option value="cardio">Cardio</option>
           <option value="mobility">Mobility</option>
         </select>
-        <input type="number" id="qlog-duration" class="form-input" style="width:65px;padding:10px;font-size:14px;" placeholder="Min" min="1" max="300">
-        <input type="number" id="qlog-rpe" class="form-input" style="width:55px;padding:10px;font-size:14px;" placeholder="RPE" min="1" max="10">
-        <button class="submit-btn" style="padding:10px 20px;font-size:14px;" onclick="quickLog()">LOG</button>
+        <input type="number" id="qlog-duration" class="app-input" style="width:60px;" placeholder="Min" min="1" max="300">
+        <input type="number" id="qlog-rpe" class="app-input" style="width:50px;" placeholder="RPE" min="1" max="10">
+        <button class="app-btn" onclick="quickLog()">LOG</button>
       </div>
       <div id="qlog-saeulen" style="display:none;"></div>
-      <div id="qlog-confirm" style="display:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--green);margin-top:8px;text-align:center;"></div>
+      <div id="qlog-confirm" style="display:none;font-size:13px;color:var(--green);margin-top:8px;text-align:center;"></div>
     </div>
 
-    <!-- HRV — eine Zeile -->
-    <div style="background:var(--dark2);border:1px solid #1e1e1e;border-radius:var(--radius);padding:14px;margin-bottom:16px;">
-      <div style="display:flex;gap:6px;align-items:center;">
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);min-width:40px;">HRV</span>
-        <input type="number" id="hrv-input" class="form-input" style="flex:1;padding:10px;font-size:14px;" placeholder="RMSSD Wert" min="1" max="200">
-        <button class="submit-btn" style="padding:10px 20px;font-size:14px;" onclick="logHRV()">LOG</button>
+    <!-- HRV -->
+    <div class="app-card">
+      <div class="app-card-header">HRV</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="number" id="hrv-input" class="app-input" style="flex:1;" placeholder="RMSSD eingeben" min="1" max="200">
+        <button class="app-btn" onclick="logHRV()">LOG</button>
       </div>
-      <div id="hrv-display" style="margin-top:8px;"></div>
+      <div id="hrv-display" style="margin-top:10px;"></div>
     </div>
 
-    <!-- HINWEISE — nur wenn relevant -->
+    <!-- HINWEISE -->
     <div id="dash-hinweise"></div>
 
-    <!-- LETZTE KÄMPFE -->
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);cursor:pointer;" onclick="showPage('fights')">KÄMPFE</div>
-        <button class="submit-btn" style="padding:6px 14px;font-size:12px;" onclick="openFightModal()">+ KAMPF</button>
+    <!-- KÄMPFE -->
+    <div class="app-card">
+      <div class="app-card-header">
+        <span onclick="showPage('fights')" style="cursor:pointer;">KÄMPFE</span>
+        <button class="app-btn-sm" onclick="openFightModal()">+ KAMPF</button>
       </div>
       <div id="fight-log-list"></div>
     </div>
 
     <!-- LETZTE EINHEITEN -->
-    <div style="margin-bottom:16px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:12px;cursor:pointer;" onclick="showPage('log')">LETZTE EINHEITEN</div>
+    <div class="app-card">
+      <div class="app-card-header" onclick="showPage('log')" style="cursor:pointer;">LETZTE EINHEITEN</div>
       <div id="recent-log"></div>
     </div>
 
     <!-- PROFIL (nur Desktop) -->
     <div class="dash-profil">
-      <div class="dash-radar-col">
-        <canvas id="rpg-radar" width="320" height="320"></canvas>
-      </div>
-      <div class="dash-scores-col">
-        <div id="dash-stats"></div>
-      </div>
+      <div class="dash-radar-col"><canvas id="rpg-radar" width="320" height="320"></canvas></div>
+      <div class="dash-scores-col"><div id="dash-stats"></div></div>
     </div>
-    <div id="saeulen-self-rating" class="dash-hide-mobile" style="margin-top:16px;"></div>
-    <div id="bench-summary" class="dash-hide-mobile" style="margin-top:12px;font-family:'Space Mono',monospace;font-size:11px;color:#555;cursor:pointer;" onclick="showPage('tests')"></div>
-
-    <!-- Kampfdatum (Desktop) -->
+    <div id="saeulen-self-rating" class="dash-hide-mobile"></div>
+    <div id="bench-summary" class="dash-hide-mobile" style="margin-top:12px;font-size:11px;color:#555;cursor:pointer;" onclick="showPage('tests')"></div>
     <div class="dash-hide-mobile" style="margin-top:16px;">
       <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">NÄCHSTER KAMPF</span>
-        <input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:6px 10px;font-size:12px;" onchange="updateFightDate()">
-        <button class="submit-btn" style="padding:4px 10px;font-size:10px;" onclick="clearFightDate()">×</button>
+        <input type="date" id="fight-date-input" class="app-input" style="width:auto;" onchange="updateFightDate()">
+        <button class="app-btn-sm" onclick="clearFightDate()">×</button>
       </div>
     </div>
   </div>

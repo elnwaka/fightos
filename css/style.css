@@ -219,6 +219,74 @@ button:active, .submit-btn:active { transform: scale(.97); transition-duration: 
 /* Larger touch targets */
 .nav-btn, .nav-hub-btn, .nav-drop-item { min-height: 44px; display: inline-flex; align-items: center; }
 
+/* ===== APP-LIKE COMPONENTS ===== */
+.app-card {
+  background: var(--dark2);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.app-card-header {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: var(--white);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.app-input {
+  background: var(--dark3);
+  border: none;
+  border-radius: 10px;
+  color: var(--white);
+  padding: 12px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: box-shadow .15s;
+  -webkit-appearance: none;
+}
+.app-input:focus {
+  box-shadow: 0 0 0 2px rgba(232,0,13,.3);
+}
+.app-input::placeholder { color: #444; }
+.app-btn {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: transform .1s, opacity .1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.app-btn:active { transform: scale(.95); opacity: .8; }
+.app-btn-sm {
+  background: rgba(232,0,13,.15);
+  color: var(--red);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.app-btn-sm:active { opacity: .6; }
+
+/* Light Mode */
+[data-theme="light"] .app-card { background: #FFF; border-color: #E8E8E8; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+[data-theme="light"] .app-input { background: #F2F2F2; color: #111; }
+[data-theme="light"] .app-input::placeholder { color: #999; }
+[data-theme="light"] .app-btn-sm { background: rgba(213,0,0,.08); }
+
 /* Noise overlay */
 body::before {
   content: '';
