@@ -876,18 +876,6 @@ body::before {
   opacity: .5;
 }
 .dash-hero-left { flex: 1; min-width: 0; }
-.dash-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.dash-action-card {
-  background: var(--dark2);
-  border: 1px solid #1e1e1e;
-  border-radius: var(--radius);
-  padding: 12px;
-}
 .rpg-name {
   font-family: 'Bebas Neue', sans-serif;
   font-size: clamp(36px, 5vw, 52px);

@@ -908,9 +908,9 @@ function renderFightCountdown() {
   if (!data) return;
   if (!data.upcomingFights) data.upcomingFights = [];
   if (data.upcomingFights.length > 0) syncPrimaryFightDate(data);
-  const display = document.getElementById('fight-countdown-display');
+  const display = document.getElementById('dash-countdown-hero');
   const input = document.getElementById('fight-date-input');
-  if (data.fightDate) input.value = data.fightDate;
+  if (input && data.fightDate) input.value = data.fightDate;
 
   const upcomingListHTML = buildUpcomingFightsHTML(data);
   const addBtnHTML = (data.upcomingFights.length < 5)
@@ -1090,10 +1090,6 @@ function renderDashStats() {
   if (!data) return;
   const el = document.getElementById('dash-stats');
 
-  // Set player name (Alter Ego > Nickname > Username)
-  const nameEl = document.getElementById('rpg-player-name');
-  if (nameEl) nameEl.textContent = getDisplayName().toUpperCase();
-
   // Subtitle
   const fights = data.fights || [];
   const wins = fights.filter(f => f.result === 'S').length;
@@ -1104,7 +1100,7 @@ function renderDashStats() {
     const first = new Date(data.log[data.log.length - 1].date);
     weeks = Math.max(1, Math.round((Date.now() - first) / (7 * 86400000)));
   }
-  const subEl = document.getElementById('rpg-subtitle');
+  const subEl = null; // rpg-subtitle removed from dashboard
   if (subEl) {
     let phase = 'AUFBAU';
     if (data.fightDate) {
