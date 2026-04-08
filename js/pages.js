@@ -968,7 +968,7 @@ function renderUebungenPage() {
     ${fS.map(e => { counter++; return exCard(e, counter, 'var(--gold)'); }).join('')}
   </div>` : ''}
 
-  <div style="margin-top:20px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;">
+  <div style="margin-top:20px;padding:16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:6px;">
     <div style="font-size:12px;color:#444;line-height:1.6;">QUELLEN: Boxing Science (Danny Wilson BSc MSc ASCC) · Phil Daru (Daru Strong) · Ross Enamait · Collins et al. 2014 (Neck/Concussion) · Loturco et al. 2016 (Punch Force) · PMC 2024 (VRT) · ExpertBoxing</div>
   </div>`;
 }
@@ -1347,7 +1347,7 @@ function openExerciseDetail(id) {
 
       ${e.video ? `<div class="ex-detail-section">
         <div class="ex-detail-section-title" style="color:${color};">AUSFÜHRUNGS-VIDEO</div>
-        <a href="${e.video}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:var(--white);text-decoration:none;font-size:13px;transition:all .2s;">
+        <a href="${e.video}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--surface-2);border:1px solid #333;border-radius:6px;color:var(--white);text-decoration:none;font-size:13px;transition:all .2s;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M10 8l6 4-6 4V8z" fill="${color}"/><rect x="2" y="4" width="20" height="16" rx="3" stroke="${color}" stroke-width="1.5" fill="none"/></svg>
           Video-Anleitung auf YouTube
         </a>
@@ -1933,11 +1933,11 @@ function renderErnaehrungPage() {
     </div>
   </div>
 
-  <div style="margin-top:30px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;">
+  <div style="margin-top:30px;padding:16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:6px;">
     <div style="font-size:12px;color:#444;line-height:1.6;">QUELLEN: ISSN Position Stand – Protein and Exercise (2017) · ACSM Nutrition and Athletic Performance (2016) · Boxing Science Nutrition Guide (Danny Wilson) · Phil Daru Fight Nutrition · Helms et al. 2014 (Protein during weight loss) · Thomas et al. 2016 (ACSM/AND/DC) · Maughan et al. 2018 (IOC Consensus) · Burke et al. 2019 (Carbohydrate for athletes) · Schoenfeld & Aragon 2018 (Protein timing meta-analysis)</div>
   </div>
 
-  <div class="related-links" style="margin-top:32px;padding-top:24px;border-top:1px solid #1a1a1a;display:flex;flex-wrap:wrap;gap:10px;">
+  <div class="related-links" style="margin-top:32px;padding-top:24px;border-top:1px solid var(--surface-2);display:flex;flex-wrap:wrap;gap:10px;">
     <span style="font-family:'Space Mono',monospace;font-size:11px;color:#444;align-self:center;">SIEHE AUCH:</span>
     <button onclick="showPage('cutten')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:4px;padding:6px 14px;cursor:pointer;">Gewicht machen</button>
     <button onclick="showPage('supplements')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);background:none;border:1px solid rgba(0,200,83,.2);border-radius:4px;padding:6px 14px;cursor:pointer;">Supplements</button>
@@ -2883,7 +2883,7 @@ function renderMentalPage() {
   </div>
 
   <!-- DAILY PROTOCOL -->
-  <div style="margin-top:40px;padding-top:32px;border-top:1px solid #1a1a1a;">
+  <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--surface-2);">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin-bottom:16px;">TÄGLICHES PROTOKOLL <span style="color:var(--gold);">15 MIN.</span></div>
     <div class="mt-daily">
       <div class="mt-slot" style="--mc:var(--blue);">
