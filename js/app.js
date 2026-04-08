@@ -3786,17 +3786,62 @@ function renderLogEntries() {
   if (!data) return;
   const el = document.getElementById('log-entries');
   if (!el) return;
-  if (!data.log || !data.log.length) { el.innerHTML = '<div style="font-size:12px;color:#444;">Noch keine Einträge.</div>'; return; }
+
+  // Week stats
+  var statsEl = document.getElementById('log-week-stats');
+  if (statsEl && data.log) {
+    var today = new Date(); today.setHours(0,0,0,0);
+    var dow = today.getDay() === 0 ? 7 : today.getDay();
+    var monday = new Date(today); monday.setDate(today.getDate() - (dow - 1));
+    var monStr = monday.toISOString().split('T')[0];
+    var weekLogs = data.log.filter(function(e) { return e.date >= monStr; });
+    var weekSessions = weekLogs.length;
+    var weekMin = weekLogs.reduce(function(s,e) { return s + (parseInt(e.duration) || 0); }, 0);
+    var rpeVals = weekLogs.map(function(e) { return parseFloat(e.rpe); }).filter(function(v) { return v > 0; });
+    var avgRpe = rpeVals.length ? Math.round(rpeVals.reduce(function(a,b){return a+b;},0) / rpeVals.length * 10) / 10 : 0;
+    var rpeColor = avgRpe > 8 ? 'var(--red)' : avgRpe >= 6 ? 'var(--gold)' : 'var(--green)';
+    statsEl.innerHTML = '<div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;">' +
+      '<div style="flex:1;min-width:100px;padding:14px;background:var(--surface-1);border-radius:var(--radius-md);border-bottom:2px solid var(--red);">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--white);">' + weekSessions + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);letter-spacing:1px;">SESSIONS</div>' +
+      '</div>' +
+      '<div style="flex:1;min-width:100px;padding:14px;background:var(--surface-1);border-radius:var(--radius-md);border-bottom:2px solid var(--blue);">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--white);">' + weekMin + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);letter-spacing:1px;">MINUTEN</div>' +
+      '</div>' +
+      '<div style="flex:1;min-width:100px;padding:14px;background:var(--surface-1);border-radius:var(--radius-md);border-bottom:2px solid ' + rpeColor + ';">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:' + rpeColor + ';">' + (avgRpe || '\u2014') + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);letter-spacing:1px;">Ø RPE</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // Empty state
+  if (!data.log || !data.log.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px 16px;">' +
+      '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-subtle)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);margin-bottom:6px;">NOCH KEINE EINHEITEN</div>' +
+      '<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:16px;">Trage dein erstes Training oben ein.</div>' +
+      '<button onclick="document.querySelector(\'.log-form-card\').scrollIntoView({behavior:\'smooth\'})" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:10px 24px;border-radius:var(--radius-md);cursor:pointer;">ERSTE SESSION EINTRAGEN</button>' +
+    '</div>';
+    return;
+  }
+
+  // Entries with type-colored border
   el.innerHTML = data.log.slice(0, 50).map((e, i) => {
     const d = new Date(e.date);
     const day = d.getDate();
     const month = d.toLocaleDateString('de-DE', { month: 'short' }).toUpperCase();
     const color = TYPE_COLORS[e.type] || 'var(--grey)';
-    return `<div class="log-entry-card">
+    return `<div class="log-entry-card" style="border-left:3px solid ${color};">
       <div><div class="log-entry-date">${day}</div><div class="log-entry-month">${month}</div></div>
       <div class="log-entry-body">
-        <div class="log-entry-type" style="color:${color};">${TYPE_LABELS[e.type] || e.type}</div>
-        <div style="font-size:13px;color:var(--white);">${e.duration} Min. · RPE ${e.rpe}${e.weight ? ' · ' + e.weight + ' kg' : ''}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:${color};letter-spacing:1px;">${TYPE_LABELS[e.type] || e.type}</span>
+          <span style="font-size:var(--fs-sm);color:var(--white);">${e.duration} Min.</span>
+          ${e.rpe ? '<span style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">RPE ' + e.rpe + '</span>' : ''}
+          ${e.weight ? '<span style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">' + e.weight + ' kg</span>' : ''}
+        </div>
         ${e.notes ? `<div class="log-entry-notes">${escapeHTML(e.notes)}</div>` : ''}
       </div>
       <button class="delete-btn" onclick="deleteLog(${i})">×</button>
