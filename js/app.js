@@ -54,12 +54,30 @@ function showFieldError(inputEl, message) {
   }, 3000);
 }
 
+// Animated modal close
+function closeModal(modalEl) {
+  if (!modalEl || !modalEl.classList.contains('active')) return;
+  modalEl.classList.remove('active');
+  modalEl.classList.add('closing');
+  modalEl.removeAttribute('aria-modal');
+  setTimeout(function() {
+    modalEl.classList.remove('closing');
+  }, 200);
+}
+
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.active').forEach(function(m) { m.classList.remove('active'); m.removeAttribute('aria-modal'); });
+    document.querySelectorAll('.modal-overlay.active').forEach(function(m) { closeModal(m); });
     document.querySelectorAll('.nav-hub.open').forEach(function(h) { h.classList.remove('open'); });
     var mm = document.getElementById('mobile-menu');
     if (mm && mm.classList.contains('open')) mm.classList.remove('open');
+  }
+});
+
+// Backdrop click to close modals
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal-overlay') && e.target.classList.contains('active')) {
+    closeModal(e.target);
   }
 });
 
@@ -750,7 +768,15 @@ function applyRevealToPage() {
 var _skipHashUpdate = false;
 
 function showPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // Animate exit on current page
+  var currentPage = document.querySelector('.page.active');
+  if (currentPage && currentPage.id !== 'page-' + pageId) {
+    currentPage.classList.remove('active');
+    currentPage.classList.add('page-exit');
+    setTimeout(function() { currentPage.classList.remove('page-exit'); }, 150);
+  } else {
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); p.classList.remove('page-exit'); });
+  }
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.nav-hub').forEach(h => h.classList.remove('active'));
   document.querySelectorAll('.nav-drop-item').forEach(d => d.classList.remove('active'));
@@ -2042,7 +2068,7 @@ function openFightModal() {
     if (opp) opp.focus();
   }, 200);
 }
-function closeFightModal() { document.getElementById('fight-modal').classList.remove('active'); }
+function closeFightModal() { closeModal(document.getElementById('fight-modal')); }
 
 function addFightLog() {
   const data = getData();
@@ -4699,7 +4725,7 @@ function deleteBlock() {
   renderWeekPlan();
 }
 
-function closeBlockModal() { document.getElementById('block-modal').classList.remove('active'); editingBlock = null; }
+function closeBlockModal() { closeModal(document.getElementById('block-modal')); editingBlock = null; }
 
 // Week ID for current week (ISO week start Monday)
 function getWeekId() {
@@ -4895,7 +4921,7 @@ function shareWhatsApp() {
   window.open('https://wa.me/?text=' + encodeURIComponent('Check meinen FightOS Trainingsplan: ' + link), '_blank');
 }
 
-function closeShareModal() { document.getElementById('share-modal').classList.remove('active'); }
+function closeShareModal() { closeModal(document.getElementById('share-modal')); }
 
 // ===== SETTINGS =====
 function openSettingsModal() {
@@ -4917,7 +4943,7 @@ function openSettingsModal() {
   setTimeout(function() { var first = modal.querySelector('input, textarea, select'); if (first) first.focus(); }, 100);
 }
 
-function closeSettingsModal() { document.getElementById('settings-modal').classList.remove('active'); }
+function closeSettingsModal() { closeModal(document.getElementById('settings-modal')); }
 
 function saveSettings() {
   const users = safeParse('fos_users', {});
