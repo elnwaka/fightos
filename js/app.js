@@ -4862,29 +4862,8 @@ function openSettingsModal() {
   document.getElementById('settings-work-start').value = s.workStart;
   document.getElementById('settings-work-end').value = s.workEnd;
 
-  const dayLabels = { mo:'Mo', di:'Di', mi:'Mi', do:'Do', fr:'Fr', sa:'Sa', so:'So' };
-  const types = [
-    { val:'boxen', label:'Boxen' },
-    { val:'pa', label:'Partnerarbeit' },
-    { val:'pratzen', label:'Pratzen' },
-    { val:'sparring', label:'Sparring' },
-    { val:'technik', label:'Technik' },
-    { val:'cardio', label:'Nur Cardio' },
-    { val:'frei', label:'Frei' }
-  ];
-
   const container = document.getElementById('settings-week-rows');
-  container.innerHTML = ['mo','di','mi','do','fr','sa','so'].map(day => {
-    const d = s.weekSchedule[day] || { time: null, type: 'frei' };
-    const isFrei = d.type === 'frei';
-    return `<div style="display:flex;gap:6px;align-items:center;">
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--white);min-width:24px;">${dayLabels[day]}</span>
-      <select id="sched-type-${day}" onchange="document.getElementById('sched-time-${day}').disabled=this.value==='frei'" style="flex:1;background:#141414;border:1px solid #252525;color:var(--white);padding:8px;font-family:'DM Sans';font-size:12px;border-radius:4px;">
-        ${types.map(t => `<option value="${t.val}" ${d.type===t.val?'selected':''}>${t.label}</option>`).join('')}
-      </select>
-      <input id="sched-time-${day}" type="time" value="${d.time || '18:00'}" ${isFrei?'disabled':''} style="width:90px;min-height:44px;background:#141414;border:1px solid #252525;color:var(--white);padding:8px;font-family:'DM Sans';font-size:14px;border-radius:4px;box-sizing:border-box;">
-    </div>`;
-  }).join('');
+  container.innerHTML = buildScheduleHTML(s.weekSchedule, 'sched');
 
   var modal = document.getElementById('settings-modal');
   modal.classList.add('active');
@@ -4902,32 +4881,65 @@ function saveSettings() {
   users[currentUser].weight = document.getElementById('settings-weight').value;
   users[currentUser].workStart = document.getElementById('settings-work-start').value;
   users[currentUser].workEnd = document.getElementById('settings-work-end').value;
-
-  const ws = {};
-  ['mo','di','mi','do','fr','sa','so'].forEach(day => {
-    const type = document.getElementById('sched-type-' + day).value;
-    const time = type === 'frei' ? null : document.getElementById('sched-time-' + day).value;
-    ws[day] = { time, type };
-  });
-  users[currentUser].weekSchedule = ws;
-  // Keep trainingTime for backward compat (use most common non-null time)
-  const times = Object.values(ws).filter(d => d.time).map(d => d.time);
-  users[currentUser].trainingTime = times[0] || '18:00';
-
   localStorage.setItem('fos_users', JSON.stringify(users));
-  closeSettingsModal();
 
-  // Regenerate week plan based on new schedule + fight date
-  const data = getData();
-  if (data) {
-    data.weekPlan = generateSmartWeekPlan();
-    saveData(data);
-  }
+  applyScheduleToUser(readScheduleFromDOM('sched'));
+  closeSettingsModal();
 
   renderDashboard();
   renderWeekPlan();
   if (typeof renderErnTimeline === 'function') renderErnTimeline();
   if (typeof renderDashStats === 'function') renderDashStats();
+}
+
+// ===== SHARED SCHEDULE HELPERS =====
+var SCHEDULE_DAY_LABELS = { mo:'Mo', di:'Di', mi:'Mi', do:'Do', fr:'Fr', sa:'Sa', so:'So' };
+var SCHEDULE_TYPES = [
+  { val:'boxen', label:'Boxen' },{ val:'pa', label:'Partnerarbeit' },
+  { val:'pratzen', label:'Pratzen' },{ val:'sparring', label:'Sparring' },
+  { val:'technik', label:'Technik' },{ val:'cardio', label:'Nur Cardio' },
+  { val:'frei', label:'Frei' }
+];
+
+function buildScheduleHTML(schedule, idPrefix) {
+  return ['mo','di','mi','do','fr','sa','so'].map(function(day) {
+    var d = schedule[day] || { time: null, type: 'frei' };
+    var isFrei = d.type === 'frei';
+    return '<div style="display:flex;gap:6px;align-items:center;">' +
+      '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--white);min-width:24px;">' + SCHEDULE_DAY_LABELS[day] + '</span>' +
+      '<select id="' + idPrefix + '-type-' + day + '" onchange="document.getElementById(\'' + idPrefix + '-time-' + day + '\').disabled=this.value===\'frei\'" style="flex:1;background:#141414;border:1px solid #252525;color:var(--white);padding:8px;font-family:\'DM Sans\';font-size:12px;border-radius:4px;">' +
+        SCHEDULE_TYPES.map(function(t) { return '<option value="' + t.val + '" ' + (d.type === t.val ? 'selected' : '') + '>' + t.label + '</option>'; }).join('') +
+      '</select>' +
+      '<input id="' + idPrefix + '-time-' + day + '" type="time" value="' + (d.time || '18:00') + '" ' + (isFrei ? 'disabled' : '') + ' style="width:90px;min-height:44px;background:#141414;border:1px solid #252525;color:var(--white);padding:8px;font-family:\'DM Sans\';font-size:14px;border-radius:4px;box-sizing:border-box;">' +
+    '</div>';
+  }).join('');
+}
+
+function readScheduleFromDOM(idPrefix) {
+  var ws = {};
+  ['mo','di','mi','do','fr','sa','so'].forEach(function(day) {
+    var typeEl = document.getElementById(idPrefix + '-type-' + day);
+    var timeEl = document.getElementById(idPrefix + '-time-' + day);
+    if (!typeEl) return;
+    var type = typeEl.value;
+    var time = type === 'frei' ? null : (timeEl ? timeEl.value : null);
+    ws[day] = { time: time, type: type };
+  });
+  return ws;
+}
+
+function applyScheduleToUser(ws) {
+  var users = safeParse('fos_users', {});
+  if (!users[currentUser]) return;
+  users[currentUser].weekSchedule = ws;
+  var times = Object.values(ws).filter(function(d) { return d.time; }).map(function(d) { return d.time; });
+  users[currentUser].trainingTime = times[0] || '18:00';
+  localStorage.setItem('fos_users', JSON.stringify(users));
+  var data = getData();
+  if (data) {
+    data.weekPlan = generateSmartWeekPlan();
+    saveData(data);
+  }
 }
 
 // ===== USER SCHEDULE =====
@@ -5757,13 +5769,6 @@ function renderAccountPage() {
     ['schlecht','Einsteiger'],['mittel','Solide Basis'],['gut','Fit'],['sehr-gut','Top-Form']
   ].map(([v,l]) => `<option value="${v}" ${u.fitnessLevel===v?'selected':''}>${l}</option>`).join('');
 
-  const dayLabels = { mo:'Mo', di:'Di', mi:'Mi', do:'Do', fr:'Fr', sa:'Sa', so:'So' };
-  const types = [
-    { val:'boxen', label:'Boxen' },{ val:'pa', label:'Partnerarbeit' },
-    { val:'pratzen', label:'Pratzen' },{ val:'sparring', label:'Sparring' },
-    { val:'technik', label:'Technik' },{ val:'cardio', label:'Nur Cardio' },
-    { val:'frei', label:'Frei' }
-  ];
   const ws = u.weekSchedule || getDefaultWeekSchedule('18:00');
 
   el.innerHTML = `
@@ -5834,17 +5839,7 @@ function renderAccountPage() {
         </div>
         <label class="form-label" style="margin-bottom:8px;display:block;">Trainingszeiten pro Tag</label>
         <div style="display:flex;flex-direction:column;gap:6px;">
-          ${['mo','di','mi','do','fr','sa','so'].map(day => {
-            const d = ws[day] || { time: null, type: 'frei' };
-            const isFrei = d.type === 'frei';
-            return `<div style="display:flex;gap:6px;align-items:center;">
-              <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--white);min-width:24px;">${dayLabels[day]}</span>
-              <select id="acc-type-${day}" onchange="document.getElementById('acc-time-${day}').disabled=this.value==='frei'" class="form-select" style="flex:1;padding:8px;font-size:12px;">
-                ${types.map(t => `<option value="${t.val}" ${d.type===t.val?'selected':''}>${t.label}</option>`).join('')}
-              </select>
-              <input id="acc-time-${day}" type="time" value="${d.time||'18:00'}" ${isFrei?'disabled':''} class="form-input" style="width:100px;padding:8px;font-size:12px;">
-            </div>`;
-          }).join('')}
+          ${buildScheduleHTML(ws, 'acc')}
         </div>
       </div>
 
@@ -5876,14 +5871,9 @@ function saveAccountPage() {
   users[currentUser].workStart = document.getElementById('acc-work-start').value;
   users[currentUser].workEnd = document.getElementById('acc-work-end').value;
 
-  const ws = {};
-  ['mo','di','mi','do','fr','sa','so'].forEach(day => {
-    const type = document.getElementById('acc-type-' + day).value;
-    const time = type === 'frei' ? null : document.getElementById('acc-time-' + day).value;
-    ws[day] = { time, type };
-  });
+  var ws = readScheduleFromDOM('acc');
   users[currentUser].weekSchedule = ws;
-  const times = Object.values(ws).filter(d => d.time).map(d => d.time);
+  var times = Object.values(ws).filter(function(d) { return d.time; }).map(function(d) { return d.time; });
   users[currentUser].trainingTime = times[0] || '18:00';
 
   localStorage.setItem('fos_users', JSON.stringify(users));
