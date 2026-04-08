@@ -19,6 +19,20 @@ function showCalcError(targetId, message) {
   el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);padding:10px 0;">' + message + '</div>';
 }
 
+// ===== MAKRO BERECHNUNG (shared) =====
+function calculateMacros(weight, phase, volume, job) {
+  var proteinG = { aufbau: 2.2, wettkampf: 2.2, cutten: 2.6, maintain: 2.0 }[phase] || 2.2;
+  var khG = { aufbau: 5.5, wettkampf: 4.5, cutten: 3.0, maintain: 4.0 }[phase] || 4.0;
+  var fatG = { aufbau: 1.1, wettkampf: 1.0, cutten: 0.8, maintain: 1.0 }[phase] || 1.0;
+  var volMult = { mittel: 1.0, hoch: 1.1, 'sehr-hoch': 1.2 }[volume] || 1.0;
+  var jobMult = { sitz: 1.0, steh: 1.05, schwer: 1.12 }[job] || 1.0;
+  var protein = Math.round(weight * proteinG * volMult);
+  var carbs = Math.round(weight * khG * volMult * jobMult);
+  var fat = Math.round(weight * fatG);
+  var kcal = Math.round(protein * 4 + carbs * 4 + fat * 9);
+  return { protein: protein, carbs: carbs, fat: fat, kcal: kcal, proteinG: proteinG, khG: khG, fatG: fatG };
+}
+
 // ===== MAKRO RECHNER (Ernährung page) =====
 function calcMakrosErn() {
   var wErr = validateCalcInput(document.getElementById('ern-weight')?.value, 30, 200, 'Gewicht');
@@ -28,16 +42,9 @@ function calcMakrosErn() {
   const vol = document.getElementById('ern-vol')?.value || 'mittel';
   const job = document.getElementById('ern-job')?.value || 'sitz';
 
-  const proteinG = { aufbau: 2.2, wettkampf: 2.2, cutten: 2.6, maintain: 2.0 }[phase];
-  const khG = { aufbau: 5.5, wettkampf: 4.5, cutten: 3.0, maintain: 4.0 }[phase];
-  const fatG = { aufbau: 1.1, wettkampf: 1.0, cutten: 0.8, maintain: 1.0 }[phase];
-  const volMult = { mittel: 1.0, hoch: 1.1, 'sehr-hoch': 1.2 }[vol];
-  const jobMult = { sitz: 1.0, steh: 1.05, schwer: 1.12 }[job];
-
-  const p = Math.round(w * proteinG * volMult);
-  const k = Math.round(w * khG * volMult * jobMult);
-  const f = Math.round(w * fatG);
-  const kcal = Math.round(p * 4 + k * 4 + f * 9);
+  const m = calculateMacros(w, phase, vol, job);
+  const p = m.protein, k = m.carbs, f = m.fat, kcal = m.kcal;
+  const proteinG = m.proteinG, khG = m.khG, fatG = m.fatG;
   const perMeal = Math.round(p / 5);
 
   const phaseLabel = { aufbau: 'Aufbauphase', wettkampf: 'Wettkampfphase', cutten: 'Cuttingphase', maintain: 'Erhaltung' }[phase];
@@ -89,19 +96,15 @@ function saveNutritionPlan() {
   var phase = document.getElementById('ern-phase').value || 'aufbau';
   var vol = document.getElementById('ern-vol').value || 'mittel';
   var job = document.getElementById('ern-job').value || 'sitz';
-  var proteinG = { aufbau: 2.2, wettkampf: 2.2, cutten: 2.6, maintain: 2.0 }[phase];
-  var khG = { aufbau: 5.5, wettkampf: 4.5, cutten: 3.0, maintain: 4.0 }[phase];
-  var fatG = { aufbau: 1.1, wettkampf: 1.0, cutten: 0.8, maintain: 1.0 }[phase];
-  var volMult = { mittel: 1.0, hoch: 1.1, 'sehr-hoch': 1.2 }[vol];
-  var jobMult = { sitz: 1.0, steh: 1.05, schwer: 1.12 }[job];
+  var m = calculateMacros(w, phase, vol, job);
   data.nutritionPlan = {
     savedAt: new Date().toISOString(),
     weight: w,
     phase: phase,
-    kcal: Math.round(w * proteinG * volMult * 4 + w * khG * volMult * jobMult * 4 + w * fatG * 9),
-    protein: Math.round(w * proteinG * volMult),
-    carbs: Math.round(w * khG * volMult * jobMult),
-    fat: Math.round(w * fatG)
+    kcal: m.kcal,
+    protein: m.protein,
+    carbs: m.carbs,
+    fat: m.fat
   };
   if (typeof saveData === 'function') saveData(data);
   var el = document.getElementById('ern-save-confirm');
