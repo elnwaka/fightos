@@ -99,6 +99,20 @@ function getUserAge() {
 }
 
 // ===== AUTH =====
+var APP_SALT = 'FightOS_v1_';
+
+async function hashPassword(password, username) {
+  var salted = APP_SALT + username.toLowerCase() + ':' + password;
+  var encoded = new TextEncoder().encode(salted);
+  var buffer = await crypto.subtle.digest('SHA-256', encoded);
+  var arr = Array.from(new Uint8Array(buffer));
+  return arr.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
+
+function isHashed(pass) {
+  return typeof pass === 'string' && pass.length === 64 && /^[0-9a-f]{64}$/.test(pass);
+}
+
 function switchAuthTab(tab) {
   document.querySelectorAll('.auth-tab').forEach((t, i) => {
     t.classList.toggle('active', (tab === 'login' ? i === 0 : i === 1));
@@ -108,7 +122,7 @@ function switchAuthTab(tab) {
   document.getElementById('auth-msg').textContent = '';
 }
 
-function doRegister() {
+async function doRegister() {
   const user = document.getElementById('reg-user').value.trim();
   const pass = document.getElementById('reg-pass').value;
   const msg = document.getElementById('auth-msg');
@@ -116,25 +130,35 @@ function doRegister() {
   if (pass.length < 3) { msg.className = 'auth-msg error'; msg.textContent = 'Passwort zu kurz!'; return; }
   const users = safeParse('fos_users', {});
   if (users[user]) { msg.className = 'auth-msg error'; msg.textContent = 'Name bereits vergeben!'; return; }
-  users[user] = { pass, onboardingDone: false, created: new Date().toISOString() };
+  var hashed = await hashPassword(pass, user);
+  users[user] = { pass: hashed, onboardingDone: false, created: new Date().toISOString() };
   localStorage.setItem('fos_users', JSON.stringify(users));
-  // Init user data
   const data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
   localStorage.setItem('fos_data_' + user, JSON.stringify(data));
   msg.className = 'auth-msg success'; msg.textContent = 'Account erstellt! Logge dich ein.';
   switchAuthTab('login');
 }
 
-function doLogin() {
+async function doLogin() {
   const user = document.getElementById('login-user').value.trim();
   const pass = document.getElementById('login-pass').value;
   const msg = document.getElementById('auth-msg');
   if (!user || !pass) { msg.className = 'auth-msg error'; msg.textContent = 'Alle Felder ausfüllen!'; return; }
   const users = safeParse('fos_users', {});
-  if (!users[user] || users[user].pass !== pass) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
+  if (!users[user]) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
+  var storedPass = users[user].pass;
+  if (isHashed(storedPass)) {
+    // Already hashed – compare hash
+    var hashed = await hashPassword(pass, user);
+    if (storedPass !== hashed) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
+  } else {
+    // Legacy plaintext – compare then migrate
+    if (storedPass !== pass) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
+    users[user].pass = await hashPassword(pass, user);
+    localStorage.setItem('fos_users', JSON.stringify(users));
+  }
   currentUser = user;
   localStorage.setItem('fos_current', user);
-  // Migration: existing users with weight but no onboardingDone flag
   if (users[user].weight && !users[user].onboardingDone) {
     users[user].onboardingDone = true;
     users[user].nickname = users[user].nickname || user;
