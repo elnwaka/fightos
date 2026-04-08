@@ -1573,13 +1573,29 @@ body::before {
 .day-block.meta { background: rgba(245,197,24,.12); color: #f5c518; border-left: 2px solid var(--gold); }
 .day-block.fight { background: rgba(232,0,13,.35); color: var(--white); font-weight: 700; border-left: 2px solid var(--red); }
 .day-block.off { background: var(--surface-1); color: var(--text-subtle); border-left: 2px solid var(--surface-3); }
-.day-block.block-done { opacity: .45; }
+.day-block.block-done { opacity: .45; transition: opacity .3s ease; }
 .day-block.block-done::after {
   content: 'ERLEDIGT';
   position: absolute; top: 4px; right: 6px;
   font-family: 'Space Mono', monospace;
   font-size: var(--fs-xs); letter-spacing: 1px;
   color: var(--green); opacity: .8;
+}
+@keyframes blockComplete {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.03); background: rgba(0,200,83,.1); }
+  100% { transform: scale(1); }
+}
+.day-block.just-completed {
+  animation: blockComplete .4s ease;
+}
+@keyframes blockUndone {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.97); background: rgba(232,0,13,.06); }
+  100% { transform: scale(1); }
+}
+.day-block.just-undone {
+  animation: blockUndone .3s ease;
 }
 .block-check-btn {
   background: none; border: 1.5px solid #333; color: var(--text-muted);

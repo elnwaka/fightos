@@ -4764,14 +4764,15 @@ function toggleBlockDone(day, idx, type, title) {
   if (!data) return;
   if (!data.completedBlocks) data.completedBlocks = {};
   const logKey = day + '_' + idx + '_' + getWeekId();
-  if (data.completedBlocks[logKey]) {
+  var wasCompleted = !!data.completedBlocks[logKey];
+  if (wasCompleted) {
     // Undo
     delete data.completedBlocks[logKey];
     saveData(data);
+    showToast('Block rückgängig', 'info', 1500);
   } else {
     // Mark done + auto-log training
     data.completedBlocks[logKey] = { date: new Date().toISOString(), type, title };
-    // Auto-create training log entry
     if (!data.log) data.log = [];
     const block = data.weekPlan && data.weekPlan[day] ? data.weekPlan[day][idx] : null;
     const duration = estimateBlockDuration(type);
@@ -4784,8 +4785,24 @@ function toggleBlockDone(day, idx, type, title) {
       notes: title + ' (via Wochenplan)'
     });
     saveData(data);
+    showToast('Block erledigt \u2713', 'success', 2000);
   }
-  renderWeekPlan();
+  // Animate the block before re-render
+  var blockEl = document.querySelector('[data-block-key="' + logKey + '"]');
+  if (!blockEl) {
+    // Fallback: find by day+idx
+    var dayCol = document.querySelector('.day-col[data-day="' + day + '"]');
+    if (dayCol) {
+      var blocks = dayCol.querySelectorAll('.day-block');
+      blockEl = blocks[idx];
+    }
+  }
+  if (blockEl) {
+    blockEl.classList.add(wasCompleted ? 'just-undone' : 'just-completed');
+    setTimeout(function() { renderWeekPlan(); }, 400);
+  } else {
+    renderWeekPlan();
+  }
 }
 
 function estimateBlockDuration(type) {
