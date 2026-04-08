@@ -7,7 +7,9 @@ const PRECACHE = [
   './js/pages.js',
   './js/calculators.js',
   './manifest.json',
-  './img/icons/icon.svg'
+  './img/icons/icon.svg',
+  './img/icons/icon-192x192.png',
+  './img/icons/icon-512x512.png'
 ];
 
 // Install: Pre-cache core files
