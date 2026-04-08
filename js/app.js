@@ -4929,6 +4929,7 @@ function saveSettings() {
   localStorage.setItem('fos_users', JSON.stringify(users));
 
   applyScheduleToUser(readScheduleFromDOM('sched'));
+  showToast('Einstellungen gespeichert');
   closeSettingsModal();
 
   renderDashboard();
