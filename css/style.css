@@ -3065,6 +3065,177 @@ body::before {
   color: #999;
 }
 
+/* ===== DESKTOP DESIGN UPGRADE ===== */
+
+/* Wider container on desktop */
+@media (min-width: 1024px) {
+  .page { max-width: 1440px; padding: 40px 48px; }
+}
+
+/* Glass card style */
+.glass {
+  background: rgba(255,255,255,.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 16px;
+  transition: all .25s ease;
+}
+.glass:hover {
+  border-color: rgba(255,255,255,.1);
+  background: rgba(255,255,255,.05);
+}
+
+/* Gradient border card */
+.glow-card {
+  position: relative;
+  background: #0a0a0a;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.glow-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(232,0,13,.3), transparent 50%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Dashboard bento grid */
+.dash-bento {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-auto-rows: auto;
+  gap: 16px;
+}
+.dash-bento .bento-wide { grid-column: span 2; }
+.dash-bento .bento-full { grid-column: 1 / -1; }
+.dash-bento .bento-cell {
+  padding: 24px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.04);
+  transition: all .3s ease;
+}
+.dash-bento .bento-cell:hover {
+  background: rgba(255,255,255,.04);
+  border-color: rgba(255,255,255,.08);
+  transform: translateY(-2px);
+}
+
+/* Section labels */
+.sec-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #333;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* Scroll reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger animation for children */
+.stagger > * {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: staggerIn .5s ease forwards;
+}
+.stagger > *:nth-child(1) { animation-delay: .05s; }
+.stagger > *:nth-child(2) { animation-delay: .1s; }
+.stagger > *:nth-child(3) { animation-delay: .15s; }
+.stagger > *:nth-child(4) { animation-delay: .2s; }
+.stagger > *:nth-child(5) { animation-delay: .25s; }
+.stagger > *:nth-child(6) { animation-delay: .3s; }
+.stagger > *:nth-child(7) { animation-delay: .35s; }
+.stagger > *:nth-child(8) { animation-delay: .4s; }
+.stagger > *:nth-child(9) { animation-delay: .45s; }
+@keyframes staggerIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Glow text effect for scores */
+.glow-text {
+  text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+}
+
+/* Pulse animation for live indicators */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+.pulse { animation: pulse 2s ease-in-out infinite; }
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--red), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Ring glow */
+.ring-glow {
+  filter: drop-shadow(0 0 8px var(--red));
+}
+
+/* Animated counter (for JS to trigger) */
+@keyframes countUp {
+  from { opacity: 0; transform: scale(.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+.count-up {
+  animation: countUp .4s ease-out forwards;
+}
+
+/* Subtle background noise/grain for depth */
+.dash-bento::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Horizontal divider with gradient */
+.divider-gradient {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(232,0,13,.2), transparent);
+  margin: 20px 0;
+}
+
+/* Stat number with accent underline */
+.stat-big {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  line-height: 1;
+  color: var(--white);
+  position: relative;
+  display: inline-block;
+}
+.stat-big::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0; right: 0;
+  height: 2px;
+  background: var(--red);
+  border-radius: 1px;
+}
+
 /* ===== BASE RESPONSIVE IMPROVEMENTS ===== */
 body { overflow-x: hidden; }
 img, iframe, canvas, video { max-width: 100%; height: auto; }
@@ -3077,6 +3248,10 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   /* --- Bottom Tab Bar --- */
   .bottom-bar { display: flex; }
   .page { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+
+  /* --- Bento Grid Collapse --- */
+  .dash-bento { grid-template-columns: 1fr; }
+  .dash-bento .bento-wide { grid-column: span 1; }
 
   /* --- Navigation Mobile: Minimal --- */
   .topbar { flex-wrap: nowrap; height: 48px; padding: 0 12px; gap: 4px; }

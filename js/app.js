@@ -5233,30 +5233,59 @@ function renderDashboard() {
 
   var DAY_SHORT = ['MO','DI','MI','DO','FR','SA','SO'];
 
+  // HRV Ampel data
+  var hrvArr = data.hrv || [];
+  var hrvStatus = '\u2014';
+  var hrvColor = '#555';
+  var hrvLabel = 'Keine Daten';
+  if (hrvArr.length > 0) {
+    var lastHrv = hrvArr[0].value;
+    if (lastHrv >= 60) { hrvStatus = '\u2705'; hrvColor = 'var(--green)'; hrvLabel = 'GR\u00dcN'; }
+    else if (lastHrv >= 40) { hrvStatus = '\u26a0\ufe0f'; hrvColor = 'var(--gold)'; hrvLabel = 'GELB'; }
+    else { hrvStatus = '\ud83d\udd34'; hrvColor = 'var(--red)'; hrvLabel = 'ROT'; }
+  }
+
+  // Axis pills in 2x2 grid
+  var pillsGridHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;">' +
+    RADAR_AXES.map(function(a) {
+      var val = scores[a.key];
+      return '<div style="text-align:center;padding:6px 8px;border-radius:12px;background:' + a.hex + '18;border:1px solid ' + a.hex + '30;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:' + a.hex + ';">' + (val !== null ? val : '\u2014') + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:#555;letter-spacing:1px;">' + a.label + '</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+
   el.innerHTML =
-    // 1. HERO: Countdown links + Score-Ring rechts
-    '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px;margin-bottom:16px;background:linear-gradient(135deg,rgba(232,0,13,.08),transparent);border:1px solid rgba(232,0,13,.1);border-radius:16px;">' +
-      '<div id="dash-countdown-hero" style="flex:1;"></div>' +
-      '<div style="text-align:center;">' +
-        '<svg width="110" height="110" viewBox="0 0 110 110">' +
+    '<div class="dash-bento stagger">' +
+
+    // ── ROW 1: HERO (wide) + SCORE RING ──
+    '<div class="bento-cell bento-wide glass glow-card" style="background:linear-gradient(135deg,rgba(232,0,13,.06),rgba(245,197,24,.03));">' +
+      '<div style="display:flex;align-items:center;gap:20px;">' +
+        '<div style="flex:1;">' +
+          '<div class="glow-text" style="font-family:\'Bebas Neue\',sans-serif;font-size:52px;line-height:1;color:var(--white);">' + getDisplayName() + '</div>' +
+          '<div id="dash-countdown-hero" style="margin-top:8px;"></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="bento-cell glass" style="text-align:center;">' +
+      '<div class="ring-glow" style="display:inline-block;">' +
+        '<svg width="140" height="140" viewBox="0 0 110 110">' +
           '<circle cx="55" cy="55" r="48" stroke="#1a1a1a" stroke-width="6" fill="none"/>' +
           '<circle cx="55" cy="55" r="48" stroke="' + ringColor + '" stroke-width="6" fill="none" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + ringOffset + '" stroke-linecap="round" transform="rotate(-90 55 55)" style="transition:stroke-dashoffset 1s ease;"/>' +
           '<text x="55" y="50" text-anchor="middle" style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;fill:var(--white);">' + (overall !== null ? overall : '\u2014') + '</text>' +
           '<text x="55" y="68" text-anchor="middle" style="font-family:\'Space Mono\',monospace;font-size:8px;fill:#555;letter-spacing:2px;">GESAMT</text>' +
         '</svg>' +
       '</div>' +
+      '<canvas id="rpg-radar" width="320" height="320" style="max-width:320px;display:block;margin:8px auto 0;"></canvas>' +
+      pillsGridHTML +
     '</div>' +
 
-    // 2. RADAR + PILLS
-    '<div style="text-align:center;margin-bottom:16px;">' +
-      '<canvas id="rpg-radar" width="260" height="260" style="max-width:260px;"></canvas>' +
-      '<div style="display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:8px 0;scrollbar-width:none;">' + pillsHTML + '</div>' +
-    '</div>' +
-
-    // 3. DIESE WOCHE (Completion Rings)
-    '<div style="margin-bottom:16px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:12px;">DIESE WOCHE <span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;margin-left:8px;">' + totalDone + '/' + totalPlanned + '</span></div>' +
-      '<div style="display:flex;justify-content:space-between;gap:4px;">' +
+    // ── ROW 2: DIESE WOCHE + CHECKLIST TODAY + HRV AMPEL ──
+    '<div class="bento-cell glass">' +
+      '<div class="sec-label">DIESE WOCHE <span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;margin-left:8px;">' + totalDone + '/' + totalPlanned + '</span></div>' +
+      '<div style="display:flex;justify-content:space-between;gap:4px;margin-top:12px;">' +
         DAY_SHORT.map(function(d, i) {
           var dc = dayCompletion[i];
           var pct = dc.total > 0 ? dc.done / dc.total : 0;
@@ -5276,25 +5305,37 @@ function renderDashboard() {
       '</div>' +
     '</div>' +
 
-    // 4. HEUTE
-    '<div style="margin-bottom:16px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:12px;">HEUTE</div>' +
-      '<div id="daily-combined"></div>' +
-      '<div id="checklist-score" style="display:none;"></div>' +
+    '<div class="bento-cell glass">' +
+      '<div class="sec-label">CHECKLIST HEUTE</div>' +
+      '<div id="checklist-score" style="margin-top:8px;"></div>' +
+      '<div id="dash-hinweise" style="margin-top:8px;"></div>' +
     '</div>' +
 
-    // 5. HINWEISE
-    '<div id="dash-hinweise"></div>' +
+    '<div class="bento-cell glass">' +
+      '<div class="sec-label">HRV AMPEL</div>' +
+      '<div style="text-align:center;margin-top:16px;">' +
+        '<div style="font-size:36px;">' + hrvStatus + '</div>' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:' + hrvColor + ';margin-top:6px;">' + hrvLabel + '</div>' +
+        (hrvArr.length > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;margin-top:4px;">' + hrvArr[0].value + ' ms</div>' : '') +
+      '</div>' +
+    '</div>' +
 
-    // 6. LETZTE AKTIVITÄT (completed blocks + recent log mixed)
-    '<div style="margin-bottom:16px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:12px;">AKTIVITÄT</div>' +
+    // ── ROW 3: TRAININGSPLAN HEUTE (full width) ──
+    '<div class="bento-cell bento-full glass">' +
+      '<div class="sec-label">TRAININGSPLAN HEUTE</div>' +
+      '<div id="daily-combined" style="margin-top:8px;"></div>' +
+    '</div>' +
+
+    // ── ROW 4: AKTIVIT\u00c4T (wide) + K\u00c4MPFE ──
+    '<div class="bento-cell bento-wide glass">' +
+      '<div class="sec-label">AKTIVIT\u00c4T</div>' +
+      '<div style="margin-top:8px;">' +
       (recentBlocks.length > 0 ?
         recentBlocks.map(function(rb) {
           var tc = TYPE_COLORS[rb.type] || 'var(--grey)';
           var d = rb.date ? new Date(rb.date) : null;
           var timeStr = d ? (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes() : '';
-          return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #111;">' +
+          return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">' +
             '<div style="width:4px;height:28px;border-radius:2px;background:' + tc + ';flex-shrink:0;"></div>' +
             '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--light);">' + (rb.title || rb.type).replace(/</g,'&lt;') + '</div>' +
             '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;">' + timeStr + '</div>' +
@@ -5303,28 +5344,29 @@ function renderDashboard() {
         }).join('') :
         '<div id="recent-log"></div>'
       ) +
+      '</div>' +
     '</div>' +
 
-    // 7. KÄMPFE (kompakt)
-    '<div style="margin-bottom:16px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);cursor:pointer;" onclick="showPage(\'fights\')">KÄMPFE</div>' +
+    '<div class="bento-cell glass">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div class="sec-label" style="cursor:pointer;" onclick="showPage(\'fights\')">K\u00c4MPFE</div>' +
         '<button class="submit-btn" style="padding:6px 14px;font-size:11px;border-radius:8px;" onclick="openFightModal()">+</button>' +
       '</div>' +
-      '<div id="fight-log-list"></div>' +
+      '<div id="fight-log-list" style="margin-top:8px;"></div>' +
     '</div>' +
 
-    // 8. BENCHMARKS (Sparklines — immer sichtbar)
+    // ── ROW 5: BENCHMARKS (full width) ──
     (topBench.length > 0 ?
-      '<div style="margin-bottom:16px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);margin-bottom:12px;cursor:pointer;" onclick="showPage(\'tests\')">BENCHMARKS</div>' +
-        '<div style="display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">' +
+      '<div class="bento-cell bento-full glass">' +
+        '<div class="sec-label" style="cursor:pointer;" onclick="showPage(\'tests\')">BENCHMARKS</div>' +
+        '<div class="divider-gradient" style="margin:8px 0;"></div>' +
+        '<div style="display:flex;gap:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">' +
           topBench.map(function(b) {
             var h = hist[b.id] || [];
             var val = data.benchmarks[b.id] || 0;
             var trend = getBenchTrend(h, b.inverse);
-            return '<div style="flex-shrink:0;min-width:100px;cursor:pointer;" onclick="showPage(\'tests\')">' +
-              '<canvas id="dash-spark-' + b.id + '" width="100" height="36" style="display:block;width:100px;height:36px;"></canvas>' +
+            return '<div style="flex-shrink:0;min-width:120px;cursor:pointer;" onclick="showPage(\'tests\')">' +
+              '<canvas id="dash-spark-' + b.id + '" width="120" height="40" style="display:block;width:120px;height:40px;"></canvas>' +
               '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">' +
                 '<span style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--white);">' + val + '<span style="font-size:9px;color:#444;"> ' + b.unit + '</span></span>' +
                 '<span style="font-size:12px;color:' + trend.color + ';">' + trend.arrow + '</span>' +
@@ -5336,16 +5378,18 @@ function renderDashboard() {
       '</div>'
     : '') +
 
-    // 9. DESKTOP EXTRAS
-    '<div class="dash-hide-mobile">' +
-      '<div id="dash-stats" style="margin-top:16px;"></div>' +
+    // ── DESKTOP EXTRAS (inside bento grid) ──
+    '<div class="bento-cell bento-full dash-hide-mobile" style="background:transparent;border:none;backdrop-filter:none;">' +
+      '<div id="dash-stats" style="margin-top:0;"></div>' +
       '<div id="saeulen-self-rating" style="margin-top:16px;"></div>' +
       '<div id="bench-summary" style="margin-top:12px;font-family:\'Space Mono\',monospace;font-size:11px;color:#555;cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
       '<div style="margin-top:16px;display:flex;align-items:center;gap:8px;">' +
         '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:6px 10px;font-size:12px;" onchange="updateFightDate()">' +
         '<button class="submit-btn" style="padding:4px 10px;font-size:10px;" onclick="clearFightDate()">\u00d7</button>' +
       '</div>' +
-    '</div>';
+    '</div>' +
+
+    '</div>'; // close dash-bento
 
   // Render sub-components
   renderFightCountdown();
