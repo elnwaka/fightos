@@ -768,15 +768,17 @@ function applyRevealToPage() {
 var _skipHashUpdate = false;
 
 function showPage(pageId) {
-  // Animate exit on current page
-  var currentPage = document.querySelector('.page.active');
-  if (currentPage && currentPage.id !== 'page-' + pageId) {
-    currentPage.classList.remove('active');
-    currentPage.classList.add('page-exit');
-    setTimeout(function() { currentPage.classList.remove('page-exit'); }, 150);
-  } else {
-    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); p.classList.remove('page-exit'); });
-  }
+  // Clean up all pages first
+  document.querySelectorAll('.page').forEach(function(p) {
+    if (p.id !== 'page-' + pageId && p.classList.contains('active')) {
+      p.classList.remove('active');
+      p.classList.add('page-exit');
+      setTimeout(function() { p.classList.remove('page-exit'); }, 150);
+    } else if (p.id !== 'page-' + pageId) {
+      p.classList.remove('active');
+      p.classList.remove('page-exit');
+    }
+  });
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.nav-hub').forEach(h => h.classList.remove('active'));
   document.querySelectorAll('.nav-drop-item').forEach(d => d.classList.remove('active'));
@@ -3831,7 +3833,7 @@ function renderRecentLog() {
 
 // ===== WOCHENPLAN =====
 function getDefaultWeekPlan() {
-  return generateSmartWeekPlan();
+  return {};
 }
 
 function generateSmartWeekPlan() {

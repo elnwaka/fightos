@@ -1384,7 +1384,11 @@ body::before {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .3s ease, transform .3s ease;
 }
+.calc-results.visible { opacity: 1; transform: translateY(0); }
 .calc-result-card {
   background: var(--surface-2);
   border: 1px solid var(--surface-3);

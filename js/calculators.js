@@ -12,6 +12,19 @@ function validateCalcInput(value, min, max, fieldName) {
   return null;
 }
 
+function revealCalcResult(el) {
+  if (!el) return;
+  el.classList.remove('visible');
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      el.classList.add('visible');
+      if (window.innerWidth < 768) {
+        setTimeout(function() { el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+      }
+    });
+  });
+}
+
 function showCalcError(targetId, message) {
   var el = document.getElementById(targetId);
   if (!el) return;
@@ -86,6 +99,8 @@ function calcMakrosErn() {
         <div class="calc-meal-row"><span class="calc-meal-time">${mealTimes.recovery} Recovery</span><span class="calc-meal-p">${Math.round(p*0.21)}g P (Casein)</span><span class="calc-meal-k">${Math.round(k*0.12)}g KH</span></div>
       </div>
     </div>`;
+  revealCalcResult(el);
+  revealCalcResult(meals);
 }
 
 // ===== ERNÄHRUNGS-PLAN SPEICHERN =====
