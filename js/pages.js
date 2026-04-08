@@ -334,7 +334,7 @@ Das kubanische Boxsystem und moderne Sportforschung zeigen: Die effektivste Meth
 • <strong>Tempo-Variation:</strong> Runde 1 bei 50%, Runde 2 bei 80%, Runde 3 bei 100% → kognitive Kontrolle über Intensität<br>
 • <strong>Eingeschränktes Sichtfeld:</strong> Sparring nur mit peripherem Sehen (Blick auf Brust fixiert)<br><br>
 
-<strong style="font-size:15px;">KOGNITIVE ERMÜDUNGSRESISTENZ (BET)</strong> <span style="font-size:10px;color:var(--gold);border:1px solid var(--gold);padding:1px 6px;border-radius:3px;">EXPERIMENTELL</span><br>
+<strong style="font-size:15px;">KOGNITIVE ERMÜDUNGSRESISTENZ (BET)</strong> <span style="font-size:10px;color:var(--gold);border:1px solid var(--gold);padding:1px 6px;border-radius:var(--radius-sm);">EXPERIMENTELL</span><br>
 ${tt('BET','Brain Endurance Training – kognitives Training unter Ermüdung. Dein Gehirn lernt, bei mentaler Erschöpfung trotzdem präzise zu arbeiten.')} ist ein vielversprechender Zusatz, aber kein Ersatz für boxspezifisches Training. Marcora et al. (2015) zeigten in einer <em>Militärstudie (nicht an Boxern!)</em>: +126% Ausdauer mit BET vs. +42% nur physisch. <strong>Achtung: Diese Studie war an Soldaten</strong> – der Transfer auf den Boxring ist plausibel und wird von GB Boxing genutzt, aber boxspezifische Evidenz fehlt noch. Van Cutsem et al. (2017) bestätigten allgemein: Mentale Ermüdung reduziert physische Leistung um <strong>5–10%</strong>.<br><br>
 
 BET konfrontiert dein Gehirn mit kognitiven Aufgaben (${tt('Stroop-Test','Farbwörter erscheinen in falscher Farbe. Du musst die FARBE benennen, nicht das Wort. Trainiert Impulshemmung und kognitive Belastbarkeit.')}, Rechenaufgaben) WÄHREND oder vor dem Training. Der ${tt('Anteriore cinguläre Cortex','Gehirnregion, die Anstrengung bewertet. Wird durch BET effizienter – wie ein Prozessor-Upgrade für dein Gehirn.')} wird effizienter, dein mentales Erschöpfungslimit verschiebt sich nach oben.<br><br>
@@ -968,7 +968,7 @@ function renderUebungenPage() {
     ${fS.map(e => { counter++; return exCard(e, counter, 'var(--gold)'); }).join('')}
   </div>` : ''}
 
-  <div style="margin-top:20px;padding:16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:6px;">
+  <div style="margin-top:20px;padding:16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);">
     <div style="font-size:12px;color:#444;line-height:1.6;">QUELLEN: Boxing Science (Danny Wilson BSc MSc ASCC) · Phil Daru (Daru Strong) · Ross Enamait · Collins et al. 2014 (Neck/Concussion) · Loturco et al. 2016 (Punch Force) · PMC 2024 (VRT) · ExpertBoxing</div>
   </div>`;
 }
@@ -1347,7 +1347,7 @@ function openExerciseDetail(id) {
 
       ${e.video ? `<div class="ex-detail-section">
         <div class="ex-detail-section-title" style="color:${color};">AUSFÜHRUNGS-VIDEO</div>
-        <a href="${e.video}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--surface-2);border:1px solid #333;border-radius:6px;color:var(--white);text-decoration:none;font-size:13px;transition:all .2s;">
+        <a href="${e.video}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--surface-2);border:1px solid #333;border-radius:var(--radius-md);color:var(--white);text-decoration:none;font-size:13px;transition:all .2s;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M10 8l6 4-6 4V8z" fill="${color}"/><rect x="2" y="4" width="20" height="16" rx="3" stroke="${color}" stroke-width="1.5" fill="none"/></svg>
           Video-Anleitung auf YouTube
         </a>
@@ -1933,16 +1933,16 @@ function renderErnaehrungPage() {
     </div>
   </div>
 
-  <div style="margin-top:30px;padding:16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:6px;">
+  <div style="margin-top:30px;padding:16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);">
     <div style="font-size:12px;color:#444;line-height:1.6;">QUELLEN: ISSN Position Stand – Protein and Exercise (2017) · ACSM Nutrition and Athletic Performance (2016) · Boxing Science Nutrition Guide (Danny Wilson) · Phil Daru Fight Nutrition · Helms et al. 2014 (Protein during weight loss) · Thomas et al. 2016 (ACSM/AND/DC) · Maughan et al. 2018 (IOC Consensus) · Burke et al. 2019 (Carbohydrate for athletes) · Schoenfeld & Aragon 2018 (Protein timing meta-analysis)</div>
   </div>
 
   <div class="related-links" style="margin-top:32px;padding-top:24px;border-top:1px solid var(--surface-2);display:flex;flex-wrap:wrap;gap:10px;">
     <span style="font-family:'Space Mono',monospace;font-size:11px;color:#444;align-self:center;">SIEHE AUCH:</span>
-    <button onclick="showPage('cutten')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:4px;padding:6px 14px;cursor:pointer;">Gewicht machen</button>
-    <button onclick="showPage('supplements')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);background:none;border:1px solid rgba(0,200,83,.2);border-radius:4px;padding:6px 14px;cursor:pointer;">Supplements</button>
-    <button onclick="showPage('regeneration')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);border-radius:4px;padding:6px 14px;cursor:pointer;">Recovery</button>
-    <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:4px;padding:6px 14px;cursor:pointer;">Rechner</button>
+    <button onclick="showPage('cutten')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Gewicht machen</button>
+    <button onclick="showPage('supplements')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);background:none;border:1px solid rgba(0,200,83,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Supplements</button>
+    <button onclick="showPage('regeneration')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Recovery</button>
+    <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
   </div>`;
   renderErnTimeline();
 }
@@ -2671,7 +2671,7 @@ function openSupplementDetail(id) {
     <article class="supp-article">
       <header class="supp-article-header">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;flex-wrap:wrap;">
-          <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;color:${headerColor};border:1px solid ${headerColor}40;padding:3px 12px;border-radius:3px;">${s.category}</span>
+          <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;color:${headerColor};border:1px solid ${headerColor}40;padding:3px 12px;border-radius:var(--radius-sm);">${s.category}</span>
           <span style="color:var(--gold);font-size:12px;letter-spacing:1px;">${'★'.repeat(s.stars)}${'☆'.repeat(5 - s.stars)}</span>
         </div>
         <h1 style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--white);line-height:1.1;">${s.name}</h1>

@@ -995,7 +995,7 @@ function renderFightCountdown() {
 
   const upcomingListHTML = buildUpcomingFightsHTML(data);
   const addBtnHTML = (data.upcomingFights.length < 5)
-    ? '<div style="margin-top:10px;"><button onclick="addUpcomingFight()" style="background:none;border:1px dashed #888;color:#888;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:\'Space Mono\',monospace;">+ Weiteren Kampf hinzuf\u00fcgen</button></div>'
+    ? '<div style="margin-top:10px;"><button onclick="addUpcomingFight()" style="background:none;border:1px dashed #888;color:#888;padding:4px 12px;border-radius:var(--radius-md);cursor:pointer;font-size:11px;font-family:\'Space Mono\',monospace;">+ Weiteren Kampf hinzuf\u00fcgen</button></div>'
     : '';
 
   if (!data.fightDate) {
@@ -1231,7 +1231,7 @@ function renderDashStats() {
         });
         if (!weakKey || weakVal >= 70) return '';
         var weakAxis = RADAR_AXES.find(function(a) { return a.key === weakKey; });
-        return '<div style="margin-top:8px;padding:8px 10px;background:' + weakAxis.hex + '11;border:1px solid ' + weakAxis.hex + '33;border-radius:4px;">' +
+        return '<div style="margin-top:8px;padding:8px 10px;background:' + weakAxis.hex + '11;border:1px solid ' + weakAxis.hex + '33;border-radius:var(--radius-sm);">' +
           '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:' + weakAxis.hex + ';letter-spacing:1px;">FOKUS: ' + weakAxis.label + ' (' + weakVal + '%)</div>' +
         '</div>';
       })()}
@@ -1631,13 +1631,13 @@ function renderHinweise() {
         + '</div>';
     }
     gettingStartedHtml = `
-      <div style="margin-bottom:16px;padding:14px 16px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(245,197,24,.15);">
+      <div style="margin-bottom:16px;padding:14px 16px;border-radius:var(--radius-md);background:rgba(255,255,255,.03);border:1px solid rgba(245,197,24,.15);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
           <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;">DEIN ERSTER SCHRITT</span>
           <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);">${completedSteps}/4 erledigt</span>
         </div>
-        <div style="width:100%;height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-bottom:12px;">
-          <div style="width:${gsPct}%;height:100%;background:var(--gold);border-radius:2px;transition:width .3s;"></div>
+        <div style="width:100%;height:4px;background:rgba(255,255,255,.06);border-radius:var(--radius-sm);margin-bottom:12px;">
+          <div style="width:${gsPct}%;height:100%;background:var(--gold);border-radius:var(--radius-sm);transition:width .3s;"></div>
         </div>
         ${gsStepsHtml}
       </div>`;
@@ -2240,8 +2240,8 @@ function renderFightsTab1(contentEl, data) {
   const visibleFights = fights.slice(0, fightsListLimit);
   const timelineRows = visibleFights.map((f, i) => {
     const dotColor = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
-    const methodTag = f.method ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#888;background:var(--surface-1);padding:2px 6px;border-radius:3px;margin-left:8px;">${f.method}</span>` : '';
-    const typeTag = f.type ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#666;background:var(--surface-0);border:1px solid var(--surface-2);padding:2px 6px;border-radius:3px;margin-left:4px;">${f.type}</span>` : '';
+    const methodTag = f.method ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#888;background:var(--surface-1);padding:2px 6px;border-radius:var(--radius-sm);margin-left:8px;">${f.method}</span>` : '';
+    const typeTag = f.type ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#666;background:var(--surface-0);border:1px solid var(--surface-2);padding:2px 6px;border-radius:var(--radius-sm);margin-left:4px;">${f.type}</span>` : '';
     return `<div onclick="openFightDetail(${i})" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--surface-1);cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
       <div style="font-family:'Space Mono',monospace;font-size:12px;color:#555;min-width:70px;">${formatDate(f.date)}</div>
       <div style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
@@ -2265,7 +2265,7 @@ function renderFightsTab1(contentEl, data) {
         <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--gold);line-height:1;">${draws}</span>
       </div>
       <div style="font-family:'Space Mono',monospace;font-size:12px;color:#444;letter-spacing:2px;margin-bottom:12px;">SIEGE – NIEDERLAGEN – UNENTSCHIEDEN</div>
-      <div style="height:6px;background:var(--surface-1);border-radius:3px;overflow:hidden;max-width:300px;">
+      <div style="height:6px;background:var(--surface-1);border-radius:var(--radius-sm);overflow:hidden;max-width:300px;">
         <div style="display:flex;height:100%;">
           <div style="width:${wPct}%;background:var(--green);"></div>
           <div style="width:${lPct}%;background:var(--red);"></div>
@@ -2312,7 +2312,7 @@ function renderFightsTab1(contentEl, data) {
       ? '<div style="text-align:center;padding:40px 0;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#1a1a1a;">0 K\u00c4MPFE</div><div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#444;margin:8px 0 16px;">Trage deinen ersten Kampf ein und baue dein Kampfarchiv auf.</div><button class="submit-btn" style="padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ ERSTEN KAMPF EINTRAGEN</button></div>'
       : timelineRows}
   </div>
-  ${fights.length > fightsListLimit ? `<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:'Space Mono',monospace;font-size:12px;color:#555;background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:6px;cursor:pointer;">Weitere Kämpfe laden (${fights.length - fightsListLimit} übrig)</button></div>` : ''}`;
+  ${fights.length > fightsListLimit ? `<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:'Space Mono',monospace;font-size:12px;color:#555;background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:var(--radius-md);cursor:pointer;">Weitere Kämpfe laden (${fights.length - fightsListLimit} übrig)</button></div>` : ''}`;
 }
 
 function renderFightsTab2(contentEl, data) {
@@ -2328,7 +2328,7 @@ function renderFightsTab3(contentEl, data) {
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:36px;color:#1a1a1a;margin-bottom:8px;">ANALYSE</div>' +
       '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#444;margin-bottom:20px;">Ab 3 K\u00e4mpfen erkennt FightOS Muster in deinen St\u00e4rken und Schw\u00e4chen.</div>' +
       '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + fights.length + '/3 K\u00e4mpfe eingetragen</div>' +
-      '<div style="width:120px;height:4px;background:var(--surface-1);border-radius:2px;margin:12px auto;overflow:hidden;"><div style="width:' + Math.round(fights.length / 3 * 100) + '%;height:100%;background:var(--red);border-radius:2px;"></div></div>' +
+      '<div style="width:120px;height:4px;background:var(--surface-1);border-radius:var(--radius-sm);margin:12px auto;overflow:hidden;"><div style="width:' + Math.round(fights.length / 3 * 100) + '%;height:100%;background:var(--red);border-radius:var(--radius-sm);"></div></div>' +
       '<button class="submit-btn" style="margin-top:16px;padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ KAMPF EINTRAGEN</button>' +
     '</div>';
     return;
@@ -2399,8 +2399,8 @@ function renderFightsTab3(contentEl, data) {
         '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);font-weight:600;">' + t + '</div>' +
         '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">' + s.wins + 'S - ' + s.losses + 'N' + (s.draws > 0 ? ' - ' + s.draws + 'U' : '') + '</div>' +
       '</div>' +
-      '<div style="height:6px;background:var(--surface-1);border-radius:3px;overflow:hidden;">' +
-        '<div style="height:100%;width:' + winrate + '%;background:var(--green);border-radius:3px;transition:width .3s;"></div>' +
+      '<div style="height:6px;background:var(--surface-1);border-radius:var(--radius-sm);overflow:hidden;">' +
+        '<div style="height:100%;width:' + winrate + '%;background:var(--green);border-radius:var(--radius-sm);transition:width .3s;"></div>' +
       '</div>' +
       '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#444;margin-top:4px;">' + winrate + '% Winrate</div>' +
       bulletsHTML +
@@ -2445,7 +2445,7 @@ function renderFightsTab3(contentEl, data) {
   var loadMoreTimelineBtn = '';
   if (chronFightsAll.length > fightsListLimit) {
     var remaining = chronFightsAll.length - fightsListLimit;
-    loadMoreTimelineBtn = '<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:6px;cursor:pointer;">Weitere Kämpfe laden (' + remaining + ' übrig)</button></div>';
+    loadMoreTimelineBtn = '<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:var(--radius-md);cursor:pointer;">Weitere Kämpfe laden (' + remaining + ' übrig)</button></div>';
   }
   var sectionC = '<div style="margin-bottom:36px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:2px;margin-bottom:14px;">FORTSCHRITTS-TIMELINE</div>' +
@@ -2576,7 +2576,7 @@ function openFightDetail(idx) {
   let videoHTML;
   if (ytId) {
     videoHTML = `
-      <div style="width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;box-shadow:0 0 40px rgba(232,0,13,.08);">
+      <div style="width:100%;aspect-ratio:16/9;border-radius:var(--radius-md);overflow:hidden;background:#000;box-shadow:0 0 40px rgba(232,0,13,.08);">
         <div id="fight-yt-container" style="width:100%;height:100%;"></div>
       </div>
       <div style="display:flex;gap:16px;margin-top:8px;">
@@ -2586,7 +2586,7 @@ function openFightDetail(idx) {
       <div id="video-input-area" style="display:none;margin-top:8px;"></div>`;
   } else {
     videoHTML = `
-      <div onclick="showVideoInput(${idx})" style="width:100%;aspect-ratio:16/9;border-radius:8px;background:var(--surface-0);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;" onmouseenter="this.style.background='var(--surface-1)'" onmouseleave="this.style.background='var(--surface-0)'">
+      <div onclick="showVideoInput(${idx})" style="width:100%;aspect-ratio:16/9;border-radius:var(--radius-md);background:var(--surface-0);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;" onmouseenter="this.style.background='var(--surface-1)'" onmouseleave="this.style.background='var(--surface-0)'">
         <div style="width:48px;height:48px;border-radius:50%;border:2px solid var(--surface-2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
           <span style="font-size:20px;color:#333;margin-left:3px;">▶</span>
         </div>
@@ -2598,7 +2598,7 @@ function openFightDetail(idx) {
   // Timestamp markers
   var markers = f.timestamps || [];
   var timestampsHTML = '<div style="display:flex;flex-direction:column;height:100%;">' +
-    '<button onclick="markNow(' + idx + ')" style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;padding:14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;margin-bottom:12px;transition:opacity .15s;" onmousedown="this.style.opacity=\'0.7\'" onmouseup="this.style.opacity=\'1\'">+ SZENE</button>' +
+    '<button onclick="markNow(' + idx + ')" style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;padding:14px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;width:100%;margin-bottom:12px;transition:opacity .15s;" onmousedown="this.style.opacity=\'0.7\'" onmouseup="this.style.opacity=\'1\'">+ SZENE</button>' +
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
       '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;letter-spacing:1px;">' + markers.length + ' MARKIERUNG' + (markers.length !== 1 ? 'EN' : '') + '</span>' +
     '</div>' +
@@ -2610,7 +2610,7 @@ function openFightDetail(idx) {
   } else {
     markers.forEach(function(m, mi) {
       var tagColor = _tsTagColors[m.tag] || '#555';
-      timestampsHTML += '<div id="ts-item-' + mi + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--surface-0);border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
+      timestampsHTML += '<div id="ts-item-' + mi + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--surface-0);border-radius:var(--radius-sm);border-left:2px solid ' + tagColor + ';">' +
         '<span id="ts-time-' + mi + '" onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;">' + formatTs(m.time) + '</span>' +
         '<input id="ts-text-' + mi + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '" placeholder="Beschreibung..." ' +
           'onblur="updateTimestampText(' + idx + ',' + mi + ',this.value)" ' +
@@ -2644,7 +2644,7 @@ function openFightDetail(idx) {
     const w = f.rounds[r-1] ? (f.rounds[r-1].winner || '') : '';
     return `<div style="display:flex;align-items:center;gap:6px;">
       <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#333;">R${r}</span>
-      ${['ich','gegner','unklar'].map(v => `<span onclick="setRoundWinner(${idx},${r-1},'${v}')" style="font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border-radius:3px;cursor:pointer;transition:all .15s;${w === v ? (v==='ich'?'background:var(--green);color:#000;':'background:var(--red);color:#fff;') : 'background:var(--surface-1);color:#333;'}">${v === 'ich' ? 'ICH' : v === 'gegner' ? 'ER' : '?'}</span>`).join('')}
+      ${['ich','gegner','unklar'].map(v => `<span onclick="setRoundWinner(${idx},${r-1},'${v}')" style="font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;${w === v ? (v==='ich'?'background:var(--green);color:#000;':'background:var(--red);color:#fff;') : 'background:var(--surface-1);color:#333;'}">${v === 'ich' ? 'ICH' : v === 'gegner' ? 'ER' : '?'}</span>`).join('')}
     </div>`;
   }).join('');
 
@@ -2667,13 +2667,13 @@ function openFightDetail(idx) {
     <!-- LEFT: VIDEO -->
     <div>${videoHTML}</div>
     <!-- RIGHT: TIMESTAMPS -->
-    <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:16px;${isMobile() ? '' : 'max-height:480px;display:flex;flex-direction:column;'}">${timestampsHTML}</div>
+    <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;${isMobile() ? '' : 'max-height:480px;display:flex;flex-direction:column;'}">${timestampsHTML}</div>
   </div>
 
   <!-- BEWERTUNG + SCORING – full width row -->
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
     <!-- Self-Rating -->
-    <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:16px;">
+    <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SELBSTBEWERTUNG</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${avgRating !== '–' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:#333;">/5</span></span>
@@ -2681,14 +2681,14 @@ function openFightDetail(idx) {
       ${ratingsHTML}
     </div>
     <!-- Runden-Scoring (kompakt neben Selbstbewertung) -->
-    <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:16px;">
+    <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:10px;">WER HAT GEWONNEN?</div>
       <div style="display:flex;flex-direction:column;gap:6px;">${roundWinnerHTML}</div>
     </div>
   </div>
 
   <!-- GEFÜHRTE VIDEO-ANALYSE -->
-  <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:24px;margin-bottom:36px;">
+  <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:24px;margin-bottom:36px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);letter-spacing:1.5px;">VIDEO-ANALYSE</div>
       <span style="font-family:'Space Mono',monospace;font-size:10px;color:#333;letter-spacing:1px;">${f.videoAnalysis ? Object.keys(f.videoAnalysis).filter(k => f.videoAnalysis[k]).length + '/15 BEANTWORTET' : '0/15 BEANTWORTET'}</span>
@@ -2731,7 +2731,7 @@ function openFightDetail(idx) {
           questions.map(function(q) {
             return '<div>' +
               '<label style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + roundColor + ';letter-spacing:1px;display:block;margin-bottom:4px;">' + q.q.replace(/</g,'&lt;') + '</label>' +
-              '<textarea style="width:100%;padding:10px 12px;background:var(--surface-1);border:1px solid ' + (va[q.key] ? '#1a3a1a' : 'var(--surface-2)') + ';color:#ccc;font-family:\'DM Sans\',sans-serif;font-size:13px;border-radius:4px;outline:none;resize:vertical;min-height:48px;box-sizing:border-box;" placeholder="' + q.ph.replace(/"/g,'&quot;') + '" onblur="saveVideoAnalysis(' + idx + ',' + r + ',\'' + q.key + '\',this.value)">' + (va[q.key] || '').replace(/</g,'&lt;') + '</textarea>' +
+              '<textarea style="width:100%;padding:10px 12px;background:var(--surface-1);border:1px solid ' + (va[q.key] ? '#1a3a1a' : 'var(--surface-2)') + ';color:#ccc;font-family:\'DM Sans\',sans-serif;font-size:13px;border-radius:var(--radius-sm);outline:none;resize:vertical;min-height:48px;box-sizing:border-box;" placeholder="' + q.ph.replace(/"/g,'&quot;') + '" onblur="saveVideoAnalysis(' + idx + ',' + r + ',\'' + q.key + '\',this.value)">' + (va[q.key] || '').replace(/</g,'&lt;') + '</textarea>' +
             '</div>';
           }).join('') +
         '</div>' +
@@ -2779,7 +2779,7 @@ function openFightDetail(idx) {
 
   <!-- ACTIONS -->
   <div style="display:flex;flex-wrap:wrap;gap:12px;padding-top:16px;border-top:1px solid var(--surface-1);">
-    <button onclick="if(confirm('Diesen Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;background:none;border:1px solid var(--surface-2);padding:10px 20px;border-radius:4px;cursor:pointer;min-height:44px;">KAMPF LÖSCHEN</button>
+    <button onclick="if(confirm('Diesen Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;background:none;border:1px solid var(--surface-2);padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;min-height:44px;">KAMPF LÖSCHEN</button>
   </div>`;
 
   showPage('fight-detail');
@@ -2984,7 +2984,7 @@ function renderTimestampList(idx) {
   el.innerHTML = markers.map(function(m) {
     var mid = m.id || '';
     var tagColor = _tsTagColors[m.tag] || '#555';
-    return '<div id="ts-item-' + mid + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--surface-0);border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
+    return '<div id="ts-item-' + mid + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--surface-0);border-radius:var(--radius-sm);border-left:2px solid ' + tagColor + ';">' +
       '<span id="ts-time-' + mid + '" onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;">' + formatTs(m.time) + '</span>' +
       '<input id="ts-text-' + mid + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '" placeholder="Was passiert hier?" ' +
         'onblur="updateTimestampById(' + idx + ',\'' + mid + '\',this.value)" ' +
@@ -3019,7 +3019,7 @@ function showVideoInput(idx) {
   var area = document.getElementById('video-input-area');
   if (!area) return;
   area.style.display = 'block';
-  area.innerHTML = '<div style="display:flex;gap:8px;"><input id="vid-url-input" type="url" placeholder="YouTube-Link einfügen..." style="flex:1;background:var(--surface-1);border:1px solid var(--surface-3);color:var(--white);padding:10px 14px;font-size:13px;border-radius:6px;outline:none;min-height:44px;" autofocus><button onclick="saveVideoUrl(' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:10px 16px;border-radius:6px;cursor:pointer;min-height:44px;white-space:nowrap;">SPEICHERN</button></div>';
+  area.innerHTML = '<div style="display:flex;gap:8px;"><input id="vid-url-input" type="url" placeholder="YouTube-Link einfügen..." style="flex:1;background:var(--surface-1);border:1px solid var(--surface-3);color:var(--white);padding:10px 14px;font-size:13px;border-radius:var(--radius-md);outline:none;min-height:44px;" autofocus><button onclick="saveVideoUrl(' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:10px 16px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;white-space:nowrap;">SPEICHERN</button></div>';
   var inp = document.getElementById('vid-url-input');
   if (inp) { inp.focus(); inp.onkeydown = function(e) { if (e.key === 'Enter') saveVideoUrl(idx); }; }
 }
@@ -3048,7 +3048,7 @@ function makeFightFieldEditable(idx, field, container) {
   // Already editing?
   if (container.querySelector('textarea')) return;
 
-  container.innerHTML = '<textarea style="width:100%;background:#0e0e0e;border:1px solid var(--surface-2);color:#ccc;padding:10px 12px;font-size:14px;font-family:\'DM Sans\',sans-serif;line-height:1.7;border-radius:6px;outline:none;resize:vertical;min-height:60px;box-sizing:border-box;" autofocus>' + val.replace(/</g,'&lt;') + '</textarea>';
+  container.innerHTML = '<textarea style="width:100%;background:#0e0e0e;border:1px solid var(--surface-2);color:#ccc;padding:10px 12px;font-size:14px;font-family:\'DM Sans\',sans-serif;line-height:1.7;border-radius:var(--radius-md);outline:none;resize:vertical;min-height:60px;box-sizing:border-box;" autofocus>' + val.replace(/</g,'&lt;') + '</textarea>';
   var ta = container.querySelector('textarea');
   ta.focus();
   ta.setSelectionRange(ta.value.length, ta.value.length);
@@ -3239,9 +3239,9 @@ function renderPrepTabContent() {
   migratePreps(data);
   var preps = data.preparations || [];
 
-  var cardStyle = 'background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:20px;margin-bottom:16px;';
+  var cardStyle = 'background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:20px;margin-bottom:16px;';
   var headingStyle = 'font-family:"Bebas Neue",sans-serif;color:var(--white);letter-spacing:1px;';
-  var btnPrimary = 'font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;';
+  var btnPrimary = 'font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;';
 
   // If a prep is open, show the wizard
   if (activePrepId) {
@@ -3291,7 +3291,7 @@ function renderPrepTabContent() {
 }
 
 function renderPrepCard(prep, data) {
-  var cardStyle = 'background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:20px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;';
+  var cardStyle = 'background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:20px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;';
   var opp = prep.opponent || {};
   var r = calcPrepReadiness(prep);
   var readyColor = r.pct === 100 ? 'var(--green)' : r.pct >= 70 ? 'var(--gold)' : 'var(--red)';
@@ -3315,7 +3315,7 @@ function renderPrepCard(prep, data) {
   html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">';
   html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);letter-spacing:1px;">' + title.replace(/</g, '&lt;') + '</div>';
   if (prep.completed) {
-    html += '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--green);border:1px solid var(--green);padding:2px 6px;border-radius:3px;letter-spacing:1px;">DONE</span>';
+    html += '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--green);border:1px solid var(--green);padding:2px 6px;border-radius:var(--radius-sm);letter-spacing:1px;">DONE</span>';
   }
   html += '</div>';
   if (subtitle) {
@@ -3324,7 +3324,7 @@ function renderPrepCard(prep, data) {
 
   // Mini readiness bar
   html += '<div style="display:flex;align-items:center;gap:12px;">';
-  html += '<div style="flex:1;max-width:200px;height:4px;background:var(--surface-1);border-radius:2px;overflow:hidden;"><div style="width:' + r.pct + '%;height:100%;background:' + readyColor + ';border-radius:2px;"></div></div>';
+  html += '<div style="flex:1;max-width:200px;height:4px;background:var(--surface-1);border-radius:var(--radius-sm);overflow:hidden;"><div style="width:' + r.pct + '%;height:100%;background:' + readyColor + ';border-radius:var(--radius-sm);"></div></div>';
   html += '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:' + readyColor + ';">' + r.pct + '%</span>';
   html += '</div>';
 
@@ -3338,7 +3338,7 @@ function renderPrepCard(prep, data) {
   ];
   chips.forEach(function(c) {
     var done = c.val === c.max;
-    html += '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:' + (done ? 'var(--green)' : '#444') + ';background:var(--surface-1);padding:3px 8px;border-radius:3px;letter-spacing:1px;">' + (done ? '\u2713 ' : '') + c.label + ' ' + c.val + '/' + c.max + '</span>';
+    html += '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:' + (done ? 'var(--green)' : '#444') + ';background:var(--surface-1);padding:3px 8px;border-radius:var(--radius-sm);letter-spacing:1px;">' + (done ? '\u2713 ' : '') + c.label + ' ' + c.val + '/' + c.max + '</span>';
   });
   html += '</div>';
 
@@ -3350,7 +3350,7 @@ function renderPrepCard(prep, data) {
   html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + statusColor + ';letter-spacing:1px;margin-bottom:12px;">' + statusLabel + '</div>';
 
   if (prep.completed) {
-    html += '<button onclick="event.stopPropagation();reopenPrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:3px;cursor:pointer;margin-bottom:4px;display:block;width:100%;">BEARBEITEN</button>';
+    html += '<button onclick="event.stopPropagation();reopenPrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;margin-bottom:4px;display:block;width:100%;">BEARBEITEN</button>';
   }
   html += '<button onclick="event.stopPropagation();deletePrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;background:none;border:none;cursor:pointer;letter-spacing:1px;">LOESCHEN</button>';
   html += '</div>';
@@ -3368,13 +3368,13 @@ function renderPrepWizard(data) {
   var step = prep.step || 1;
   var fights = data.fights || [];
 
-  var inputStyle = 'width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--surface-3);color:#fff;font-family:"DM Sans",sans-serif;font-size:13px;border-radius:4px;outline:none;box-sizing:border-box;';
+  var inputStyle = 'width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--surface-3);color:#fff;font-family:"DM Sans",sans-serif;font-size:13px;border-radius:var(--radius-sm);outline:none;box-sizing:border-box;';
   var textareaStyle = inputStyle + 'resize:vertical;min-height:80px;';
   var labelStyle = 'font-family:"Space Mono",monospace;font-size:10px;color:#555;letter-spacing:2px;margin-bottom:6px;display:block;';
   var headingStyle = 'font-family:"Bebas Neue",sans-serif;color:var(--white);letter-spacing:1px;';
-  var cardStyle = 'background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:20px;margin-bottom:16px;';
-  var btnPrimary = 'font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;';
-  var btnSecondary = 'font-family:"Space Mono",monospace;font-size:11px;letter-spacing:1px;padding:10px 20px;background:transparent;color:#555;border:1px solid var(--surface-3);border-radius:4px;cursor:pointer;';
+  var cardStyle = 'background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:20px;margin-bottom:16px;';
+  var btnPrimary = 'font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;';
+  var btnSecondary = 'font-family:"Space Mono",monospace;font-size:11px;letter-spacing:1px;padding:10px 20px;background:transparent;color:#555;border:1px solid var(--surface-3);border-radius:var(--radius-sm);cursor:pointer;';
 
   // Back to overview
   var oppName = (prep.opponent && prep.opponent.name) ? escapeHTML(prep.opponent.name) : 'Neue Vorbereitung';
@@ -3498,7 +3498,7 @@ function renderPrepWizard(data) {
     var checkedCount = [mc.alterEgo, mc.triggerWords, mc.visualization, mc.breathing, mc.videoStudied, mc.comboDrilled].filter(Boolean).length;
 
     var checkItem = function(label, path, checked) {
-      var boxStyle = 'width:20px;height:20px;border-radius:3px;border:2px solid ' + (checked ? 'var(--red)' : '#333') + ';background:' + (checked ? 'var(--red)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;';
+      var boxStyle = 'width:20px;height:20px;border-radius:var(--radius-sm);border:2px solid ' + (checked ? 'var(--red)' : '#333') + ';background:' + (checked ? 'var(--red)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;';
       return '<div onclick="togglePrepCheck(\'' + path + '\')" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--surface-1);cursor:pointer;">' +
         '<div style="' + boxStyle + '">' + (checked ? '<span style="color:#fff;font-size:12px;">\u2713</span>' : '') + '</div>' +
         '<span style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:' + (checked ? '#888' : '#555') + ';' + (checked ? 'text-decoration:line-through;' : '') + '">' + label + '</span>' +
@@ -3512,7 +3512,7 @@ function renderPrepWizard(data) {
           '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">CHECKLISTE</div>' +
           '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:' + (checkedCount === 6 ? 'var(--green)' : 'var(--red)') + ';">' + checkedCount + '/6</div>' +
         '</div>' +
-        '<div style="height:4px;background:var(--surface-1);border-radius:2px;margin-bottom:16px;overflow:hidden;"><div style="width:' + Math.round(checkedCount / 6 * 100) + '%;height:100%;background:' + (checkedCount === 6 ? 'var(--green)' : 'var(--red)') + ';border-radius:2px;transition:width .3s;"></div></div>' +
+        '<div style="height:4px;background:var(--surface-1);border-radius:var(--radius-sm);margin-bottom:16px;overflow:hidden;"><div style="width:' + Math.round(checkedCount / 6 * 100) + '%;height:100%;background:' + (checkedCount === 6 ? 'var(--green)' : 'var(--red)') + ';border-radius:var(--radius-sm);transition:width .3s;"></div></div>' +
         checkItem('Alter Ego aktiviert \u2014 ' + alterEgoName, 'mentalChecklist.alterEgo', mc.alterEgo) +
         checkItem('Trigger-W\u00f6rter festgelegt', 'mentalChecklist.triggerWords', mc.triggerWords) +
         checkItem('Kampf visualisiert (3x durchgespielt)', 'mentalChecklist.visualization', mc.visualization) +
@@ -3556,12 +3556,12 @@ function renderPrepWizard(data) {
           '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">PACKLISTE</div>' +
           '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:' + (packedCount === 10 ? 'var(--green)' : '#555') + ';">' + packedCount + '/10</div>' +
         '</div>' +
-        '<div style="height:4px;background:var(--surface-1);border-radius:2px;margin-bottom:16px;overflow:hidden;"><div style="width:' + (packedCount * 10) + '%;height:100%;background:' + (packedCount === 10 ? 'var(--green)' : 'var(--blue)') + ';border-radius:2px;transition:width .3s;"></div></div>';
+        '<div style="height:4px;background:var(--surface-1);border-radius:var(--radius-sm);margin-bottom:16px;overflow:hidden;"><div style="width:' + (packedCount * 10) + '%;height:100%;background:' + (packedCount === 10 ? 'var(--green)' : 'var(--blue)') + ';border-radius:var(--radius-sm);transition:width .3s;"></div></div>';
 
     packItems.forEach(function(item) {
       var key = item[0], label = item[1];
       var checked = !!pl[key];
-      var boxStyle = 'width:20px;height:20px;border-radius:3px;border:2px solid ' + (checked ? 'var(--green)' : '#333') + ';background:' + (checked ? 'var(--green)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;';
+      var boxStyle = 'width:20px;height:20px;border-radius:var(--radius-sm);border:2px solid ' + (checked ? 'var(--green)' : '#333') + ';background:' + (checked ? 'var(--green)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;';
       contentHTML += '<div onclick="togglePrepCheck(\'packingList.' + key + '\')" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--surface-1);cursor:pointer;">' +
         '<div style="' + boxStyle + '">' + (checked ? '<span style="color:#fff;font-size:12px;">\u2713</span>' : '') + '</div>' +
         '<span style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:' + (checked ? 'var(--green)' : '#888') + ';' + (checked ? 'text-decoration:line-through;' : '') + '">' + label + '</span>' +
@@ -3623,7 +3623,7 @@ function renderPrepWizard(data) {
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">READINESS CHECK</div>' +
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:' + readyColor + ';">' + r.pct + '%</div>' +
       '</div>' +
-      '<div style="height:6px;background:var(--surface-1);border-radius:3px;overflow:hidden;margin-bottom:16px;"><div style="width:' + r.pct + '%;height:100%;background:' + readyColor + ';border-radius:3px;transition:width .3s;"></div></div>' +
+      '<div style="height:6px;background:var(--surface-1);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:16px;"><div style="width:' + r.pct + '%;height:100%;background:' + readyColor + ';border-radius:var(--radius-sm);transition:width .3s;"></div></div>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
         '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + (r.opp >= 4 ? 'var(--green)' : '#555') + ';letter-spacing:1px;">' + (r.opp >= 4 ? '\u2713' : '\u25CB') + ' GEGNER ' + r.opp + '/5</div>' +
         '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + (r.gp >= 4 ? 'var(--green)' : '#555') + ';letter-spacing:1px;">' + (r.gp >= 4 ? '\u2713' : '\u25CB') + ' GAMEPLAN ' + r.gp + '/5</div>' +
@@ -3651,7 +3651,7 @@ function updateQlogSaeulen() {
   var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNÄHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITÄT'];
   var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
   el.innerHTML = saeulen.map(function(si) {
-    return '<span style="font-family:\'Space Mono\',monospace;font-size:8px;padding:2px 5px;border-radius:2px;background:' + saeulenColors[si] + '22;color:' + saeulenColors[si] + ';letter-spacing:0.5px;">' + saeulenLabels[si] + '</span>';
+    return '<span style="font-family:\'Space Mono\',monospace;font-size:8px;padding:2px 5px;border-radius:var(--radius-sm);background:' + saeulenColors[si] + '22;color:' + saeulenColors[si] + ';letter-spacing:0.5px;">' + saeulenLabels[si] + '</span>';
   }).join('');
 }
 
@@ -4349,8 +4349,8 @@ function _renderWeekPlanInner() {
       var wh = parseInt((s.workStart || '08:00').split(':')[0]);
       if (wh >= 12 || wh < 5) hints.push('\u26A0 Ungewoehnliche Arbeitszeiten – pruefe ob Trainingszeiten passen');
       return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">' +
-        hints.map(function(h) { return '<span style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:var(--surface-1);border:1px solid var(--surface-2);border-radius:4px;color:#555;">' + h + '</span>'; }).join('') +
-        '<span onclick="showPage(\'account\')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:transparent;border:1px solid var(--surface-3);border-radius:4px;color:var(--red);cursor:pointer;">AENDERN \u2192</span>' +
+        hints.map(function(h) { return '<span style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:var(--surface-1);border:1px solid var(--surface-2);border-radius:var(--radius-sm);color:#555;">' + h + '</span>'; }).join('') +
+        '<span onclick="showPage(\'account\')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:transparent;border:1px solid var(--surface-3);border-radius:var(--radius-sm);color:var(--red);cursor:pointer;">AENDERN \u2192</span>' +
       '</div>';
     })()}
     <div class="page-header" style="display:none;"></div>
@@ -4369,7 +4369,7 @@ function _renderWeekPlanInner() {
       if (fb.rpeLow) lines.push('\u2192 ' + fb.rpeLow);
       if (fb.missedSaeulen && fb.missedSaeulen.length) lines.push('\u2192 VERSAEUMT: ' + fb.missedSaeulen.map(function(si){return saeulenLabels[si];}).join(', ') + ' (extra Fokus)');
       if (lines.length === 0 && pct >= 80) lines.push('\u2713 Gute Woche! Weiter so.');
-      return '<div style="background:#0d0d0d;border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:8px;padding:16px;margin-bottom:16px;">' +
+      return '<div style="background:#0d0d0d;border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
           '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--blue);letter-spacing:2px;">LETZTE WOCHE</span>' +
           '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:' + rateColor + ';">' + pct + '%</span>' +
@@ -4397,12 +4397,12 @@ function _renderWeekPlanInner() {
       var pills = wi.map(function(e) {
         var key = e[0], score = e[1];
         var isCritical = score < 35;
-        return '<span style="font-family:\'Space Mono\',monospace;font-size:11px;padding:4px 10px;border-radius:4px;background:' + PILLAR_COLORS[key] + '22;color:' + PILLAR_COLORS[key] + ';border:1px solid ' + PILLAR_COLORS[key] + '44;">' + PILLAR_LABELS[key] + ' ' + Math.round(score) + '%' + (isCritical ? ' !!!' : '') + '</span>';
+        return '<span style="font-family:\'Space Mono\',monospace;font-size:11px;padding:4px 10px;border-radius:var(--radius-sm);background:' + PILLAR_COLORS[key] + '22;color:' + PILLAR_COLORS[key] + ';border:1px solid ' + PILLAR_COLORS[key] + '44;">' + PILLAR_LABELS[key] + ' ' + Math.round(score) + '%' + (isCritical ? ' !!!' : '') + '</span>';
       }).join('');
       var actions = wi.map(function(e) {
         return '<div style="font-size:11px;color:#888;line-height:1.5;">→ <span style="color:' + PILLAR_COLORS[e[0]] + ';">' + PILLAR_LABELS[e[0]] + '</span>: ' + PILLAR_ACTIONS[e[0]] + '</div>';
       }).join('');
-      return '<div style="margin-bottom:16px;padding:14px 16px;background:#0d0d0d;border:1px solid var(--surface-2);border-radius:8px;border-left:3px solid var(--red);">' +
+      return '<div style="margin-bottom:16px;padding:14px 16px;background:#0d0d0d;border:1px solid var(--surface-2);border-radius:var(--radius-md);border-left:3px solid var(--red);">' +
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
           '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:2px;color:var(--red);">FASS-PRINZIP AKTIV</span>' +
           pills +
@@ -4423,11 +4423,11 @@ function _renderWeekPlanInner() {
       var covered = Object.keys(coveredSet).length;
       var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNÄHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITÄT'];
       var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
-      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px;padding:12px 16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;">' +
+      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px;padding:12px 16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);">' +
         '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:1px;margin-right:4px;">SÄULEN ' + covered + '/8</span>' +
         saeulenLabels.map(function(l, i) {
           var active = coveredSet[i];
-          return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:3px;letter-spacing:0.5px;' +
+          return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);letter-spacing:0.5px;' +
             (active ? 'background:' + saeulenColors[i] + '22;color:' + saeulenColors[i] + ';border:1px solid ' + saeulenColors[i] + '44;' : 'background:var(--surface-1);color:#333;border:1px solid var(--surface-2);') +
           '">' + l + '</span>';
         }).join('') +
@@ -4567,7 +4567,7 @@ function openBlockDetail(day, idx) {
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">UEBUNGEN</div>';
     block.exercises.forEach(function(ex) {
       var exData = typeof getExerciseById === 'function' ? getExerciseById(ex.id) : null;
-      exerciseHTML += '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:16px;margin-bottom:10px;">';
+      exerciseHTML += '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;margin-bottom:10px;">';
       exerciseHTML += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
       exerciseHTML += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">' + (ex.label || ex.id).replace(/</g,'&lt;') + '</div>';
       if (exData) {
@@ -4576,7 +4576,7 @@ function openBlockDetail(day, idx) {
       exerciseHTML += '</div>';
       if (exData) {
         if (exData.desc) exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;margin-bottom:8px;">' + exData.desc + '</div>';
-        if (exData.sets && exData.sets.length) exerciseHTML += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' + exData.sets.map(function(s) { return '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);background:#1a1a0a;padding:4px 10px;border-radius:4px;">' + s + '</span>'; }).join('') + '</div>';
+        if (exData.sets && exData.sets.length) exerciseHTML += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' + exData.sets.map(function(s) { return '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);background:#1a1a0a;padding:4px 10px;border-radius:var(--radius-sm);">' + s + '</span>'; }).join('') + '</div>';
         if (exData.tip) exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;line-height:1.5;"><strong style="color:var(--gold);">' + (exData.tipLabel || 'Tipp') + ':</strong> ' + exData.tip + '</div>';
         if (exData.boxingConnection) exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#444;line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--surface-1);"><strong style="color:#555;">Boxing:</strong> ' + exData.boxingConnection + '</div>';
         if (exData.video) exerciseHTML += '<a href="' + exData.video + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-family:\'Space Mono\',monospace;font-size:10px;color:var(--red);text-decoration:none;letter-spacing:1px;">VIDEO ANLEITUNG \u2197</a>';
@@ -4599,13 +4599,13 @@ function openBlockDetail(day, idx) {
     (block.hint ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#666;margin-top:8px;line-height:1.5;">' + block.hint.replace(/</g,'&lt;') + '</div>' : '') +
     '<div style="display:flex;gap:6px;margin-top:12px;">' +
       blockSaeulen.map(function(si) {
-        return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:3px;background:' + saeulenColors[si] + '22;color:' + saeulenColors[si] + ';border:1px solid ' + saeulenColors[si] + '44;">' + saeulenLabels[si] + '</span>';
+        return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);background:' + saeulenColors[si] + '22;color:' + saeulenColors[si] + ';border:1px solid ' + saeulenColors[si] + '44;">' + saeulenLabels[si] + '</span>';
       }).join('') +
     '</div>' +
   '</div>' +
 
   // Warm-up
-  (typeDetail.warmup ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--gold);border-radius:8px;padding:16px;margin-bottom:16px;">' +
+  (typeDetail.warmup ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px;margin-bottom:8px;">WARM-UP</div>' +
     '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.7;">' + typeDetail.warmup + '</div>' +
   '</div>' : '') +
@@ -4614,20 +4614,20 @@ function openBlockDetail(day, idx) {
   exerciseHTML +
 
   // Cool-down
-  (typeDetail.cooldown ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:8px;padding:16px;margin-top:16px;margin-bottom:16px;">' +
+  (typeDetail.cooldown ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:16px;margin-top:16px;margin-bottom:16px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">COOL-DOWN</div>' +
     '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.7;">' + typeDetail.cooldown + '</div>' +
   '</div>' : '') +
 
   // Hinweise
-  (typeDetail.notes ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:16px;margin-bottom:16px;">' +
+  (typeDetail.notes ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">HINWEISE</div>' +
     '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;line-height:1.7;">' + typeDetail.notes + '</div>' +
   '</div>' : '') +
 
   // Bearbeiten-Button
   '<div style="display:flex;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--surface-2);">' +
-    '<button onclick="editBlockFromDetail(\'' + day + '\',' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;background:none;border:1px solid var(--surface-3);padding:10px 20px;border-radius:4px;cursor:pointer;">BEARBEITEN</button>' +
+    '<button onclick="editBlockFromDetail(\'' + day + '\',' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;background:none;border:1px solid var(--surface-3);padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;">BEARBEITEN</button>' +
     '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\');showPage(\'wochenplan\')" class="submit-btn" style="padding:10px 20px;font-size:13px;">ALS ERLEDIGT MARKIEREN</button>' +
   '</div>';
 
@@ -4952,10 +4952,10 @@ function buildScheduleHTML(schedule, idPrefix) {
     var isFrei = d.type === 'frei';
     return '<div style="display:flex;gap:6px;align-items:center;">' +
       '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--white);min-width:24px;">' + SCHEDULE_DAY_LABELS[day] + '</span>' +
-      '<select id="' + idPrefix + '-type-' + day + '" onchange="document.getElementById(\'' + idPrefix + '-time-' + day + '\').disabled=this.value===\'frei\'" style="flex:1;background:var(--surface-2);border:1px solid var(--surface-3);color:var(--white);padding:8px;font-family:\'DM Sans\';font-size:12px;border-radius:4px;">' +
+      '<select id="' + idPrefix + '-type-' + day + '" onchange="document.getElementById(\'' + idPrefix + '-time-' + day + '\').disabled=this.value===\'frei\'" style="flex:1;background:var(--surface-2);border:1px solid var(--surface-3);color:var(--white);padding:8px;font-family:\'DM Sans\';font-size:12px;border-radius:var(--radius-sm);">' +
         SCHEDULE_TYPES.map(function(t) { return '<option value="' + t.val + '" ' + (d.type === t.val ? 'selected' : '') + '>' + t.label + '</option>'; }).join('') +
       '</select>' +
-      '<input id="' + idPrefix + '-time-' + day + '" type="time" value="' + (d.time || '18:00') + '" ' + (isFrei ? 'disabled' : '') + ' style="width:90px;min-height:44px;background:var(--surface-2);border:1px solid var(--surface-3);color:var(--white);padding:8px;font-family:\'DM Sans\';font-size:14px;border-radius:4px;box-sizing:border-box;">' +
+      '<input id="' + idPrefix + '-time-' + day + '" type="time" value="' + (d.time || '18:00') + '" ' + (isFrei ? 'disabled' : '') + ' style="width:90px;min-height:44px;background:var(--surface-2);border:1px solid var(--surface-3);color:var(--white);padding:8px;font-family:\'DM Sans\';font-size:14px;border-radius:var(--radius-sm);box-sizing:border-box;">' +
     '</div>';
   }).join('');
 }
@@ -5184,22 +5184,22 @@ function buildDailyRoutineHTML() {
   const tomorrowTypeLabel = TYPE_LABEL_MAP[tomorrow.type] || tomorrow.type;
   let tomorrowNote = '';
   if (tomorrowIsSparring) {
-    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:#1a1208;border:1px solid var(--orange);border-radius:8px;font-size:12px;color:var(--orange);">Morgen: Sparring \u2014 heute fr\u00fch schlafen!</div>`;
+    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:#1a1208;border:1px solid var(--orange);border-radius:var(--radius-md);font-size:12px;color:var(--orange);">Morgen: Sparring \u2014 heute fr\u00fch schlafen!</div>`;
   } else if (tomorrowIsBoxing) {
-    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:#0d1a0d;border:1px solid var(--green);border-radius:8px;font-size:12px;color:var(--green);">Morgen: ${tomorrowTypeLabel} (${tomorrowLabel}) um ${tomorrow.time || '?'}</div>`;
+    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:#0d1a0d;border:1px solid var(--green);border-radius:var(--radius-md);font-size:12px;color:var(--green);">Morgen: ${tomorrowTypeLabel} (${tomorrowLabel}) um ${tomorrow.time || '?'}</div>`;
   } else if (tomorrow.type === 'frei') {
-    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:var(--surface-1);border:1px solid #333;border-radius:8px;font-size:12px;color:#666;">Morgen: Freier Tag (${tomorrowLabel})</div>`;
+    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:var(--surface-1);border:1px solid #333;border-radius:var(--radius-md);font-size:12px;color:#666;">Morgen: Freier Tag (${tomorrowLabel})</div>`;
   }
 
   // Header with today's type
   const headerHTML = `<div style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
     <span style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">${dayLabel}</span>
-    <span style="background:${isBoxingDay || isSparringDay ? 'var(--red)' : isFreeDay ? 'var(--green)' : 'var(--gold)'};color:#000;font-size:12px;font-weight:700;padding:3px 10px;border-radius:4px;text-transform:uppercase;">${typeLabel}${today.time ? ' \u00b7 ' + today.time : ''}</span>
+    <span style="background:${isBoxingDay || isSparringDay ? 'var(--red)' : isFreeDay ? 'var(--green)' : 'var(--gold)'};color:#000;font-size:12px;font-weight:700;padding:3px 10px;border-radius:var(--radius-sm);text-transform:uppercase;">${typeLabel}${today.time ? ' \u00b7 ' + today.time : ''}</span>
   </div>`;
 
   // Warnings HTML
   const warningsHTML = warnings.length ? warnings.map(w =>
-    `<div style="margin-bottom:6px;padding:8px 12px;background:#1a1208;border:1px solid var(--orange);border-radius:6px;font-size:11px;color:var(--orange);">⚠ ${w}</div>`
+    `<div style="margin-bottom:6px;padding:8px 12px;background:#1a1208;border:1px solid var(--orange);border-radius:var(--radius-md);font-size:11px;color:var(--orange);">⚠ ${w}</div>`
   ).join('') : '';
 
   // Filter out noise blocks
@@ -5482,7 +5482,7 @@ function renderDashboard() {
   // Radar pills
   var pillsHTML = RADAR_AXES.map(function(a) {
     var val = scores[a.key];
-    return '<div style="flex-shrink:0;text-align:center;padding:6px 10px;border-radius:20px;background:' + a.hex + '18;border:1px solid ' + a.hex + '30;min-width:50px;">' +
+    return '<div style="flex-shrink:0;text-align:center;padding:6px 10px;border-radius:var(--radius-full);background:' + a.hex + '18;border:1px solid ' + a.hex + '30;min-width:50px;">' +
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:' + a.hex + ';">' + (val !== null ? val : '\u2014') + '</div>' +
       '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:#555;letter-spacing:1px;">' + a.label + '</div>' +
     '</div>';
@@ -5515,7 +5515,7 @@ function renderDashboard() {
 
   el.innerHTML =
     '<div class="dash-bento stagger">' +
-    (isNewUser ? '<div class="bento-full bento-cell glass" style="text-align:center;padding:40px 24px;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:var(--white);margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div><div style="font-size:15px;color:#666;max-width:500px;margin:0 auto 24px;line-height:1.6;">Dein persönlicher Boxing-Coach. Starte mit deinem ersten Schritt:</div><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"><button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:12px 24px;border-radius:8px;cursor:pointer;">Wochenplan ansehen</button><button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.3);padding:12px 24px;border-radius:8px;cursor:pointer;">Ersten Test machen</button><button onclick="showPage(\'mental\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:8px;cursor:pointer;">Alter Ego erstellen</button></div></div>' : '') +
+    (isNewUser ? '<div class="bento-full bento-cell glass" style="text-align:center;padding:40px 24px;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:var(--white);margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div><div style="font-size:15px;color:#666;max-width:500px;margin:0 auto 24px;line-height:1.6;">Dein persönlicher Boxing-Coach. Starte mit deinem ersten Schritt:</div><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"><button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;">Wochenplan ansehen</button><button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;">Ersten Test machen</button><button onclick="showPage(\'mental\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;">Alter Ego erstellen</button></div></div>' : '') +
 
     // ── ROW 1: HERO (wide) + SCORE RING ──
     '<div class="bento-cell bento-wide glass glow-card" style="background:linear-gradient(135deg,rgba(232,0,13,.06),rgba(245,197,24,.03));">' +
@@ -5594,7 +5594,7 @@ function renderDashboard() {
           var d = rb.date ? new Date(rb.date) : null;
           var timeStr = d ? (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes() : '';
           return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">' +
-            '<div style="width:4px;height:28px;border-radius:2px;background:' + tc + ';flex-shrink:0;"></div>' +
+            '<div style="width:4px;height:28px;border-radius:var(--radius-sm);background:' + tc + ';flex-shrink:0;"></div>' +
             '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--light);">' + (rb.title || rb.type).replace(/</g,'&lt;') + '</div>' +
             '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;">' + timeStr + '</div>' +
             '<div style="font-size:12px;color:var(--green);">\u2713</div>' +
@@ -5608,7 +5608,7 @@ function renderDashboard() {
     '<div class="bento-cell glass">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;">' +
         '<div class="sec-label" style="cursor:pointer;" onclick="showPage(\'fights\')">K\u00c4MPFE</div>' +
-        '<button class="submit-btn" style="padding:6px 14px;font-size:11px;border-radius:8px;" onclick="openFightModal()">+</button>' +
+        '<button class="submit-btn" style="padding:6px 14px;font-size:11px;border-radius:var(--radius-md);" onclick="openFightModal()">+</button>' +
       '</div>' +
       '<div id="fight-log-list" style="margin-top:8px;"></div>' +
     '</div>' +
@@ -6240,7 +6240,7 @@ function renderTestsPage() {
   }).join('');
 
   // Batch input form
-  const batchHTML = `<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:8px;padding:20px;margin-bottom:24px;">
+  const batchHTML = `<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:20px;margin-bottom:24px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;cursor:pointer;" onclick="var c=document.getElementById('batch-test-form');c.style.display=c.style.display==='none'?'block':'none';">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">ALLE TESTS AUF EINMAL EINTRAGEN</div>
       <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--red);letter-spacing:1px;">AUFKLAPPEN ▾</span>
@@ -6278,8 +6278,8 @@ function renderTestsPage() {
     </div>
     <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;">
       <span style="font-family:'Space Mono',monospace;font-size:11px;color:#444;align-self:center;">SIEHE AUCH:</span>
-      <button onclick="showPage('periodisierung')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:4px;padding:6px 14px;cursor:pointer;">Periodisierung</button>
-      <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:4px;padding:6px 14px;cursor:pointer;">Rechner</button>
+      <button onclick="showPage('periodisierung')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Periodisierung</button>
+      <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
     </div>`;
 
   setTimeout(() => {
@@ -6333,7 +6333,7 @@ function showBenchDetail(benchId) {
     '<div style="font-family:\'Space Mono\',monospace;font-size:14px;color:' + trend.color + ';">' + trend.arrow + ' ' + (b.inverse ? (pctChange < 0 ? '' : '+') : (pctChange > 0 ? '+' : '')) + pctChange + '% seit Start</div>' +
   '</div>' +
   '<canvas id="bench-detail-chart" width="560" height="200" style="width:100%;height:200px;margin-bottom:16px;"></canvas>' +
-  '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px;background:var(--surface-1);border-radius:6px;">' +
+  '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px;background:var(--surface-1);border-radius:var(--radius-md);">' +
     '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">BESTLEISTUNG</span><br><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--gold);">' + bestVal + ' ' + b.unit + '</span></div>' +
     '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">AM</span><br><span style="font-family:\'Space Mono\',monospace;font-size:12px;color:#888;">' + (bestEntry ? bestEntry.date : '') + '</span></div>' +
     '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">EINTRAEGE</span><br><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);">' + hist.length + '</span></div>' +
@@ -6342,7 +6342,7 @@ function showBenchDetail(benchId) {
   '<div style="display:flex;flex-direction:column;gap:4px;">' +
     hist.slice().reverse().map(function(h, i) {
       var isBest = h.value === bestVal;
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surface-1);border-radius:4px;' + (isBest ? 'border-left:2px solid var(--gold);' : '') + '">' +
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surface-1);border-radius:var(--radius-sm);' + (isBest ? 'border-left:2px solid var(--gold);' : '') + '">' +
         '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">' + h.date + '</span>' +
         '<span style="font-family:\'Space Mono\',monospace;font-size:13px;color:' + (isBest ? 'var(--gold)' : 'var(--white)') + ';">' + h.value + ' ' + b.unit + (isBest ? ' \u2605' : '') + '</span>' +
         '<span onclick="deleteBenchEntry(\'' + benchId + '\',\'' + h.date + '\')" style="font-size:12px;color:#222;cursor:pointer;padding:0 4px;" title="Loeschen">\u00d7</span>' +
@@ -6396,13 +6396,13 @@ function renderDailyCombined() {
   const checkHTML = `
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--surface-2);">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);margin-bottom:10px;">TAGES-CHECKLIST</div>
-      <div style="margin-bottom:10px;height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden;">
+      <div style="margin-bottom:10px;height:4px;background:var(--surface-2);border-radius:var(--radius-sm);overflow:hidden;">
         <div style="height:100%;width:${pct}%;background:${pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : 'var(--red)'};transition:width .3s;"></div>
       </div>
       ${DAILY_ITEMS.map(item => {
         const checked = cl[item.id];
         return `<div style="display:flex;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid #151515;cursor:pointer;${checked ? 'opacity:.5;' : ''}" onclick="toggleCheck('${item.id}')">
-          <div style="width:20px;height:20px;border-radius:4px;border:2px solid ${checked ? 'var(--green)' : '#333'};background:${checked ? 'var(--green)' : 'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:var(--black);">${checked ? '✓' : ''}</div>
+          <div style="width:20px;height:20px;border-radius:var(--radius-sm);border:2px solid ${checked ? 'var(--green)' : '#333'};background:${checked ? 'var(--green)' : 'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:var(--black);">${checked ? '✓' : ''}</div>
           <span style="font-size:12px;color:${checked ? '#555' : 'var(--light)'};">${item.label}</span>
         </div>`;
       }).join('')}
@@ -6447,13 +6447,13 @@ function renderChecklist() {
   score.innerHTML = `<span style="color:${pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : 'var(--red)'};">${done}/${total}</span> erledigt`;
 
   el.innerHTML = `
-    <div style="margin-bottom:12px;height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden;">
+    <div style="margin-bottom:12px;height:4px;background:var(--surface-2);border-radius:var(--radius-sm);overflow:hidden;">
       <div style="height:100%;width:${pct}%;background:${pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : 'var(--red)'};transition:width .3s;"></div>
     </div>
     ${DAILY_ITEMS.map(item => {
       const checked = cl[item.id];
       return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #151515;cursor:pointer;${checked ? 'opacity:.5;' : ''}" onclick="toggleCheck('${item.id}')">
-        <div style="width:22px;height:22px;border-radius:4px;border:2px solid ${checked ? 'var(--green)' : '#333'};background:${checked ? 'var(--green)' : 'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:var(--black);">${checked ? '✓' : ''}</div>
+        <div style="width:22px;height:22px;border-radius:var(--radius-sm);border:2px solid ${checked ? 'var(--green)' : '#333'};background:${checked ? 'var(--green)' : 'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:var(--black);">${checked ? '✓' : ''}</div>
         <span style="font-size:13px;color:${checked ? '#555' : 'var(--light)'};">${item.label}</span>
       </div>`;
     }).join('')}
@@ -6554,7 +6554,7 @@ if ('serviceWorker' in navigator) {
       var banner = document.createElement('div');
       banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9999;background:var(--blue);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;animation:fadeSlideIn .3s ease;';
       banner.innerHTML = '<span style="font-family:\'Space Mono\',monospace;font-size:12px;color:#fff;">Update verfuegbar</span>' +
-        '<button onclick="location.reload()" style="font-family:\'Space Mono\',monospace;font-size:12px;color:#fff;background:rgba(255,255,255,.15);border:none;padding:6px 16px;border-radius:4px;cursor:pointer;letter-spacing:1px;">NEU LADEN</button>';
+        '<button onclick="location.reload()" style="font-family:\'Space Mono\',monospace;font-size:12px;color:#fff;background:rgba(255,255,255,.15);border:none;padding:6px 16px;border-radius:var(--radius-sm);cursor:pointer;letter-spacing:1px;">NEU LADEN</button>';
       document.body.appendChild(banner);
       setTimeout(function() { if (banner.parentNode) banner.parentNode.removeChild(banner); }, 10000);
     }
