@@ -3626,3 +3626,21 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   color: var(--text-subtle);
 }
 
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01s !important;
+    scroll-behavior: auto !important;
+  }
+  body::before { display: none; }
+  .reveal { opacity: 1; transform: none; }
+  .stagger > * { opacity: 1; transform: none; }
+  .si-slide { scroll-snap-align: none; }
+  .si-intro { scroll-snap-type: none; }
+  .glass, .modal, .nav-drop { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .anim-pulse { animation: none !important; }
+  .pulse { animation: none !important; }
+}
+
