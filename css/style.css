@@ -25,6 +25,14 @@
   --surface-2: #1a1a1a;
   --surface-3: #252525;
   --surface-4: #333;
+  --fs-xs: 11px;
+  --fs-sm: 13px;
+  --fs-base: 15px;
+  --fs-md: 18px;
+  --fs-lg: 22px;
+  --fs-xl: 28px;
+  --fs-2xl: 36px;
+  --fs-hero: clamp(40px, 8vw, 56px);
   --radius: 6px;
   --trans: 0.18s ease;
 }
@@ -136,7 +144,7 @@ body {
   font-family: 'DM Sans', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
-  font-size: 16px;
+  font-size: var(--fs-base);
   line-height: 1.7;
   cursor: default;
 }
@@ -146,10 +154,10 @@ body {
 .si-center { max-width:520px; text-align:center; }
 .si-num { font-family:'Bebas Neue',sans-serif; font-size:120px; opacity:.15; line-height:.8; }
 .si-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(28px,5vw,42px); letter-spacing:2px; margin-top:-20px; }
-.si-body { font-family:'DM Sans',sans-serif; font-size:15px; color:#888; line-height:1.8; margin-top:20px; }
-.si-why { font-family:'Space Mono',monospace; font-size:11px; margin-top:20px; letter-spacing:1px; }
-.si-reason { font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text-muted); margin-top:8px; line-height:1.6; }
-.si-btn { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; padding:18px 56px; background:var(--red); color:#fff; border:none; border-radius:6px; cursor:pointer; transition:transform .15s,box-shadow .2s; }
+.si-body { font-family:'DM Sans',sans-serif; font-size:var(--fs-base); color:#888; line-height:1.8; margin-top:20px; }
+.si-why { font-family:'Space Mono',monospace; font-size:var(--fs-xs); margin-top:20px; letter-spacing:1px; }
+.si-reason { font-family:'DM Sans',sans-serif; font-size:var(--fs-sm); color:var(--text-muted); margin-top:8px; line-height:1.6; }
+.si-btn { font-family:'Bebas Neue',sans-serif; font-size:var(--fs-lg); letter-spacing:3px; padding:18px 56px; background:var(--red); color:#fff; border:none; border-radius:6px; cursor:pointer; transition:transform .15s,box-shadow .2s; }
 .si-btn:hover { transform:scale(1.03); box-shadow:0 0 30px rgba(232,0,13,.2); }
 .si-btn:active { transform:scale(.97); }
 @keyframes siBounce { 0%,100% { transform:translateX(-50%) translateY(0); } 50% { transform:translateX(-50%) translateY(12px); } }
@@ -178,7 +186,7 @@ body {
   border: none;
   color: var(--text-muted);
   font-family: 'Space Mono', monospace;
-  font-size: 9px;
+  font-size: var(--fs-xs);
   letter-spacing: 0.5px;
   padding: 6px 12px;
   cursor: pointer;
@@ -196,7 +204,7 @@ body {
   width: 100%;
   text-align: left;
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
+  font-size: var(--fs-base);
   color: var(--light);
   background: none;
   border: none;
@@ -286,7 +294,7 @@ body::before {
 .auth-logo span { color: var(--red); }
 .auth-sub {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 3px;
   color: var(--grey);
   text-transform: uppercase;
@@ -303,7 +311,7 @@ body::before {
   flex: 1;
   padding: 10px;
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   text-transform: uppercase;
   background: transparent;
@@ -316,7 +324,7 @@ body::before {
 .form-group { margin-bottom: 18px; }
 .form-label {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--grey);
   text-transform: uppercase;
@@ -330,7 +338,7 @@ body::before {
   color: var(--white);
   padding: 12px 16px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   border-radius: var(--radius);
   outline: none;
   transition: var(--trans);
@@ -345,7 +353,7 @@ body::before {
   color: var(--white);
   padding: 12px 16px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   border-radius: var(--radius);
   outline: none;
   transition: var(--trans);
@@ -360,7 +368,7 @@ body::before {
   width: 100%;
   padding: 14px;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-size: var(--fs-lg);
   letter-spacing: 3px;
   border: none;
   border-radius: var(--radius);
@@ -372,11 +380,11 @@ body::before {
 .btn-sm {
   width: auto;
   padding: 8px 18px;
-  font-size: 16px;
+  font-size: var(--fs-base);
   letter-spacing: 2px;
 }
 .auth-msg {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   text-align: center;
   margin-top: 16px;
   min-height: 20px;
@@ -423,7 +431,7 @@ body::before {
 }
 .ob-logo {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
+  font-size: var(--fs-xl);
   letter-spacing: 6px;
   color: var(--white);
   text-align: center;
@@ -446,7 +454,7 @@ body::before {
 }
 .ob-step-label {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -466,14 +474,14 @@ body::before {
 }
 .ob-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 26px;
+  font-size: var(--fs-xl);
   letter-spacing: 2px;
   color: var(--white);
   margin-bottom: 4px;
 }
 .ob-sub {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   letter-spacing: 1px;
   margin-bottom: 24px;
@@ -497,7 +505,7 @@ body::before {
   background: rgba(232,0,13,.06);
 }
 .ob-option-icon {
-  font-size: 22px;
+  font-size: var(--fs-lg);
   width: 36px;
   text-align: center;
   flex-shrink: 0;
@@ -505,12 +513,12 @@ body::before {
 .ob-option-text { flex: 1; }
 .ob-option-label {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 17px;
+  font-size: var(--fs-md);
   color: var(--white);
   letter-spacing: 1px;
 }
 .ob-option-desc {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   margin-top: 2px;
 }
@@ -524,7 +532,7 @@ body::before {
   flex: 0 0 auto;
   padding: 14px 22px;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 17px;
+  font-size: var(--fs-md);
   letter-spacing: 2px;
   background: transparent;
   border: 1px solid #333;
@@ -538,7 +546,7 @@ body::before {
   flex: 1;
   padding: 14px;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
+  font-size: var(--fs-md);
   letter-spacing: 3px;
   background: var(--red);
   color: var(--white);
@@ -549,7 +557,7 @@ body::before {
 }
 .ob-btn-next:hover { background: #c00010; }
 .ob-msg {
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--red);
   text-align: center;
   margin-top: 8px;
@@ -571,7 +579,7 @@ body::before {
 .account-section:last-of-type { border-bottom: none; }
 .account-section-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-size: var(--fs-lg);
   color: var(--white);
   letter-spacing: 2px;
   margin-bottom: 16px;
@@ -602,7 +610,7 @@ body::before {
 }
 .topbar-logo {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 26px;
+  font-size: var(--fs-xl);
   letter-spacing: 3px;
   color: var(--white);
   margin-right: 24px;
@@ -618,7 +626,7 @@ body::before {
 }
 .nav-btn {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 1.5px;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -645,7 +653,7 @@ body::before {
 }
 .nav-hub-btn {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 1.5px;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -687,7 +695,7 @@ body::before {
   width: 100%;
   text-align: left;
   font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: #999;
   background: none;
   border: none;
@@ -706,7 +714,7 @@ body::before {
 }
 .user-pill {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--grey);
   background: var(--surface-2);
   border: 1px solid var(--surface-3);
@@ -716,7 +724,7 @@ body::before {
 }
 .share-pill {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--gold);
   background: rgba(245,197,24,.1);
   border: 1px solid rgba(245,197,24,.3);
@@ -728,7 +736,7 @@ body::before {
 }
 .share-pill:hover { background: rgba(245,197,24,.2); }
 .logout-btn {
-  font-size: 18px;
+  font-size: var(--fs-md);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -737,7 +745,7 @@ body::before {
 }
 .logout-btn:hover { color: var(--red); }
 .topbar-icon-btn {
-  font-size: 16px;
+  font-size: var(--fs-base);
   background: transparent;
   border: 1px solid var(--surface-3);
   border-radius: 50%;
@@ -783,7 +791,7 @@ body::before {
 .page-title .gold { color: var(--gold); }
 .page-sub {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--grey);
   text-transform: uppercase;
@@ -804,7 +812,7 @@ body::before {
 .card-top[style*="--ca"] { border-left: 3px solid var(--ca, var(--red)); padding-left: 20px; }
 .card-lbl {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--grey);
   text-transform: uppercase;
@@ -812,14 +820,14 @@ body::before {
 }
 .card-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 26px;
+  font-size: var(--fs-xl);
   letter-spacing: 1px;
   color: var(--white);
   margin-bottom: 10px;
   line-height: 1;
 }
 .card-body {
-  font-size: 14.5px;
+  font-size: var(--fs-base);
   color: #aaa;
   line-height: 1.8;
 }
@@ -853,7 +861,7 @@ body::before {
 }
 .stat-label {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--grey);
   text-transform: uppercase;
@@ -899,7 +907,7 @@ body::before {
 }
 .rpg-subtitle {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--grey);
   letter-spacing: 1.5px;
   margin-top: 6px;
@@ -966,14 +974,14 @@ body::before {
 }
 .rpg-stat-label {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--grey);
   text-transform: uppercase;
 }
 .rpg-stat-value {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-size: var(--fs-lg);
   color: var(--white);
   line-height: 1;
 }
@@ -992,7 +1000,7 @@ body::before {
 /* Benchmark section hint */
 .prog-sub {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--text-subtle);
   letter-spacing: .5px;
   margin: -8px 0 16px 0;
@@ -1003,7 +1011,7 @@ body::before {
 .tag {
   display: inline-block;
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   padding: 3px 9px;
   border-radius: 3px;
   letter-spacing: 1px;
@@ -1025,7 +1033,7 @@ body::before {
   display: flex;
   gap: 14px;
   align-items: flex-start;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   line-height: 1.75;
 }
 .info-box > span:first-child {
@@ -1036,7 +1044,7 @@ body::before {
   height: 22px;
   border-radius: 50%;
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   flex-shrink: 0;
   margin-top: 1px;
@@ -1092,7 +1100,7 @@ body::before {
 .ex-detail-photos { margin-bottom: 24px; width: 100%; }
 .ex-photo-label {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   letter-spacing: 3px;
   color: var(--text-muted);
   margin-bottom: 10px;
@@ -1129,7 +1137,7 @@ body::before {
   padding: 4px 0;
   text-align: center;
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: #888;
   background: linear-gradient(transparent, rgba(0,0,0,.8));
@@ -1144,20 +1152,20 @@ body::before {
 }
 .ex-name {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-size: var(--fs-lg);
   letter-spacing: 1px;
   color: var(--white);
   margin-bottom: 3px;
 }
 .ex-muscle {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 1px;
   color: var(--grey);
   margin-bottom: 10px;
 }
 .ex-desc {
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: #888;
   line-height: 1.7;
 }
@@ -1170,7 +1178,7 @@ body::before {
 }
 .ex-s {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   background: var(--surface-2);
   padding: 3px 9px;
@@ -1181,7 +1189,7 @@ body::before {
   padding: 10px 18px;
   background: rgba(245,197,24,.04);
   border-top: 1px solid rgba(245,197,24,.1);
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: #888;
   line-height: 1.6;
 }
@@ -1197,7 +1205,7 @@ body::before {
 }
 .prog-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
+  font-size: var(--fs-lg);
   letter-spacing: 2px;
   margin-bottom: 20px;
   display: flex;
@@ -1211,10 +1219,10 @@ body::before {
   align-items: center;
   margin-bottom: 6px;
 }
-.prog-name { font-size: 13px; color: var(--light); }
+.prog-name { font-size: var(--fs-sm); color: var(--light); }
 .prog-val {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--grey);
 }
 .prog-bar {
@@ -1229,7 +1237,7 @@ body::before {
   transition: width .6s ease;
 }
 .edit-icon {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   cursor: pointer;
   color: var(--text-subtle);
   transition: var(--trans);
@@ -1240,11 +1248,11 @@ body::before {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--fs-sm);
 }
 .data-table th {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--grey);
@@ -1284,18 +1292,18 @@ body::before {
 }
 .tl-time {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--gold);
   letter-spacing: 1px;
   margin-bottom: 3px;
 }
 .tl-title {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--white);
   margin-bottom: 3px;
 }
-.tl-body { font-size: 12px; color: #888; line-height: 1.7; }
+.tl-body { font-size: var(--fs-xs); color: #888; line-height: 1.7; }
 
 /* ===== CALCULATOR ===== */
 .calc-box {
@@ -1312,7 +1320,7 @@ body::before {
 }
 .calc-group label {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--grey);
   text-transform: uppercase;
@@ -1326,7 +1334,7 @@ body::before {
   color: var(--white);
   padding: 10px 13px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   border-radius: var(--radius);
   outline: none;
   transition: var(--trans);
@@ -1335,7 +1343,7 @@ body::before {
 .calc-group select option { background: var(--surface-2); }
 .calc-btn {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-size: var(--fs-lg);
   letter-spacing: 3px;
   background: var(--red);
   color: var(--white);
@@ -1367,43 +1375,43 @@ body::before {
 }
 .calc-result-unit {
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: var(--fs-xs);
   color: var(--grey);
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-.calc-result-desc { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+.calc-result-desc { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 5px; }
 .calc-result-val.protein { color: var(--blue); }
 .calc-result-val.carbs { color: var(--green); }
 .calc-result-val.fat { color: var(--orange); }
 .calc-save-row { grid-column: 1 / -1; text-align: center; margin-top: 12px; }
 .calc-meal-wrap { background: var(--dark2); border: 1px solid var(--dark3); border-radius: var(--radius); padding: 20px; }
-.calc-meal-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--white); margin-bottom: 14px; }
-.calc-meal-list { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
+.calc-meal-title { font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-md); letter-spacing: 2px; color: var(--white); margin-bottom: 14px; }
+.calc-meal-list { display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-xs); }
 .calc-meal-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; padding: 8px; background: var(--dark); border-radius: 4px; }
 .calc-meal-time { color: var(--light); }
 .calc-meal-p { color: var(--blue); }
 .calc-meal-k { color: var(--green); }
-.calc-meta { margin-bottom: 12px; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
+.calc-meta { margin-bottom: 12px; font-family: 'Space Mono', monospace; font-size: var(--fs-xs); color: var(--text-muted); }
 .calc-zone-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px; background: var(--dark2); border-radius: 4px; margin-bottom: 6px; }
-.calc-zone-bpm { min-width: 90px; font-size: 12px; font-weight: 700; font-family: 'Space Mono', monospace; }
-.calc-zone-name { font-size: 12px; color: var(--white); font-weight: 600; }
-.calc-zone-desc { font-size: 11px; color: var(--text-muted); }
+.calc-zone-bpm { min-width: 90px; font-size: var(--fs-xs); font-weight: 700; font-family: 'Space Mono', monospace; }
+.calc-zone-name { font-size: var(--fs-xs); color: var(--white); font-weight: 600; }
+.calc-zone-desc { font-size: var(--fs-xs); color: var(--text-muted); }
 .calc-cut-box { background: var(--dark2); border: 1px solid var(--dark3); border-radius: var(--radius); padding: 20px; }
-.calc-cut-status { font-family: 'Bebas Neue', sans-serif; font-size: 22px; margin-bottom: 8px; }
-.calc-cut-plan { font-size: 13px; color: var(--light); line-height: 1.8; }
+.calc-cut-status { font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-lg); margin-bottom: 8px; }
+.calc-cut-plan { font-size: var(--fs-sm); color: var(--light); line-height: 1.8; }
 .calc-cut-stats { margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
 .calc-cut-stat { text-align: center; padding: 12px; background: var(--dark); border-radius: 4px; }
-.calc-cut-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--white); }
-.calc-cut-stat-label { font-size: 12px; color: var(--text-muted); }
+.calc-cut-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-xl); color: var(--white); }
+.calc-cut-stat-label { font-size: var(--fs-xs); color: var(--text-muted); }
 .calc-rm-hero { margin-bottom: 16px; }
 .calc-rm-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--white); }
 .calc-rm-title span { color: var(--orange); }
-.calc-rm-sub { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
+.calc-rm-sub { font-family: 'Space Mono', monospace; font-size: var(--fs-xs); color: var(--text-muted); }
 .calc-rm-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px; background: var(--dark2); border-radius: 4px; margin-bottom: 4px; }
-.calc-rm-val { min-width: 60px; font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--white); }
-.calc-rm-pct { font-family: 'Space Mono', monospace; font-size: 12px; }
-.calc-rm-label { font-size: 11px; color: var(--text-muted); }
+.calc-rm-val { min-width: 60px; font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-lg); color: var(--white); }
+.calc-rm-pct { font-family: 'Space Mono', monospace; font-size: var(--fs-xs); }
+.calc-rm-label { font-size: var(--fs-xs); color: var(--text-muted); }
 
 /* ===== FAQ ===== */
 .faq-item { border-bottom: 1px solid var(--surface-2); }
@@ -1414,7 +1422,7 @@ body::before {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  font-size: 15px;
+  font-size: var(--fs-base);
   font-weight: 600;
   color: var(--white);
   transition: var(--trans);
@@ -1423,7 +1431,7 @@ body::before {
 .faq-q:hover { color: var(--red); }
 .faq-q:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .faq-arr {
-  font-size: 15px;
+  font-size: var(--fs-base);
   color: var(--grey);
   transition: transform .22s ease;
   flex-shrink: 0;
@@ -1433,7 +1441,7 @@ body::before {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows .3s ease;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: #999;
   line-height: 1.85;
 }
@@ -1452,7 +1460,7 @@ body::before {
 }
 .wk-btn {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   text-transform: uppercase;
   padding: 8px 16px;
@@ -1496,7 +1504,7 @@ body::before {
 .day-col .add-block-btn { display: none; }
 .day-col.day-active .add-block-btn { display: block; }
 .day-col:not(.day-active) .day-block {
-  font-size: 10px;
+  font-size: var(--fs-xs);
   padding: 3px 6px;
   line-height: 1.2;
 }
@@ -1518,13 +1526,13 @@ body::before {
 }
 .day-name {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
+  font-size: var(--fs-md);
   letter-spacing: 1px;
   color: var(--white);
 }
 .day-date {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-subtle);
   letter-spacing: 1px;
 }
@@ -1536,7 +1544,7 @@ body::before {
   flex: 1;
 }
 .day-block {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   padding: 6px 8px;
   border-radius: 3px;
   line-height: 1.3;
@@ -1558,13 +1566,13 @@ body::before {
   content: 'ERLEDIGT';
   position: absolute; top: 4px; right: 6px;
   font-family: 'Space Mono', monospace;
-  font-size: 10px; letter-spacing: 1px;
+  font-size: var(--fs-xs); letter-spacing: 1px;
   color: var(--green); opacity: .8;
 }
 .block-check-btn {
   background: none; border: 1.5px solid #333; color: var(--text-muted);
   width: 20px; height: 20px; border-radius: 4px;
-  font-size: 11px; cursor: pointer; display: flex;
+  font-size: var(--fs-xs); cursor: pointer; display: flex;
   align-items: center; justify-content: center;
   transition: var(--trans); flex-shrink: 0;
 }
@@ -1585,15 +1593,15 @@ body::before {
   padding: 14px 12px 10px;
 }
 .day-col.day-active .day-name {
-  font-size: 20px;
+  font-size: var(--fs-lg);
 }
 .day-col.day-active .day-block {
-  font-size: 12px;
+  font-size: var(--fs-xs);
   padding: 8px 10px;
 }
 /* Collapsed: vertical text for day name */
 .day-col:not(.day-active) .day-name {
-  font-size: 14px;
+  font-size: var(--fs-sm);
 }
 .day-col:not(.day-active) .day-header > div:last-child {
   display: none;
@@ -1601,7 +1609,7 @@ body::before {
 .ex-chip {
   display: inline-block;
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: var(--fs-xs);
   letter-spacing: .5px;
   padding: 2px 6px;
   border-radius: 3px;
@@ -1619,7 +1627,7 @@ body::before {
 .add-block-btn {
   margin: 6px 8px 8px;
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 1px;
   color: var(--text-subtle);
   background: transparent;
@@ -1650,7 +1658,7 @@ body::before {
 .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
 .form-group-inline label {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--grey);
   text-transform: uppercase;
@@ -1666,7 +1674,7 @@ body::before {
   color: var(--white);
   padding: 11px 14px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   border-radius: var(--radius);
   outline: none;
   transition: var(--trans);
@@ -1678,7 +1686,7 @@ body::before {
 .form-group-inline select option { background: var(--surface-2); }
 .submit-btn {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
+  font-size: var(--fs-md);
   letter-spacing: 3px;
   background: var(--red);
   color: var(--white);
@@ -1714,7 +1722,7 @@ body::before {
 }
 .log-entry-month {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--grey);
   text-align: center;
   letter-spacing: 1px;
@@ -1722,19 +1730,19 @@ body::before {
 .log-entry-body { flex: 1; }
 .log-entry-type {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-bottom: 4px;
 }
-.log-entry-notes { font-size: 13px; color: #aaa; margin-top: 6px; }
+.log-entry-notes { font-size: var(--fs-sm); color: #aaa; margin-top: 6px; }
 .log-entry-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
 .delete-btn {
   background: transparent;
   border: none;
   color: var(--text-subtle);
   cursor: pointer;
-  font-size: 18px;
+  font-size: var(--fs-md);
   transition: var(--trans);
   flex-shrink: 0;
 }
@@ -1757,7 +1765,7 @@ body::before {
 }
 .fight-countdown-label {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 3px;
   color: var(--grey);
   text-transform: uppercase;
@@ -1766,7 +1774,7 @@ body::before {
 .phase-badge {
   display: inline-block;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 24px;
+  font-size: var(--fs-lg);
   letter-spacing: 3px;
   padding: 8px 20px;
   border-radius: var(--radius);
@@ -1799,22 +1807,22 @@ body::before {
 }
 .hrv-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 24px;
+  font-size: var(--fs-lg);
   letter-spacing: 2px;
 }
 .hrv-range {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   margin-bottom: 12px;
 }
-.hrv-desc { font-size: 12px; color: #aaa; }
+.hrv-desc { font-size: var(--fs-xs); color: #aaa; }
 
 /* ===== SECTION HEADERS (guide-style) ===== */
 .section-header { margin-bottom: 32px; }
 .section-label {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 4px;
   color: var(--red);
   text-transform: uppercase;
@@ -1829,7 +1837,7 @@ body::before {
 }
 .section-title span { color: var(--red); }
 .section-sub {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: #777;
   margin-top: 12px;
   max-width: 680px;
@@ -1839,7 +1847,7 @@ body::before {
 /* ===== CATEGORY HEADERS ===== */
 .cat-header {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
+  font-size: var(--fs-xl);
   letter-spacing: 2px;
   margin-bottom: 20px;
   padding-bottom: 8px;
@@ -1877,7 +1885,7 @@ body::before {
 }
 .modal-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
+  font-size: var(--fs-xl);
   letter-spacing: 2px;
   color: var(--white);
   margin-bottom: 20px;
@@ -1887,7 +1895,7 @@ body::before {
   background: transparent;
   border: none;
   color: var(--text-subtle);
-  font-size: 24px;
+  font-size: var(--fs-lg);
   cursor: pointer;
   transition: var(--trans);
 }
@@ -1909,13 +1917,13 @@ body::before {
 .phase-block.current { outline: 2px solid var(--gold); outline-offset: -2px; }
 .phase-week {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   margin-bottom: 8px;
 }
 .phase-name {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
+  font-size: var(--fs-xl);
   color: var(--white);
   margin-bottom: 12px;
 }
@@ -1925,7 +1933,7 @@ body::before {
   margin-bottom: 16px;
 }
 .phase-details {
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: #888;
   line-height: 2;
 }
@@ -1950,7 +1958,7 @@ body::before {
   border: 1px solid #333;
   color: #ccc;
   font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   font-style: normal;
   font-weight: 400;
   line-height: 1.6;
@@ -1989,13 +1997,13 @@ body::before {
 .cluster-header:first-of-type { margin-top: 0; }
 .cluster-name {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
+  font-size: var(--fs-xl);
   letter-spacing: 2px;
   color: var(--white);
 }
 .cluster-sub {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--grey);
   text-transform: uppercase;
@@ -2016,7 +2024,7 @@ body::before {
 }
 .bench-name {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--grey);
   text-transform: uppercase;
@@ -2029,7 +2037,7 @@ body::before {
   line-height: 1;
 }
 .bench-target {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   margin-top: 4px;
 }
@@ -2052,7 +2060,7 @@ body::before {
   color: var(--white);
   padding: 6px 10px;
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   border-radius: 4px;
   outline: none;
   margin-top: 8px;
@@ -2097,7 +2105,7 @@ body::before {
 }
 .tests-overall-label {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: 2px;
   color: var(--text-muted);
 }
@@ -2115,14 +2123,14 @@ body::before {
 }
 .tests-axis-label {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 1px;
   color: #888;
   flex: 1;
 }
 .tests-axis-val {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
+  font-size: var(--fs-lg);
   line-height: 1;
   min-width: 48px;
   text-align: right;
@@ -2147,7 +2155,7 @@ body::before {
   border: 1px solid rgba(232,0,13,.15);
   border-radius: var(--radius);
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: #999;
   letter-spacing: 1px;
 }
@@ -2165,12 +2173,12 @@ body::before {
 }
 .tests-cluster-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
+  font-size: var(--fs-lg);
   letter-spacing: 3px;
 }
 .tests-cluster-avg {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: 1px;
   margin-left: auto;
 }
@@ -2197,13 +2205,13 @@ body::before {
 }
 .test-card-name {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-size: var(--fs-lg);
   letter-spacing: 1px;
   color: var(--white);
 }
 .test-card-level {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   letter-spacing: 1px;
 }
@@ -2215,7 +2223,7 @@ body::before {
 }
 .test-card-how {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-subtle);
 }
 .how-toggle {
@@ -2223,7 +2231,7 @@ body::before {
   border: 1px solid var(--surface-3);
   color: var(--gold);
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: var(--fs-xs);
   letter-spacing: 1px;
   padding: 3px 8px;
   border-radius: 3px;
@@ -2272,7 +2280,7 @@ body::before {
   align-items: center;
   justify-content: center;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--gold);
   flex-shrink: 0;
   margin-top: 1px;
@@ -2280,14 +2288,14 @@ body::before {
 .how-step-body { min-width: 0; }
 .how-step-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 15px;
+  font-size: var(--fs-base);
   letter-spacing: 1px;
   color: var(--white);
   margin-bottom: 2px;
 }
 .how-step-desc {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: #777;
   line-height: 1.6;
 }
@@ -2311,7 +2319,7 @@ body::before {
 }
 .test-card-pct {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   min-width: 36px;
   text-align: right;
@@ -2324,7 +2332,7 @@ body::before {
 }
 .test-card-meta-item {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-subtle);
 }
 .test-card-right {
@@ -2342,7 +2350,7 @@ body::before {
 }
 .test-card-unit {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   margin-top: -4px;
 }
@@ -2353,7 +2361,7 @@ body::before {
   color: var(--white);
   padding: 7px 10px;
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   border-radius: 4px;
   outline: none;
   text-align: right;
@@ -2379,7 +2387,7 @@ body::before {
 .mt-hero-quote span { color: var(--red); }
 .mt-hero-attr {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-subtle);
   letter-spacing: 2px;
 }
@@ -2406,12 +2414,12 @@ body::before {
 }
 .mt-ego-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 24px;
+  font-size: var(--fs-lg);
   letter-spacing: 2px;
   color: var(--white);
 }
 .mt-ego-sub {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--text-muted);
   line-height: 1.6;
   margin-top: 6px;
@@ -2425,7 +2433,7 @@ body::before {
 .mt-ego-field label {
   display: block;
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -2438,7 +2446,7 @@ body::before {
   border-radius: 6px;
   padding: 10px 14px;
   color: var(--white);
-  font-size: 14px;
+  font-size: var(--fs-sm);
   font-family: inherit;
   transition: border-color .2s;
 }
@@ -2457,7 +2465,7 @@ body::before {
   border-radius: 6px;
   padding: 10px 24px;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 16px;
+  font-size: var(--fs-base);
   letter-spacing: 1.5px;
   cursor: pointer;
   transition: opacity .2s;
@@ -2465,7 +2473,7 @@ body::before {
 .mt-ego-save:hover { opacity: .85; }
 .mt-ego-msg {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--green);
   margin-left: 14px;
 }
@@ -2480,12 +2488,12 @@ body::before {
 }
 .mt-ego-saved-name {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
+  font-size: var(--fs-lg);
   color: var(--red);
   letter-spacing: 1px;
 }
 .mt-ego-saved-traits {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-muted);
 }
 
@@ -2511,7 +2519,7 @@ body::before {
 .mt-acc-left { flex: 1; display: flex; align-items: baseline; gap: 14px; }
 .mt-acc-num {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
+  font-size: var(--fs-xl);
   line-height: 1;
   color: var(--mc);
   opacity: .25;
@@ -2519,18 +2527,18 @@ body::before {
 }
 .mt-acc-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-size: var(--fs-lg);
   letter-spacing: 1.5px;
   color: var(--white);
 }
 .mt-acc-sub {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-subtle);
   margin-left: 8px;
 }
 .mt-acc-arrow {
-  font-size: 18px;
+  font-size: var(--fs-md);
   color: var(--text-subtle);
   transition: transform .3s ease;
 }
@@ -2550,7 +2558,7 @@ body::before {
   padding: 8px 4px 32px 46px;
 }
 .mt-acc-intro {
-  font-size: 15px;
+  font-size: var(--fs-base);
   color: #aaa;
   line-height: 1.8;
   margin-bottom: 16px;
@@ -2559,7 +2567,7 @@ body::before {
 .mt-acc-intro strong { color: var(--white); }
 .mt-acc-aside {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   line-height: 1.7;
   padding: 12px 16px;
@@ -2577,7 +2585,7 @@ body::before {
 .mt-acc-step:last-child { border-bottom: none; }
 .mt-acc-step-n {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
+  font-size: var(--fs-md);
   color: var(--mc);
   opacity: .5;
   min-width: 20px;
@@ -2585,13 +2593,13 @@ body::before {
 }
 .mt-acc-step-t {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 15px;
+  font-size: var(--fs-base);
   letter-spacing: .5px;
   color: var(--white);
   margin-bottom: 3px;
 }
 .mt-acc-step-d {
-  font-size: 13.5px;
+  font-size: var(--fs-sm);
   color: #777;
   line-height: 1.7;
 }
@@ -2619,14 +2627,14 @@ body::before {
 }
 .mt-slot-time {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 16px;
+  font-size: var(--fs-base);
   letter-spacing: 1px;
   color: var(--mc);
   margin-bottom: 8px;
 }
 .mt-slot-body {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   line-height: 1.9;
 }
@@ -2656,18 +2664,18 @@ body::before {
 }
 .pd-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-size: var(--fs-lg);
   letter-spacing: 1.5px;
   color: var(--white);
 }
 .pd-hint {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-subtle);
   margin-left: 8px;
 }
 .pd-arrow {
-  font-size: 16px;
+  font-size: var(--fs-base);
   color: var(--text-subtle);
   transition: transform .3s ease;
   flex-shrink: 0;
@@ -2697,7 +2705,7 @@ body::before {
   color: var(--white);
   padding: 6px 12px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   border-radius: 4px;
   width: 160px;
   outline: none;
@@ -2725,8 +2733,8 @@ body::before {
   transition: background .15s;
 }
 .search-item:hover { background: var(--surface-2); }
-.search-item-title { font-size: 13px; color: var(--white); font-weight: 600; }
-.search-item-ctx { font-size: 12px; color: var(--text-muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+.search-item-title { font-size: var(--fs-sm); color: var(--white); font-weight: 600; }
+.search-item-ctx { font-size: var(--fs-xs); color: var(--text-muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
 
 /* ===== SÄULEN INTRO ===== */
 .saeulen-intro { margin-bottom: 60px; }
@@ -2734,7 +2742,7 @@ body::before {
 /* Hero */
 .si-hero { text-align: center; padding: 60px 0 50px; }
 .si-hero-label {
-  font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 6px;
+  font-family: 'Space Mono', monospace; font-size: var(--fs-xs); letter-spacing: 6px;
   color: var(--red); margin-bottom: 16px; text-transform: uppercase;
 }
 .si-hero-title {
@@ -2759,11 +2767,11 @@ body::before {
 .si-visible .si-step-num { color: var(--text-subtle); }
 .si-step-body { flex: 1; }
 .si-step-title {
-  font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+  font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-lg);
   color: var(--white); letter-spacing: 1px; margin-bottom: 10px;
 }
 .si-step-text {
-  font-size: 13px; color: #999; line-height: 1.85;
+  font-size: var(--fs-sm); color: #999; line-height: 1.85;
 }
 .si-step-text strong { color: var(--white); font-weight: 600; }
 
@@ -2788,7 +2796,7 @@ body::before {
 }
 .si-barrel-stave span {
   position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
-  font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.5px;
+  font-family: 'Space Mono', monospace; font-size: var(--fs-xs); letter-spacing: 0.5px;
   color: var(--text-muted); white-space: nowrap; text-transform: uppercase;
 }
 .si-stave-weak { background: var(--red) !important; }
@@ -2816,7 +2824,7 @@ body::before {
 @keyframes si-water-fade { to { opacity: .6; } }
 
 .si-barrel-caption {
-  font-size: 12px; color: var(--text-muted); margin-top: 32px; line-height: 1.6;
+  font-size: var(--fs-xs); color: var(--text-muted); margin-top: 32px; line-height: 1.6;
 }
 
 /* Cluster Preview Cards */
@@ -2834,14 +2842,14 @@ body::before {
 }
 .si-cluster-card:hover { border-color: var(--scc); }
 .si-cluster-name {
-  font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+  font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-md);
   color: var(--scc); letter-spacing: 2px;
 }
 .si-cluster-desc {
-  font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.5;
+  font-size: var(--fs-xs); color: var(--text-muted); margin-top: 4px; line-height: 1.5;
 }
 .si-cluster-count {
-  font-family: 'Space Mono', monospace; font-size: 11px;
+  font-family: 'Space Mono', monospace; font-size: var(--fs-xs);
   color: var(--text-subtle); letter-spacing: 1px; margin-top: 10px;
 }
 
@@ -2855,7 +2863,7 @@ body::before {
 .si-scroll-cta.si-visible { opacity: 1; transform: translateY(0); }
 .si-scroll-line { flex: 1; height: 1px; background: var(--surface-3); }
 .si-scroll-text {
-  font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+  font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-lg);
   color: var(--red); letter-spacing: 4px; white-space: nowrap;
 }
 
@@ -2867,11 +2875,11 @@ body::before {
 .sc-cluster-head:first-child { margin-top: 0; }
 .sc-cluster-line { width: 32px; height: 3px; border-radius: 2px; margin-bottom: 10px; }
 .sc-cluster-label {
-  font-family: 'Bebas Neue', sans-serif; font-size: 26px;
+  font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-xl);
   letter-spacing: 3px; line-height: 1;
 }
 .sc-cluster-sub {
-  font-family: 'Space Mono', monospace; font-size: 11px;
+  font-family: 'Space Mono', monospace; font-size: var(--fs-xs);
   color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px;
 }
 
@@ -2890,22 +2898,22 @@ body::before {
   padding: 20px 16px; min-width: 56px;
 }
 .sc-card-num {
-  font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+  font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-xl);
   line-height: 1; opacity: .4;
 }
 .sc-card:hover .sc-card-num { opacity: .8; }
 
 .sc-card-body { flex: 1; padding: 18px 20px 16px 0; }
 .sc-card-cat {
-  font-family: 'Space Mono', monospace; font-size: 11px;
+  font-family: 'Space Mono', monospace; font-size: var(--fs-xs);
   color: var(--text-subtle); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;
 }
 .sc-card-title {
-  font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+  font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-lg);
   color: var(--white); letter-spacing: 1.5px; line-height: 1.1;
 }
 .sc-card-desc {
-  font-size: 12px; color: #777; line-height: 1.6;
+  font-size: var(--fs-xs); color: #777; line-height: 1.6;
   margin-top: 8px; max-width: 600px;
 }
 .sc-card-foot {
@@ -2914,7 +2922,7 @@ body::before {
 }
 .sc-card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .sc-card-arrow {
-  font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+  font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-lg);
   color: var(--text-subtle); transition: color .2s, transform .2s;
   flex-shrink: 0; padding-right: 4px;
 }
@@ -2928,22 +2936,22 @@ body::before {
 /* ===== DETAIL PAGES (Säulen + Übungen) ===== */
 .back-link {
   background: none; border: 1px solid var(--surface-3); color: var(--light); cursor: pointer;
-  font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px;
+  font-family: 'Space Mono', monospace; font-size: var(--fs-xs); letter-spacing: 1px;
   padding: 8px 16px; border-radius: 6px; transition: all .15s;
 }
 .back-link:hover { border-color: var(--red); color: var(--white); }
 .detail-content { max-width: 900px; }
 .detail-section { margin-bottom: 32px; }
 .detail-section-title {
-  font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--red);
+  font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-lg); color: var(--red);
   letter-spacing: 2px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--surface-3);
 }
-.detail-text { font-size: 13px; color: #aaa; line-height: 1.8; }
+.detail-text { font-size: var(--fs-sm); color: #aaa; line-height: 1.8; }
 .link-card {
   display: flex; justify-content: space-between; align-items: center;
   background: var(--surface-2); border: 1px solid var(--surface-3); border-radius: 8px;
   padding: 16px 20px; cursor: pointer; width: 100%; transition: all .15s;
-  font-size: 14px; color: var(--white); font-family: 'DM Sans', sans-serif;
+  font-size: var(--fs-sm); color: var(--white); font-family: 'DM Sans', sans-serif;
 }
 .link-card:hover { border-color: var(--red); background: var(--surface-2); }
 
@@ -2955,16 +2963,16 @@ body::before {
   position: sticky; top: 80px; align-self: start;
 }
 .ex-detail-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--white); letter-spacing: 2px; }
-.ex-detail-subtitle { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 20px; }
+.ex-detail-subtitle { font-family: 'Space Mono', monospace; font-size: var(--fs-xs); color: var(--text-muted); letter-spacing: 2px; margin-bottom: 20px; }
 .ex-detail-section { margin-bottom: 24px; }
-.ex-detail-section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--red); letter-spacing: 1px; margin-bottom: 10px; }
-.ex-detail-text { font-size: 13px; color: #aaa; line-height: 1.8; }
+.ex-detail-section-title { font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-md); color: var(--red); letter-spacing: 1px; margin-bottom: 10px; }
+.ex-detail-text { font-size: var(--fs-sm); color: #aaa; line-height: 1.8; }
 .muscle-svg { width: 200px; height: auto; }
 .muscle-svg .muscle-base { fill: #161616; stroke: #252525; stroke-width: 0.6; transition: fill .3s; }
 .muscle-svg .muscle-active { stroke: rgba(255,255,255,.15); stroke-width: 0.5; opacity: 0.85; }
-.muscle-label { font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--text-muted); text-align: center; letter-spacing: 2px; }
+.muscle-label { font-family: 'Bebas Neue', sans-serif; font-size: var(--fs-sm); color: var(--text-muted); text-align: center; letter-spacing: 2px; }
 .muscle-tag {
-  font-family: 'Space Mono', monospace; font-size: 12px;
+  font-family: 'Space Mono', monospace; font-size: var(--fs-xs);
   padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px;
 }
 
@@ -2978,40 +2986,40 @@ body::before {
 }
 .routine-time {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--gold);
   min-width: 50px;
   flex-shrink: 0;
 }
-.routine-label { font-size: 13px; color: var(--light); }
+.routine-label { font-size: var(--fs-sm); color: var(--light); }
 .routine-now { background: rgba(232,0,13,.06); border-radius: 4px; padding: 8px; border-left: 3px solid var(--red); }
 
 
 /* ===== GOAL FILTER BAR ===== */
 .goal-filter-bar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px; padding:16px; background:var(--surface-0); border:1px solid var(--surface-2); border-radius:8px; }
-.goal-filter-btn { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.5px; padding:6px 12px; background:var(--surface-1); border:1px solid var(--surface-3); border-radius:4px; color:#777; cursor:pointer; transition:all .2s; white-space:nowrap; }
+.goal-filter-btn { font-family:'Space Mono',monospace; font-size:var(--fs-xs); letter-spacing:0.5px; padding:6px 12px; background:var(--surface-1); border:1px solid var(--surface-3); border-radius:4px; color:#777; cursor:pointer; transition:all .2s; white-space:nowrap; }
 .goal-filter-btn:hover { background:var(--surface-2); color:var(--gfc); border-color:color-mix(in srgb, var(--gfc) 30%, transparent); }
 .goal-filter-btn.active { background:color-mix(in srgb, var(--gfc) 10%, #0a0a0a); color:var(--gfc); border-color:color-mix(in srgb, var(--gfc) 50%, transparent); }
-.goal-filter-info { display:flex; align-items:center; gap:12px; padding:12px 16px; margin-bottom:24px; background:var(--surface-0); border:1px solid; border-radius:6px; font-size:13px; color:#999; }
+.goal-filter-info { display:flex; align-items:center; gap:12px; padding:12px 16px; margin-bottom:24px; background:var(--surface-0); border:1px solid; border-radius:6px; font-size:var(--fs-sm); color:#999; }
 
 /* ===== MEDIATHEK (legacy) ===== */
 .med-goals { display:flex; flex-direction:column; gap:0; }
 .med-goal-card { display:flex; align-items:center; gap:16px; padding:16px 20px; background:var(--surface-0); border:1px solid var(--surface-2); cursor:pointer; transition:all .2s; user-select:none; }
 .med-goal-card:hover { background:var(--surface-2); border-color:color-mix(in srgb, var(--gc) 30%, transparent); }
 .med-goal-card.med-goal-open { background:var(--surface-1); border-color:color-mix(in srgb, var(--gc) 40%, transparent); }
-.med-goal-icon { font-size:28px; width:44px; text-align:center; flex-shrink:0; }
-.med-goal-label { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--gc); letter-spacing:1px; }
-.med-goal-sub { font-size:11px; color:var(--text-muted); flex:1; }
-.med-goal-arrow { font-size:16px; color:var(--text-muted); transition:transform .2s; margin-left:auto; }
+.med-goal-icon { font-size:var(--fs-xl); width:44px; text-align:center; flex-shrink:0; }
+.med-goal-label { font-family:'Bebas Neue',sans-serif; font-size:var(--fs-lg); color:var(--gc); letter-spacing:1px; }
+.med-goal-sub { font-size:var(--fs-xs); color:var(--text-muted); flex:1; }
+.med-goal-arrow { font-size:var(--fs-base); color:var(--text-muted); transition:transform .2s; margin-left:auto; }
 
 .med-goal-detail { background:var(--surface-0); border-left:3px solid var(--surface-3); padding:0; margin-bottom:8px; }
 .med-ex-row { padding:14px 20px 14px 28px; border-bottom:1px solid var(--surface-1); }
 .med-ex-row.med-fundamental { border-left:3px solid var(--gold); margin-left:-3px; padding-left:25px; }
 .med-ex-header { display:flex; align-items:center; gap:10px; margin-bottom:4px; }
-.med-ex-name { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--white); }
-.med-badge-fund { font-size:10px; letter-spacing:1.5px; padding:2px 6px; background:rgba(245,197,24,.12); color:var(--gold); border-radius:3px; font-family:'Space Mono',monospace; }
-.med-ex-why { font-size:12px; color:#999; line-height:1.6; margin-bottom:4px; }
-.med-ex-source { font-size:10px; color:var(--text-subtle); font-style:italic; }
+.med-ex-name { font-family:'Space Mono',monospace; font-size:var(--fs-sm); font-weight:700; color:var(--white); }
+.med-badge-fund { font-size:var(--fs-xs); letter-spacing:1.5px; padding:2px 6px; background:rgba(245,197,24,.12); color:var(--gold); border-radius:3px; font-family:'Space Mono',monospace; }
+.med-ex-why { font-size:var(--fs-xs); color:#999; line-height:1.6; margin-bottom:4px; }
+.med-ex-source { font-size:var(--fs-xs); color:var(--text-subtle); font-style:italic; }
 
 .med-fund-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px; }
 .med-fund-card { background:var(--surface-0); border:1px solid var(--surface-2); border-radius:8px; overflow:hidden; transition:border-color .2s; }
@@ -3019,9 +3027,9 @@ body::before {
 .med-fund-img { height:100px; overflow:hidden; background:#080808; }
 .med-fund-img img { width:100%; height:100%; object-fit:cover; object-position:center 20%; filter:grayscale(40%) brightness(.65); }
 .med-fund-body { padding:12px 14px; }
-.med-fund-cat { font-size:11px; letter-spacing:2px; color:var(--red); margin-bottom:2px; font-family:'Space Mono',monospace; }
-.med-fund-name { font-family:'Bebas Neue',sans-serif; font-size:18px; color:var(--white); margin-bottom:4px; }
-.med-fund-why { font-size:11px; color:#777; line-height:1.5; }
+.med-fund-cat { font-size:var(--fs-xs); letter-spacing:2px; color:var(--red); margin-bottom:2px; font-family:'Space Mono',monospace; }
+.med-fund-name { font-family:'Bebas Neue',sans-serif; font-size:var(--fs-md); color:var(--white); margin-bottom:4px; }
+.med-fund-why { font-size:var(--fs-xs); color:#777; line-height:1.5; }
 
 /* ===== SUPPLEMENT ARTICLE ===== */
 .supp-article {
@@ -3041,7 +3049,7 @@ body::before {
   align-items: start;
 }
 .supp-article-body {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: #bbb;
   line-height: 1.75;
   min-width: 0;
@@ -3049,7 +3057,7 @@ body::before {
 .supp-article-body strong { color: var(--white); }
 .supp-h2 {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
+  font-size: var(--fs-lg);
   letter-spacing: 1px;
   color: var(--white);
   margin-bottom: 14px;
@@ -3057,7 +3065,7 @@ body::before {
   border-top: 1px solid var(--surface-2);
 }
 .supp-text {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: #bbb;
   line-height: 1.8;
   margin-bottom: 36px;
@@ -3103,12 +3111,12 @@ body::before {
   align-items: center;
   padding: 7px 0;
   border-bottom: 1px solid var(--surface-1);
-  font-size: 11px;
+  font-size: var(--fs-xs);
 }
 .supp-sidebar-row:last-child { border-bottom: none; }
 .supp-sidebar-row span:first-child {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--text-subtle);
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -3194,7 +3202,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* Section labels */
 .sec-label {
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: var(--fs-xs);
   letter-spacing: 3px;
   color: var(--text-subtle);
   text-transform: uppercase;
@@ -3314,7 +3322,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   padding: 12px 20px;
   border-radius: 10px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--white);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
