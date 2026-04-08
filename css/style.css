@@ -1420,13 +1420,16 @@ body::before {
 }
 .faq-item.open .faq-arr { transform: rotate(180deg); color: var(--red); }
 .faq-a {
-  display: none;
-  padding: 0 0 18px;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .3s ease;
   font-size: 13px;
   color: #999;
   line-height: 1.85;
 }
-.faq-item.open .faq-a { display: block; }
+.faq-item.open .faq-a { grid-template-rows: 1fr; }
+.faq-a > * { overflow: hidden; }
+.faq-a-inner { padding: 0 0 18px; }
 .faq-a strong { color: var(--white); }
 
 /* ===== WOCHENPLAN ===== */
@@ -2523,12 +2526,15 @@ body::before {
 }
 .mt-acc.open .mt-acc-arrow { transform: rotate(180deg); color: var(--mc); }
 .mt-acc-body {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height .4s ease;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .35s ease;
 }
 .mt-acc.open .mt-acc-body {
-  max-height: 1200px;
+  grid-template-rows: 1fr;
+}
+.mt-acc-body > * {
+  overflow: hidden;
 }
 .mt-acc-inner {
   padding: 8px 4px 32px 46px;
@@ -2658,20 +2664,19 @@ body::before {
 }
 .pd-section.open .pd-arrow { transform: rotate(180deg); color: var(--red); }
 .pd-body {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height .4s ease;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .35s ease;
 }
-.pd-section.open .pd-body {
-  max-height: 5000px;
-  transition: max-height .6s ease;
+.pd-section.open .pd-body,
+.pd-section.open-default .pd-body {
+  grid-template-rows: 1fr;
+}
+.pd-body > * {
+  overflow: hidden;
 }
 .pd-inner {
   padding: 0 4px 28px;
-}
-/* First section auto-open */
-.pd-section.open-default .pd-body {
-  max-height: 5000px;
 }
 
 /* ===== SEARCH ===== */

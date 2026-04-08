@@ -2907,17 +2907,8 @@ function renderMentalPage() {
 }
 
 function toggleMtAcc(head) {
-  const acc = head.closest('.mt-acc');
-  const body = acc.querySelector('.mt-acc-body');
-  const wasOpen = acc.classList.contains('open');
-
-  if (wasOpen) {
-    acc.classList.remove('open');
-    body.style.maxHeight = '0';
-  } else {
-    acc.classList.add('open');
-    body.style.maxHeight = body.scrollHeight + 'px';
-  }
+  var acc = head.closest('.mt-acc');
+  acc.classList.toggle('open');
 }
 
 function saveAlterEgo() {
@@ -2958,7 +2949,7 @@ function renderFAQPage() {
         ${f.q}
         <span class="faq-arr">▾</span>
       </div>
-      <div class="faq-a">${f.a}</div>
+      <div class="faq-a"><div class="faq-a-inner">${f.a}</div></div>
     </div>`).join('')}
   </div>`;
 }
