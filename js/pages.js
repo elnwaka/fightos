@@ -2812,9 +2812,9 @@ function renderMentalPage() {
   // Load saved alter ego
   const data = typeof getData === 'function' ? getData() : null;
   const alterEgo = data && data.alterEgo ? data.alterEgo : {};
-  const eName = alterEgo.name || '';
-  const eTraits = alterEgo.traits || '';
-  const eTotem = alterEgo.totem || '';
+  const eName = typeof escapeHTML === 'function' ? escapeHTML(alterEgo.name || '') : (alterEgo.name || '');
+  const eTraits = typeof escapeHTML === 'function' ? escapeHTML(alterEgo.traits || '') : (alterEgo.traits || '');
+  const eTotem = typeof escapeHTML === 'function' ? escapeHTML(alterEgo.totem || '') : (alterEgo.totem || '');
 
   el.innerHTML = `
   <div class="page-header">

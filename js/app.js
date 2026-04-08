@@ -13,6 +13,11 @@ var currentFightsTab = 'kaempfe';
 var fightsListLimit = 20;
 var activePrepId = null; // ID of prep being edited, null = overview
 
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function safeParse(key, fallback) {
   var raw = localStorage.getItem(key);
   if (raw === null) return fallback !== undefined ? fallback : null;
@@ -2056,7 +2061,7 @@ function renderFightLog() {
     return `<div onclick="openFightDetail(${i})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #111;cursor:pointer;" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${color};width:28px;text-align:center;">${f.result}</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;color:var(--white);">vs. ${f.opponent || 'Unbekannt'}</div>
+        <div style="font-size:13px;color:var(--white);">vs. ${escapeHTML(f.opponent) || 'Unbekannt'}</div>
         <div style="font-family:'Space Mono',monospace;font-size:12px;color:#444;">${formatDate(f.date)} · ${f.method || ''}</div>
       </div>
       <div style="font-size:12px;color:#333;">→</div>
@@ -2202,7 +2207,7 @@ function renderFightsTab1(contentEl, data) {
       <div style="font-family:'Space Mono',monospace;font-size:12px;color:#555;min-width:70px;">${formatDate(f.date)}</div>
       <div style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
       <div style="flex:1;min-width:0;display:flex;align-items:center;flex-wrap:wrap;">
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">vs. ${escapeHTML(f.opponent || 'Unbekannt').toUpperCase()}</span>
         ${methodTag}${typeTag}
       </div>
       <div style="font-size:14px;color:#333;">&#8250;</div>
@@ -2297,9 +2302,9 @@ function renderFightsTab3(contentEl, data) {
     return '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid #111;gap:8px 16px;">' +
       '<div style="flex-shrink:0;min-width:' + (isMobile() ? '100%' : '120px') + ';">' +
         '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + formatDate(f.date) + '</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#888;">vs. ' + (f.opponent || 'Unbekannt') + '</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#888;">vs. ' + escapeHTML(f.opponent || 'Unbekannt') + '</div>' +
       '</div>' +
-      '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:13px;color:#aaa;line-height:1.5;">' + f.improve + '</div>' +
+      '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:13px;color:#aaa;line-height:1.5;">' + escapeHTML(f.improve) + '</div>' +
     '</div>';
   }).join('');
 
@@ -2391,7 +2396,7 @@ function renderFightsTab3(contentEl, data) {
     timelineHTML += '<div style="position:absolute;left:0;top:' + topPx + 'px;display:flex;align-items:flex-start;gap:14px;">' +
       '<div style="width:12px;height:12px;border-radius:50%;background:' + dotColor + ';flex-shrink:0;margin-top:2px;z-index:1;"></div>' +
       '<div>' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + formatDate(f.date) + ' <span style="color:#888;">vs. ' + (f.opponent || 'Unbekannt') + '</span></div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + formatDate(f.date) + ' <span style="color:#888;">vs. ' + escapeHTML(f.opponent || 'Unbekannt') + '</span></div>' +
         '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;">' + (f.method || '') + '</div>' +
       '</div>' +
     '</div>' + gapHTML;
@@ -2615,7 +2620,7 @@ function openFightDetail(idx) {
     <span style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,36px);color:${color};letter-spacing:2px;">${label}</span>
     <span style="font-family:'Space Mono',monospace;font-size:11px;color:#444;">${f.method || ''}</span>
   </div>
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--white);letter-spacing:3px;line-height:.9;margin-bottom:10px;">vs. ${(f.opponent || 'Unbekannt').toUpperCase()}</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--white);letter-spacing:3px;line-height:.9;margin-bottom:10px;">vs. ${escapeHTML(f.opponent || 'Unbekannt').toUpperCase()}</div>
   <div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;margin-bottom:28px;">${formatDate(f.date)}${f.style ? ' · ' + f.style : ''}${f.type ? ' · ' + f.type : ''}</div>
 
   <!-- MAIN: VIDEO LEFT + TIMESTAMPS RIGHT -->
@@ -2715,22 +2720,22 @@ function openFightDetail(idx) {
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
     <div style="padding:16px 0;border-bottom:1px solid #111;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--green);letter-spacing:1px;margin-bottom:8px;">WAS LIEF GUT</div>
-      <div id="fd-good" class="editable-field" onclick="makeFightFieldEditable(${idx},'good',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.good || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
+      <div id="fd-good" class="editable-field" onclick="makeFightFieldEditable(${idx},'good',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.good) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
     <div style="padding:16px 0;border-bottom:1px solid #111;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red);letter-spacing:1px;margin-bottom:8px;">WAS MUSS BESSER WERDEN</div>
-      <div id="fd-improve" class="editable-field" onclick="makeFightFieldEditable(${idx},'improve',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.improve || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
+      <div id="fd-improve" class="editable-field" onclick="makeFightFieldEditable(${idx},'improve',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.improve) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
     <div style="padding:16px 0;border-bottom:1px solid #111;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">GEGNER-SCHWÄCHEN</div>
-      <div id="fd-opponentWeaknesses" class="editable-field" onclick="makeFightFieldEditable(${idx},'opponentWeaknesses',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.opponentWeaknesses || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
+      <div id="fd-opponentWeaknesses" class="editable-field" onclick="makeFightFieldEditable(${idx},'opponentWeaknesses',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.opponentWeaknesses) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
   </div>
 
   <!-- NÄCHSTE SCHRITTE -->
   <div style="margin-bottom:36px;padding:20px 0;border-top:1px solid #111;">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1.5px;margin-bottom:10px;">WAS ICH NÄCHSTES MAL ANDERS MACHE</div>
-    <div id="fd-nextSteps" class="editable-field" onclick="makeFightFieldEditable(${idx},'nextSteps',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.nextSteps || '<span style="color:#222;">Konkrete Maßnahmen für das nächste Training / den nächsten Kampf...</span>'}</div>
+    <div id="fd-nextSteps" class="editable-field" onclick="makeFightFieldEditable(${idx},'nextSteps',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.nextSteps) || '<span style="color:#222;">Konkrete Maßnahmen für das nächste Training / den nächsten Kampf...</span>'}</div>
   </div>
 
   <!-- ACTIONS -->
@@ -2973,7 +2978,7 @@ function makeFightFieldEditable(idx, field, container) {
     else { d.fights[idx][field] = newVal; }
     saveData(d);
     // Replace textarea with display text
-    container.innerHTML = '<div style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;padding:4px 0;">' + (newVal || '<span style="color:#222;">Klicke hier um Notizen hinzuzufügen...</span>') + '</div>';
+    container.innerHTML = '<div style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;padding:4px 0;">' + (escapeHTML(newVal) || '<span style="color:#222;">Klicke hier um Notizen hinzuzufügen...</span>') + '</div>';
   };
 }
 
@@ -3288,7 +3293,7 @@ function renderPrepWizard(data) {
   var btnSecondary = 'font-family:"Space Mono",monospace;font-size:11px;letter-spacing:1px;padding:10px 20px;background:transparent;color:#555;border:1px solid #252525;border-radius:4px;cursor:pointer;';
 
   // Back to overview
-  var oppName = (prep.opponent && prep.opponent.name) ? prep.opponent.name : 'Neue Vorbereitung';
+  var oppName = (prep.opponent && prep.opponent.name) ? escapeHTML(prep.opponent.name) : 'Neue Vorbereitung';
   var backHTML = '<div style="margin-bottom:20px;">' +
     '<button onclick="backToOverview()" style="' + btnSecondary + 'padding:6px 14px;font-size:10px;">\u2190 ALLE VORBEREITUNGEN</button>' +
     '<div style="' + headingStyle + 'font-size:22px;margin-top:12px;">' + oppName.replace(/</g, '&lt;') + '</div>' +
@@ -3373,7 +3378,7 @@ function renderPrepWizard(data) {
         '<div style="margin-top:16px;"><label style="' + labelStyle + '">ST\u00c4RKEN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'opponent.strengths\', this.value)" placeholder="Was macht der Gegner gut?">' + (opp.strengths || '') + '</textarea></div>' +
         '<div style="margin-top:12px;"><label style="' + labelStyle + '">SCHW\u00c4CHEN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'opponent.weaknesses\', this.value)" placeholder="Wo hat der Gegner L\u00fccken?">' + (opp.weaknesses || '') + '</textarea></div>' +
         '<div style="margin-top:12px;"><label style="' + labelStyle + '">VIDEO-LINK</label><input style="' + inputStyle + '" value="' + (opp.videoLink || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'opponent.videoLink\', this.value)" placeholder="YouTube-Link zum Gegner"></div>' +
-        '<div style="margin-top:12px;"><label style="' + labelStyle + '">NOTIZEN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'opponent.notes\', this.value)" placeholder="Sonstige Infos...">' + (opp.notes || '') + '</textarea></div>' +
+        '<div style="margin-top:12px;"><label style="' + labelStyle + '">NOTIZEN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'opponent.notes\', this.value)" placeholder="Sonstige Infos...">' + escapeHTML(opp.notes) + '</textarea></div>' +
       '</div>' +
       navButtons(1);
   }
@@ -3652,7 +3657,7 @@ function renderLogEntries() {
       <div class="log-entry-body">
         <div class="log-entry-type" style="color:${color};">${TYPE_LABELS[e.type] || e.type}</div>
         <div style="font-size:13px;color:var(--white);">${e.duration} Min. · RPE ${e.rpe}${e.weight ? ' · ' + e.weight + ' kg' : ''}</div>
-        ${e.notes ? `<div class="log-entry-notes">${e.notes}</div>` : ''}
+        ${e.notes ? `<div class="log-entry-notes">${escapeHTML(e.notes)}</div>` : ''}
       </div>
       <button class="delete-btn" onclick="deleteLog(${i})">×</button>
     </div>`;
