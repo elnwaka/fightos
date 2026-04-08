@@ -609,6 +609,14 @@ body::before {
   align-items: center;
   height: 54px;
 }
+.topbar-logo, .user-pill, .share-pill {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+}
 .topbar-logo {
   font-family: 'Bebas Neue', sans-serif;
   font-size: var(--fs-xl);

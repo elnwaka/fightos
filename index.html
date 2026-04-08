@@ -194,7 +194,7 @@
 <div id="app-screen">
   <!-- TOP BAR -->
   <div class="topbar">
-    <div class="topbar-logo" onclick="showPage('dashboard')">FIGHT<span>OS</span></div>
+    <button class="topbar-logo" onclick="showPage('dashboard')" aria-label="Zur Übersicht">FIGHT<span>OS</span></button>
     <div class="topbar-nav">
       <button class="nav-btn active" data-page="dashboard">Übersicht</button>
       <button class="nav-btn" data-page="fights">Kämpfe</button>
@@ -232,9 +232,9 @@
         <input type="text" id="global-search" class="search-input" placeholder="Suche..." oninput="handleSearch(this.value)" onfocus="document.getElementById('search-results').style.display='block'" onblur="setTimeout(()=>document.getElementById('search-results').style.display='none',200)">
         <div id="search-results" class="search-results"></div>
       </div>
-      <span class="user-pill" id="user-pill" onclick="showPage('account')" style="cursor:pointer;" title="Mein Account"></span>
+      <button class="user-pill" id="user-pill" onclick="showPage('account')" title="Mein Account" aria-label="Mein Account"></button>
       <button class="topbar-icon-btn" onclick="showPage('log')" title="Trainingslog" aria-label="Trainingslog">&#9998;</button>
-      <span class="share-pill" onclick="sharePlan()">Teilen</span>
+      <button class="share-pill" onclick="sharePlan()" aria-label="Plan teilen">Teilen</button>
       <button class="topbar-icon-btn" onclick="toggleTheme()" title="Dark/Light Mode" id="theme-toggle-btn" aria-label="Design wechseln">☀</button>
       <button class="logout-btn" onclick="doLogout()" title="Logout" aria-label="Abmelden">⏻</button>
     </div>
