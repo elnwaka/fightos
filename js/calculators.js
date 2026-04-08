@@ -3,8 +3,26 @@
    Makros, HF-Zonen, Wettkampf-Prep, 1RM
    ============================================ */
 
+// ===== INPUT VALIDATION =====
+function validateCalcInput(value, min, max, fieldName) {
+  var num = parseFloat(value);
+  if (isNaN(num)) return fieldName + ': Bitte eine Zahl eingeben.';
+  if (num < min) return fieldName + ': Minimum ' + min + '.';
+  if (num > max) return fieldName + ': Maximum ' + max + '.';
+  return null;
+}
+
+function showCalcError(targetId, message) {
+  var el = document.getElementById(targetId);
+  if (!el) return;
+  el.style.display = 'block';
+  el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);padding:10px 0;">' + message + '</div>';
+}
+
 // ===== MAKRO RECHNER (Ernährung page) =====
 function calcMakrosErn() {
+  var wErr = validateCalcInput(document.getElementById('ern-weight')?.value, 30, 200, 'Gewicht');
+  if (wErr) { showCalcError('ern-results', wErr); return; }
   const w = parseFloat(document.getElementById('ern-weight')?.value) || 75;
   const phase = document.getElementById('ern-phase')?.value || 'aufbau';
   const vol = document.getElementById('ern-vol')?.value || 'mittel';
@@ -92,6 +110,10 @@ function saveNutritionPlan() {
 
 // ===== HF-ZONEN RECHNER =====
 function calcHFZonen() {
+  var ageErr = validateCalcInput(document.getElementById('hf-age')?.value, 10, 80, 'Alter');
+  var restErr = validateCalcInput(document.getElementById('hf-rest')?.value, 30, 120, 'Ruhepuls');
+  var err = ageErr || restErr;
+  if (err) { showCalcError('hf-results', err); return; }
   const age = parseInt(document.getElementById('hf-age')?.value) || 25;
   const rest = parseInt(document.getElementById('hf-rest')?.value) || 55;
   const maxHF = 220 - age;
@@ -121,6 +143,11 @@ function calcHFZonen() {
 
 // ===== WETTKAMPF-PREP RECHNER =====
 function calcWettkampfPrep() {
+  var curErr = validateCalcInput(document.getElementById('cut-current')?.value, 40, 200, 'Aktuelles Gewicht');
+  var tgtErr = validateCalcInput(document.getElementById('cut-target')?.value, 40, 200, 'Zielgewicht');
+  var wksErr = validateCalcInput(document.getElementById('cut-weeks')?.value, 1, 52, 'Wochen');
+  var err = curErr || tgtErr || wksErr;
+  if (err) { showCalcError('cut-results', err); return; }
   const cur = parseFloat(document.getElementById('cut-current')?.value) || 82;
   const tgt = parseFloat(document.getElementById('cut-target')?.value) || 75;
   const wks = parseInt(document.getElementById('cut-weeks')?.value) || 8;
@@ -176,11 +203,16 @@ function calcWettkampfPrep() {
 
 // ===== 1RM RECHNER =====
 function calc1RM() {
+  var wErr = validateCalcInput(document.getElementById('rm-weight')?.value, 1, 500, 'Gewicht');
+  var rErr = validateCalcInput(document.getElementById('rm-reps')?.value, 1, 30, 'Wiederholungen');
+  var err = wErr || rErr;
+  if (err) { showCalcError('rm-results', err); return; }
   const weight = parseFloat(document.getElementById('rm-weight')?.value) || 80;
   const reps = parseInt(document.getElementById('rm-reps')?.value) || 5;
 
   // Epley formula
   const oneRM = Math.round(weight * (1 + reps / 30));
+  var repWarning = reps > 10 ? '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);padding:8px 0;margin-bottom:8px;">⚠ Schätzung wird ungenauer über 10 Wiederholungen. Teste mit ≤5 Reps für präzisere Werte.</div>' : '';
 
   const percentages = [
     { pct: 100, label: '1RM (Max)', color: 'var(--red)' },
@@ -198,7 +230,8 @@ function calc1RM() {
   el.innerHTML = `
     <div style="margin-bottom:16px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--white);">Geschätztes 1RM: <span style="color:var(--orange)">${oneRM} kg</span></div>
-      <div style="font-family:'Space Mono',monospace;font-size:12px;color:#555;">Basierend auf ${weight} kg × ${reps} Reps (Epley-Formel)</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);">Basierend auf ${weight} kg × ${reps} Reps (Epley-Formel)</div>
+      ${repWarning}
     </div>
     ${percentages.map(p => {
       const val = Math.round(oneRM * p.pct / 100);
