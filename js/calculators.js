@@ -1,5 +1,5 @@
 /* ============================================
-   FIGHTOS — Calculators
+   FIGHTOS – Calculators
    Makros, HF-Zonen, Wettkampf-Prep, 1RM
    ============================================ */
 
@@ -101,11 +101,11 @@ function calcHFZonen() {
   }
 
   const zones = [
-    { name: 'Zone 1 — Aktive Erholung', min: zone(.5), max: zone(.6), color: '#7eb4ff', desc: 'Mobility, Cool-down, leichter Spaziergang' },
-    { name: 'Zone 2 — Aerobe Basis', min: zone(.6), max: zone(.7), color: '#6dffa7', desc: 'Fahrrad zur Arbeit, leichter Lauf — TÄGLICH' },
-    { name: 'Zone 3 — Aerob intensiv', min: zone(.7), max: zone(.8), color: '#f5c518', desc: 'Mittleres Tempo, Fartlek-Mittelstrecke' },
-    { name: 'Zone 4 — Laktatschwelle', min: zone(.8), max: zone(.9), color: '#ffb47a', desc: 'HIIT-Runden, intensives Sparring' },
-    { name: 'Zone 5 — VO₂max', min: zone(.9), max: maxHF, color: '#ff7a80', desc: '30-Sek-Sprints, SIT — max. 1×/Woche' }
+    { name: 'Zone 1 – Aktive Erholung', min: zone(.5), max: zone(.6), color: '#7eb4ff', desc: 'Mobility, Cool-down, leichter Spaziergang' },
+    { name: 'Zone 2 – Aerobe Basis', min: zone(.6), max: zone(.7), color: '#6dffa7', desc: 'Fahrrad zur Arbeit, leichter Lauf – TÄGLICH' },
+    { name: 'Zone 3 – Aerob intensiv', min: zone(.7), max: zone(.8), color: '#f5c518', desc: 'Mittleres Tempo, Fartlek-Mittelstrecke' },
+    { name: 'Zone 4 – Laktatschwelle', min: zone(.8), max: zone(.9), color: '#ffb47a', desc: 'HIIT-Runden, intensives Sparring' },
+    { name: 'Zone 5 – VO₂max', min: zone(.9), max: maxHF, color: '#ff7a80', desc: '30-Sek-Sprints, SIT – max. 1×/Woche' }
   ];
 
   const el = document.getElementById('hf-results');

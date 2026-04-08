@@ -1,5 +1,5 @@
 /* ============================================
-   FIGHTOS — Core Application Logic
+   FIGHTOS – Core Application Logic
    Auth, Navigation, Fight Date, HRV, Logs
    ============================================ */
 
@@ -10,6 +10,7 @@ function isMobile() { return window.innerWidth < 768; }
 let currentUser = null;
 let editingBlock = null;
 var currentFightsTab = 'kaempfe';
+var fightsListLimit = 20;
 var activePrepId = null; // ID of prep being edited, null = overview
 
 function showToast(message, type, duration) {
@@ -25,6 +26,17 @@ function showToast(message, type, duration) {
     toast.classList.add('out');
     setTimeout(function() { toast.remove(); }, 300);
   }, duration);
+}
+
+function showFieldError(inputEl, message) {
+  if (!inputEl) return;
+  inputEl.style.borderColor = 'var(--red)';
+  inputEl.style.boxShadow = '0 0 0 3px rgba(232,0,13,.15)';
+  showToast(message, 'error');
+  setTimeout(function() {
+    inputEl.style.borderColor = '';
+    inputEl.style.boxShadow = '';
+  }, 3000);
 }
 
 document.addEventListener('keydown', function(e) {
@@ -152,7 +164,7 @@ const OB_STEPS = [
       <div class="form-group">
         <label class="form-label">GEBURTSJAHR</label>
         <select class="form-select" id="ob-birthyear">
-          <option value="">— Wählen —</option>${yOpts}
+          <option value="">– Wählen –</option>${yOpts}
         </select>
       </div>`;
     },
@@ -168,7 +180,7 @@ const OB_STEPS = [
   },
   {
     title: 'DEIN KÖRPER',
-    sub: 'Gewicht und Größe — damit sich alles an dich anpasst.',
+    sub: 'Gewicht und Größe – damit sich alles an dich anpasst.',
     render() {
       const wOpts = [50,55,60,65,70,75,80,85,90,95,100].map(w =>
         `<option value="${w}" ${(obData.weight||75)==w?'selected':''}>${w} kg</option>`
@@ -291,7 +303,7 @@ const OB_STEPS = [
   },
   {
     title: 'AKTUELLE FITNESS',
-    sub: 'Ehrliche Selbsteinschätzung — hilft uns, realistische Ziele zu setzen.',
+    sub: 'Ehrliche Selbsteinschätzung – hilft uns, realistische Ziele zu setzen.',
     render() {
       const opts = [
         { val:'schlecht', icon:'😤', label:'EINSTEIGER', desc:'Wenig Grundfitness, fange gerade erst an' },
@@ -561,7 +573,7 @@ function showSaeulenIntro() {
     })(di);
   }
 
-  // IntersectionObserver — animiert Slides wenn sie sichtbar werden
+  // IntersectionObserver – animiert Slides wenn sie sichtbar werden
   if (window.IntersectionObserver) {
     var animated = {};
     var obs = new IntersectionObserver(function(entries) {
@@ -708,6 +720,8 @@ function showPage(pageId) {
   if (pageId === 'saeulen-detail') navPage = 'saeulen';
   if (pageId === 'uebung-detail') navPage = 'uebungen';
   if (pageId === 'supplement-detail') navPage = 'supplements';
+  if (pageId === 'fight-detail') navPage = 'fights';
+  if (pageId === 'block-detail') navPage = 'wochenplan';
   // Highlight direct nav button
   const btn = document.querySelector(`.nav-btn[data-page="${navPage}"]`);
   if (btn) btn.classList.add('active');
@@ -730,7 +744,6 @@ function showPage(pageId) {
   if (pageId === 'tests') renderTestsPage();
   if (pageId === 'account') renderAccountPage();
   if (pageId === 'fights') renderFightsPage();
-  if (pageId === 'fight-detail') navPage = 'fights';
   // Stop YouTube player when leaving fight-detail
   if (pageId !== 'fight-detail' && window._fightPlayer) {
     try { window._fightPlayer.pauseVideo(); } catch(e) {}
@@ -802,7 +815,8 @@ function updateFightDate() {
   if (dateVal) {
     const diff = Math.ceil((new Date(dateVal + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000);
     if (diff > 365) {
-      alert('Kampfdatum darf max. 365 Tage in der Zukunft liegen.');
+      var inp = document.getElementById('fight-date-input');
+      showFieldError(inp, 'Kampfdatum darf max. 365 Tage in der Zukunft liegen.');
       return;
     }
   }
@@ -822,7 +836,7 @@ function updateFightDate() {
     }
     syncPrimaryFightDate(data);
   } else {
-    // Cleared the input — remove all upcoming fights
+    // Cleared the input – remove all upcoming fights
     data.upcomingFights = [];
     data.fightDate = '';
   }
@@ -843,23 +857,23 @@ function addUpcomingFight() {
   if (!data) return;
   if (!data.upcomingFights) data.upcomingFights = [];
   if (data.upcomingFights.length >= 5) {
-    alert('Maximal 5 Kämpfe gleichzeitig möglich.');
+    showToast('Maximal 5 Kämpfe gleichzeitig möglich.', 'error');
     return;
   }
   const label = prompt('Bezeichnung (z.B. "Meisterschaft Tag 2"):', '') || '';
   const dateStr = prompt('Datum (YYYY-MM-DD):', '');
   if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-    if (dateStr !== null) alert('Ungültiges Datumsformat. Bitte YYYY-MM-DD verwenden.');
+    if (dateStr !== null) showToast('Ungültiges Datumsformat. Bitte YYYY-MM-DD verwenden.', 'error');
     return;
   }
   const diff = Math.ceil((new Date(dateStr + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000);
   if (diff > 365) {
-    alert('Kampfdatum darf max. 365 Tage in der Zukunft liegen.');
+    showToast('Kampfdatum darf max. 365 Tage in der Zukunft liegen.', 'error');
     return;
   }
   // Avoid duplicate dates
   if (data.upcomingFights.find(f => f.date === dateStr)) {
-    alert('Dieses Datum ist bereits eingetragen.');
+    showToast('Dieses Datum ist bereits eingetragen.', 'error');
     return;
   }
   data.upcomingFights.push({ date: dateStr, label: label });
@@ -921,7 +935,7 @@ function clearFightDate() {
   renderWeekPlan();
 }
 
-// Amateur Boxing: Kein wochenlanges Taper — nur kurze Anpassung vor Kampf
+// Amateur Boxing: Kein wochenlanges Taper – nur kurze Anpassung vor Kampf
 function getFightPhase(daysUntil) {
   if (daysUntil <= 0) return { name: 'RECOVERY', label: 'Regeneration', cls: 'phase-aufbau', color: 'var(--green)' };
   if (daysUntil <= 2) return { name: 'KAMPFTAG', label: 'Kampf-Modus', cls: 'phase-kampf', color: 'var(--red)' };
@@ -1009,9 +1023,9 @@ function buildUpcomingFightsHTML(data) {
   '</div>';
 }
 
-// ===== DASHBOARD STATS — MEASURABLE PERFORMANCE PROFILE =====
+// ===== DASHBOARD STATS – MEASURABLE PERFORMANCE PROFILE =====
 
-// 3 radar axes — only real, testable performance dimensions
+// 3 radar axes – only real, testable performance dimensions
 // 8 SÄULEN = 8 RADAR-ACHSEN (das Fundament der App)
 const RADAR_AXES = [
   { key:'kraft',    label:'KRAFT',        color:'var(--red)',    hex:'#e8000d', saeulenIdx:0 },
@@ -1051,7 +1065,7 @@ function calcProfileScores(data) {
     return sr[key] ? Math.round(sr[key] * 20) : null; // 1-5 → 20-100%
   }
 
-  // S1: KRAFT — Benchmarks (Deadlift, Klimmzüge, CMJ, Schlagfrequenz)
+  // S1: KRAFT – Benchmarks (Deadlift, Klimmzüge, CMJ, Schlagfrequenz)
   const kraft = avg([
     pct(b.deadlift, bw * 2.5),
     pct(b.pullups, scaleByWeight(bw, PULLUP_TIERS)),
@@ -1059,22 +1073,22 @@ function calcProfileScores(data) {
     pct(b.punch_freq, scaleByWeight(bw, PUNCH_TIERS))
   ]);
 
-  // S2: METABOLISCH — Cooper-Test + Selbsteinschätzung
+  // S2: METABOLISCH – Cooper-Test + Selbsteinschätzung
   const metabol = avg([
     pct(b.cooper, scaleByWeight(bw, COOPER_TIERS)),
     ratingPct('metabol')
   ]);
 
-  // S3: KOGNITION — Selbsteinschätzung (Reaktion, Antizipation, Entscheidung)
+  // S3: KOGNITION – Selbsteinschätzung (Reaktion, Antizipation, Entscheidung)
   const kognitiv = ratingPct('kognitiv');
 
-  // S4: ERNÄHRUNG — Bodyfat + Selbsteinschätzung
+  // S4: ERNÄHRUNG – Bodyfat + Selbsteinschätzung
   const ernaehr = avg([
     inversePct(b.bodyfat, bfTarget),
     ratingPct('ernaehr')
   ]);
 
-  // S5: REGENERATION — HRV-Daten + Selbsteinschätzung
+  // S5: REGENERATION – HRV-Daten + Selbsteinschätzung
   var recoveryScore = null;
   if (hrv.length >= 7) {
     var recent = hrv.slice(0, 7);
@@ -1085,7 +1099,7 @@ function calcProfileScores(data) {
   }
   const recovery = avg([recoveryScore, ratingPct('recovery')]);
 
-  // S6: RING IQ — Kampferfahrung + Selbsteinschätzung
+  // S6: RING IQ – Kampferfahrung + Selbsteinschätzung
   var fightIQ = null;
   if (fights.length >= 3) {
     var wins = fights.filter(function(f) { return f.result === 'S'; }).length;
@@ -1093,10 +1107,10 @@ function calcProfileScores(data) {
   }
   const ringiQ = avg([fightIQ, ratingPct('ringiQ')]);
 
-  // S7: PSYCHE — Selbsteinschätzung
+  // S7: PSYCHE – Selbsteinschätzung
   const psyche = ratingPct('psyche');
 
-  // S8: MOBILITÄT — Selbsteinschätzung + Mobility-Training-Häufigkeit
+  // S8: MOBILITÄT – Selbsteinschätzung + Mobility-Training-Häufigkeit
   var mobilLog = null;
   var last30 = log.filter(function(e) {
     var d = new Date(e.date);
@@ -1151,7 +1165,7 @@ function renderDashStats() {
           <div class="rpg-stat-info">
             <div class="rpg-stat-top">
               <span class="rpg-stat-label">${a.label}</span>
-              <span class="rpg-stat-value" style="color:${hasVal ? a.color : '#333'};">${hasVal ? val : '—'}</span>
+              <span class="rpg-stat-value" style="color:${hasVal ? a.color : '#333'};">${hasVal ? val : '–'}</span>
             </div>
             <div class="rpg-stat-bar">
               <div class="rpg-stat-fill" style="width:${hasVal ? val : 0}%;background:${a.color};"></div>
@@ -1163,7 +1177,7 @@ function renderDashStats() {
         <div class="rpg-stat-info">
           <div class="rpg-stat-top">
             <span class="rpg-stat-label">GESAMT</span>
-            <span class="rpg-stat-value" style="color:var(--gold);font-size:24px;">${overall !== null ? overall : '—'}<span style="font-size:12px;color:#444;"> / 100</span></span>
+            <span class="rpg-stat-value" style="color:var(--gold);font-size:24px;">${overall !== null ? overall : '–'}<span style="font-size:12px;color:#444;"> / 100</span></span>
           </div>
           <div class="rpg-stat-bar">
             <div class="rpg-stat-fill" style="width:${overall || 0}%;background:linear-gradient(90deg,var(--red),var(--gold));"></div>
@@ -1262,7 +1276,8 @@ function logHRV() {
   const val = parseInt(document.getElementById('hrv-input').value);
   if (!val || isNaN(val) || val < 1 || val > 200) {
     if (val !== undefined && val !== null && !isNaN(val) && (val < 1 || val > 200)) {
-      alert('HRV-Wert muss zwischen 1 und 200 liegen.');
+      var inp = document.getElementById('hrv-input');
+      showFieldError(inp, 'HRV-Wert muss zwischen 1 und 200 liegen.');
     }
     return;
   }
@@ -1447,19 +1462,19 @@ function renderHinweise() {
   if (data.fightDate) {
     const diff = Math.ceil((new Date(data.fightDate + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000);
     if (diff < -2) {
-      items.push({ text:'Kampf vorbei — zurück zum normalen Training.', color:'var(--green)', priority:1 });
+      items.push({ text:'Kampf vorbei – zurück zum normalen Training.', color:'var(--green)', priority:1 });
     } else if (diff < 0) {
       items.push({ text:'Recovery-Phase: Leichte Bewegung, viel Protein, 9+ Stunden Schlaf.', color:'var(--green)', priority:2 });
     } else if (diff === 0) {
       items.push({ text:'KAMPFTAG! PAPE Warm-up 45 Min. vor Ring. Rote Beete Shot 2–3h vorher. Box-Breathing 4-4-4-4.', color:'var(--red)', priority:5 });
     } else if (diff === 1) {
-      items.push({ text:'Morgen Kampf — heute NUR leicht! Shadow Boxing + Visualisierung. Equipment packen.', color:'var(--red)', priority:5 });
+      items.push({ text:'Morgen Kampf – heute NUR leicht! Shadow Boxing + Visualisierung. Equipment packen.', color:'var(--red)', priority:5 });
     } else if (diff <= 3) {
-      items.push({ text:`Kampf in ${diff} Tagen — Schärfungsphase. Kein neues Sparring, Gameplan-Pratzen schleifen.`, color:'var(--gold)', priority:4 });
+      items.push({ text:`Kampf in ${diff} Tagen – Schärfungsphase. Kein neues Sparring, Gameplan-Pratzen schleifen.`, color:'var(--gold)', priority:4 });
     } else if (diff <= 7) {
-      items.push({ text:`Kampf in ${diff} Tagen — normales Training. Hartes Sparring bis 3 Tage vor Kampf OK.`, color:'var(--blue)', priority:2 });
+      items.push({ text:`Kampf in ${diff} Tagen – normales Training. Hartes Sparring bis 3 Tage vor Kampf OK.`, color:'var(--blue)', priority:2 });
     } else {
-      items.push({ text:`Kampf in ${diff} Tagen — volle Intensität. Kraft + Sparring + Kondition pushen.`, color:'var(--blue)', priority:1 });
+      items.push({ text:`Kampf in ${diff} Tagen – volle Intensität. Kraft + Sparring + Kondition pushen.`, color:'var(--blue)', priority:1 });
     }
   }
 
@@ -1479,14 +1494,14 @@ function renderHinweise() {
       const daysSince = Math.floor((today - new Date(hist[hist.length - 1].date)) / 86400000);
       const dueIn = cfg.weeks * 7 - daysSince;
       if (dueIn <= 0) {
-        items.push({ text:`${cfg.name} — letzter Test vor ${daysSince} Tagen. Neuer Test fällig.`, color:'var(--red)', priority:2 });
+        items.push({ text:`${cfg.name} – letzter Test vor ${daysSince} Tagen. Neuer Test fällig.`, color:'var(--red)', priority:2 });
       } else if (dueIn <= 7) {
-        items.push({ text:`${cfg.name} — nächster Test in ${dueIn} Tagen.`, color:'var(--gold)', priority:0 });
+        items.push({ text:`${cfg.name} – nächster Test in ${dueIn} Tagen.`, color:'var(--gold)', priority:0 });
       }
     }
   }
   if (neverCount > 0) {
-    items.push({ text:`${neverCount} Tests noch nie durchgeführt — gehe zur Test-Seite.`, color:'var(--blue)', priority:1 });
+    items.push({ text:`${neverCount} Tests noch nie durchgeführt – gehe zur Test-Seite.`, color:'var(--blue)', priority:1 });
   }
 
   // --- HRV Erinnerung ---
@@ -1503,7 +1518,7 @@ function renderHinweise() {
   if (log.length > 0) {
     const daysSinceLog = Math.floor((today - new Date(log[0].date)) / 86400000);
     if (daysSinceLog >= 4) {
-      items.push({ text:`Letzte Einheit vor ${daysSinceLog} Tagen — alles OK?`, color:'var(--gold)', priority:0 });
+      items.push({ text:`Letzte Einheit vor ${daysSinceLog} Tagen – alles OK?`, color:'var(--gold)', priority:0 });
     }
   }
 
@@ -1525,7 +1540,7 @@ function renderHinweise() {
     if (scores[sk] !== null && scores[sk] < weakestVal) { weakestVal = scores[sk]; weakest = sk; }
   }
   if (weakest && weakestVal < 70) {
-    items.push({ text: 'Schwächste Säule: ' + saeulenNames[weakest] + ' (' + weakestVal + '%) — ' + saeulenTipps[weakest], color: 'var(--red)', priority: 3 });
+    items.push({ text: 'Schwächste Säule: ' + saeulenNames[weakest] + ' (' + weakestVal + '%) – ' + saeulenTipps[weakest], color: 'var(--red)', priority: 3 });
   }
 
   items.sort((a, b) => b.priority - a.priority);
@@ -1591,7 +1606,7 @@ function getBenchmarks() {
   const age = getUserAge() || 25;
   const bfTarget = age < 25 ? 7 : age <= 35 ? 9 : 11;
   return [
-    // LEISTUNGSTESTS — fließen ins Radar
+    // LEISTUNGSTESTS – fließen ins Radar
     { id:'deadlift', name:'Deadlift 1RM', unit:'kg', target:Math.round(bw * 2.5), color:'var(--red)', cluster:'Kraft',
       how:'Trap Bar oder Langhantel · 1RM-Test mit Aufwärmprotokoll',
       howSteps:[
@@ -1613,10 +1628,10 @@ function getBenchmarks() {
     { id:'cmj', name:'CMJ Sprunghöhe', unit:'cm', target:scaleByWeight(bw, CMJ_TIERS), color:'var(--red)', cluster:'Kraft',
       how:'Counter Movement Jump · MyJump App oder Kreidemarkierung',
       howSteps:[
-        {t:'Methode A — MyJump App', d:'Smartphone am Boden aufstellen, App starten. Springe barfuß auf hartem Boden. Die App berechnet die Flugzeit → Sprunghöhe. 3 Versuche, bester zählt.'},
-        {t:'Methode B — Kreide/Wand', d:'Stelle dich seitlich an eine Wand. Arm hoch strecken → Markierung 1. Dann aus dem Stand springen und am höchsten Punkt markieren → Markierung 2. Differenz = Sprunghöhe.'},
+        {t:'Methode A – MyJump App', d:'Smartphone am Boden aufstellen, App starten. Springe barfuß auf hartem Boden. Die App berechnet die Flugzeit → Sprunghöhe. 3 Versuche, bester zählt.'},
+        {t:'Methode B – Kreide/Wand', d:'Stelle dich seitlich an eine Wand. Arm hoch strecken → Markierung 1. Dann aus dem Stand springen und am höchsten Punkt markieren → Markierung 2. Differenz = Sprunghöhe.'},
         {t:'Ausführung', d:'Stehe aufrecht, Füße schulterbreit. Gehe schnell in die Hocke (Knie ~90°), schwinge die Arme nach vorne-oben und springe MAXIMAL. Lande auf beiden Füßen.'},
-        {t:'Regeln', d:'Kein Anlauf, kein Zwischenschritt. Die Gegenbewegung (Counter Movement) ist erlaubt und gewollt — das unterscheidet den CMJ vom Squat Jump.'},
+        {t:'Regeln', d:'Kein Anlauf, kein Zwischenschritt. Die Gegenbewegung (Counter Movement) ist erlaubt und gewollt – das unterscheidet den CMJ vom Squat Jump.'},
         {t:'Tipp', d:'3-5 Min. dynamisches Aufwärmen + 2-3 Probesprünge bei 80%. Dann 3 maximale Versuche mit je 2 Min. Pause. Bester Wert zählt.'}
       ], interval:8 },
     { id:'punch_freq', name:'Schlagfrequenz 10s', unit:'Schläge', target:scaleByWeight(bw, PUNCH_TIERS), color:'var(--red)', cluster:'Kraft',
@@ -1633,7 +1648,7 @@ function getBenchmarks() {
       howSteps:[
         {t:'Vorbereitung', d:'400m-Tartanbahn (oder GPS-Uhr auf flacher Strecke). Laufschuhe, leichte Kleidung. Nicht direkt nach einer Mahlzeit testen.'},
         {t:'Aufwärmen', d:'10 Min. lockeres Einlaufen + 4-5 Steigerungsläufe über 80m. Dann 3 Min. Pause.'},
-        {t:'Ausführung', d:'Auf "START" läufst du 12 Minuten so weit wie möglich. Gleichmäßiges Tempo ist der Schlüssel — starte NICHT zu schnell! Die letzten 2 Min. kannst du anziehen.'},
+        {t:'Ausführung', d:'Auf "START" läufst du 12 Minuten so weit wie möglich. Gleichmäßiges Tempo ist der Schlüssel – starte NICHT zu schnell! Die letzten 2 Min. kannst du anziehen.'},
         {t:'Pacing-Strategie', d:'Für 3500m brauchst du ~3:26 min/km. Laufe die ersten 3 Runden (1200m) in ~4:08. Steigere dann. Zähle jede 400m-Runde mit.'},
         {t:'Messung', d:'Nach 12 Min. pfeift der Partner. Bleib stehen wo du bist. Miss die zurückgelegte Distanz auf 10m genau (Markierungen auf der Bahn nutzen). VO₂max ≈ (Distanz − 504) ÷ 44.7.'}
       ], interval:8 },
@@ -1641,10 +1656,10 @@ function getBenchmarks() {
     { id:'bodyfat', name:'Körperfettanteil', unit:'%', target:bfTarget, color:'var(--green)', cluster:'Ernährung', inverse:true,
       how:'Caliper 7-Falten, Navy-Methode oder DEXA',
       howSteps:[
-        {t:'Methode A — Caliper (genaueste tragbare)', d:'7-Punkt-Messung: Brust, Achsel, Trizeps, Subscapular, Bauch, Hüfte, Oberschenkel. Jede Falte 3× messen, Median nehmen. Immer rechte Seite.'},
+        {t:'Methode A – Caliper (genaueste tragbare)', d:'7-Punkt-Messung: Brust, Achsel, Trizeps, Subscapular, Bauch, Hüfte, Oberschenkel. Jede Falte 3× messen, Median nehmen. Immer rechte Seite.'},
         {t:'Caliper-Technik', d:'Falte mit Daumen + Zeigefinger greifen (2cm vom Messpunkt). Caliper 1cm unterhalb ansetzen. 2 Sek. warten, dann ablesen. In Jackson-Pollock-Formel eingeben.'},
-        {t:'Methode B — Navy-Methode (einfachste)', d:'Miss mit Maßband: Bauchumfang (Nabel), Halsumfang (schmalste Stelle). Formel: 86.010 × log10(Bauch − Hals) − 70.041 × log10(Größe) + 36.76.'},
-        {t:'Methode C — DEXA-Scan (Goldstandard)', d:'Termin bei Sportmediziner oder Uni-Institut. Kosten: ca. 50-100€. Dauert 10 Min. Gibt dir exakte Fett-, Muskel- und Knochenmasse.'},
+        {t:'Methode B – Navy-Methode (einfachste)', d:'Miss mit Maßband: Bauchumfang (Nabel), Halsumfang (schmalste Stelle). Formel: 86.010 × log10(Bauch − Hals) − 70.041 × log10(Größe) + 36.76.'},
+        {t:'Methode C – DEXA-Scan (Goldstandard)', d:'Termin bei Sportmediziner oder Uni-Institut. Kosten: ca. 50-100€. Dauert 10 Min. Gibt dir exakte Fett-, Muskel- und Knochenmasse.'},
         {t:'Wichtig', d:'Immer morgens nüchtern messen, gleiche Bedingungen. Caliper-Werte sind ~1.5% niedriger als DEXA. Wähle EINE Methode und bleibe dabei für Vergleichbarkeit.'}
       ], interval:4 }
   ];
@@ -1716,7 +1731,7 @@ function renderSaeulenProgress() {
               <div class="bench-name"><span class="tt">${b.name}<span class="tt-text">${getBenchTooltip(b)}</span></span></div>
               <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;margin:-4px 0 8px 0;">${b.how}</div>
               <div style="display:flex;align-items:baseline;gap:8px;">
-                <div class="bench-current">${val || '—'}</div>
+                <div class="bench-current">${val || '–'}</div>
                 <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">${b.unit}</div>
                 <div style="margin-left:auto;font-size:11px;font-family:'Space Mono',monospace;color:${getBenchLevel(pct).color};font-weight:700;">${getBenchLevel(pct).label} · ${Math.round(pct)}%</div>
               </div>
@@ -1739,7 +1754,7 @@ function getBenchTooltip(b) {
   const tips = {
     deadlift: `1RM Trap Bar oder Langhantel. Korreliert mit Schlagkraft (r=0.72–0.80). Nationalkader: 2.5× KG (${bw}kg = ${Math.round(bw*2.5)}kg). Alle 10 Wo. testen.`,
     pullups: `Saubere Klimmzüge bis Versagen. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, PULLUP_TIERS)} Wdh. Wichtiger als Bankdrücken für Clinch + Schlagkraft.`,
-    cmj: `Counter Movement Jump — MyJump App oder Kreidemarkierung. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, CMJ_TIERS)}cm. Korreliert direkt mit Schlagkraft.`,
+    cmj: `Counter Movement Jump – MyJump App oder Kreidemarkierung. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, CMJ_TIERS)}cm. Korreliert direkt mit Schlagkraft.`,
     punch_freq: `Gerade Führhand am Sandsack, 10 Sek. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, PUNCH_TIERS)} Schläge. Video zur Kontrolle.`,
     cooper: `400m-Bahn, 12 Min. max. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, COOPER_TIERS)}m. VO₂max ≈ (Meter − 504) / 44.7 → Ziel: 60+ ml/kg/min.`,
     bodyfat: `Caliper (7 Falten), Navy-Methode oder DEXA. Für Alter ${age} Nationalkader: ${age < 25 ? 7 : age <= 35 ? 9 : 11}%. Wettkampf: 6–8%.`
@@ -1792,7 +1807,7 @@ function applyPD(pageId, prefix, openFirst) {
     head.setAttribute('onclick', 'togglePD(this)');
     head.innerHTML = '<div class="pd-head-left"><div class="pd-title">' + titleText + '</div></div><div class="pd-arrow">▾</div>';
 
-    // Build body — collect all siblings until next section header
+    // Build body – collect all siblings until next section header
     var body = document.createElement('div');
     body.className = 'pd-body';
     var inner = document.createElement('div');
@@ -1918,16 +1933,17 @@ function updateBenchmark(id, val) {
   if (!data.benchmarkHistory) data.benchmarkHistory = {};
   const numVal = parseFloat(val) || 0;
 
-  // Input validation — reject negative and unreasonably high values
-  if (numVal < 0) { showToast('Ungültiger Wert', 'error'); return; }
+  // Input validation – reject negative and unreasonably high values
+  var benchInput = document.querySelector('.bench-input[onchange*="' + id + '"]');
+  if (numVal < 0) { showFieldError(benchInput, 'Ungültiger Wert'); return; }
   const benchLimits = { deadlift: 500, pullups: 50, cmj: 100, punch_freq: 150, cooper: 5000, bodyfat: 40 };
   const benchMins = { bodyfat: 3 };
-  if (benchLimits[id] !== undefined && numVal > benchLimits[id]) { showToast('Ungültiger Wert', 'error'); return; }
-  if (benchMins[id] !== undefined && numVal > 0 && numVal < benchMins[id]) { showToast('Ungültiger Wert', 'error'); return; }
+  if (benchLimits[id] !== undefined && numVal > benchLimits[id]) { showFieldError(benchInput, 'Ungültiger Wert'); return; }
+  if (benchMins[id] !== undefined && numVal > 0 && numVal < benchMins[id]) { showFieldError(benchInput, 'Ungültiger Wert'); return; }
 
   const oldVal = data.benchmarks[id] || 0;
   data.benchmarks[id] = numVal;
-  // Track history — only log if value actually changed
+  // Track history – only log if value actually changed
   if (numVal !== oldVal && numVal > 0) {
     if (!data.benchmarkHistory[id]) data.benchmarkHistory[id] = [];
     var today = new Date().toISOString().split('T')[0];
@@ -2061,35 +2077,56 @@ function renderFightsPage() {
   if (!data) return;
   const el = document.getElementById('page-fights');
 
-  // Tab bar
-  const tabs = [
-    { key: 'kaempfe', label: 'MEINE KÄMPFE' },
-    { key: 'vorbereitung', label: 'VORBEREITUNG' },
-    { key: 'analyse', label: 'ANALYSE' }
-  ];
+  // Only rebuild header + tab bar if not already present
+  if (!document.getElementById('fights-tab-content')) {
+    const tabs = [
+      { key: 'kaempfe', label: 'MEINE KÄMPFE' },
+      { key: 'vorbereitung', label: 'VORBEREITUNG' },
+      { key: 'analyse', label: 'ANALYSE' }
+    ];
 
-  const tabBarHTML = `
-  <div class="page-header">
-    <div class="page-title">MEINE <span>KÄMPFE</span></div>
-    <div class="page-sub">Dein komplettes Kampfarchiv — Analyse, Video, Runden-Notizen.</div>
-  </div>
-  <div style="display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid #1a1a1a;margin-bottom:24px;">
-    ${tabs.map(t => {
-      const isActive = currentFightsTab === t.key;
-      return `<div onclick="currentFightsTab='${t.key}';renderFightsPage();" style="padding:12px ${isMobile() ? '12px' : '20px'};cursor:pointer;font-family:'Space Mono',monospace;font-size:${isMobile() ? '11px' : '12px'};text-transform:uppercase;letter-spacing:${isMobile() ? '1px' : '2px'};color:${isActive ? 'var(--white)' : '#555'};border-bottom:${isActive ? '2px solid var(--red)' : '2px solid transparent'};transition:all .2s;margin-bottom:-1px;" onmouseenter="if(!${isActive})this.style.color='#888'" onmouseleave="if(!${isActive})this.style.color='#555'">${t.label}</div>`;
-    }).join('')}
-  </div>
-  <div id="fights-tab-content"></div>`;
+    const headerAndTabsHTML = `
+    <div class="page-header">
+      <div class="page-title">MEINE <span>KÄMPFE</span></div>
+      <div class="page-sub">Dein komplettes Kampfarchiv – Analyse, Video, Runden-Notizen.</div>
+    </div>
+    <div id="fights-tab-bar" style="display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid #1a1a1a;margin-bottom:24px;">
+      ${tabs.map(t => {
+        const isActive = currentFightsTab === t.key;
+        return `<div class="fights-tab-btn${isActive ? ' active' : ''}" data-tab="${t.key}" onclick="switchFightsTab('${t.key}')" style="padding:12px ${isMobile() ? '12px' : '20px'};cursor:pointer;font-family:'Space Mono',monospace;font-size:${isMobile() ? '11px' : '12px'};text-transform:uppercase;letter-spacing:${isMobile() ? '1px' : '2px'};color:${isActive ? 'var(--white)' : '#555'};border-bottom:${isActive ? '2px solid var(--red)' : '2px solid transparent'};transition:all .2s;margin-bottom:-1px;" onmouseenter="if(!this.classList.contains('active'))this.style.color='#888'" onmouseleave="if(!this.classList.contains('active'))this.style.color='#555'">${t.label}</div>`;
+      }).join('')}
+    </div>
+    <div id="fights-tab-content"></div>`;
 
-  el.innerHTML = tabBarHTML;
+    el.innerHTML = headerAndTabsHTML;
+  }
 
-  // Render active tab content
-  const contentEl = document.getElementById('fights-tab-content');
-  if (currentFightsTab === 'kaempfe') {
+  // Render only the tab content
+  switchFightsTab(currentFightsTab);
+}
+
+function switchFightsTab(tabKey) {
+  currentFightsTab = tabKey;
+  fightsListLimit = 20;
+
+  // Update tab button active states
+  document.querySelectorAll('.fights-tab-btn').forEach(function(b) {
+    var isActive = b.dataset.tab === tabKey;
+    b.classList.toggle('active', isActive);
+    b.style.color = isActive ? 'var(--white)' : '#555';
+    b.style.borderBottom = isActive ? '2px solid var(--red)' : '2px solid transparent';
+  });
+
+  // Re-render only the content area
+  var contentEl = document.getElementById('fights-tab-content');
+  var data = getData();
+  if (!data || !contentEl) return;
+
+  if (tabKey === 'kaempfe') {
     renderFightsTab1(contentEl, data);
-  } else if (currentFightsTab === 'vorbereitung') {
+  } else if (tabKey === 'vorbereitung') {
     renderFightsTab2(contentEl, data);
-  } else if (currentFightsTab === 'analyse') {
+  } else if (tabKey === 'analyse') {
     renderFightsTab3(contentEl, data);
   }
 }
@@ -2120,7 +2157,7 @@ function renderFightsTab1(contentEl, data) {
   const lPct = (losses / total * 100).toFixed(0);
   const dPct = (draws / total * 100).toFixed(0);
 
-  // Matchup matrix — opponent types
+  // Matchup matrix – opponent types
   const types = ['Distanz', 'Infighter', 'Konter', 'Allrounder', 'Unbekannt'];
   const typeStats = {};
   types.forEach(t => { typeStats[t] = { total: 0, wins: 0 }; });
@@ -2144,8 +2181,9 @@ function renderFightsTab1(contentEl, data) {
     </tr>`;
   }).join('');
 
-  // Fight timeline rows
-  const timelineRows = fights.map((f, i) => {
+  // Fight timeline rows (paginated)
+  const visibleFights = fights.slice(0, fightsListLimit);
+  const timelineRows = visibleFights.map((f, i) => {
     const dotColor = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
     const methodTag = f.method ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#888;background:#111;padding:2px 6px;border-radius:3px;margin-left:8px;">${f.method}</span>` : '';
     const typeTag = f.type ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#666;background:#0a0a0a;border:1px solid #1a1a1a;padding:2px 6px;border-radius:3px;margin-left:4px;">${f.type}</span>` : '';
@@ -2218,7 +2256,8 @@ function renderFightsTab1(contentEl, data) {
     ${fights.length === 0
       ? '<div style="text-align:center;padding:40px 0;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#1a1a1a;">0 K\u00c4MPFE</div><div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#444;margin:8px 0 16px;">Trage deinen ersten Kampf ein und baue dein Kampfarchiv auf.</div><button class="submit-btn" style="padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ ERSTEN KAMPF EINTRAGEN</button></div>'
       : timelineRows}
-  </div>`;
+  </div>
+  ${fights.length > fightsListLimit ? `<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:'Space Mono',monospace;font-size:12px;color:#555;background:none;border:1px solid #1a1a1a;padding:10px 24px;border-radius:6px;cursor:pointer;">Weitere Kämpfe laden (${fights.length - fightsListLimit} übrig)</button></div>` : ''}`;
 }
 
 function renderFightsTab2(contentEl, data) {
@@ -2320,7 +2359,8 @@ function renderFightsTab3(contentEl, data) {
 
   // ---- SECTION C: FORTSCHRITTS-TIMELINE ----
   // Fights are stored newest first; timeline should be chronological (oldest at top)
-  var chronFights = fights.slice().reverse();
+  var chronFightsAll = fights.slice().reverse();
+  var chronFights = chronFightsAll.slice(0, fightsListLimit);
   var timelineHTML = '';
   chronFights.forEach(function(f, i) {
     var dotColor = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
@@ -2347,12 +2387,18 @@ function renderFightsTab3(contentEl, data) {
   });
 
   var timelineHeight = chronFights.length * 90;
+  var loadMoreTimelineBtn = '';
+  if (chronFightsAll.length > fightsListLimit) {
+    var remaining = chronFightsAll.length - fightsListLimit;
+    loadMoreTimelineBtn = '<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;background:none;border:1px solid #1a1a1a;padding:10px 24px;border-radius:6px;cursor:pointer;">Weitere Kämpfe laden (' + remaining + ' übrig)</button></div>';
+  }
   var sectionC = '<div style="margin-bottom:36px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:2px;margin-bottom:14px;">FORTSCHRITTS-TIMELINE</div>' +
     '<div style="position:relative;padding-left:6px;height:' + timelineHeight + 'px;">' +
       '<div style="position:absolute;left:5px;top:0;width:2px;height:100%;background:#1a1a1a;"></div>' +
       timelineHTML +
     '</div>' +
+    loadMoreTimelineBtn +
   '</div>';
 
   // ---- SECTION D: KAMPF-STATISTIKEN ----
@@ -2471,7 +2517,7 @@ function openFightDetail(idx) {
     { key: 'mental', label: 'MENTAL' }
   ];
 
-  // Video section — with YouTube API for seeking
+  // Video section – with YouTube API for seeking
   let videoHTML;
   if (ytId) {
     videoHTML = `
@@ -2536,7 +2582,7 @@ function openFightDetail(idx) {
 
   // Average rating
   const ratedVals = ratingCats.map(c => f.ratings[c.key] || 0).filter(v => v > 0);
-  const avgRating = ratedVals.length ? (ratedVals.reduce((a,b) => a+b,0) / ratedVals.length).toFixed(1) : '—';
+  const avgRating = ratedVals.length ? (ratedVals.reduce((a,b) => a+b,0) / ratedVals.length).toFixed(1) : '–';
 
   // Round winner badges
   const roundWinnerHTML = [1,2,3].map(r => {
@@ -2569,13 +2615,13 @@ function openFightDetail(idx) {
     <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;${isMobile() ? '' : 'max-height:480px;display:flex;flex-direction:column;'}">${timestampsHTML}</div>
   </div>
 
-  <!-- BEWERTUNG + SCORING — full width row -->
+  <!-- BEWERTUNG + SCORING – full width row -->
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
     <!-- Self-Rating -->
     <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SELBSTBEWERTUNG</span>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${avgRating !== '—' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:#333;">/5</span></span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${avgRating !== '–' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:#333;">/5</span></span>
       </div>
       ${ratingsHTML}
     </div>
@@ -2592,16 +2638,16 @@ function openFightDetail(idx) {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);letter-spacing:1.5px;">VIDEO-ANALYSE</div>
       <span style="font-family:'Space Mono',monospace;font-size:10px;color:#333;letter-spacing:1px;">${f.videoAnalysis ? Object.keys(f.videoAnalysis).filter(k => f.videoAnalysis[k]).length + '/15 BEANTWORTET' : '0/15 BEANTWORTET'}</span>
     </div>
-    <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:#444;margin-bottom:20px;">Schau dir den Kampf an und beantworte die Fragen Runde fuer Runde. Nimm dir Zeit — ehrliche Analyse macht dich besser.</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:#444;margin-bottom:20px;">Schau dir den Kampf an und beantworte die Fragen Runde fuer Runde. Nimm dir Zeit – ehrliche Analyse macht dich besser.</div>
 
     ${[1,2,3].map(r => {
       const va = (f.videoAnalysis && f.videoAnalysis['r'+r]) || {};
       const roundColor = r === 1 ? 'var(--blue)' : r === 2 ? 'var(--gold)' : 'var(--red)';
       const questions = r === 1 ? [
-        { key: 'distance', q: 'Wer hat die Distanz kontrolliert?', ph: 'Ich / Gegner / Wechselnd — beschreibe warum' },
+        { key: 'distance', q: 'Wer hat die Distanz kontrolliert?', ph: 'Ich / Gegner / Wechselnd – beschreibe warum' },
         { key: 'jab', q: 'Wie war dein Jab?', ph: 'Schnell genug? Hat er getroffen? Hat der Gegner ihn gelesen?' },
         { key: 'firstImpression', q: 'Was hast du in den ersten 30 Sekunden ueber den Gegner gelernt?', ph: 'Stance, Tempo, Aggressivitaet, schwache Seite...' },
-        { key: 'ringPosition', q: 'Wo hast du gestanden? Mitte oder Seile?', ph: 'Wenn Seile — wann und warum bist du dort gelandet?' },
+        { key: 'ringPosition', q: 'Wo hast du gestanden? Mitte oder Seile?', ph: 'Wenn Seile – wann und warum bist du dort gelandet?' },
         { key: 'adjustment', q: 'Hast du etwas angepasst während der Runde?', ph: 'z.B. Distanz geändert, mehr Körper, Tempo hoch...' }
       ] : r === 2 ? [
         { key: 'combos', q: 'Welche Kombinationen haben funktioniert?', ph: 'z.B. Jab-Cross-Hook, 1-2 Koerper, Aufwaerts...' },
@@ -2647,14 +2693,14 @@ function openFightDetail(idx) {
           for (var k = 0; k < keys.length; k++) { if (rd[keys[k]]) total++; }
         }
         if (total === 0) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#222;text-align:center;">Beantworte die Fragen oben um deine Analyse zu starten.</div>';
-        if (total < 10) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;text-align:center;">' + total + '/15 — Mach weiter, je ehrlicher desto besser.</div>';
-        if (total < 15) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);text-align:center;">' + total + '/15 — Fast fertig. Fuell die letzten Fragen aus.</div>';
-        return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--green);text-align:center;">\\u2713 ANALYSE KOMPLETT — Gute Arbeit. Nutze die Erkenntnisse im Training.</div>';
+        if (total < 10) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;text-align:center;">' + total + '/15 – Mach weiter, je ehrlicher desto besser.</div>';
+        if (total < 15) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);text-align:center;">' + total + '/15 – Fast fertig. Fuell die letzten Fragen aus.</div>';
+        return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--green);text-align:center;">\\u2713 ANALYSE KOMPLETT – Gute Arbeit. Nutze die Erkenntnisse im Training.</div>';
       })()}
     </div>
   </div>
 
-  <!-- ANALYSE — full width below -->
+  <!-- ANALYSE – full width below -->
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
     <div style="padding:16px 0;border-bottom:1px solid #111;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--green);letter-spacing:1px;margin-bottom:8px;">WAS LIEF GUT</div>
@@ -3516,7 +3562,7 @@ function quickLog() {
   var type = document.getElementById('qlog-type').value;
   var duration = parseInt(document.getElementById('qlog-duration').value) || 0;
   var rpe = parseInt(document.getElementById('qlog-rpe').value) || 0;
-  if (!duration) { alert('Dauer eingeben!'); return; }
+  if (!duration) { var inp = document.getElementById('qlog-duration'); showFieldError(inp, 'Dauer eingeben!'); return; }
   var today = new Date().toISOString().split('T')[0];
   data.log.unshift({ date: today, type: type, duration: duration, rpe: rpe, weight: null, notes: '' });
   saveData(data);
@@ -3541,7 +3587,8 @@ function addLogEntry() {
   let weightVal = parseFloat(rawWeight) || null;
   // Validate weight if provided
   if (weightVal !== null && (weightVal < 30 || weightVal > 200)) {
-    alert('Gewicht muss zwischen 30 und 200 kg liegen.');
+    var inp = document.getElementById('log-weight');
+    showFieldError(inp, 'Gewicht muss zwischen 30 und 200 kg liegen.');
     return;
   }
   const entry = {
@@ -3712,9 +3759,9 @@ function generateSmartWeekPlan() {
 
   // S&C rotation: alternate between sessions A, B, C across free days
   const scSessions = [
-    { title: 'S&C A — POWER: Trap Bar DL ' + dlIntensity + ' + Pull-Ups 3x5 + Med Ball Slams 3x6', hint: dlHint + ' + Face Pulls 3x15 als Warm-up', exercises: [{id:'trap-bar-deadlift',label:'Trap Bar DL'},{id:'weighted-pull-ups',label:'Pull-Ups 3x5'},{id:'med-ball-rotational-slams',label:'Med Ball Slams 3x6'}] },
-    { title: 'S&C B — EXPLOSIVE: Power Clean 4x3 + Row 3x6 + Jump Squat 3x5 (' + Math.round(bw*0.35) + 'kg)', hint: 'Jump Squat Gewicht: 30-40% KG = ' + Math.round(bw*0.3) + '-' + Math.round(bw*0.4) + 'kg + Face Pulls 3x15', exercises: [{id:'hang-power-clean',label:'Power Clean 4x3'},{id:'bent-over-row',label:'Row 3x6'},{id:'jump-squat',label:'Jump Squat 3x5'}] },
-    { title: 'S&C C — COMBAT: Landmine Press 3x5 + Cable Row 3x8 + Pallof Press 3x8', hint: 'Einarm-Drücken + Rudern + Rumpfstabi + Face Pulls 3x15', exercises: [{id:'landmine-press',label:'Landmine Press 3x5'},{id:'single-arm-cable-row',label:'Cable Row 3x8'},{id:'pallof-press-rotation',label:'Pallof Press 3x8'}] }
+    { title: 'S&C A – POWER: Trap Bar DL ' + dlIntensity + ' + Pull-Ups 3x5 + Med Ball Slams 3x6', hint: dlHint + ' + Face Pulls 3x15 als Warm-up', exercises: [{id:'trap-bar-deadlift',label:'Trap Bar DL'},{id:'weighted-pull-ups',label:'Pull-Ups 3x5'},{id:'med-ball-rotational-slams',label:'Med Ball Slams 3x6'}] },
+    { title: 'S&C B – EXPLOSIVE: Power Clean 4x3 + Row 3x6 + Jump Squat 3x5 (' + Math.round(bw*0.35) + 'kg)', hint: 'Jump Squat Gewicht: 30-40% KG = ' + Math.round(bw*0.3) + '-' + Math.round(bw*0.4) + 'kg + Face Pulls 3x15', exercises: [{id:'hang-power-clean',label:'Power Clean 4x3'},{id:'bent-over-row',label:'Row 3x6'},{id:'jump-squat',label:'Jump Squat 3x5'}] },
+    { title: 'S&C C – COMBAT: Landmine Press 3x5 + Cable Row 3x8 + Pallof Press 3x8', hint: 'Einarm-Drücken + Rudern + Rumpfstabi + Face Pulls 3x15', exercises: [{id:'landmine-press',label:'Landmine Press 3x5'},{id:'single-arm-cable-row',label:'Cable Row 3x8'},{id:'pallof-press-rotation',label:'Pallof Press 3x8'}] }
   ];
   let scIdx = 0;
 
@@ -3734,7 +3781,7 @@ function generateSmartWeekPlan() {
   var cardioLabel = cardioMin + '-' + cardioMax + ' Min.';
   // S&C
   var dlIntensity = isAnfaenger ? '4x5 @70%' : '4x3 @85%';
-  var dlHint = isAnfaenger ? 'Technik lernen, Gewicht langsam steigern' : 'Schwer, aber sauber — kein Muskelversagen';
+  var dlHint = isAnfaenger ? 'Technik lernen, Gewicht langsam steigern' : 'Schwer, aber sauber – kein Muskelversagen';
   var canHIIT = !isAnfaenger;
   var hiitCount = 0;
   // S&C Frequenz: Anfaenger max 2x/Woche, Fortgeschritten max 3x
@@ -3746,7 +3793,7 @@ function generateSmartWeekPlan() {
     if ((ws[day] || {}).type === 'sparring') sparringDayIndices.push(di);
   });
 
-  // Bodyweight S&C — Anfaenger vs Fortgeschritten
+  // Bodyweight S&C – Anfaenger vs Fortgeschritten
   var bwSessions = isAnfaenger ? [
     { title: 'Koerpergewicht A: Oberkörper', hint: '3x Knie-Liegestuetze (oder normale wenn du 10+ schaffst), 3x Schraegzuege am Tisch, 3x20s Plank. Ziel: Kraft aufbauen damit deine Schlaege sitzen.', exercises: [] },
     { title: 'Koerpergewicht B: Beine + Core', hint: '3x15 Kniebeugen, 3x10 Ausfallschritte je Seite, 3x10 Beinheben liegend. Ziel: Stabilere Beinarbeit im Ring.', exercises: [] },
@@ -3758,7 +3805,7 @@ function generateSmartWeekPlan() {
   ];
 
   // IMT-Label je nach Geraet
-  var imtTitle = gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege durch die Nase';
+  var imtTitle = gym !== 'none' ? 'IMT – 30 Atemzuege' : 'Atemuebung – 30 tiefe Atemzuege durch die Nase';
   var imtHint = gym !== 'none' ? 'PowerBreathe oder aehnliches Geraet, progressiver Widerstand' : 'Langsam durch die Nase einatmen (4 Sek.), kurz halten, langsam ausatmen (6 Sek.). Kein Geraet noetig.';
 
   // Nacken nur fuer Fortgeschritten+
@@ -3809,15 +3856,15 @@ function generateSmartWeekPlan() {
     if (lastWeek.completionRate < 0.5) {
       volumeMult *= 0.80;
       feedbackAdjustments.volumeReduced = true;
-      feedbackAdjustments.volumeReason = 'Nur ' + Math.round(lastWeek.completionRate * 100) + '% geschafft — Plan war zu voll';
+      feedbackAdjustments.volumeReason = 'Nur ' + Math.round(lastWeek.completionRate * 100) + '% geschafft – Plan war zu voll';
     } else if (lastWeek.completionRate < 0.7) {
       volumeMult *= 0.90;
       feedbackAdjustments.volumeReduced = true;
-      feedbackAdjustments.volumeReason = Math.round(lastWeek.completionRate * 100) + '% geschafft — leicht reduziert';
+      feedbackAdjustments.volumeReason = Math.round(lastWeek.completionRate * 100) + '% geschafft – leicht reduziert';
     } else if (lastWeek.completionRate > 0.9 && lastWeek.avgRPE < 7 && lastWeek.avgRPE > 0) {
       volumeMult *= 1.10;
       feedbackAdjustments.volumeIncreased = true;
-      feedbackAdjustments.volumeReason = Math.round(lastWeek.completionRate * 100) + '% bei RPE ' + lastWeek.avgRPE + ' — kannst mehr';
+      feedbackAdjustments.volumeReason = Math.round(lastWeek.completionRate * 100) + '% bei RPE ' + lastWeek.avgRPE + ' – kannst mehr';
     }
 
     // Typ-spezifisch
@@ -3844,10 +3891,10 @@ function generateSmartWeekPlan() {
 
     // RPE-Feedback
     if (lastWeek.avgRPE > 8.5) {
-      feedbackAdjustments.rpeWarning = 'RPE ' + lastWeek.avgRPE + ' — Uebertrainings-Risiko, Volumen reduziert';
+      feedbackAdjustments.rpeWarning = 'RPE ' + lastWeek.avgRPE + ' – Uebertrainings-Risiko, Volumen reduziert';
       volumeMult *= 0.90;
     } else if (lastWeek.avgRPE > 0 && lastWeek.avgRPE < 5) {
-      feedbackAdjustments.rpeLow = 'RPE ' + lastWeek.avgRPE + ' — Intensitaet steigern';
+      feedbackAdjustments.rpeLow = 'RPE ' + lastWeek.avgRPE + ' – Intensitaet steigern';
     }
   }
 
@@ -3873,11 +3920,11 @@ function generateSmartWeekPlan() {
     const phase = fightPhasePerDay[day] || 'training';
 
     // =============================================
-    // KAMPFTAG — Fight day (alles relativ zur Kampfzeit)
+    // KAMPFTAG – Fight day (alles relativ zur Kampfzeit)
     // =============================================
     if (phase === 'kampftag') {
       const fightTime = d.time || '18:00';
-      blocks.push({ time: timeBefore(fightTime, 4, 0), title: 'Letzte grosse Mahlzeit (KH-Loading)', hint: 'Reis, Nudeln, Kartoffeln — Glykogenspeicher fuer den Kampf fuellen', type: 'meta' });
+      blocks.push({ time: timeBefore(fightTime, 4, 0), title: 'Letzte grosse Mahlzeit (KH-Loading)', hint: 'Reis, Nudeln, Kartoffeln – Glykogenspeicher fuer den Kampf fuellen', type: 'meta' });
       blocks.push({ time: timeBefore(fightTime, 1, 0), title: 'PAPE Warm-Up: Squats 3x3 → 10 Min. Pause → Jump Squats', hint: 'Schwere Kniebeugen aktivieren das Nervensystem, nach Pause dann explosive Spruenge', type: 'strength',
         exercises: [{id:'jump-squat',label:'Jump Squats'}] });
       blocks.push({ time: timeBefore(fightTime, 0, 20), title: 'Shadow Boxing + Pratzen + Box-Breathing', type: 'boxing',
@@ -3886,36 +3933,36 @@ function generateSmartWeekPlan() {
       blocks.push({ time: timeAdd(fightTime, 1, 0), title: 'Post-Kampf: Protein + KH + Elektrolyte', hint: 'Eiweiss + Kohlenhydrate + Wasser mit Salz zur Regeneration', type: 'recovery' });
 
     // =============================================
-    // KAMPF-MODUS — 1–2 Tage vor Kampf
+    // KAMPF-MODUS – 1–2 Tage vor Kampf
     // =============================================
     } else if (phase === 'kampfmodus') {
       blocks.push({ time: isWeekend ? '08:00' : morningTime, title: imtTitle + ' (leicht)', hint: imtHint, type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
-      blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Leichte Mobility 15 Min.', hint: 'Hueften, Schultern, T-Spine — locker bleiben', type: 'recovery',
+      blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Leichte Mobility 15 Min.', hint: 'Hueften, Schultern, T-Spine – locker bleiben', type: 'recovery',
         exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
       blocks.push({ time: isWeekend ? '11:00' : timeAdd(s.workEnd, 0, 30), title: 'Shadow Boxing 2 Runden + Gameplan', hint: 'Locker, Kombis visualisieren, Distanzgefuehl schaerfen', type: 'boxing',
         exercises: [{id:'shadow-boxing',label:'Shadow Boxing'}] });
       blocks.push({ time: '21:00', title: 'Visualisierung + Box-Breathing', hint: '10 Min. Kampf mental durchgehen, 4-4-4-4 Atmung, frueh schlafen', type: 'recovery' });
 
     // =============================================
-    // SCHÄRFEN — 3–4 Tage vor Kampf
+    // SCHÄRFEN – 3–4 Tage vor Kampf
     // =============================================
     } else if (phase === 'schaerfen') {
       blocks.push({ time: isWeekend ? '08:00' : morningTime, title: imtTitle, hint: imtHint, type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
 
       if (isSparringDay) {
-        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Vor dem Verein: Aufwaermen', hint: 'Seilspringen + Schultern mobilisieren — kein schweres S&C vor Sparring', type: 'boxing' });
+        blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Vor dem Verein: Aufwaermen', hint: 'Seilspringen + Schultern mobilisieren – kein schweres S&C vor Sparring', type: 'boxing' });
         blocks.push({ time: d.time, title: 'Taktisches Sparring (-30% Volumen)', hint: 'Weniger Runden, voller Fokus auf Gameplan', type: 'boxing' });
         blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Dehnung + Foam Rolling 15 Min.', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'}] });
       } else if (isBoxingDay) {
-        blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Explosive Reize: 3x3 Jump Squats', hint: 'Nervensystem aktivieren — kein Muskelversagen!', type: 'strength',
+        blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Explosive Reize: 3x3 Jump Squats', hint: 'Nervensystem aktivieren – kein Muskelversagen!', type: 'strength',
           exercises: [{id:'jump-squat',label:'Jump Squat'}] });
         blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Vor dem Verein: Aufwaermen + Face Pulls', hint: '3 Min. Seil, Face Pulls 3x15 mit Band, Schultern + Hueften mobilisieren', type: 'boxing' });
         blocks.push({ time: d.time, title: trainingLabel + ' (hohe Intensitaet)', hint: 'Volumen reduziert, Schaerfe und Timing schleifen', type: 'boxing' });
       } else {
-        blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Explosive Reize: Jump Squats + Lateral Bounds', hint: 'Kurz und knackig — Nervensystem wach halten', type: 'strength',
+        blocks.push({ time: isWeekend ? '08:15' : timeAdd(morningTime, 0, 10), title: 'Explosive Reize: Jump Squats + Lateral Bounds', hint: 'Kurz und knackig – Nervensystem wach halten', type: 'strength',
           exercises: [{id:'jump-squat',label:'Jump Squat'},{id:'lateral-bounds',label:'Lateral Bounds'}] });
         blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 20-30 Min.', hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140', type: 'cardio',
           exercises: [{id:'zone2',label:'Zone 2'}] });
@@ -3924,18 +3971,18 @@ function generateSmartWeekPlan() {
         exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'ankle-mobility',label:'Ankle Mobility'}] });
 
     // =============================================
-    // RECOVERY — Nach dem Kampf
+    // RECOVERY – Nach dem Kampf
     // =============================================
     } else if (phase === 'recovery') {
       blocks.push({ time: isWeekend ? '09:00' : morningTime, title: imtTitle + ' (leicht)', hint: imtHint, type: 'meta',
         exercises: [{id:'imt',label:'IMT'}] });
-      blocks.push({ time: isWeekend ? '09:15' : timeAdd(morningTime, 0, 10), title: 'Sanfte Mobility 15 Min.', hint: 'Lockeres Dehnen, kein Krafttraining — Koerper erholen lassen', type: 'recovery',
+      blocks.push({ time: isWeekend ? '09:15' : timeAdd(morningTime, 0, 10), title: 'Sanfte Mobility 15 Min.', hint: 'Lockeres Dehnen, kein Krafttraining – Koerper erholen lassen', type: 'recovery',
         exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
-      blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 20 Min.', hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140 — foerdert Regeneration', type: 'cardio',
+      blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 20 Min.', hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140 – foerdert Regeneration', type: 'cardio',
         exercises: [{id:'zone2',label:'Zone 2'}] });
 
     // =============================================
-    // NORMALES TRAINING — 5+ Tage vor Kampf
+    // NORMALES TRAINING – 5+ Tage vor Kampf
     // =============================================
     } else {
       // --- MORGENS (alle Tage) ---
@@ -3946,8 +3993,8 @@ function generateSmartWeekPlan() {
         // SPARRING-TAG: Kein schweres S&C, leicht halten
         blocks.push({ time: timeBefore(d.time, 0, 20), title: 'Vor dem Verein: Aufwaermen', hint: '5 Min. Seil, Schultern + Hueften mobilisieren, locker warmwerden', type: 'boxing',
           exercises: [{id:'shadow-boxing',label:'Shadow Boxing'}] });
-        blocks.push({ time: d.time, title: 'Sparring im Verein', hint: 'Kein schweres S&C heute — dein Koerper braucht alles fuers Sparring', type: 'boxing' });
-        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Nach dem Verein: Dehnung + Foam Rolling', hint: 'Hueftbeuger, Schultern, Nacken — nach Sparring besonders wichtig', type: 'recovery',
+        blocks.push({ time: d.time, title: 'Sparring im Verein', hint: 'Kein schweres S&C heute – dein Koerper braucht alles fuers Sparring', type: 'boxing' });
+        blocks.push({ time: timeAdd(d.time, 1, 30), title: 'Nach dem Verein: Dehnung + Foam Rolling', hint: 'Hueftbeuger, Schultern, Nacken – nach Sparring besonders wichtig', type: 'recovery',
           exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'ankle-mobility',label:'Ankle Mobility'}] });
 
       } else if (isBoxingDay) {
@@ -3962,13 +4009,13 @@ function generateSmartWeekPlan() {
             exercises: [{id:'overcoming-iso',label:'Overcoming Iso'}, ...nackenEx] });
         }
         // Training-Typ-spezifische Hints + Säulen-Anpassung
-        var boxHint = 'Vereinstraining — dein Trainer gibt den Inhalt vor';
+        var boxHint = 'Vereinstraining – dein Trainer gibt den Inhalt vor';
         // Kognitions- und Ring-IQ-Schwäche: Taktische Fokus-Hinweise
         if (hasWeakKognitiv) boxHint += '. [FOKUS KOGNITION] Bewusst auf Blickverhalten achten: Brustbereich des Gegners fixieren, peripher Schlaege erkennen.';
         if (hasWeakRingIQ) boxHint += '. [FOKUS RING IQ] Heute gezielt Distanzkontrolle ueben: Jab als Masstab, nach jeder Kombi Winkel wechseln.';
-        // IMT 2. Session (mittags — Saeulen sagen 2x taeglich)
+        // IMT 2. Session (mittags – Saeulen sagen 2x taeglich)
         if (!isWeekend) {
-          blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'IMT — 30 Atemzuege (2. Session)', hint: '2x taeglich laut Protokoll — progressiver Widerstand alle 2 Wochen', type: 'meta',
+          blocks.push({ time: timeAdd(lunchTime, 0, 25), title: 'IMT – 30 Atemzuege (2. Session)', hint: '2x taeglich laut Protokoll – progressiver Widerstand alle 2 Wochen', type: 'meta',
             exercises: [{id:'imt',label:'IMT'}] });
         }
         blocks.push({ time: timeBefore(d.time, 0, 15), title: 'Vor dem Verein: Aufwaermen + Face Pulls', hint: '3 Min. Seil, Face Pulls 3x15 mit Band, Schultern mobilisieren', type: 'boxing' });
@@ -3986,14 +4033,14 @@ function generateSmartWeekPlan() {
       } else if (isFreeDay) {
         if (prevWasSparring) {
           // Tag NACH Sparring: Erholung, kein S&C
-          blocks.push({ time: isWeekend ? '09:00' : timeAdd(morningTime, 0, 10), title: 'Erholungstag nach Sparring', hint: 'Kein schweres Training — Koerper und Kopf regenerieren' + (hasWeakRecovery ? '. [SCHWAECHE REGENERATION] Heute Schlaf priorisieren: Ziel 8-9h. Kein Bildschirm 1h vor Bett.' : ''), type: 'recovery' });
+          blocks.push({ time: isWeekend ? '09:00' : timeAdd(morningTime, 0, 10), title: 'Erholungstag nach Sparring', hint: 'Kein schweres Training – Koerper und Kopf regenerieren' + (hasWeakRecovery ? '. [SCHWAECHE REGENERATION] Heute Schlaf priorisieren: Ziel 8-9h. Kein Bildschirm 1h vor Bett.' : ''), type: 'recovery' });
           blocks.push({ time: isWeekend ? '10:00' : timeAdd(morningTime, 0, 30), title: hasWeakMobil ? 'Erweiterte Mobility 25 Min.' : 'Leichte Mobility 15 Min.', hint: (hasWeakMobil ? '[SCHWAECHE MOBILITAET] Laengere Session: ' : '') + 'Locker dehnen, Foam Rolling wenn verfuegbar', type: 'recovery',
             exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
-          blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 20-30 Min.', hint: 'Lockeres Laufen oder Spaziergang — foerdert Regeneration', type: 'cardio',
+          blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 20-30 Min.', hint: 'Lockeres Laufen oder Spaziergang – foerdert Regeneration', type: 'cardio',
             exercises: [{id:'zone2',label:'Zone 2'}] });
         } else if (nextIsSparring) {
           // Tag VOR Sparring: leicht halten
-          blocks.push({ time: isWeekend ? '09:00' : timeAdd(morningTime, 0, 10), title: 'Leichte Mobility 15 Min.', hint: 'Morgen ist Sparring — heute Koerper schonen, frueh schlafen', type: 'recovery',
+          blocks.push({ time: isWeekend ? '09:00' : timeAdd(morningTime, 0, 10), title: 'Leichte Mobility 15 Min.', hint: 'Morgen ist Sparring – heute Koerper schonen, frueh schlafen', type: 'recovery',
             exercises: [{id:'hip-cars',label:'Hip CARs'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'}] });
           blocks.push({ time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio 30 Min.', hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140', type: 'cardio',
             exercises: [{id:'zone2',label:'Zone 2'}] });
@@ -4004,7 +4051,7 @@ function generateSmartWeekPlan() {
           var weekHint = weekNum === 4 ? ' [DELOAD: Halbes Volumen, gleiche Technik]' : weekNum === 3 ? ' [PEAK: Volle Intensitaet, weniger Saetze]' : '';
           if (feedbackAdjustments.strengthProgression) weekHint += ' [STEIGERE GEWICHT: +2.5-5kg]';
           if (feedbackAdjustments.volumeReduced) weekHint += ' [ANGEPASST: Weniger Volumen]';
-          if (hasWeakKraft) weekHint += ' [FOKUS KRAFT: Deine Schlagkraft-Basis ist schwach — heute sauber und schwer arbeiten]';
+          if (hasWeakKraft) weekHint += ' [FOKUS KRAFT: Deine Schlagkraft-Basis ist schwach – heute sauber und schwer arbeiten]';
           if (gym === 'full') {
             var sc = scSessions[scIdx % scSessions.length]; scIdx++;
             blocks.push({ time: scTime, title: sc.title, hint: sc.hint + weekHint, type: 'strength', exercises: sc.exercises });
@@ -4016,7 +4063,7 @@ function generateSmartWeekPlan() {
             blocks.push({ time: scTime, title: bwS.title, hint: bwS.hint + weekHint, type: 'strength', exercises: bwS.exercises });
           }
           if (hasNacken && doNacken) {
-            blocks.push({ time: timeAdd(scTime, 0, 45), title: 'Nackentraining 10 Min.', hint: 'Isometrisch: Stirn, Hinterkopf, Seiten — je 3x10 Sek. halten', type: 'strength',
+            blocks.push({ time: timeAdd(scTime, 0, 45), title: 'Nackentraining 10 Min.', hint: 'Isometrisch: Stirn, Hinterkopf, Seiten – je 3x10 Sek. halten', type: 'strength',
               exercises: [{id:'iso-nacken',label:'Iso Nacken'},{id:'nacken-flexion',label:'Nacken Flexion'}] });
           }
           // Cardio-Auswahl: Bei schwacher Ausdauer aggressiver (mehr HIIT)
@@ -4026,7 +4073,7 @@ function generateSmartWeekPlan() {
               exercises: [{id:'hiit-4x4',label:'HIIT 4x4'}] });
           } else if (canHIIT && hiitCount < maxHIIT) {
             hiitCount++;
-            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'SIT — Sprint Intervalle', hint: '8-10x 30 Sek. All-Out-Sprint, 3-4 Min. Pause. Nie vor Sparring!' + (hasWeakMetabol ? ' [FOKUS: Ausdauer-Defizit beheben]' : ''), type: 'cardio',
+            blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'SIT – Sprint Intervalle', hint: '8-10x 30 Sek. All-Out-Sprint, 3-4 Min. Pause. Nie vor Sparring!' + (hasWeakMetabol ? ' [FOKUS: Ausdauer-Defizit beheben]' : ''), type: 'cardio',
               exercises: [{id:'sit-sprints',label:'SIT Sprints'}] });
           } else {
             blocks.push({ time: isWeekend ? '15:00' : timeAdd(s.workEnd, 0, 30), title: 'Zone 2 Cardio ' + cardioLabel, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140 (min. 30 Min. fuer volle Wirkung)', type: 'cardio',
@@ -4040,7 +4087,7 @@ function generateSmartWeekPlan() {
             blocks.push({ time: isWeekend ? '16:00' : timeAdd(s.workEnd, 1, 0), title: 'Reaktions-Drill 10 Min.', hint: '[SCHWAECHE KOGNITION] Tennisball-Reaktionsuebung: Ball gegen Wand werfen + fangen, Farbcodes, Nummern-Rufen im Shadow Boxing.', type: 'meta' });
           }
         } else {
-          // Max S&C erreicht — Ruhetag mit Varianz
+          // Max S&C erreicht – Ruhetag mit Varianz
           var rv = restDayVariants[restIdx % restDayVariants.length]; restIdx++;
           blocks.push({ time: isWeekend ? '10:00' : timeAdd(morningTime, 0, 10), title: rv.title, hint: rv.hint, type: 'recovery' });
           if (rv.title.indexOf('Komplett') === -1) {
@@ -4061,7 +4108,7 @@ function generateSmartWeekPlan() {
         // Mobility-Dauer: Bei schwacher Mobilität laenger
         var mobilDuration = hasWeakMobil ? 25 : 15;
         var mobilHint = 'Faszienrolle: Oberschenkel, Hueftbeuger, T-Spine + statisches Stretching';
-        if (hasWeakMobil) mobilHint = '[SCHWAECHE MOBILITAET] ' + mobilHint + ' + Schulter-Dislocates, Ankle Mobility, T-Spine Rotation — laengere Session weil Mobilitaet dein Schwachpunkt ist';
+        if (hasWeakMobil) mobilHint = '[SCHWAECHE MOBILITAET] ' + mobilHint + ' + Schulter-Dislocates, Ankle Mobility, T-Spine Rotation – laengere Session weil Mobilitaet dein Schwachpunkt ist';
         blocks.push({ time: isWeekend ? '17:00' : timeAdd(s.workEnd, 1, 30), title: 'Mobility + Foam Rolling ' + mobilDuration + ' Min.', hint: mobilHint, type: 'recovery',
           exercises: hasWeakMobil ? [{id:'hip-cars',label:'Hip CARs'},{id:'thoracic-rotation',label:'Thoracic Rotation'},{id:'shoulder-dislocates',label:'Shoulder Dislocates'},{id:'ankle-mobility',label:'Ankle Mobility'}] : [{id:'hip-cars',label:'Hip CARs'},{id:'thoracic-rotation',label:'Thoracic Rotation'}] });
       }
@@ -4161,7 +4208,7 @@ function _renderWeekPlanInner() {
       <div class="page-title">WOCHEN<span>PLAN</span></div>
       <div class="page-sub">Dein Plan passt sich an dein Level, Equipment und Kampfdatum an.</div>
       <div style="margin-top:8px;"><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${weekNum===4?'var(--green)':weekNum===3?'var(--red)':'var(--blue)'};letter-spacing:1px;">WOCHE ${weekNum}: ${weekLabel}</span>
-      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;margin-left:8px;">${weekNum===1?'Grundlagen aufbauen':weekNum===2?'Volumen steigern':weekNum===3?'Intensitaet hoch, Volumen runter':weekNum===4?'Erholung — halbes Volumen':''}${volumeMult<1?' · Volumen x'+volumeMult:''}</span></div>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;margin-left:8px;">${weekNum===1?'Grundlagen aufbauen':weekNum===2?'Volumen steigern':weekNum===3?'Intensitaet hoch, Volumen runter':weekNum===4?'Erholung – halbes Volumen':''}${volumeMult<1?' · Volumen x'+volumeMult:''}</span></div>
     </div>
     ${(function() {
       var hints = [];
@@ -4172,7 +4219,7 @@ function _renderWeekPlanInner() {
       hints.push('S&C: max ' + (s.experienceLevel === 'anfaenger' ? '2' : '3') + 'x/Woche');
       // Shift-Work Warnung
       var wh = parseInt((s.workStart || '08:00').split(':')[0]);
-      if (wh >= 12 || wh < 5) hints.push('\u26A0 Ungewoehnliche Arbeitszeiten — pruefe ob Trainingszeiten passen');
+      if (wh >= 12 || wh < 5) hints.push('\u26A0 Ungewoehnliche Arbeitszeiten – pruefe ob Trainingszeiten passen');
       return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">' +
         hints.map(function(h) { return '<span style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:#111;border:1px solid #1a1a1a;border-radius:4px;color:#555;">' + h + '</span>'; }).join('') +
         '<span onclick="showPage(\'account\')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:transparent;border:1px solid #252525;border-radius:4px;color:var(--red);cursor:pointer;">AENDERN \u2192</span>' +
@@ -4236,7 +4283,7 @@ function _renderWeekPlanInner() {
         actions +
       '</div>';
     })()}
-    ${!data.fightDate ? '<div class="info-box info-tip" style="margin-bottom:20px;"><span>💡</span><div>Trage auf dem Dashboard ein <strong>Kampfdatum</strong> ein — der Wochenplan passt sich automatisch an (Schärfen, Kampf-Modus, Recovery).</div></div>' : ''}
+    ${!data.fightDate ? '<div class="info-box info-tip" style="margin-bottom:20px;"><span>💡</span><div>Trage auf dem Dashboard ein <strong>Kampfdatum</strong> ein – der Wochenplan passt sich automatisch an (Schärfen, Kampf-Modus, Recovery).</div></div>' : ''}
     ${(function() {
       var coveredSet = {};
       DAY_NAMES.forEach(function(day) {
@@ -4358,7 +4405,7 @@ var BLOCK_DETAIL_CONTENT = {
     notes: 'Zone 2 = du kannst noch reden. HIIT = volle Belastung in den Arbeitsintervallen. Puls kontrollieren wenn moeglich.'
   },
   'recovery': {
-    warmup: 'Nicht noetig — direkt mit lockerer Bewegung starten',
+    warmup: 'Nicht noetig – direkt mit lockerer Bewegung starten',
     cooldown: 'Tiefe Bauchatmung 2 Min. (4-4-4-4)',
     notes: 'Kein Leistungsdruck. Ziel ist Durchblutung und Beweglichkeit, nicht Erschoepfung.'
   },
@@ -4888,15 +4935,15 @@ function buildDailyRoutineHTML() {
 
   if (yesterdayWasSparring && isFreeDay) {
     // === TAG NACH SPARRING ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzuege' : 'Atemuebung – 30 tiefe Atemzuege', color: 'var(--red)' });
     routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Erholungstag: Leichte Mobility 15 Min.', color: 'var(--purple)' });
     routine.push({ time: isWeekend ? '14:00' : timeAdd(today.workEnd, 0, 30), label: 'Zone 2 Cardio 20-30 Min. (Regeneration)', color: 'var(--green)' });
     routine.push({ time: isWeekend ? '17:00' : timeAdd(today.workEnd, 1, 30), label: 'Mobility + Foam Rolling 15 Min.', color: 'var(--purple)' });
-    warnings.push('Erholungstag nach Sparring — kein schweres Training!');
+    warnings.push('Erholungstag nach Sparring – kein schweres Training!');
 
   } else if (isSparringDay) {
     // === SPARRING TAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzuege' : 'Atemuebung – 30 tiefe Atemzuege', color: 'var(--red)' });
     routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Leichte Mobility 10 Min.', color: 'var(--purple)' });
     routine.push({ time: timeBefore(today.time, 0, 15), label: 'Vor dem Verein: Aufwaermen', color: 'var(--gold)' });
     routine.push({ time: today.time, label: 'Sparring im Verein', color: 'var(--red)' });
@@ -4905,7 +4952,7 @@ function buildDailyRoutineHTML() {
 
   } else if (isBoxingDay) {
     // === BOXTAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzuege' : 'Atemuebung – 30 tiefe Atemzuege', color: 'var(--red)' });
     if (gym === 'none') {
       routine.push({ time: timeAdd(wakeTime, 0, 15), label: isAnfaenger ? 'Knie-Liegestuetze + Core 15 Min.' : 'Liegestuetze + Core 15 Min.', color: 'var(--red)' });
     } else if (!isAnfaenger) {
@@ -4914,7 +4961,7 @@ function buildDailyRoutineHTML() {
       routine.push({ time: timeAdd(wakeTime, 0, 15), label: 'Liegestuetze + Core 15 Min.', color: 'var(--red)' });
     }
     if (!isWeekend) {
-      routine.push({ time: timeAdd(lunchTime, 0, 25), label: gym !== 'none' ? 'IMT — 30 Atemzuege (2. Session)' : 'Atemuebung — 30 Atemzuege (2. Session)', color: 'var(--gold)' });
+      routine.push({ time: timeAdd(lunchTime, 0, 25), label: gym !== 'none' ? 'IMT – 30 Atemzuege (2. Session)' : 'Atemuebung – 30 Atemzuege (2. Session)', color: 'var(--gold)' });
     }
     routine.push({ time: timeBefore(today.time, 0, 15), label: 'Vor dem Verein: Aufwaermen + Face Pulls', color: 'var(--gold)' });
     routine.push({ time: today.time, label: typeLabel + ' im Verein', color: 'var(--red)' });
@@ -4922,7 +4969,7 @@ function buildDailyRoutineHTML() {
 
   } else if (isFreeDay) {
     // === FREIER TAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT — 30 Atemzuege' : 'Atemuebung — 30 tiefe Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzuege' : 'Atemuebung – 30 tiefe Atemzuege', color: 'var(--red)' });
 
     if (tomorrowIsSparring) {
       routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Leichte Mobility 15 Min. (morgen Sparring!)', color: 'var(--purple)' });
@@ -4965,7 +5012,7 @@ function buildDailyRoutineHTML() {
 
   // Tomorrow sparring warning (general)
   if (tomorrowIsSparring && !isFreeDay) {
-    warnings.push('Morgen ist Sparring-Tag — heute CNS schonen und frueh schlafen!');
+    warnings.push('Morgen ist Sparring-Tag – heute CNS schonen und frueh schlafen!');
   }
 
   // Sort by time
@@ -5074,38 +5121,38 @@ function renderReminders() {
     const hist = history[id];
     if (!hist || !hist.length) {
       if (benchmarks[id]) continue; // Has a value but no history (legacy data)
-      reminders.push({ priority: 1, color: 'var(--blue)', text: `${cfg.name} — noch nie getestet. Ersten Wert eintragen!` });
+      reminders.push({ priority: 1, color: 'var(--blue)', text: `${cfg.name} – noch nie getestet. Ersten Wert eintragen!` });
     } else {
       const lastDate = new Date(hist[hist.length - 1].date);
       const daysSince = Math.floor((today - lastDate) / 86400000);
       const dueIn = cfg.weeks * 7 - daysSince;
       if (dueIn <= 0) {
-        reminders.push({ priority: 2, color: 'var(--red)', text: `${cfg.name} — letzter Test vor ${daysSince} Tagen. Zeit für einen neuen Test!` });
+        reminders.push({ priority: 2, color: 'var(--red)', text: `${cfg.name} – letzter Test vor ${daysSince} Tagen. Zeit für einen neuen Test!` });
       } else if (dueIn <= 7) {
-        reminders.push({ priority: 0, color: 'var(--gold)', text: `${cfg.name} — nächster Test in ${dueIn} Tagen fällig.` });
+        reminders.push({ priority: 0, color: 'var(--gold)', text: `${cfg.name} – nächster Test in ${dueIn} Tagen fällig.` });
       }
     }
   }
 
   // --- HRV Erinnerung ---
   if (hrv.length === 0) {
-    reminders.push({ priority: 1, color: 'var(--blue)', text: 'HRV — noch nie eingetragen. Morgens messen für bessere Trainingssteuerung.' });
+    reminders.push({ priority: 1, color: 'var(--blue)', text: 'HRV – noch nie eingetragen. Morgens messen für bessere Trainingssteuerung.' });
   } else {
     const lastHRV = new Date(hrv[0].date);
     const daysSinceHRV = Math.floor((today - lastHRV) / 86400000);
     if (daysSinceHRV >= 3) {
-      reminders.push({ priority: 2, color: 'var(--gold)', text: `HRV — seit ${daysSinceHRV} Tagen nicht eingetragen.` });
+      reminders.push({ priority: 2, color: 'var(--gold)', text: `HRV – seit ${daysSinceHRV} Tagen nicht eingetragen.` });
     }
   }
 
   // --- Training-Log Erinnerung ---
   if (log.length === 0) {
-    reminders.push({ priority: 1, color: 'var(--blue)', text: 'Training-Log — noch keine Einheiten dokumentiert.' });
+    reminders.push({ priority: 1, color: 'var(--blue)', text: 'Training-Log – noch keine Einheiten dokumentiert.' });
   } else {
     const lastLog = new Date(log[0].date);
     const daysSinceLog = Math.floor((today - lastLog) / 86400000);
     if (daysSinceLog >= 4) {
-      reminders.push({ priority: 0, color: 'var(--gold)', text: `Letzte Trainingseinheit vor ${daysSinceLog} Tagen — alles OK?` });
+      reminders.push({ priority: 0, color: 'var(--gold)', text: `Letzte Trainingseinheit vor ${daysSinceLog} Tagen – alles OK?` });
     }
   }
 
@@ -5113,10 +5160,10 @@ function renderReminders() {
   if (data.fightDate) {
     const diff = Math.ceil((new Date(data.fightDate + 'T00:00:00') - today) / 86400000);
     if (diff === 5 || diff === 4) {
-      reminders.push({ priority: 3, color: 'var(--red)', text: `Kampf in ${diff} Tagen — Gewicht checken! Letztes hartes Sparring sollte jetzt sein.` });
+      reminders.push({ priority: 3, color: 'var(--red)', text: `Kampf in ${diff} Tagen – Gewicht checken! Letztes hartes Sparring sollte jetzt sein.` });
     }
     if (diff === 1) {
-      reminders.push({ priority: 3, color: 'var(--red)', text: 'MORGEN KAMPF — Equipment packen, Carbs laden, früh schlafen.' });
+      reminders.push({ priority: 3, color: 'var(--red)', text: 'MORGEN KAMPF – Equipment packen, Carbs laden, früh schlafen.' });
     }
   }
 
@@ -5127,7 +5174,7 @@ function renderReminders() {
     const individual = reminders.filter(r => r.text.includes('nie getestet'));
     if (individual.length > 3) {
       individual.forEach(r => reminders.splice(reminders.indexOf(r), 1));
-      reminders.push({ priority: 1, color: 'var(--blue)', text: `${neverTested.length} Benchmarks noch nie getestet — trage deine ersten Werte ein.` });
+      reminders.push({ priority: 1, color: 'var(--blue)', text: `${neverTested.length} Benchmarks noch nie getestet – trage deine ersten Werte ein.` });
     }
   }
 
@@ -5630,7 +5677,7 @@ function renderAccountPage() {
         <div class="account-grid">
           <div class="form-group">
             <label class="form-label">Geburtsjahr</label>
-            <select class="form-select" id="acc-birthyear"><option value="">—</option>${yOpts}</select>
+            <select class="form-select" id="acc-birthyear"><option value="">–</option>${yOpts}</select>
           </div>
           <div class="form-group">
             <label class="form-label">Gewichtsklasse</label>
@@ -5755,7 +5802,7 @@ function saveAccountPage() {
       }
       syncPrimaryFightDate(data);
     } else {
-      // Cleared — remove primary, shift if others exist
+      // Cleared – remove primary, shift if others exist
       if (data.upcomingFights.length > 1) {
         data.upcomingFights.shift();
         syncPrimaryFightDate(data);
@@ -5821,7 +5868,7 @@ function renderTestsPage() {
     </div>
     <div class="tests-overview">
       <div class="tests-overall">
-        <div class="tests-overall-score">${overall !== null ? overall + '%' : '—'}</div>
+        <div class="tests-overall-score">${overall !== null ? overall + '%' : '–'}</div>
         <div>
           <div class="tests-overall-label">${overallLevel ? overallLevel.label.toUpperCase() : 'KEINE DATEN'}</div>
           <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;margin-top:2px;">Gesamt · ${filled.length}/${RADAR_AXES.length} Achsen</div>
@@ -5835,14 +5882,14 @@ function renderTestsPage() {
           <div style="flex:1;">
             <div style="display:flex;justify-content:space-between;align-items:baseline;">
               <span class="tests-axis-label">${a.label}</span>
-              <span class="tests-axis-val" style="color:${val !== null ? a.hex : '#333'};">${val !== null ? val + '%' : '—'}</span>
+              <span class="tests-axis-val" style="color:${val !== null ? a.hex : '#333'};">${val !== null ? val + '%' : '–'}</span>
             </div>
             <div class="tests-axis-bar"><div class="tests-axis-fill" style="width:${val||0}%;background:${a.hex};"></div></div>
           </div>
         </div>`;
       }).join('')}
       ${vo2max ? `<div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;margin-top:6px;padding-top:8px;border-top:1px solid #1a1a1a;">VO₂max (geschätzt): <strong style="color:var(--blue);">${vo2max} ml/kg/min</strong></div>` : ''}
-      ${weakest ? `<div class="tests-weakest">Schwächstes Glied: <strong>${weakest.label} (${weakest.val}%)</strong> — das Fass-Prinzip: Dein Gesamtniveau wird von der schwächsten Säule begrenzt.</div>` : ''}
+      ${weakest ? `<div class="tests-weakest">Schwächstes Glied: <strong>${weakest.label} (${weakest.val}%)</strong> – das Fass-Prinzip: Dein Gesamtniveau wird von der schwächsten Säule begrenzt.</div>` : ''}
     </div>
   </div>`;
 
@@ -5965,7 +6012,7 @@ function renderTestsPage() {
     return `<div class="tests-cluster">
       <div class="tests-cluster-header">
         <span class="tests-cluster-title" style="color:${clusterColors[c]};">${c.toUpperCase()}</span>
-        ${clusterLevel ? `<span class="tests-cluster-avg" style="color:${clusterLevel.color};">${clusterLevel.label} · ${clusterAvg}%</span>` : '<span class="tests-cluster-avg" style="color:#333;">— Noch keine Tests</span>'}
+        ${clusterLevel ? `<span class="tests-cluster-avg" style="color:${clusterLevel.color};">${clusterLevel.label} · ${clusterAvg}%</span>` : '<span class="tests-cluster-avg" style="color:#333;">– Noch keine Tests</span>'}
       </div>
       ${items.map(b => {
         const val = data.benchmarks[b.id] || 0;
@@ -5979,7 +6026,7 @@ function renderTestsPage() {
         } else {
           pct = Math.min(100, (val / b.target) * 100);
         }
-        const level = val > 0 ? getBenchLevel(pct) : { label:'—', color:'#333' };
+        const level = val > 0 ? getBenchLevel(pct) : { label:'–', color:'#333' };
 
         // Trend
         let trendHTML = '';
@@ -6047,7 +6094,7 @@ function renderTestsPage() {
             </div>
           </div>
           <div class="test-card-right">
-            <div class="test-card-value" style="color:${val ? 'var(--white)' : '#222'};">${val || '—'}</div>
+            <div class="test-card-value" style="color:${val ? 'var(--white)' : '#222'};">${val || '–'}</div>
             <div class="test-card-unit">${b.unit}</div>
             <input class="test-card-input" type="number" step="any" placeholder="${b.target}" value="${val||''}"
               onchange="updateBenchmark('${b.id}', this.value)">
