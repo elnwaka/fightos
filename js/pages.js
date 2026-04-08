@@ -2929,6 +2929,7 @@ function saveAlterEgo() {
   if (!data) return;
   data.alterEgo = { name, traits, totem };
   saveData(data);
+  showToast('Alter Ego gespeichert');
   // Update all name displays across the app
   const pill = document.getElementById('user-pill');
   if (pill) pill.textContent = name;

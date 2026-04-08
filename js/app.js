@@ -12,6 +12,30 @@ let editingBlock = null;
 var currentFightsTab = 'kaempfe';
 var activePrepId = null; // ID of prep being edited, null = overview
 
+function showToast(message, type, duration) {
+  type = type || 'success';
+  duration = duration || 2500;
+  var container = document.getElementById('toast-container');
+  if (!container) return;
+  var toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(function() {
+    toast.classList.add('out');
+    setTimeout(function() { toast.remove(); }, 300);
+  }, duration);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active').forEach(function(m) { m.classList.remove('active'); m.removeAttribute('aria-modal'); });
+    document.querySelectorAll('.nav-hub.open').forEach(function(h) { h.classList.remove('open'); });
+    var mm = document.getElementById('mobile-menu');
+    if (mm && mm.classList.contains('open')) mm.classList.remove('open');
+  }
+});
+
 // ===== BENCHMARK CONSTANTS =====
 const BENCH_LEVEL_THRESHOLDS = [
   { max: 40,  label: 'Anfänger',       color: '#555' },
@@ -807,6 +831,7 @@ function updateFightDate() {
   saveData(data); // Save first so generateSmartWeekPlan reads the new date
   data.weekPlan = generateSmartWeekPlan();
   saveData(data);
+  showToast('Kampfdatum aktualisiert');
   renderFightCountdown();
   renderDashStats();
   renderHinweise();
@@ -851,6 +876,7 @@ function addUpcomingFight() {
 }
 
 function removeUpcomingFight(dateStr) {
+  if (!confirm('Diesen geplanten Kampf entfernen?')) return;
   const data = getData();
   if (!data) return;
   if (!data.upcomingFights) data.upcomingFights = [];
@@ -871,6 +897,7 @@ function removeUpcomingFight(dateStr) {
 }
 
 function clearFightDate() {
+  if (!confirm('Kampfdatum löschen?')) return;
   const data = getData();
   if (!data) return;
   if (!data.upcomingFights) data.upcomingFights = [];
@@ -1245,6 +1272,7 @@ function logHRV() {
   data.hrv.unshift({ date: new Date().toISOString().split('T')[0], value: val });
   if (data.hrv.length > 90) data.hrv.pop();
   saveData(data);
+  showToast('HRV eingetragen');
   document.getElementById('hrv-input').value = '';
   document.getElementById('hrv-input').placeholder = '\u2713 ' + val;
   setTimeout(function() {
@@ -1891,11 +1919,11 @@ function updateBenchmark(id, val) {
   const numVal = parseFloat(val) || 0;
 
   // Input validation — reject negative and unreasonably high values
-  if (numVal < 0) return;
+  if (numVal < 0) { showToast('Ungültiger Wert', 'error'); return; }
   const benchLimits = { deadlift: 500, pullups: 50, cmj: 100, punch_freq: 150, cooper: 5000, bodyfat: 40 };
   const benchMins = { bodyfat: 3 };
-  if (benchLimits[id] !== undefined && numVal > benchLimits[id]) return;
-  if (benchMins[id] !== undefined && numVal > 0 && numVal < benchMins[id]) return;
+  if (benchLimits[id] !== undefined && numVal > benchLimits[id]) { showToast('Ungültiger Wert', 'error'); return; }
+  if (benchMins[id] !== undefined && numVal > 0 && numVal < benchMins[id]) { showToast('Ungültiger Wert', 'error'); return; }
 
   const oldVal = data.benchmarks[id] || 0;
   data.benchmarks[id] = numVal;
@@ -1913,6 +1941,7 @@ function updateBenchmark(id, val) {
     if (data.benchmarkHistory[id].length > 50) data.benchmarkHistory[id] = data.benchmarkHistory[id].slice(-50);
   }
   saveData(data);
+  showToast('Benchmark aktualisiert');
   // Re-render dashboard stats + radar so changes reflect immediately
   renderDashStats();
   renderRadarChart(calcProfileScores(data));
@@ -1921,7 +1950,11 @@ function updateBenchmark(id, val) {
 
 // ===== FIGHT LOG =====
 function openFightModal() {
-  document.getElementById('fight-modal').classList.add('active');
+  var modal = document.getElementById('fight-modal');
+  modal.classList.add('active');
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  setTimeout(function() { var first = modal.querySelector('input, textarea, select'); if (first) first.focus(); }, 100);
   document.getElementById('fight-log-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('fight-log-opponent').value = '';
   // Reset extra fields
@@ -1967,6 +2000,7 @@ function addFightLog() {
     opponentWeaknesses: weakn
   });
   saveData(data);
+  showToast('Kampf gespeichert');
   closeFightModal();
   renderFightLog();
   renderDashStats();
@@ -2004,10 +2038,12 @@ function renderFightLog() {
 }
 
 function deleteFight(i) {
+  if (!confirm('Diesen Kampf endgültig löschen?')) return;
   const data = getData();
   if (!data) return;
   data.fights.splice(i, 1);
   saveData(data);
+  showToast('Kampf gelöscht', 'info');
   renderFightLog();
   renderDashStats();
 }
@@ -2622,22 +2658,22 @@ function openFightDetail(idx) {
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
     <div style="padding:16px 0;border-bottom:1px solid #111;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--green);letter-spacing:1px;margin-bottom:8px;">WAS LIEF GUT</div>
-      <div id="fd-good" onclick="makeFightFieldEditable(${idx},'good',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.good || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
+      <div id="fd-good" class="editable-field" onclick="makeFightFieldEditable(${idx},'good',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.good || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
     <div style="padding:16px 0;border-bottom:1px solid #111;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red);letter-spacing:1px;margin-bottom:8px;">WAS MUSS BESSER WERDEN</div>
-      <div id="fd-improve" onclick="makeFightFieldEditable(${idx},'improve',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.improve || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
+      <div id="fd-improve" class="editable-field" onclick="makeFightFieldEditable(${idx},'improve',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.improve || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
     <div style="padding:16px 0;border-bottom:1px solid #111;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">GEGNER-SCHWÄCHEN</div>
-      <div id="fd-opponentWeaknesses" onclick="makeFightFieldEditable(${idx},'opponentWeaknesses',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.opponentWeaknesses || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
+      <div id="fd-opponentWeaknesses" class="editable-field" onclick="makeFightFieldEditable(${idx},'opponentWeaknesses',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.opponentWeaknesses || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
   </div>
 
   <!-- NÄCHSTE SCHRITTE -->
   <div style="margin-bottom:36px;padding:20px 0;border-top:1px solid #111;">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1.5px;margin-bottom:10px;">WAS ICH NÄCHSTES MAL ANDERS MACHE</div>
-    <div id="fd-nextSteps" onclick="makeFightFieldEditable(${idx},'nextSteps',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.nextSteps || '<span style="color:#222;">Konkrete Maßnahmen für das nächste Training / den nächsten Kampf...</span>'}</div>
+    <div id="fd-nextSteps" class="editable-field" onclick="makeFightFieldEditable(${idx},'nextSteps',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${f.nextSteps || '<span style="color:#222;">Konkrete Maßnahmen für das nächste Training / den nächsten Kampf...</span>'}</div>
   </div>
 
   <!-- ACTIONS -->
@@ -2777,6 +2813,7 @@ function updateTimestampById(idx, markerId, value) {
 }
 
 function deleteTimestamp(idx, markerId) {
+  if (!confirm('Diese Markierung löschen?')) return;
   var data = getData();
   if (!data || !data.fights[idx]) return;
   if (!data.fights[idx].timestamps) return;
@@ -3518,6 +3555,7 @@ function addLogEntry() {
   if (!entry.date || !entry.duration) return;
   data.log.unshift(entry);
   saveData(data);
+  showToast('Training eingetragen');
   document.getElementById('log-duration').value = '';
   document.getElementById('log-rpe').value = '';
   document.getElementById('log-weight').value = '';
@@ -3564,6 +3602,7 @@ function renderLogEntries() {
 }
 
 function deleteLog(i) {
+  if (!confirm('Diesen Eintrag löschen?')) return;
   const data = getData();
   if (!data) return;
   data.log.splice(i, 1);
@@ -4433,7 +4472,11 @@ function editBlock(day, idx) {
   document.getElementById('block-edit-title').value = block.title;
   document.getElementById('block-edit-time').value = block.time;
   document.getElementById('block-edit-type').value = block.type;
-  document.getElementById('block-modal').classList.add('active');
+  var modal = document.getElementById('block-modal');
+  modal.classList.add('active');
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  setTimeout(function() { var first = modal.querySelector('input, textarea, select'); if (first) first.focus(); }, 100);
 }
 
 function addBlock(day) {
@@ -4447,7 +4490,11 @@ function addBlock(day) {
   document.getElementById('block-edit-title').value = newBlock.title;
   document.getElementById('block-edit-time').value = newBlock.time;
   document.getElementById('block-edit-type').value = newBlock.type;
-  document.getElementById('block-modal').classList.add('active');
+  var modal = document.getElementById('block-modal');
+  modal.classList.add('active');
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  setTimeout(function() { var first = modal.querySelector('input, textarea, select'); if (first) first.focus(); }, 100);
 }
 
 function saveBlock() {
@@ -4467,6 +4514,7 @@ function saveBlock() {
 }
 
 function deleteBlock() {
+  if (!confirm('Diesen Trainingsblock entfernen?')) return;
   if (!editingBlock) return;
   const data = getData();
   if (!data) return;
@@ -4691,7 +4739,11 @@ function openSettingsModal() {
     </div>`;
   }).join('');
 
-  document.getElementById('settings-modal').classList.add('active');
+  var modal = document.getElementById('settings-modal');
+  modal.classList.add('active');
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  setTimeout(function() { var first = modal.querySelector('input, textarea, select'); if (first) first.focus(); }, 100);
 }
 
 function closeSettingsModal() { document.getElementById('settings-modal').classList.remove('active'); }
@@ -5181,6 +5233,7 @@ function renderDashboard() {
   var scores = calcProfileScores(data);
   var filled = Object.values(scores).filter(function(v) { return v !== null; });
   var overall = filled.length ? Math.round(filled.reduce(function(a,b){return a+b;},0) / filled.length) : null;
+  var isNewUser = (!data.log || data.log.length === 0) && (!data.fights || data.fights.length === 0);
 
   // Week completion rings data
   var weekId = getWeekId();
@@ -5258,6 +5311,7 @@ function renderDashboard() {
 
   el.innerHTML =
     '<div class="dash-bento stagger">' +
+    (isNewUser ? '<div class="bento-full bento-cell glass" style="text-align:center;padding:40px 24px;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:var(--white);margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div><div style="font-size:15px;color:#666;max-width:500px;margin:0 auto 24px;line-height:1.6;">Dein persönlicher Boxing-Coach. Starte mit deinem ersten Schritt:</div><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"><button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:12px 24px;border-radius:8px;cursor:pointer;">Wochenplan ansehen</button><button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.3);padding:12px 24px;border-radius:8px;cursor:pointer;">Ersten Test machen</button><button onclick="showPage(\'mental\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:8px;cursor:pointer;">Alter Ego erstellen</button></div></div>' : '') +
 
     // ── ROW 1: HERO (wide) + SCORE RING ──
     '<div class="bento-cell bento-wide glass glow-card" style="background:linear-gradient(135deg,rgba(232,0,13,.06),rgba(245,197,24,.03));">' +
@@ -6124,6 +6178,7 @@ function showBenchDetail(benchId) {
 }
 
 function deleteBenchEntry(benchId, date) {
+  if (!confirm('Diesen Benchmark-Eintrag löschen?')) return;
   var data = getData();
   if (!data || !data.benchmarkHistory || !data.benchmarkHistory[benchId]) return;
   data.benchmarkHistory[benchId] = data.benchmarkHistory[benchId].filter(function(h) { return h.date !== date; });

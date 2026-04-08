@@ -233,10 +233,10 @@
         <div id="search-results" class="search-results"></div>
       </div>
       <span class="user-pill" id="user-pill" onclick="showPage('account')" style="cursor:pointer;" title="Mein Account"></span>
-      <button class="topbar-icon-btn" onclick="showPage('log')" title="Trainingslog">&#9998;</button>
+      <button class="topbar-icon-btn" onclick="showPage('log')" title="Trainingslog" aria-label="Trainingslog">&#9998;</button>
       <span class="share-pill" onclick="sharePlan()">Teilen</span>
-      <button class="topbar-icon-btn" onclick="toggleTheme()" title="Dark/Light Mode" id="theme-toggle-btn">☀</button>
-      <button class="logout-btn" onclick="doLogout()" title="Logout">⏻</button>
+      <button class="topbar-icon-btn" onclick="toggleTheme()" title="Dark/Light Mode" id="theme-toggle-btn" aria-label="Design wechseln">☀</button>
+      <button class="logout-btn" onclick="doLogout()" title="Logout" aria-label="Abmelden">⏻</button>
     </div>
   </div>
 
@@ -401,7 +401,7 @@
 <!-- ===== MODAL: FIGHT LOG ===== -->
 <div class="modal-overlay" id="fight-modal">
   <div class="modal">
-    <button class="modal-close" onclick="closeFightModal()">×</button>
+    <button class="modal-close" onclick="closeFightModal()" aria-label="Schließen">×</button>
     <div class="modal-title">KAMPF EINTRAGEN</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
       <div class="form-group-inline">
@@ -481,7 +481,7 @@
 <!-- ===== MODAL: EDIT BLOCK ===== -->
 <div class="modal-overlay" id="block-modal">
   <div class="modal">
-    <button class="modal-close" onclick="closeBlockModal()">×</button>
+    <button class="modal-close" onclick="closeBlockModal()" aria-label="Schließen">×</button>
     <div class="modal-title">BLOCK BEARBEITEN</div>
     <div class="form-group-inline" style="margin-bottom:16px;">
       <label>Titel</label>
@@ -515,7 +515,7 @@
 <!-- ===== MODAL: SHARE ===== -->
 <div class="modal-overlay" id="share-modal">
   <div class="modal">
-    <button class="modal-close" onclick="closeShareModal()">×</button>
+    <button class="modal-close" onclick="closeShareModal()" aria-label="Schließen">×</button>
     <div class="modal-title">PLAN TEILEN</div>
     <p style="font-size:13px;color:#999;margin-bottom:16px;">Teile deinen Wochenplan, Ziele und Fortschritt mit Freunden. Sie brauchen keinen Account.</p>
     <div class="form-group-inline" style="margin-bottom:16px;">
@@ -532,7 +532,7 @@
 <!-- ===== MODAL: SETTINGS ===== -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal">
-    <button class="modal-close" onclick="closeSettingsModal()">×</button>
+    <button class="modal-close" onclick="closeSettingsModal()" aria-label="Schließen">×</button>
     <div class="modal-title">PROFIL BEARBEITEN</div>
     <div class="form-group-inline" style="margin-bottom:16px;">
       <label>Geburtsjahr</label>
@@ -642,5 +642,6 @@
   }
 })();
 </script>
+<div class="toast-container" id="toast-container"></div>
 </body>
 </html>
