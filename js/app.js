@@ -816,7 +816,7 @@ function showPage(pageId) {
     try { window._fightPlayer.destroy(); } catch(e) {}
     window._fightPlayer = null;
   }
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: window.scrollY > 200 ? 'smooth' : 'instant' });
   // Remove focus from any input to prevent blinking caret
   if (document.activeElement && document.activeElement.tagName !== 'BODY') {
     document.activeElement.blur();
