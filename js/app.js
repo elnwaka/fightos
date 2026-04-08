@@ -6504,7 +6504,12 @@ function toggleTheme() {
   html.setAttribute('data-theme', next);
   localStorage.setItem('fos_theme', next);
   var btn = document.getElementById('theme-toggle-btn');
-  if (btn) btn.textContent = next === 'light' ? '\u263E' : '\u2600';
+  if (btn) {
+    var sun = btn.querySelector('.icon-sun');
+    var moon = btn.querySelector('.icon-moon');
+    if (sun) sun.style.display = next === 'light' ? 'none' : 'block';
+    if (moon) moon.style.display = next === 'light' ? 'block' : 'none';
+  }
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.content = next === 'light' ? '#FFFFFF' : '#E8000D';
   // Re-render charts with new theme colors
@@ -6519,7 +6524,12 @@ function toggleTheme() {
   if (saved === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
     var btn = document.getElementById('theme-toggle-btn');
-    if (btn) btn.textContent = '\u263E';
+    if (btn) {
+      var sun = btn.querySelector('.icon-sun');
+      var moon = btn.querySelector('.icon-moon');
+      if (sun) sun.style.display = 'none';
+      if (moon) moon.style.display = 'block';
+    }
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.content = '#FFFFFF';
   }
