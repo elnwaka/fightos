@@ -2827,7 +2827,32 @@ function setFightRating(idx, key, val) {
   if (!data.fights[idx].ratings) data.fights[idx].ratings = {};
   data.fights[idx].ratings[key] = val;
   saveData(data);
-  openFightDetail(idx);
+  // Partial DOM update: update dots for this rating row
+  var dots = document.querySelectorAll('span[onclick*="setFightRating(' + idx + ',\'' + key + '\'"]');
+  dots.forEach(function(dot, i) {
+    var n = i + 1;
+    if (n <= val) {
+      dot.style.background = 'var(--red)';
+      dot.style.border = 'none';
+    } else {
+      dot.style.background = '#1a1a1a';
+      dot.style.border = '1px solid #222';
+    }
+  });
+  // Update average display
+  var ratingCats = ['jab','defense','footwork','power','cardio','mental'];
+  var ratings = data.fights[idx].ratings;
+  var vals = ratingCats.map(function(k) { return ratings[k] || 0; }).filter(function(v) { return v > 0; });
+  var avg = vals.length ? (vals.reduce(function(a,b){return a+b;},0) / vals.length).toFixed(1) : '\u2014';
+  var avgEl = document.querySelector('.dash-hero-score, [style*="font-size:24px"][style*="gold"]');
+  // Find the avg text near the SELBSTBEWERTUNG heading
+  var selfHeading = document.querySelectorAll('span');
+  selfHeading.forEach(function(el) {
+    if (el.textContent === 'SELBSTBEWERTUNG') {
+      var avgSpan = el.parentElement.querySelector('[style*="font-size:24px"]');
+      if (avgSpan) avgSpan.innerHTML = avg + '<span style="font-size:12px;color:var(--text-subtle);">/5</span>';
+    }
+  });
 }
 
 function setRoundWinner(idx, roundIdx, winner) {
@@ -2835,9 +2860,29 @@ function setRoundWinner(idx, roundIdx, winner) {
   if (!data || !data.fights[idx]) return;
   if (!data.fights[idx].rounds) return;
   var current = data.fights[idx].rounds[roundIdx].winner;
-  data.fights[idx].rounds[roundIdx].winner = (current === winner) ? '' : winner;
+  var newWinner = (current === winner) ? '' : winner;
+  data.fights[idx].rounds[roundIdx].winner = newWinner;
   saveData(data);
-  openFightDetail(idx);
+  // Partial DOM update: update the 3 buttons for this round
+  var btns = document.querySelectorAll('span[onclick*="setRoundWinner(' + idx + ',' + roundIdx + '"]');
+  btns.forEach(function(btn) {
+    var v = '';
+    if (btn.textContent === 'ICH') v = 'ich';
+    else if (btn.textContent === 'ER') v = 'gegner';
+    else v = 'unklar';
+    if (v === newWinner) {
+      btn.style.background = v === 'ich' ? 'var(--green)' : 'var(--red)';
+      btn.style.color = v === 'ich' ? '#000' : '#fff';
+    } else {
+      btn.style.background = '#111';
+      btn.style.color = 'var(--text-subtle)';
+    }
+  });
+  // Update the round dot color in the rounds section
+  var roundDots = document.querySelectorAll('.fight-round-dot');
+  if (roundDots[roundIdx]) {
+    roundDots[roundIdx].style.background = newWinner === 'ich' ? 'var(--green)' : newWinner === 'gegner' ? 'var(--red)' : '#222';
+  }
 }
 
 // ===== TIMESTAMP SYSTEM =====
