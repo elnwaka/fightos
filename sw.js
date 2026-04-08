@@ -7,6 +7,7 @@ const PRECACHE = [
   './js/pages.js',
   './js/calculators.js',
   './manifest.json',
+  './js/chart.min.js',
   './img/icons/icon.svg',
   './img/icons/icon-192x192.png',
   './img/icons/icon-512x512.png'
