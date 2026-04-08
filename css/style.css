@@ -68,7 +68,7 @@
 [data-theme="light"] .day-block.meta { background: rgba(196,144,0,.08); color: #C49000; border-left-color: #C49000; }
 [data-theme="light"] .dash-profil { background: #FFF; border-color: #E0E0E0; }
 [data-theme="light"] .dash-action-card { background: #FFF; border-color: #E0E0E0; }
-[data-theme="light"] canvas { filter: invert(1) hue-rotate(180deg); }
+/* Canvas charts use JS-based theming — no CSS filter needed */
 [data-theme="light"] .rpg-stat-bar { background: #E0E0E0; }
 [data-theme="light"] .user-pill { background: #F0F0F0; color: #111; }
 [data-theme="light"] .submit-btn { box-shadow: 0 2px 8px rgba(213,0,0,.15); }

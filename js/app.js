@@ -1241,6 +1241,19 @@ function renderDashStats() {
 }
 
 var _radarChart = null;
+function getChartTheme() {
+  var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  return {
+    label: isLight ? '#333' : '#777',
+    tick: isLight ? '#999' : '#555',
+    grid: isLight ? 'rgba(0,0,0,.08)' : 'rgba(255,255,255,.06)',
+    pointBorder: isLight ? '#333' : '#fff',
+    backdrop: isLight ? 'transparent' : 'transparent'
+  };
+}
+
+var _lastRadarScores = null;
+
 function renderRadarChart(canvasOrScores, scoresArg) {
   var canvas, scores;
   if (canvasOrScores instanceof HTMLCanvasElement) {
@@ -1252,16 +1265,18 @@ function renderRadarChart(canvasOrScores, scoresArg) {
   }
   if (!canvas || typeof Chart === 'undefined') return;
 
+  if (scores) _lastRadarScores = scores;
+  else if (_lastRadarScores) scores = _lastRadarScores;
+  else return;
+
   var keys = RADAR_AXES.map(function(a) { return a.key; });
   var labels = RADAR_AXES.map(function(a) { return a.label; });
   var values = keys.map(function(k) { return scores[k] || 0; });
   var colors = RADAR_AXES.map(function(a) { return a.hex; });
+  var theme = getChartTheme();
 
   // Destroy old chart
   if (_radarChart) { _radarChart.destroy(); _radarChart = null; }
-
-  // Finde den richtigen Canvas (könnte Tests-Seite oder Dashboard sein)
-  var isTestsRadar = canvas.id === 'tests-radar';
 
   _radarChart = new Chart(canvas, {
     type: 'radar',
@@ -1273,7 +1288,7 @@ function renderRadarChart(canvasOrScores, scoresArg) {
         borderColor: 'rgba(232,0,13,.7)',
         borderWidth: 2,
         pointBackgroundColor: colors,
-        pointBorderColor: '#fff',
+        pointBorderColor: theme.pointBorder,
         pointBorderWidth: 1.5,
         pointRadius: 4,
         pointHoverRadius: 6
@@ -1291,18 +1306,18 @@ function renderRadarChart(canvasOrScores, scoresArg) {
           max: 100,
           ticks: {
             stepSize: 25,
-            color: '#333',
+            color: theme.tick,
             font: { family: "'Space Mono', monospace", size: 9 },
-            backdropColor: 'transparent'
+            backdropColor: theme.backdrop
           },
           grid: {
-            color: 'rgba(255,255,255,.06)'
+            color: theme.grid
           },
           angleLines: {
-            color: 'rgba(255,255,255,.06)'
+            color: theme.grid
           },
           pointLabels: {
-            color: '#666',
+            color: theme.label,
             font: { family: "'Space Mono', monospace", size: 10, weight: '600' }
           }
         }
@@ -6410,9 +6425,12 @@ function toggleTheme() {
   localStorage.setItem('fos_theme', next);
   var btn = document.getElementById('theme-toggle-btn');
   if (btn) btn.textContent = next === 'light' ? '\u263E' : '\u2600';
-  // Update meta theme-color
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.content = next === 'light' ? '#FFFFFF' : '#E8000D';
+  // Re-render charts with new theme colors
+  if (_lastRadarScores) {
+    setTimeout(function() { renderRadarChart(_lastRadarScores); }, 50);
+  }
 }
 
 // Apply saved theme on load
