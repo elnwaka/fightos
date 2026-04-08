@@ -2469,13 +2469,13 @@ function openFightDetail(idx) {
 
   markers.sort(function(a, b) { return a.time - b.time; });
   if (markers.length === 0) {
-    timestampsHTML += '<div style="text-align:center;padding:24px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Druecke + SZENE waehrend<br>du den Kampf schaust</div>';
+    timestampsHTML += '<div style="text-align:center;padding:24px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Drücke + SZENE während<br>du den Kampf schaust</div>';
   } else {
     markers.forEach(function(m, mi) {
       var tagColor = _tsTagColors[m.tag] || '#555';
       timestampsHTML += '<div id="ts-item-' + mi + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
         '<span id="ts-time-' + mi + '" onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;">' + formatTs(m.time) + '</span>' +
-        '<input id="ts-text-' + mi + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '" placeholder="Beschreibung..." ' +
+        '<input id="ts-text-' + mi + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '" placeholder="Beschreibung..." ' +
           'onblur="updateTimestampText(' + idx + ',' + mi + ',this.value)" ' +
           'onkeydown="if(event.key===\'Enter\')this.blur()" ' +
           'style="flex:1;padding:4px 6px;background:transparent;border:none;border-bottom:1px solid #111;color:#aaa;font-family:\'DM Sans\',sans-serif;font-size:12px;outline:none;min-width:0;">' +
@@ -2566,7 +2566,7 @@ function openFightDetail(idx) {
         { key: 'jab', q: 'Wie war dein Jab?', ph: 'Schnell genug? Hat er getroffen? Hat der Gegner ihn gelesen?' },
         { key: 'firstImpression', q: 'Was hast du in den ersten 30 Sekunden ueber den Gegner gelernt?', ph: 'Stance, Tempo, Aggressivitaet, schwache Seite...' },
         { key: 'ringPosition', q: 'Wo hast du gestanden? Mitte oder Seile?', ph: 'Wenn Seile — wann und warum bist du dort gelandet?' },
-        { key: 'adjustment', q: 'Hast du etwas angepasst waehrend der Runde?', ph: 'z.B. Distanz geaendert, mehr Koerper, Tempo hoch...' }
+        { key: 'adjustment', q: 'Hast du etwas angepasst während der Runde?', ph: 'z.B. Distanz geändert, mehr Körper, Tempo hoch...' }
       ] : r === 2 ? [
         { key: 'combos', q: 'Welche Kombinationen haben funktioniert?', ph: 'z.B. Jab-Cross-Hook, 1-2 Koerper, Aufwaerts...' },
         { key: 'gegnermuster', q: 'Welche Muster hat der Gegner gezeigt?', ph: 'z.B. senkt linke Hand nach Cross, geht immer rechts raus...' },
@@ -2649,18 +2649,28 @@ function openFightDetail(idx) {
 
   // Init YouTube player after DOM is set
   if (ytId) {
-    function _initFightPlayer() {
-      if (document.getElementById('fight-yt-container')) {
+    function _initFightPlayerWithRetry(retries) {
+      retries = retries || 0;
+      var container = document.getElementById('fight-yt-container');
+      if (!container) {
+        if (retries < 5) {
+          setTimeout(function() { _initFightPlayerWithRetry(retries + 1); }, 500);
+        }
+        return;
+      }
+      try {
         window._fightPlayer = new YT.Player('fight-yt-container', {
           videoId: ytId,
           width: '100%',
           height: '100%',
           playerVars: { rel: 0, modestbranding: 1, playsinline: 1 }
         });
+      } catch(e) {
+        console.error('YT.Player init failed:', e);
       }
     }
     if (window.YT && window.YT.Player) {
-      _initFightPlayer();
+      _initFightPlayerWithRetry(0);
     } else {
       if (!document.getElementById('yt-api-script')) {
         var tag = document.createElement('script');
@@ -2668,7 +2678,7 @@ function openFightDetail(idx) {
         tag.src = 'https://www.youtube.com/iframe_api';
         document.head.appendChild(tag);
       }
-      window.onYouTubeIframeAPIReady = _initFightPlayer;
+      window.onYouTubeIframeAPIReady = function() { _initFightPlayerWithRetry(0); };
     }
   }
 }
@@ -2736,10 +2746,13 @@ function markNow(idx) {
   data.fights[idx].timestamps.push({ id: newId, time: sec, text: '', tag: 'sonstiges', created: new Date().toISOString() });
   saveData(data);
   renderTimestampList(idx);
-  // Focus the new marker by its unique id
+  // Focus the last timestamp input in the rendered list
   setTimeout(function() {
-    var el = document.getElementById('ts-text-' + newId);
-    if (el) el.focus();
+    var list = document.getElementById('ts-list');
+    if (list) {
+      var inputs = list.querySelectorAll('input[type="text"]');
+      if (inputs.length > 0) inputs[inputs.length - 1].focus();
+    }
   }, 50);
 }
 
@@ -2781,7 +2794,7 @@ function renderTimestampList(idx) {
   markers.sort(function(a, b) { return a.time - b.time; });
 
   if (markers.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:24px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Druecke JETZT waehrend<br>du den Kampf schaust</div>';
+    el.innerHTML = '<div style="text-align:center;padding:24px 0;font-family:\'Space Mono\',monospace;font-size:10px;color:#1a1a1a;">Drücke JETZT während<br>du den Kampf schaust</div>';
     return;
   }
 
@@ -2790,7 +2803,7 @@ function renderTimestampList(idx) {
     var tagColor = _tsTagColors[m.tag] || '#555';
     return '<div id="ts-item-' + mid + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:#0a0a0a;border-radius:4px;border-left:2px solid ' + tagColor + ';">' +
       '<span id="ts-time-' + mid + '" onclick="seekVideo(' + m.time + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + tagColor + ';cursor:pointer;white-space:nowrap;min-width:36px;">' + formatTs(m.time) + '</span>' +
-      '<input id="ts-text-' + mid + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '" placeholder="Was passiert hier?" ' +
+      '<input id="ts-text-' + mid + '" type="text" value="' + (m.text || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '" placeholder="Was passiert hier?" ' +
         'onblur="updateTimestampById(' + idx + ',\'' + mid + '\',this.value)" ' +
         'onkeydown="if(event.key===\'Enter\')this.blur()" ' +
         'style="flex:1;padding:4px 6px;background:transparent;border:none;border-bottom:1px solid #111;color:#aaa;font-family:\'DM Sans\',sans-serif;font-size:12px;outline:none;min-width:0;">' +
@@ -3662,7 +3675,7 @@ function generateSmartWeekPlan() {
   const scSessions = [
     { title: 'S&C A — POWER: Trap Bar DL ' + dlIntensity + ' + Pull-Ups 3x5 + Med Ball Slams 3x6', hint: dlHint + ' + Face Pulls 3x15 als Warm-up', exercises: [{id:'trap-bar-deadlift',label:'Trap Bar DL'},{id:'weighted-pull-ups',label:'Pull-Ups 3x5'},{id:'med-ball-rotational-slams',label:'Med Ball Slams 3x6'}] },
     { title: 'S&C B — EXPLOSIVE: Power Clean 4x3 + Row 3x6 + Jump Squat 3x5 (' + Math.round(bw*0.35) + 'kg)', hint: 'Jump Squat Gewicht: 30-40% KG = ' + Math.round(bw*0.3) + '-' + Math.round(bw*0.4) + 'kg + Face Pulls 3x15', exercises: [{id:'hang-power-clean',label:'Power Clean 4x3'},{id:'bent-over-row',label:'Row 3x6'},{id:'jump-squat',label:'Jump Squat 3x5'}] },
-    { title: 'S&C C — COMBAT: Landmine Press 3x5 + Cable Row 3x8 + Pallof Press 3x8', hint: 'Einarm-Druecken + Rudern + Rumpfstabi + Face Pulls 3x15', exercises: [{id:'landmine-press',label:'Landmine Press 3x5'},{id:'single-arm-cable-row',label:'Cable Row 3x8'},{id:'pallof-press-rotation',label:'Pallof Press 3x8'}] }
+    { title: 'S&C C — COMBAT: Landmine Press 3x5 + Cable Row 3x8 + Pallof Press 3x8', hint: 'Einarm-Drücken + Rudern + Rumpfstabi + Face Pulls 3x15', exercises: [{id:'landmine-press',label:'Landmine Press 3x5'},{id:'single-arm-cable-row',label:'Cable Row 3x8'},{id:'pallof-press-rotation',label:'Pallof Press 3x8'}] }
   ];
   let scIdx = 0;
 
@@ -4602,14 +4615,37 @@ function sharePlan() {
   };
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
   const url = window.location.origin + window.location.pathname + '?share=' + encoded;
-  document.getElementById('share-link').value = url;
-  document.getElementById('share-modal').classList.add('active');
+  var shareLinkEl = document.getElementById('share-link');
+  var shareModalEl = document.getElementById('share-modal');
+  if (shareLinkEl) shareLinkEl.value = url;
+  if (shareModalEl) shareModalEl.classList.add('active');
 }
 
 function copyShareLink() {
   const link = document.getElementById('share-link');
+  if (!link) return;
   link.select();
-  navigator.clipboard.writeText(link.value);
+  try {
+    navigator.clipboard.writeText(link.value).catch(function() {
+      var ta = document.createElement('textarea');
+      ta.value = link.value;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    });
+  } catch(e) {
+    var ta = document.createElement('textarea');
+    ta.value = link.value;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
   link.style.borderColor = 'var(--green)';
   setTimeout(() => link.style.borderColor = '#252525', 1500);
 }
