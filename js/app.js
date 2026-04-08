@@ -13,6 +13,16 @@ var currentFightsTab = 'kaempfe';
 var fightsListLimit = 20;
 var activePrepId = null; // ID of prep being edited, null = overview
 
+function safeParse(key, fallback) {
+  var raw = localStorage.getItem(key);
+  if (raw === null) return fallback !== undefined ? fallback : null;
+  try { return JSON.parse(raw); }
+  catch (e) {
+    if (typeof showToast === 'function') showToast('Daten beschädigt – Standardwerte geladen', 'error', 4000);
+    return fallback !== undefined ? fallback : null;
+  }
+}
+
 function showToast(message, type, duration) {
   type = type || 'success';
   duration = duration || 2500;
@@ -76,7 +86,7 @@ function getBenchLevel(pct) {
 }
 
 function getUserAge() {
-  const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const users = safeParse('fos_users', {});
   const u = users[currentUser];
   const birthYear = u && u.birthYear ? parseInt(u.birthYear) : null;
   if (!birthYear) return null;
@@ -99,7 +109,7 @@ function doRegister() {
   const msg = document.getElementById('auth-msg');
   if (!user || !pass) { msg.className = 'auth-msg error'; msg.textContent = 'Alle Felder ausfüllen!'; return; }
   if (pass.length < 3) { msg.className = 'auth-msg error'; msg.textContent = 'Passwort zu kurz!'; return; }
-  const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const users = safeParse('fos_users', {});
   if (users[user]) { msg.className = 'auth-msg error'; msg.textContent = 'Name bereits vergeben!'; return; }
   users[user] = { pass, onboardingDone: false, created: new Date().toISOString() };
   localStorage.setItem('fos_users', JSON.stringify(users));
@@ -115,7 +125,7 @@ function doLogin() {
   const pass = document.getElementById('login-pass').value;
   const msg = document.getElementById('auth-msg');
   if (!user || !pass) { msg.className = 'auth-msg error'; msg.textContent = 'Alle Felder ausfüllen!'; return; }
-  const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const users = safeParse('fos_users', {});
   if (!users[user] || users[user].pass !== pass) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
   currentUser = user;
   localStorage.setItem('fos_current', user);
@@ -427,7 +437,7 @@ function obPrev() {
 }
 
 function obComplete() {
-  const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const users = safeParse('fos_users', {});
   if (!users[currentUser]) return;
 
   // Write all collected data
@@ -499,7 +509,7 @@ function enterApp() {
   if (typeof updateQlogSaeulen === 'function') updateQlogSaeulen();
 
   // Show 8 Säulen intro on first visit
-  var users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  var users = safeParse('fos_users', {});
   if (users[currentUser] && !users[currentUser].seenIntro) {
     showSaeulenIntro();
   } else {
@@ -654,7 +664,7 @@ function closeIntro() {
   if (dots.length && dots[0].parentNode && dots[0].parentNode.parentNode) {
     dots[0].parentNode.parentNode.removeChild(dots[0].parentNode);
   }
-  var users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  var users = safeParse('fos_users', {});
   if (users[currentUser]) {
     users[currentUser].seenIntro = true;
     localStorage.setItem('fos_users', JSON.stringify(users));
@@ -668,9 +678,10 @@ function closeIntro() {
 // ===== DATA HELPERS =====
 function getData() {
   if (!currentUser) return null;
-  const raw = localStorage.getItem('fos_data_' + currentUser);
-  if (raw) return JSON.parse(raw);
-  const data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: getDefaultWeekPlan() };
+  var defaultData = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: getDefaultWeekPlan() };
+  var parsed = safeParse('fos_data_' + currentUser, null);
+  if (parsed) return parsed;
+  var data = defaultData;
   localStorage.setItem('fos_data_' + currentUser, JSON.stringify(data));
   return data;
 }
@@ -1546,7 +1557,7 @@ function renderHinweise() {
   items.sort((a, b) => b.priority - a.priority);
 
   // --- Getting Started guide for new users ---
-  const gsUsers = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const gsUsers = safeParse('fos_users', {});
   const gsHasWeight = !!(gsUsers[currentUser] && gsUsers[currentUser].weight);
   const gsHasLog = data.log && data.log.length > 0;
   const gsHasBench = data.benchmarks && Object.values(data.benchmarks).some(v => v > 0);
@@ -4755,7 +4766,7 @@ function closeShareModal() { document.getElementById('share-modal').classList.re
 // ===== SETTINGS =====
 function openSettingsModal() {
   const s = getUserSchedule();
-  const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const users = safeParse('fos_users', {});
   const u = users[currentUser] || {};
   document.getElementById('settings-birthyear').value = u.birthYear || '';
   document.getElementById('settings-weight').value = s.weight;
@@ -4796,7 +4807,7 @@ function openSettingsModal() {
 function closeSettingsModal() { document.getElementById('settings-modal').classList.remove('active'); }
 
 function saveSettings() {
-  const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const users = safeParse('fos_users', {});
   if (!users[currentUser]) return;
   users[currentUser].birthYear = document.getElementById('settings-birthyear').value;
   users[currentUser].weight = document.getElementById('settings-weight').value;
@@ -4844,7 +4855,7 @@ function getDefaultWeekSchedule(defaultTime) {
 }
 
 function getUserSchedule() {
-  const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const users = safeParse('fos_users', {});
   const u = users[currentUser];
   if (!u) return { workStart:'08:00', workEnd:'17:00', trainingTime:'18:00', weight:75, nickname:'Boxer', experienceLevel:'anfaenger', boxingYears:0, height:175, goal:'fitness', fitnessLevel:'mittel', weekSchedule: getDefaultWeekSchedule('18:00') };
   const ws = u.weekSchedule || getDefaultWeekSchedule(u.trainingTime || '18:00');
@@ -5236,7 +5247,7 @@ function checkAndSaveWeeklySnapshot() {
     const dateStr = dayDate.toISOString().split('T')[0];
     const key = 'fos_checklist_' + currentUser + '_' + dateStr;
     let cl = {};
-    try { cl = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { cl = {}; }
+    cl = safeParse(key, {});
     const checked = DAILY_ITEMS.filter(item => cl[item.id] === true).length;
     if (checked >= 3) checklistDays++;
   }
@@ -5631,7 +5642,7 @@ function renderBenchSummary() {
 function renderAccountPage() {
   const el = document.getElementById('page-account');
   if (!el) return;
-  const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const users = safeParse('fos_users', {});
   const u = users[currentUser] || {};
   const data = getData();
 
@@ -5762,7 +5773,7 @@ function renderAccountPage() {
 }
 
 function saveAccountPage() {
-  const users = JSON.parse(localStorage.getItem('fos_users') || '{}');
+  const users = safeParse('fos_users', {});
   if (!users[currentUser]) return;
 
   users[currentUser].birthYear = document.getElementById('acc-birthyear').value;
@@ -6290,8 +6301,7 @@ function getChecklistKey() {
 }
 
 function getChecklist() {
-  const raw = localStorage.getItem(getChecklistKey());
-  return raw ? JSON.parse(raw) : {};
+  return safeParse(getChecklistKey(), {});
 }
 
 function toggleCheck(id) {
