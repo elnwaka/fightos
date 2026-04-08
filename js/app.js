@@ -3699,7 +3699,25 @@ function addLogEntry() {
     weight: weightVal,
     notes: document.getElementById('log-notes').value
   };
-  if (!entry.date || !entry.duration) return;
+  if (!entry.date || !entry.duration) {
+    // Highlight missing fields
+    if (!entry.date) {
+      showFieldError(document.getElementById('log-date'), 'Datum fehlt');
+    }
+    if (!entry.duration) {
+      var durEl = document.getElementById('log-duration');
+      showFieldError(durEl, 'Dauer eingeben');
+      if (entry.date) durEl.focus();
+    }
+    if (!entry.date) document.getElementById('log-date').focus();
+    // Shake the submit button
+    var submitBtn = document.querySelector('#page-log .submit-btn');
+    if (submitBtn) {
+      submitBtn.classList.add('anim-shake');
+      setTimeout(function() { submitBtn.classList.remove('anim-shake'); }, 400);
+    }
+    return;
+  }
   data.log.unshift(entry);
   saveData(data);
   showToast('Training eingetragen');
@@ -3710,6 +3728,16 @@ function addLogEntry() {
   renderLogEntries();
   renderDashStats();
   renderRecentLog();
+  // Scroll to and highlight new entry
+  setTimeout(function() {
+    var firstEntry = document.querySelector('#log-entries .log-entry');
+    if (firstEntry) {
+      firstEntry.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      firstEntry.style.transition = 'background .3s';
+      firstEntry.style.background = 'rgba(0,200,83,.08)';
+      setTimeout(function() { firstEntry.style.background = ''; }, 1500);
+    }
+  }, 100);
 }
 
 const TYPE_COLORS = { kraft: 'var(--red)', boxen: 'var(--red)', sparring: 'var(--gold)', cardio: 'var(--blue)', pratzen: 'var(--red)', technik: 'var(--red)', mobility: '#8bc34a' };
