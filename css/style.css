@@ -3538,8 +3538,21 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .card-body::after { content:''; position:absolute; bottom:0; left:0; right:0; height:40px; background:linear-gradient(transparent, var(--black)); pointer-events:none; }
   [data-theme="light"] .card-body::after { background:linear-gradient(transparent, #F5F5F5); }
 
-  /* --- RPE tooltip auf Mobile entfernen --- */
-  .tt { display: none; }
+  /* --- Tooltips auf Mobile als Tap-to-reveal --- */
+  .tt .tt-text {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    top: auto;
+    max-width: 100%;
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding: 20px 20px 28px;
+    font-size: 14px;
+    z-index: 9999;
+  }
+  .tt .tt-text::after { display: none; }
+  .tt:hover .tt-text { visibility: hidden; opacity: 0; }
+  .tt.tt-open .tt-text { visibility: visible; opacity: 1; pointer-events: auto; }
 
   /* --- Allgemein: Info-Boxes kompakter --- */
   .info-box { font-size: 12px; padding: 10px; }

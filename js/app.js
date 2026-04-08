@@ -6452,3 +6452,17 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
+
+// ===== TOOLTIP TAP-TO-REVEAL (Mobile) =====
+document.addEventListener('click', function(e) {
+  var tt = e.target.closest('.tt');
+  // Close all open tooltips first
+  document.querySelectorAll('.tt.tt-open').forEach(function(el) {
+    if (el !== tt) el.classList.remove('tt-open');
+  });
+  // Toggle tapped tooltip
+  if (tt) {
+    e.preventDefault();
+    tt.classList.toggle('tt-open');
+  }
+});
