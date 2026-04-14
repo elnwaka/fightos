@@ -310,27 +310,9 @@ async function doLogin() {
     users[user].firebaseUid = _fbUser.uid;
     if (!users[user].created) users[user].created = new Date().toISOString();
     localStorage.setItem('fos_users', JSON.stringify(users));
-    // Sync from cloud then enter — with timeout
-    var syncDone = false;
-    function finishLogin() {
-      if (syncDone) return;
-      syncDone = true;
-      // After sync, check onboarding
-      var u2 = safeParse('fos_users', {});
-      var profile = u2[currentUser] || {};
-      if (!profile.onboardingDone && !profile.weight && !profile.nickname) {
-        showOnboarding(); return;
-      }
-      // Mark as done if they have data
-      if (!profile.onboardingDone) {
-        profile.onboardingDone = true;
-        u2[currentUser] = profile;
-        localStorage.setItem('fos_users', JSON.stringify(u2));
-      }
-      enterApp();
-    }
-    syncFromCloud(finishLogin);
-    setTimeout(finishLogin, 3000);
+    // Enter app immediately — sync in background
+    enterApp();
+    syncFromCloud(function() {});
   } catch(e) {
     msg.className = 'auth-msg error';
     if (e.code === 'auth/user-not-found') {
@@ -716,11 +698,13 @@ function enterApp() {
   renderLogEntries();
   if (typeof updateQlogSaeulen === 'function') updateQlogSaeulen();
 
-  // Show 8 Säulen intro on first visit
+  // Show 8 Säulen intro only on very first visit (skip for Firebase returning users)
   var users = safeParse('fos_users', {});
-  if (users[currentUser] && !users[currentUser].seenIntro) {
+  var isReturning = _fbUser || (users[currentUser] && users[currentUser].pass === 'firebase');
+  if (!isReturning && users[currentUser] && !users[currentUser].seenIntro) {
     showSaeulenIntro();
   } else {
+    if (users[currentUser]) { users[currentUser].seenIntro = true; localStorage.setItem('fos_users', JSON.stringify(users)); }
     showPage(getPageFromHash());
   }
 
