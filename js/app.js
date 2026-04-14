@@ -31,8 +31,11 @@ var _fbSyncEnabled = false;
 })();
 
 // Sync data TO Firestore
-function syncToCloud() {
-  if (!_fbSyncEnabled || !_fbUser || !currentUser) return;
+function syncToCloud(showFeedback) {
+  if (!_fbSyncEnabled || !_fbUser || !currentUser) {
+    if (showFeedback) showToast('Nicht mit Cloud verbunden', 'error');
+    return;
+  }
   var data = getData();
   if (!data) return;
   var users = safeParse('fos_users', {});
@@ -42,7 +45,19 @@ function syncToCloud() {
     profile: userData,
     data: data,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true }).catch(function(e) { console.warn('Sync failed:', e); });
+  }, { merge: true }).then(function() {
+    if (showFeedback) showToast('Daten synchronisiert');
+  }).catch(function(e) {
+    console.warn('Sync failed:', e);
+    if (showFeedback) showToast('Sync fehlgeschlagen', 'error');
+  });
+}
+
+// Manual sync trigger
+function forceSyncNow() {
+  if (!_fbUser) { showToast('Nicht eingeloggt', 'error'); return; }
+  showToast('Synchronisiere...', 'info', 1500);
+  syncToCloud(true);
 }
 
 // Sync data FROM Firestore
@@ -710,6 +725,11 @@ function enterApp() {
   } else {
     if (users[currentUser]) { users[currentUser].seenIntro = true; localStorage.setItem('fos_users', JSON.stringify(users)); }
     showPage(getPageFromHash());
+  }
+
+  // Force sync existing data to cloud on every app entry
+  if (_fbSyncEnabled && _fbUser) {
+    setTimeout(syncToCloud, 1000);
   }
 
   // Request notification permission + schedule daily reminders
@@ -6012,7 +6032,11 @@ function renderDashboard() {
       '<div class="db-hero-fade"></div>' +
       '<div class="db-hero-inner">' +
         '<div class="db-hero-name">' + escapeHTML(getDisplayName()) + '</div>' +
-        '<div class="db-hero-sub">' + record + (koRate > 0 ? ' \u00b7 ' + koRate + '% KO' : '') + ' \u00b7 ' + weightClass + '</div>' +
+        '<div style="display:flex;align-items:baseline;gap:12px;margin-top:8px;flex-wrap:wrap;">' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(24px,4vw,36px);color:var(--white);">' + wins + 'S<span style="color:var(--text-subtle);"> – </span>' + losses + 'N<span style="color:var(--text-subtle);"> – </span>' + draws + 'U</div>' +
+          (koRate > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);">' + koRate + '% KO</div>' : '') +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:rgba(255,255,255,.3);">' + weightClass + '</div>' +
+        '</div>' +
       '</div>' +
     '</div>' +
 
@@ -6033,8 +6057,15 @@ function renderDashboard() {
       '<button class="db-action-btn" onclick="showPage(\'tests\')">Test machen</button>' +
     '</div>' +
 
-    // ══ FIGHT COUNTDOWN ══
-    '<div id="dash-countdown-hero"></div>' +
+    // ══ NÄCHSTER KAMPF (prominent, with date input) ══
+    '<div class="db-sec">' +
+      '<div class="db-sec-hd"><div class="db-sec-ttl">N\u00c4CHSTER KAMPF</div></div>' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">' +
+        '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:8px 12px;font-size:var(--fs-sm);" onchange="updateFightDate()">' +
+        '<button class="submit-btn" style="padding:4px 10px;font-size:var(--fs-xs);" onclick="clearFightDate()">\u00d7</button>' +
+      '</div>' +
+      '<div id="dash-countdown-hero"></div>' +
+    '</div>' +
 
     // ══ NEXT TRAINING BLOCK (NEW) ══
     (nextBlockType !== 'frei' ?
@@ -6137,11 +6168,7 @@ function renderDashboard() {
     : '') +
 
     // ══ FOOTER ══
-    '<div class="db-sec" style="display:flex;align-items:center;gap:8px;">' +
-      '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:5px 8px;font-size:var(--fs-xs);" onchange="updateFightDate()">' +
-      '<button class="submit-btn" style="padding:3px 8px;font-size:var(--fs-xs);" onclick="clearFightDate()">\u00d7</button>' +
-      '<div id="bench-summary" style="margin-left:auto;font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
-    '</div>' +
+    '<div id="bench-summary" style="padding:8px 0;font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
     '<div class="dash-hide-mobile"><div id="saeulen-self-rating"></div></div>' +
 
     '</div>'; // close db-content
@@ -6484,6 +6511,12 @@ function renderAccountPage() {
 
       <button class="btn btn-red" onclick="saveAccountPage()" style="margin-bottom:16px;">SPEICHERN</button>
       <div id="acc-msg" class="auth-msg" style="margin-bottom:24px;"></div>
+
+      <div class="account-section" style="margin-top:32px;padding-top:24px;border-top:1px solid var(--surface-2);">
+        <div class="account-section-title">CLOUD SYNC</div>
+        <div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;line-height:1.6;">Daten manuell mit der Cloud synchronisieren. Nützlich wenn du Daten von einem anderen Gerät übertragen willst.</div>
+        <button onclick="forceSyncNow()" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;">JETZT SYNCHRONISIEREN</button>
+      </div>
 
       <div class="account-section" style="margin-top:32px;padding-top:24px;border-top:2px solid rgba(232,0,13,.2);">
         <div class="account-section-title" style="color:var(--red);">DANGER ZONE</div>
