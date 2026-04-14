@@ -340,11 +340,10 @@ function doLogout() {
   _fbUser = null;
   currentUser = null;
   localStorage.removeItem('fos_current');
-  // Reset CSS variables from flash-prevention
-  document.documentElement.style.removeProperty('--auth-display');
-  document.documentElement.style.removeProperty('--app-display');
   document.getElementById('app-screen').classList.remove('active');
+  document.getElementById('app-screen').style.display = 'none';
   document.getElementById('auth-screen').classList.add('active');
+  document.getElementById('auth-screen').style.display = '';
 }
 
 // ===== ONBOARDING WIZARD =====
@@ -675,11 +674,10 @@ function getDisplayName() {
 }
 
 function enterApp() {
-  // Ensure CSS variables match the state
-  document.documentElement.style.setProperty('--auth-display', 'none');
-  document.documentElement.style.setProperty('--app-display', 'block');
   document.getElementById('auth-screen').classList.remove('active');
+  document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app-screen').classList.add('active');
+  document.getElementById('app-screen').style.display = 'block';
   document.getElementById('user-pill').textContent = getDisplayName();
   // Prevent any input from stealing focus on load
   setTimeout(function() { document.activeElement && document.activeElement.blur(); }, 150);
