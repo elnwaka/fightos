@@ -73,117 +73,117 @@
 </div>
 
 <!-- ============ 8 SÄULEN INTRO (First Visit) ============ -->
-<div id="saeulen-intro" style="display:none;position:fixed;inset:0;z-index:9999;background:#000;overflow:hidden;">
-  <div id="si-scroll" style="height:100%;overflow-y:auto;scroll-snap-type:y mandatory;">
+<div id="saeulen-intro">
+  <div id="si-scroll">
     <!-- Slide 0: Hero -->
-    <div class="si-slide" id="si-0" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;">
-      <div style="opacity:0;" class="si-fade" data-delay="300">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,10vw,80px);color:var(--white);letter-spacing:4px;line-height:.9;">FIGHT<span style="color:var(--red);">OS</span></div>
-        <div style="font-family:'Space Mono',monospace;font-size:12px;color:#333;letter-spacing:3px;margin-top:12px;">ELITE BOXER PLATFORM</div>
+    <div class="si-slide si-hero-slide" id="si-0">
+      <div class="si-fade" data-delay="300">
+        <div class="si-hero-logo">FIGHT<span>OS</span></div>
+        <div class="si-hero-sub">ELITE BOXER PLATFORM</div>
       </div>
-      <div style="opacity:0;margin-top:48px;" class="si-fade" data-delay="1200">
-        <div style="font-family:'DM Sans',sans-serif;font-size:clamp(16px,3vw,22px);color:#888;line-height:1.6;max-width:500px;">Ein Boxer ist nur so stark<br>wie seine <span style="color:var(--white);font-weight:700;">schwächste Säule.</span></div>
+      <div class="si-fade" data-delay="1200" style="margin-top:48px;">
+        <div class="si-hero-quote">Ein Boxer ist nur so stark<br>wie seine <strong>schwächste Säule.</strong></div>
       </div>
-      <div style="opacity:0;margin-top:48px;" class="si-fade" data-delay="2400">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--red);letter-spacing:3px;">8 SÄULEN. EIN SYSTEM.</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:14px;color:#444;margin-top:8px;">FightOS verbessert jede einzelne.</div>
+      <div class="si-fade" data-delay="2400" style="margin-top:48px;">
+        <div class="si-hero-cta">8 SÄULEN. EIN SYSTEM.</div>
+        <div class="si-hero-cta-sub">FightOS verbessert jede einzelne.</div>
       </div>
     </div>
 
     <!-- Slide 1-8: Jede Säule -->
-    <div class="si-slide si-pillar" id="si-1" data-color="#e8000d">
+    <div class="si-slide si-pillar" id="si-1" style="--pillar-color:#e8000d;">
       <div class="si-center">
-        <div class="si-num" style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:#e8000d;opacity:.15;line-height:.8;">1</div>
-        <div class="si-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,42px);color:#e8000d;letter-spacing:2px;margin-top:-20px;">KRAFT, POWER & SCHNELLIGKEIT</div>
-        <div class="si-body" style="font-family:'DM Sans',sans-serif;font-size:15px;color:#888;line-height:1.8;margin-top:20px;">Deine Schlagkraft beginnt am Boden. Maximalkraft, Explosivität und Handgeschwindigkeit – die kinetische Kette von den Beinen bis zur Faust. Ohne Kraft keine Wirkung.</div>
-        <div class="si-why" style="font-family:'Space Mono',monospace;font-size:11px;color:#e8000d;margin-top:20px;letter-spacing:1px;">WARUM DU DAS BRAUCHST</div>
-        <div class="si-reason" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#555;margin-top:8px;line-height:1.6;">Jeder Schlag der nicht sitzt ist verschwendete Energie. Kraft entscheidet ob dein Gegner deinen Jab respektiert oder durchläuft.</div>
+        <div class="si-num">1</div>
+        <div class="si-title">KRAFT, POWER & SCHNELLIGKEIT</div>
+        <div class="si-body">Deine Schlagkraft beginnt am Boden. Maximalkraft, Explosivität und Handgeschwindigkeit – die kinetische Kette von den Beinen bis zur Faust. Ohne Kraft keine Wirkung.</div>
+        <div class="si-why">WARUM DU DAS BRAUCHST</div>
+        <div class="si-reason">Jeder Schlag der nicht sitzt ist verschwendete Energie. Kraft entscheidet ob dein Gegner deinen Jab respektiert oder durchläuft.</div>
       </div>
     </div>
 
-    <div class="si-slide si-pillar" id="si-2" data-color="#2979ff">
+    <div class="si-slide si-pillar" id="si-2" style="--pillar-color:#2979ff;">
       <div class="si-center">
-        <div class="si-num" style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:#2979ff;opacity:.15;line-height:.8;">2</div>
-        <div class="si-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,42px);color:#2979ff;letter-spacing:2px;margin-top:-20px;">METABOLISCHE KAPAZITÄT</div>
-        <div class="si-body" style="font-family:'DM Sans',sans-serif;font-size:15px;color:#888;line-height:1.8;margin-top:20px;">VO₂max, Laktatschwelle, Atemmuskulatur. Dein aerober Motor entscheidet ob du in Runde 3 noch Druck machen kannst – oder nur überlebst.</div>
-        <div class="si-why" style="font-family:'Space Mono',monospace;font-size:11px;color:#2979ff;margin-top:20px;letter-spacing:1px;">WARUM DU DAS BRAUCHST</div>
-        <div class="si-reason" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#555;margin-top:8px;line-height:1.6;">73-86% der Energie im Amateurkampf kommt aerob. Wer müde wird, wird getroffen. Kondition ist Schutz.</div>
+        <div class="si-num">2</div>
+        <div class="si-title">METABOLISCHE KAPAZITÄT</div>
+        <div class="si-body">VO₂max, Laktatschwelle, Atemmuskulatur. Dein aerober Motor entscheidet ob du in Runde 3 noch Druck machen kannst – oder nur überlebst.</div>
+        <div class="si-why">WARUM DU DAS BRAUCHST</div>
+        <div class="si-reason">73-86% der Energie im Amateurkampf kommt aerob. Wer müde wird, wird getroffen. Kondition ist Schutz.</div>
       </div>
     </div>
 
-    <div class="si-slide si-pillar" id="si-3" data-color="#ab47bc">
+    <div class="si-slide si-pillar" id="si-3" style="--pillar-color:#ab47bc;">
       <div class="si-center">
-        <div class="si-num" style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:#ab47bc;opacity:.15;line-height:.8;">3</div>
-        <div class="si-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,42px);color:#ab47bc;letter-spacing:2px;margin-top:-20px;">KOGNITIVE LEISTUNG</div>
-        <div class="si-body" style="font-family:'DM Sans',sans-serif;font-size:15px;color:#888;line-height:1.8;margin-top:20px;">Antizipation, Blickverhalten, Entscheidungsfindung unter Ermüdung. Wer den Schlag vorhersieht, muss nicht reagieren.</div>
-        <div class="si-why" style="font-family:'Space Mono',monospace;font-size:11px;color:#ab47bc;margin-top:20px;letter-spacing:1px;">WARUM DU DAS BRAUCHST</div>
-        <div class="si-reason" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#555;margin-top:8px;line-height:1.6;">Elite-Boxer treffen 83% ihrer Antizipationen richtig. Anfänger nur 68%. Das ist trainierbar – nicht Talent.</div>
+        <div class="si-num">3</div>
+        <div class="si-title">KOGNITIVE LEISTUNG</div>
+        <div class="si-body">Antizipation, Blickverhalten, Entscheidungsfindung unter Ermüdung. Wer den Schlag vorhersieht, muss nicht reagieren.</div>
+        <div class="si-why">WARUM DU DAS BRAUCHST</div>
+        <div class="si-reason">Elite-Boxer treffen 83% ihrer Antizipationen richtig. Anfänger nur 68%. Das ist trainierbar – nicht Talent.</div>
       </div>
     </div>
 
-    <div class="si-slide si-pillar" id="si-4" data-color="#4caf50">
+    <div class="si-slide si-pillar" id="si-4" style="--pillar-color:#4caf50;">
       <div class="si-center">
-        <div class="si-num" style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:#4caf50;opacity:.15;line-height:.8;">4</div>
-        <div class="si-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,42px);color:#4caf50;letter-spacing:2px;margin-top:-20px;">ERNÄHRUNG & GEWICHT</div>
-        <div class="si-body" style="font-family:'DM Sans',sans-serif;font-size:15px;color:#888;line-height:1.8;margin-top:20px;">Makros, Timing, Hydration, Gewicht machen. Der beste Motor bringt nichts mit dem falschen Treibstoff.</div>
-        <div class="si-why" style="font-family:'Space Mono',monospace;font-size:11px;color:#4caf50;margin-top:20px;letter-spacing:1px;">WARUM DU DAS BRAUCHST</div>
-        <div class="si-reason" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#555;margin-top:8px;line-height:1.6;">Falsches Gewichtmachen kostet 20-30% Leistung. Richtiges Timing und Makros geben dir den Vorteil auf der Waage und im Ring.</div>
+        <div class="si-num">4</div>
+        <div class="si-title">ERNÄHRUNG & GEWICHT</div>
+        <div class="si-body">Makros, Timing, Hydration, Gewicht machen. Der beste Motor bringt nichts mit dem falschen Treibstoff.</div>
+        <div class="si-why">WARUM DU DAS BRAUCHST</div>
+        <div class="si-reason">Falsches Gewichtmachen kostet 20-30% Leistung. Richtiges Timing und Makros geben dir den Vorteil auf der Waage und im Ring.</div>
       </div>
     </div>
 
-    <div class="si-slide si-pillar" id="si-5" data-color="#ff6d00">
+    <div class="si-slide si-pillar" id="si-5" style="--pillar-color:#ff6d00;">
       <div class="si-center">
-        <div class="si-num" style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:#ff6d00;opacity:.15;line-height:.8;">5</div>
-        <div class="si-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,42px);color:#ff6d00;letter-spacing:2px;margin-top:-20px;">REGENERATION</div>
-        <div class="si-body" style="font-family:'DM Sans',sans-serif;font-size:15px;color:#888;line-height:1.8;margin-top:20px;">Schlafoptimierung, HRV-Monitoring, Übertraining vermeiden. Du wirst nicht im Training stärker – du wirst im Schlaf stärker.</div>
-        <div class="si-why" style="font-family:'Space Mono',monospace;font-size:11px;color:#ff6d00;margin-top:20px;letter-spacing:1px;">WARUM DU DAS BRAUCHST</div>
-        <div class="si-reason" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#555;margin-top:8px;line-height:1.6;">Unter 8 Stunden Schlaf steigt das Verletzungsrisiko um 61%. 95% des Wachstumshormons wird im Tiefschlaf ausgeschüttet.</div>
+        <div class="si-num">5</div>
+        <div class="si-title">REGENERATION</div>
+        <div class="si-body">Schlafoptimierung, HRV-Monitoring, Übertraining vermeiden. Du wirst nicht im Training stärker – du wirst im Schlaf stärker.</div>
+        <div class="si-why">WARUM DU DAS BRAUCHST</div>
+        <div class="si-reason">Unter 8 Stunden Schlaf steigt das Verletzungsrisiko um 61%. 95% des Wachstumshormons wird im Tiefschlaf ausgeschüttet.</div>
       </div>
     </div>
 
-    <div class="si-slide si-pillar" id="si-6" data-color="#f5c518">
+    <div class="si-slide si-pillar" id="si-6" style="--pillar-color:#f5c518;">
       <div class="si-center">
-        <div class="si-num" style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:#f5c518;opacity:.15;line-height:.8;">6</div>
-        <div class="si-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,42px);color:#f5c518;letter-spacing:2px;margin-top:-20px;">RING IQ & TAKTIK</div>
-        <div class="si-body" style="font-family:'DM Sans',sans-serif;font-size:15px;color:#888;line-height:1.8;margin-top:20px;">Mustererkennung, Distanzkontrolle, Gegner lesen, Tells erkennen. Auf Nationalebene gewinnt nicht der Fittere – sondern der Klügere.</div>
-        <div class="si-why" style="font-family:'Space Mono',monospace;font-size:11px;color:#f5c518;margin-top:20px;letter-spacing:1px;">WARUM DU DAS BRAUCHST</div>
-        <div class="si-reason" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#555;margin-top:8px;line-height:1.6;">Gewinner landen weniger Schläge – aber mit höherer Genauigkeit. Taktik schlägt Athletik.</div>
+        <div class="si-num">6</div>
+        <div class="si-title">RING IQ & TAKTIK</div>
+        <div class="si-body">Mustererkennung, Distanzkontrolle, Gegner lesen, Tells erkennen. Auf Nationalebene gewinnt nicht der Fittere – sondern der Klügere.</div>
+        <div class="si-why">WARUM DU DAS BRAUCHST</div>
+        <div class="si-reason">Gewinner landen weniger Schläge – aber mit höherer Genauigkeit. Taktik schlägt Athletik.</div>
       </div>
     </div>
 
-    <div class="si-slide si-pillar" id="si-7" data-color="#00bcd4">
+    <div class="si-slide si-pillar" id="si-7" style="--pillar-color:#00bcd4;">
       <div class="si-center">
-        <div class="si-num" style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:#00bcd4;opacity:.15;line-height:.8;">7</div>
-        <div class="si-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,42px);color:#00bcd4;letter-spacing:2px;margin-top:-20px;">SPORTPSYCHOLOGIE</div>
-        <div class="si-body" style="font-family:'DM Sans',sans-serif;font-size:15px;color:#888;line-height:1.8;margin-top:20px;">Visualisierung, Arousal-Kontrolle, Alter Ego, Box-Breathing. 90% des Kampfes passiert im Kopf – und das ist trainierbar.</div>
-        <div class="si-why" style="font-family:'Space Mono',monospace;font-size:11px;color:#00bcd4;margin-top:20px;letter-spacing:1px;">WARUM DU DAS BRAUCHST</div>
-        <div class="si-reason" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#555;margin-top:8px;line-height:1.6;">70% der Boxer berichten von starker Kampfangst. Die besten channeln diese Energie. Das unterscheidet Sieger von Verlierern.</div>
+        <div class="si-num">7</div>
+        <div class="si-title">SPORTPSYCHOLOGIE</div>
+        <div class="si-body">Visualisierung, Arousal-Kontrolle, Alter Ego, Box-Breathing. 90% des Kampfes passiert im Kopf – und das ist trainierbar.</div>
+        <div class="si-why">WARUM DU DAS BRAUCHST</div>
+        <div class="si-reason">70% der Boxer berichten von starker Kampfangst. Die besten channeln diese Energie. Das unterscheidet Sieger von Verlierern.</div>
       </div>
     </div>
 
-    <div class="si-slide si-pillar" id="si-8" data-color="#8bc34a">
+    <div class="si-slide si-pillar" id="si-8" style="--pillar-color:#8bc34a;">
       <div class="si-center">
-        <div class="si-num" style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:#8bc34a;opacity:.15;line-height:.8;">8</div>
-        <div class="si-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,42px);color:#8bc34a;letter-spacing:2px;margin-top:-20px;">MOBILITÄT & PRÄVENTION</div>
-        <div class="si-body" style="font-family:'DM Sans',sans-serif;font-size:15px;color:#888;line-height:1.8;margin-top:20px;">Nackentraining, Schulter- und Hüftmobilität, Hand- und Handgelenksstabilität. Jedes Pfund Nackenmuskel senkt das KO-Risiko.</div>
-        <div class="si-why" style="font-family:'Space Mono',monospace;font-size:11px;color:#8bc34a;margin-top:20px;letter-spacing:1px;">WARUM DU DAS BRAUCHST</div>
-        <div class="si-reason" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#555;margin-top:8px;line-height:1.6;">28% aller Boxverletzungen betreffen Hand und Handgelenk. Prävention ist kein Extra – es ist Pflicht.</div>
+        <div class="si-num">8</div>
+        <div class="si-title">MOBILITÄT & PRÄVENTION</div>
+        <div class="si-body">Nackentraining, Schulter- und Hüftmobilität, Hand- und Handgelenksstabilität. Jedes Pfund Nackenmuskel senkt das KO-Risiko.</div>
+        <div class="si-why">WARUM DU DAS BRAUCHST</div>
+        <div class="si-reason">28% aller Boxverletzungen betreffen Hand und Handgelenk. Prävention ist kein Extra – es ist Pflicht.</div>
       </div>
     </div>
 
     <!-- Slide 9: Outro -->
-    <div class="si-slide" id="si-9" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,5vw,40px);color:var(--white);letter-spacing:2px;line-height:1.2;max-width:500px;">FIGHTOS TRAINIERT<br>JEDE EINZELNE SÄULE.</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:15px;color:#555;margin-top:20px;line-height:1.6;max-width:440px;">Dein Wochenplan, dein Dashboard, deine Tests – alles basiert auf den 8 Säulen. Du siehst immer wo du stark bist und wo du arbeiten musst.</div>
-      <div style="display:flex;gap:6px;margin-top:32px;">
-        <span style="width:8px;height:8px;border-radius:50%;background:#e8000d;"></span>
-        <span style="width:8px;height:8px;border-radius:50%;background:#2979ff;"></span>
-        <span style="width:8px;height:8px;border-radius:50%;background:#ab47bc;"></span>
-        <span style="width:8px;height:8px;border-radius:50%;background:#4caf50;"></span>
-        <span style="width:8px;height:8px;border-radius:50%;background:#ff6d00;"></span>
-        <span style="width:8px;height:8px;border-radius:50%;background:#f5c518;"></span>
-        <span style="width:8px;height:8px;border-radius:50%;background:#00bcd4;"></span>
-        <span style="width:8px;height:8px;border-radius:50%;background:#8bc34a;"></span>
+    <div class="si-slide si-hero-slide" id="si-9">
+      <div class="si-outro-title">FIGHTOS TRAINIERT<br>JEDE EINZELNE SÄULE.</div>
+      <div class="si-outro-desc">Dein Wochenplan, dein Dashboard, deine Tests – alles basiert auf den 8 Säulen. Du siehst immer wo du stark bist und wo du arbeiten musst.</div>
+      <div class="si-outro-dots">
+        <span class="si-outro-dot" style="background:#e8000d;"></span>
+        <span class="si-outro-dot" style="background:#2979ff;"></span>
+        <span class="si-outro-dot" style="background:#ab47bc;"></span>
+        <span class="si-outro-dot" style="background:#4caf50;"></span>
+        <span class="si-outro-dot" style="background:#ff6d00;"></span>
+        <span class="si-outro-dot" style="background:#f5c518;"></span>
+        <span class="si-outro-dot" style="background:#00bcd4;"></span>
+        <span class="si-outro-dot" style="background:#8bc34a;"></span>
       </div>
       <button onclick="closeIntro()" class="si-btn" style="margin-top:40px;">JETZT STARTEN</button>
     </div>
