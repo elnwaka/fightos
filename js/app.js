@@ -750,8 +750,10 @@ function enterApp() {
 // ===== NOTIFICATION SYSTEM =====
 function initNotifications() {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
-  // Ask permission after 3 seconds (not immediately on load)
   setTimeout(function() {
+    // Only show if app screen is active (not on login/register)
+    var appScreen = document.getElementById('app-screen');
+    if (!appScreen || !appScreen.classList.contains('active')) return;
     if (Notification.permission === 'default') {
       // Show a soft prompt first
       var banner = document.createElement('div');
