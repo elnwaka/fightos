@@ -5579,11 +5579,22 @@ function renderDashboard() {
   var totalDone = dayCompletion.reduce(function(s,d){return s+d.done;},0);
   var totalPlanned = dayCompletion.reduce(function(s,d){return s+d.total;},0);
 
-  // SVG Ring for overall score
+  // SVG Ring for overall score (larger on desktop)
+  var ringSize = window.innerWidth >= 768 ? 180 : 140;
+  var ringR = 52;
   var ringPct = overall !== null ? overall : 0;
-  var circumference = 2 * Math.PI * 48;
-  var ringOffset = circumference * (1 - ringPct / 100);
+  var circumference = 2 * Math.PI * ringR;
   var ringColor = ringPct >= 70 ? 'var(--green)' : ringPct >= 40 ? 'var(--gold)' : 'var(--red)';
+  // Weekly comparison
+  var weekDiff = '';
+  if (data.weeklySnapshots && data.weeklySnapshots.length >= 2 && overall !== null) {
+    var prevScore = data.weeklySnapshots[1].overallScore;
+    if (prevScore !== null && prevScore !== undefined) {
+      var d = overall - prevScore;
+      if (d > 0) weekDiff = '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--green);margin-top:4px;">+' + d + ' seit letzter Woche</div>';
+      else if (d < 0) weekDiff = '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);margin-top:4px;">' + d + ' seit letzter Woche</div>';
+    }
+  }
 
   // Recent completed blocks (last 5)
   var recentBlocks = [];
@@ -5652,17 +5663,17 @@ function renderDashboard() {
       '</div>' +
     '</div>' +
 
-    '<div class="bento-cell glass" style="text-align:center;">' +
-      '<div class="ring-glow" style="display:inline-block;">' +
-        '<svg width="140" height="140" viewBox="0 0 110 110">' +
-          '<circle cx="55" cy="55" r="48" stroke="#1a1a1a" stroke-width="6" fill="none"/>' +
-          '<circle cx="55" cy="55" r="48" stroke="' + ringColor + '" stroke-width="6" fill="none" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + ringOffset + '" stroke-linecap="round" transform="rotate(-90 55 55)" style="transition:stroke-dashoffset 1s ease;"/>' +
-          '<text x="55" y="50" text-anchor="middle" style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;fill:var(--white);">' + (overall !== null ? overall : '\u2014') + '</text>' +
-          '<text x="55" y="68" text-anchor="middle" style="font-family:\'Space Mono\',monospace;font-size:8px;fill:#555;letter-spacing:2px;">GESAMT</text>' +
+    '<div class="bento-cell glass" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
+      '<div style="display:inline-block;filter:drop-shadow(0 0 12px rgba(232,0,13,.25));">' +
+        '<svg width="' + ringSize + '" height="' + ringSize + '" viewBox="0 0 120 120">' +
+          '<defs><linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="var(--red)"/><stop offset="100%" stop-color="var(--gold)"/></linearGradient></defs>' +
+          '<circle cx="60" cy="60" r="' + ringR + '" stroke="var(--surface-2)" stroke-width="8" fill="none"/>' +
+          '<circle id="dash-ring-fg" cx="60" cy="60" r="' + ringR + '" stroke="url(#ring-grad)" stroke-width="6" fill="none" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + circumference + '" stroke-linecap="round" transform="rotate(-90 60 60)"/>' +
+          '<text id="dash-ring-num" x="60" y="54" text-anchor="middle" style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;fill:var(--white);">0</text>' +
+          '<text x="60" y="72" text-anchor="middle" style="font-family:\'Space Mono\',monospace;font-size:8px;fill:var(--text-subtle);letter-spacing:2px;">GESAMT</text>' +
         '</svg>' +
       '</div>' +
-      '<canvas id="rpg-radar" width="320" height="320" style="max-width:320px;display:block;margin:8px auto 0;"></canvas>' +
-      pillsGridHTML +
+      weekDiff +
     '</div>' +
 
     // ── ROW 2: DIESE WOCHE + CHECKLIST TODAY + HRV AMPEL ──
@@ -5763,6 +5774,7 @@ function renderDashboard() {
 
     // ── DESKTOP EXTRAS (inside bento grid) ──
     '<div class="bento-cell bento-full dash-hide-mobile" style="background:transparent;border:none;backdrop-filter:none;">' +
+      '<div style="text-align:center;margin-bottom:20px;"><canvas id="rpg-radar" width="320" height="320" style="max-width:320px;"></canvas></div>' +
       '<div id="dash-stats" style="margin-top:0;"></div>' +
       '<div id="saeulen-self-rating" style="margin-top:16px;"></div>' +
       '<div id="bench-summary" style="margin-top:12px;font-family:\'Space Mono\',monospace;font-size:11px;color:#555;cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
@@ -5782,6 +5794,30 @@ function renderDashboard() {
   renderFightLog();
   if (recentBlocks.length === 0) renderRecentLog();
   renderSaeulenSelfRating();
+
+  // Animate score ring
+  setTimeout(function() {
+    var ringFg = document.getElementById('dash-ring-fg');
+    var ringNum = document.getElementById('dash-ring-num');
+    if (ringFg && ringNum && overall !== null) {
+      var targetOffset = circumference * (1 - ringPct / 100);
+      ringFg.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.25,.8,.25,1)';
+      ringFg.style.strokeDashoffset = targetOffset;
+      // Count-up animation
+      var start = 0;
+      var end = overall;
+      var duration = 1200;
+      var startTime = null;
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        ringNum.textContent = Math.round(start + (end - start) * eased);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+  }, 600);
 
   // Draw radar + sparklines
   setTimeout(function() {
