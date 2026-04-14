@@ -10,6 +10,8 @@ const PRECACHE = [
   './js/calculators.js',
   './manifest.json',
   './js/chart.min.js',
+  './js/apexcharts.min.js',
+  './css/apexcharts.css',
   './img/icons/icon.svg',
   './img/icons/icon-192x192.png',
   './img/icons/icon-512x512.png'

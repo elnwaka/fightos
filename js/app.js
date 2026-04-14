@@ -1344,16 +1344,18 @@ function getChartTheme() {
 
 var _lastRadarScores = null;
 
-function renderRadarChart(canvasOrScores, scoresArg) {
-  var canvas, scores;
-  if (canvasOrScores instanceof HTMLCanvasElement) {
-    canvas = canvasOrScores;
+function renderRadarChart(scoresOrEl, scoresArg) {
+  var el, scores;
+  if (typeof scoresOrEl === 'string' || (scoresOrEl && scoresOrEl.nodeType)) {
+    el = typeof scoresOrEl === 'string' ? document.getElementById(scoresOrEl) : scoresOrEl;
     scores = scoresArg;
   } else {
-    canvas = document.getElementById('rpg-radar');
-    scores = canvasOrScores;
+    el = document.getElementById('rpg-radar');
+    scores = scoresOrEl;
   }
-  if (!canvas || typeof Chart === 'undefined') return;
+  // Support both canvas and div — ApexCharts needs div
+  if (!el) return;
+  if (typeof ApexCharts === 'undefined') return;
 
   if (scores) _lastRadarScores = scores;
   else if (_lastRadarScores) scores = _lastRadarScores;
@@ -1363,107 +1365,82 @@ function renderRadarChart(canvasOrScores, scoresArg) {
   var labels = RADAR_AXES.map(function(a) { return a.label; });
   var values = keys.map(function(k) { return scores[k] || 0; });
   var colors = RADAR_AXES.map(function(a) { return a.hex; });
-  var theme = getChartTheme();
-  var isMob = window.innerWidth < 480;
+  var isLight = document.documentElement.getAttribute('data-theme') === 'light';
 
-  // Destroy old chart
   if (_radarChart) { _radarChart.destroy(); _radarChart = null; }
 
-  // Radial gradient fill
-  var ctx = canvas.getContext('2d');
-  var cx = canvas.width / 2;
-  var cy = canvas.height / 2;
-  var r = Math.min(cx, cy) * 0.6;
-  var gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-  gradient.addColorStop(0, 'rgba(232,0,13,.25)');
-  gradient.addColorStop(1, 'rgba(232,0,13,.02)');
-
-  // Ghost layer (last week's scores)
-  var datasets = [{
-    label: 'Aktuell',
-    data: values,
-    backgroundColor: gradient,
-    borderColor: 'rgba(232,0,13,.7)',
-    borderWidth: 2,
-    pointBackgroundColor: colors,
-    pointBorderColor: theme.pointBorder,
-    pointBorderWidth: 1.5,
-    pointRadius: 4,
-    pointHoverRadius: 6
-  }];
-
-  // Add ghost dataset if weekly snapshot exists
+  // Ghost series
+  var series = [{ name: 'Aktuell', data: values }];
   var data = typeof getData === 'function' ? getData() : null;
   if (data && data.weeklySnapshots && data.weeklySnapshots.length >= 1) {
     var snap = data.weeklySnapshots[0];
     if (snap.overallScore !== null && snap.overallScore !== undefined) {
-      // Use snapshot scores or estimate from overall
-      var ghostValues = keys.map(function() { return snap.overallScore || 0; });
-      datasets.push({
-        label: 'Letzte Woche',
-        data: ghostValues,
-        backgroundColor: 'transparent',
-        borderColor: 'rgba(255,255,255,.12)',
-        borderWidth: 1.5,
-        borderDash: [4, 4],
-        pointRadius: 0,
-        pointHoverRadius: 3
-      });
+      series.push({ name: 'Letzte Woche', data: keys.map(function() { return snap.overallScore || 0; }) });
     }
   }
 
-  _radarChart = new Chart(canvas, {
-    type: 'radar',
-    data: {
-      labels: labels,
-      datasets: datasets
+  var opts = {
+    series: series,
+    chart: {
+      type: 'radar',
+      height: el.offsetHeight || (window.innerWidth >= 768 ? 400 : 280),
+      background: 'transparent',
+      toolbar: { show: false },
+      animations: { enabled: true, easing: 'easeinout', speed: 1200 },
+      dropShadow: { enabled: true, blur: 4, left: 0, top: 2, color: '#e8000d', opacity: 0.15 }
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      animation: {
-        duration: 1200,
-        easing: 'easeOutQuart',
-        delay: 500
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(0,0,0,.85)',
-          titleFont: { family: "'Space Mono', monospace", size: 11 },
-          bodyFont: { family: "'Bebas Neue', sans-serif", size: 18 },
-          cornerRadius: 8,
-          padding: 12,
-          displayColors: false,
-          callbacks: {
-            label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw + '/100'; }
-          }
-        }
-      },
-      scales: {
-        r: {
-          beginAtZero: true,
-          max: 100,
-          ticks: {
-            stepSize: 20,
-            color: theme.tick,
-            font: { family: "'Space Mono', monospace", size: 9 },
-            backdropColor: 'transparent'
-          },
-          grid: {
-            color: 'rgba(255,255,255,.04)'
-          },
-          angleLines: {
-            color: 'rgba(255,255,255,.08)'
-          },
-          pointLabels: {
-            color: colors,
-            font: { family: "'Space Mono', monospace", size: isMob ? 10 : 12, weight: '700' }
-          }
+    colors: ['#e8000d', 'rgba(255,255,255,.15)'],
+    fill: {
+      type: ['gradient', 'solid'],
+      gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.3, gradientToColors: ['#f5c518'], stops: [0, 100], opacityFrom: 0.3, opacityTo: 0.05 },
+      opacity: [0.25, 0]
+    },
+    stroke: { width: [2.5, 1.5], dashArray: [0, 4] },
+    markers: {
+      size: [4, 0],
+      colors: colors,
+      strokeColors: isLight ? '#333' : '#fff',
+      strokeWidth: 1.5,
+      hover: { size: 6 }
+    },
+    xaxis: {
+      categories: labels,
+      labels: {
+        style: {
+          colors: colors,
+          fontSize: window.innerWidth < 480 ? '10px' : '12px',
+          fontFamily: "'Space Mono', monospace",
+          fontWeight: 700
         }
       }
-    }
-  });
+    },
+    yaxis: {
+      show: false,
+      min: 0,
+      max: 100,
+      tickAmount: 5
+    },
+    plotOptions: {
+      radar: {
+        size: undefined,
+        polygons: {
+          strokeColors: isLight ? 'rgba(0,0,0,.06)' : 'rgba(255,255,255,.04)',
+          connectorColors: isLight ? 'rgba(0,0,0,.08)' : 'rgba(255,255,255,.08)',
+          fill: { colors: ['transparent'] }
+        }
+      }
+    },
+    legend: { show: false },
+    tooltip: {
+      theme: 'dark',
+      style: { fontSize: '14px', fontFamily: "'Bebas Neue', sans-serif" },
+      y: { formatter: function(val) { return val + ' / 100'; } }
+    },
+    grid: { show: false }
+  };
+
+  _radarChart = new ApexCharts(el, opts);
+  _radarChart.render();
 }
 
 // ===== HRV =====
@@ -5777,7 +5754,7 @@ function renderDashboard() {
     (hasScores ?
       '<div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;padding:24px 0;">' +
         '<div style="flex-shrink:0;">' +
-          '<canvas id="rpg-radar" width="' + radarSize + '" height="' + radarSize + '" style="max-width:' + radarSize + 'px;display:block;"></canvas>' +
+          '<div id="rpg-radar" style="max-width:' + radarSize + 'px;margin:0 auto;"></div>' +
         '</div>' +
         '<div style="flex:1;min-width:200px;">' +
           '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:2px;margin-bottom:16px;">PERFORMANCE</div>' +
@@ -6336,7 +6313,7 @@ function renderTestsPage() {
   // Hero section
   const heroHTML = `<div class="tests-hero">
     <div class="tests-radar-wrap">
-      <canvas id="tests-radar" width="260" height="260"></canvas>
+      <div id="tests-radar" style="max-width:260px;margin:0 auto;"></div>
     </div>
     <div class="tests-overview">
       <div class="tests-overall">
@@ -6620,8 +6597,8 @@ function renderTestsPage() {
     </div>`;
 
   setTimeout(() => {
-    const canvas = document.getElementById('tests-radar');
-    if (canvas) renderRadarChart(canvas, scores);
+    var radarEl = document.getElementById('tests-radar');
+    if (radarEl) renderRadarChart(radarEl, scores);
     // Draw Sparklines
     BENCHMARKS.forEach(function(b) {
       var hist = (data.benchmarkHistory || {})[b.id] || [];
