@@ -486,16 +486,16 @@
     <div class="modal-title">BLOCK BEARBEITEN</div>
     <div class="form-group-inline" style="margin-bottom:16px;">
       <label>Titel</label>
-      <input type="text" id="block-edit-title" style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;">
+      <input type="text" id="block-edit-title" class="form-input">
     </div>
     <div class="form-row">
       <div class="form-group-inline">
         <label>Uhrzeit</label>
-        <input type="time" id="block-edit-time" style="width:100%;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;">
+        <input type="time" id="block-edit-time" class="form-input">
       </div>
       <div class="form-group-inline">
         <label>Typ</label>
-        <select id="block-edit-type">
+        <select id="block-edit-type" class="form-select">
           <option value="strength">Kraft</option>
           <option value="boxing">Boxen</option>
           <option value="cardio">Cardio</option>
@@ -521,7 +521,7 @@
     <p style="font-size:13px;color:#999;margin-bottom:16px;">Teile deinen Wochenplan, Ziele und Fortschritt mit Freunden. Sie brauchen keinen Account.</p>
     <div class="form-group-inline" style="margin-bottom:16px;">
       <label>Share-Link</label>
-      <input type="text" id="share-link" readonly style="width:100%;background:#141414;border:1px solid #252525;color:var(--gold);padding:11px 14px;font-family:'Space Mono';font-size:11px;border-radius:6px;outline:none;">
+      <input type="text" id="share-link" readonly class="form-input" style="color:var(--gold);font-family:'Space Mono',monospace;font-size:var(--fs-xs);">
     </div>
     <div style="display:flex;gap:12px;">
       <button class="submit-btn" onclick="copyShareLink()" style="flex:1;">Link kopieren</button>
@@ -537,11 +537,11 @@
     <div class="modal-title">PROFIL BEARBEITEN</div>
     <div class="form-group-inline" style="margin-bottom:16px;">
       <label>Geburtsjahr</label>
-      <select id="settings-birthyear"></select>
+      <select id="settings-birthyear" class="form-select"></select>
     </div>
     <div class="form-group-inline" style="margin-bottom:16px;">
       <label>Gewichtsklasse (kg)</label>
-      <select id="settings-weight">
+      <select id="settings-weight" class="form-select">
         <option value="50">50 kg</option><option value="55">55 kg</option>
         <option value="60">60 kg</option><option value="65">65 kg</option>
         <option value="70">70 kg</option><option value="75">75 kg</option>
@@ -553,9 +553,9 @@
     <div class="form-group-inline" style="margin-bottom:16px;">
       <label>Arbeitszeit</label>
       <div style="display:flex;gap:8px;align-items:center;">
-        <input id="settings-work-start" type="time" value="08:00" style="flex:1;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;">
-        <span style="color:#555;">bis</span>
-        <input id="settings-work-end" type="time" value="17:00" style="flex:1;background:#141414;border:1px solid #252525;color:var(--white);padding:11px 14px;font-family:'DM Sans';font-size:13px;border-radius:6px;outline:none;">
+        <input id="settings-work-start" type="time" value="08:00" class="form-input" style="flex:1;">
+        <span style="color:var(--text-muted);">bis</span>
+        <input id="settings-work-end" type="time" value="17:00" class="form-input" style="flex:1;">
       </div>
     </div>
     <div class="form-group-inline" style="margin-bottom:16px;">
