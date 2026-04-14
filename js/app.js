@@ -13,6 +13,22 @@ var currentFightsTab = 'kaempfe';
 var fightsListLimit = 20;
 var activePrepId = null; // ID of prep being edited, null = overview
 
+function animateValue(el, start, end, duration, suffix) {
+  suffix = suffix || '';
+  return new Promise(function(resolve) {
+    var startTime = null;
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(start + (end - start) * eased) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+      else resolve();
+    }
+    requestAnimationFrame(step);
+  });
+}
+
 function escapeHTML(str) {
   if (!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -5739,11 +5755,11 @@ function renderDashboard() {
           var isToday = i === todayDow;
           return '<div style="text-align:center;' + (isToday ? 'transform:scale(1.15);' : 'opacity:.7;') + '">' +
             '<svg width="36" height="36" viewBox="0 0 36 36">' +
-              '<circle cx="18" cy="18" r="14" stroke="#1a1a1a" stroke-width="3" fill="none"/>' +
-              '<circle cx="18" cy="18" r="14" stroke="' + col + '" stroke-width="3" fill="none" stroke-dasharray="' + c + '" stroke-dashoffset="' + off + '" stroke-linecap="round" transform="rotate(-90 18 18)"/>' +
-              (pct >= 1 ? '<text x="18" y="22" text-anchor="middle" style="font-size:14px;fill:var(--green);">\u2713</text>' : '<text x="18" y="22" text-anchor="middle" style="font-family:\'Space Mono\',monospace;font-size:10px;fill:#555;">' + dc.done + '</text>') +
+              '<circle cx="18" cy="18" r="14" stroke="var(--surface-2)" stroke-width="3" fill="none"/>' +
+              '<circle id="week-ring-' + i + '" data-target="' + off + '" cx="18" cy="18" r="14" stroke="' + col + '" stroke-width="3" fill="none" stroke-dasharray="' + c + '" stroke-dashoffset="' + c + '" stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset .6s cubic-bezier(.25,.8,.25,1);"/>' +
+              (pct >= 1 ? '<text x="18" y="22" text-anchor="middle" style="font-size:14px;fill:var(--green);">\u2713</text>' : '<text x="18" y="22" text-anchor="middle" style="font-family:\'Space Mono\',monospace;font-size:10px;fill:var(--text-muted);">' + dc.done + '</text>') +
             '</svg>' +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:8px;color:' + (isToday ? 'var(--white)' : '#444') + ';margin-top:2px;">' + d + '</div>' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:8px;color:' + (isToday ? 'var(--white)' : 'var(--text-subtle)') + ';margin-top:2px;">' + d + '</div>' +
           '</div>';
         }).join('') +
       '</div>' +
@@ -5760,7 +5776,7 @@ function renderDashboard() {
       '<div style="text-align:center;margin-top:16px;">' +
         '<div style="font-size:36px;">' + hrvStatus + '</div>' +
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:' + hrvColor + ';margin-top:6px;">' + hrvLabel + '</div>' +
-        (hrvArr.length > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;margin-top:4px;">' + hrvArr[0].value + ' ms</div>' : '') +
+        (hrvArr.length > 0 ? '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);margin-top:4px;">0 ms</div>' : '') +
       '</div>' +
     '</div>' +
 
@@ -5850,37 +5866,51 @@ function renderDashboard() {
   if (recentBlocks.length === 0) renderRecentLog();
   renderSaeulenSelfRating();
 
-  // Animate score ring
+  // ═══ ANIMATION CHOREOGRAPHY ═══
+
+  // 300ms: Score ring + number count-up
   setTimeout(function() {
     var ringFg = document.getElementById('dash-ring-fg');
     var ringNum = document.getElementById('dash-ring-num');
     if (ringFg && ringNum && overall !== null) {
-      var targetOffset = circumference * (1 - ringPct / 100);
       ringFg.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.25,.8,.25,1)';
-      ringFg.style.strokeDashoffset = targetOffset;
-      // Count-up animation
-      var start = 0;
-      var end = overall;
-      var duration = 1200;
-      var startTime = null;
-      function step(ts) {
-        if (!startTime) startTime = ts;
-        var progress = Math.min((ts - startTime) / duration, 1);
-        var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-        ringNum.textContent = Math.round(start + (end - start) * eased);
-        if (progress < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
+      ringFg.style.strokeDashoffset = circumference * (1 - ringPct / 100);
+      animateValue(ringNum, 0, overall, 1200);
+    }
+  }, 300);
+
+  // 500ms: Radar chart
+  setTimeout(function() {
+    renderRadarChart(scores);
+  }, 500);
+
+  // 600ms: Week rings stagger (MO→SO, 50ms apart)
+  setTimeout(function() {
+    for (var wi = 0; wi < 7; wi++) {
+      (function(idx) {
+        setTimeout(function() {
+          var ring = document.getElementById('week-ring-' + idx);
+          if (ring) ring.style.strokeDashoffset = ring.getAttribute('data-target');
+        }, idx * 50);
+      })(wi);
     }
   }, 600);
 
-  // Draw radar + sparklines
+  // 700ms: HRV value count-up
   setTimeout(function() {
-    renderRadarChart(scores);
+    var hrvEl = document.getElementById('dash-hrv-val');
+    if (hrvEl) {
+      var target = parseInt(hrvEl.getAttribute('data-target')) || 0;
+      if (target > 0) animateValue(hrvEl, 0, target, 800, ' ms');
+    }
+  }, 700);
+
+  // 800ms: Sparklines
+  setTimeout(function() {
     topBench.forEach(function(b) {
       drawSparkline('dash-spark-' + b.id, hist[b.id], b.color || '#e8000d', b.inverse);
     });
-  }, 50);
+  }, 800);
 }
 
 // Selbsteinschätzung der 8 Säulen (1-5 Punkte)
