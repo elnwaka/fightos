@@ -3798,6 +3798,49 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   color: var(--text-subtle);
 }
 
+/* ===== POLISH DETAILS ===== */
+@keyframes checkBounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.block-check-btn.just-checked {
+  animation: checkBounce .3s ease;
+}
+
+/* Activity feed hover */
+.activity-item {
+  transition: transform .15s ease, background .15s ease;
+}
+.activity-item:hover {
+  transform: translateX(4px);
+  background: rgba(255,255,255,.02);
+}
+
+/* Fight countdown pulse */
+@keyframes countdownPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .7; }
+}
+.countdown-urgent {
+  animation: countdownPulse 2s ease-in-out infinite;
+  color: var(--gold);
+}
+.countdown-critical {
+  animation: countdownPulse 1s ease-in-out infinite;
+  color: var(--red);
+}
+
+/* Week completion golden glow */
+@keyframes goldenGlimmer {
+  0%, 100% { text-shadow: 0 0 8px rgba(245,197,24,.3); }
+  50% { text-shadow: 0 0 20px rgba(245,197,24,.6); }
+}
+.week-complete {
+  color: var(--gold);
+  animation: goldenGlimmer 2s ease-in-out infinite;
+}
+
 /* ===== SKELETON LOADING ===== */
 @keyframes shimmer {
   0% { background-position: -400px 0; }

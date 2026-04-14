@@ -1124,7 +1124,7 @@ function renderFightCountdown() {
       <div class="phase-badge phase-taper" style="margin-top:12px;">NUR LEICHT HEUTE</div>`;
   } else {
     mainHTML = `
-      <div class="fight-countdown-num">${diff}</div>
+      <div class="fight-countdown-num ${diff <= 1 ? 'countdown-critical' : diff <= 7 ? 'countdown-urgent' : ''}">${diff}</div>
       <div class="fight-countdown-label">TAGE BIS ZUM KAMPF · ${formatDate(data.fightDate)}</div>
       <div class="phase-badge ${phase.cls}" style="margin-top:12px;">${phase.name}</div>
       ${diff <= 4 ? '<div style="font-size:12px;color:#888;margin-top:8px;">Schärfungsphase: Training leicht anpassen, kein neues hartes Sparring mehr.</div>' : '<div style="font-size:12px;color:#666;margin-top:8px;">Normales Training. Erst 3–4 Tage vor Kampf leicht anpassen.</div>'}`;
@@ -1526,121 +1526,112 @@ function renderHRV() {
   renderHRVTrend(data);
 }
 
+var _hrvChart = null;
 function renderHRVTrend(data) {
-  const container = document.getElementById('hrv-display');
+  var container = document.getElementById('hrv-display');
   if (!container) return;
-  const oldCanvas = document.getElementById('hrv-trend-canvas');
-  if (oldCanvas) oldCanvas.remove();
-  const oldLabel = document.getElementById('hrv-trend-label');
+  if (typeof Chart === 'undefined') return;
+
+  // Cleanup
+  var oldCanvas = document.getElementById('hrv-trend-canvas');
+  if (oldCanvas) { if (_hrvChart) { _hrvChart.destroy(); _hrvChart = null; } oldCanvas.remove(); }
+  var oldLabel = document.getElementById('hrv-trend-label');
   if (oldLabel) oldLabel.remove();
 
-  const entries = data.hrv || [];
+  var entries = data.hrv || [];
   if (entries.length < 3) return;
 
-  // Sort by date ascending and take last 30
-  const sorted = entries.slice().sort((a, b) => a.date.localeCompare(b.date));
-  const last30 = sorted.slice(-30);
-  const values = last30.map(e => e.value);
+  var sorted = entries.slice().sort(function(a, b) { return a.date.localeCompare(b.date); });
+  var last30 = sorted.slice(-30);
+  var values = last30.map(function(e) { return e.value; });
+  var labels = last30.map(function(e) { return e.date; });
 
-  // Determine trend: compare avg of last chunk vs first chunk
-  const halfLen = Math.max(1, Math.floor(values.length / 2));
-  const chunkSize = Math.min(7, halfLen);
-  const avgFirst = values.slice(0, chunkSize).reduce((s, v) => s + v, 0) / chunkSize;
-  const avgLast = values.slice(-chunkSize).reduce((s, v) => s + v, 0) / chunkSize;
-  const trendDiff = avgLast - avgFirst;
-  let lineColor;
-  if (trendDiff > 2) lineColor = 'var(--green)';
-  else if (trendDiff < -2) lineColor = 'var(--red)';
-  else lineColor = 'var(--gold)';
+  // Trend color
+  var chunkSize = Math.min(7, Math.max(1, Math.floor(values.length / 2)));
+  var avgFirst = values.slice(0, chunkSize).reduce(function(s, v) { return s + v; }, 0) / chunkSize;
+  var avgLast = values.slice(-chunkSize).reduce(function(s, v) { return s + v; }, 0) / chunkSize;
+  var trendDiff = avgLast - avgFirst;
+  var trendHex = trendDiff > 2 ? '#00C853' : trendDiff < -2 ? '#E8000D' : '#F5C518';
 
-  // Compute 7-day moving average
-  const ma7 = [];
-  for (let i = 0; i < values.length; i++) {
-    const win = values.slice(Math.max(0, i - 6), i + 1);
-    ma7.push(win.reduce((s, v) => s + v, 0) / win.length);
+  // 7-day moving average
+  var ma7 = [];
+  for (var i = 0; i < values.length; i++) {
+    var win = values.slice(Math.max(0, i - 6), i + 1);
+    ma7.push(win.reduce(function(s, v) { return s + v; }, 0) / win.length);
   }
 
-  // Create canvas element
-  const canvas = document.createElement('canvas');
+  // Canvas
+  var canvas = document.createElement('canvas');
   canvas.id = 'hrv-trend-canvas';
-  canvas.style.width = '100%';
-  canvas.style.height = '80px';
-  canvas.style.display = 'block';
-  canvas.style.marginTop = '12px';
-  canvas.height = 160;
+  canvas.style.cssText = 'width:100%;height:100px;display:block;margin-top:12px;';
   container.appendChild(canvas);
 
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = Math.round(rect.width * 2);
-  const ctx = canvas.getContext('2d');
-  ctx.scale(2, 2);
-  const w = rect.width;
-  const h = 80;
+  // Gradient fill
+  var ctx = canvas.getContext('2d');
+  var grad = ctx.createLinearGradient(0, 0, 0, 100);
+  grad.addColorStop(0, trendHex + '26');
+  grad.addColorStop(1, trendHex + '00');
 
-  const allVals = values.concat(ma7);
-  const minV = Math.min(...allVals) - 2;
-  const maxV = Math.max(...allVals) + 2;
-  const range = maxV - minV || 1;
-  const pad = 4;
+  _hrvChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'HRV',
+        data: values,
+        borderColor: trendHex,
+        borderWidth: 2,
+        backgroundColor: grad,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: trendHex
+      }, {
+        label: '7-Tage \u00D8',
+        data: ma7,
+        borderColor: 'rgba(255,255,255,.2)',
+        borderWidth: 1,
+        borderDash: [4, 4],
+        pointRadius: 0,
+        fill: false,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 1000, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,.85)',
+          titleFont: { family: "'Space Mono', monospace", size: 11 },
+          bodyFont: { family: "'Bebas Neue', sans-serif", size: 18 },
+          cornerRadius: 8,
+          padding: 12,
+          displayColors: false,
+          callbacks: {
+            title: function(ctx) { return formatDate(ctx[0].label); },
+            label: function(ctx) { return ctx.dataset.label + ': ' + Math.round(ctx.raw) + ' ms'; }
+          }
+        }
+      },
+      scales: {
+        x: { display: false },
+        y: { display: false, beginAtZero: false }
+      }
+    }
+  });
 
-  function xPos(i) { return pad + (i / Math.max(values.length - 1, 1)) * (w - pad * 2); }
-  function yPos(v) { return pad + (1 - (v - minV) / range) * (h - pad * 2); }
-
-  // Resolve CSS variable for canvas drawing
-  function resolveColor(c) {
-    if (!c.startsWith('var(')) return c;
-    return getComputedStyle(document.documentElement).getPropertyValue(c.slice(4, -1).trim()).trim() || '#888';
-  }
-  const resolved = resolveColor(lineColor);
-
-  // X-axis tick marks
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-  ctx.lineWidth = 0.5;
-  for (let i = 0; i < values.length; i++) {
-    ctx.beginPath();
-    ctx.moveTo(xPos(i), h - pad);
-    ctx.lineTo(xPos(i), h - pad + 3);
-    ctx.stroke();
-  }
-
-  // 7-day moving average line (semi-transparent)
-  ctx.strokeStyle = resolved;
-  ctx.globalAlpha = 0.25;
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  for (let i = 0; i < ma7.length; i++) {
-    if (i === 0) ctx.moveTo(xPos(i), yPos(ma7[i]));
-    else ctx.lineTo(xPos(i), yPos(ma7[i]));
-  }
-  ctx.stroke();
-
-  // Main HRV value line
-  ctx.globalAlpha = 1;
-  ctx.strokeStyle = resolved;
-  ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  for (let i = 0; i < values.length; i++) {
-    if (i === 0) ctx.moveTo(xPos(i), yPos(values[i]));
-    else ctx.lineTo(xPos(i), yPos(values[i]));
-  }
-  ctx.stroke();
-
-  // Dot on the most recent value
-  ctx.beginPath();
-  ctx.arc(xPos(values.length - 1), yPos(values[values.length - 1]), 3, 0, Math.PI * 2);
-  ctx.fillStyle = resolved;
-  ctx.fill();
-
-  // Trend text label below the chart
-  const change30 = values[values.length - 1] - values[0];
-  const sign = change30 >= 0 ? '+' : '';
-  const lblColor = change30 > 0 ? 'var(--green)' : change30 < 0 ? 'var(--red)' : 'var(--gold)';
-  const label = document.createElement('div');
+  // Trend label
+  var change30 = values[values.length - 1] - values[0];
+  var sign = change30 >= 0 ? '+' : '';
+  var lblHex = change30 > 0 ? '#00C853' : change30 < 0 ? '#E8000D' : '#F5C518';
+  var label = document.createElement('div');
   label.id = 'hrv-trend-label';
-  label.style.cssText = 'font-family:"Space Mono",monospace;font-size:11px;margin-top:6px;';
-  label.innerHTML = '<span style="color:' + lblColor + ';">Trend: ' + sign + change30.toFixed(1) + ' RMSSD (30 Tage)</span> <span style="color:var(--grey);margin-left:8px;">7-Tage \u00D8 = transparent</span>';
+  label.style.cssText = 'font-family:"Space Mono",monospace;font-size:var(--fs-xs);margin-top:6px;';
+  label.innerHTML = '<span style="color:' + lblHex + ';">Trend: ' + sign + change30.toFixed(1) + ' RMSSD</span>';
   container.appendChild(label);
 }
 
@@ -5744,7 +5735,7 @@ function renderDashboard() {
 
     // ── ROW 2: DIESE WOCHE + CHECKLIST TODAY + HRV AMPEL ──
     '<div class="bento-cell glass">' +
-      '<div class="sec-label">DIESE WOCHE <span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;margin-left:8px;">' + totalDone + '/' + totalPlanned + '</span></div>' +
+      '<div class="sec-label">DIESE WOCHE <span class="' + (totalPlanned > 0 && totalDone >= totalPlanned ? 'week-complete' : '') + '" style="font-family:\'Space Mono\',monospace;font-size:11px;margin-left:8px;">' + totalDone + '/' + totalPlanned + '</span></div>' +
       '<div style="display:flex;justify-content:space-between;gap:4px;margin-top:12px;">' +
         DAY_SHORT.map(function(d, i) {
           var dc = dayCompletion[i];
@@ -5795,7 +5786,7 @@ function renderDashboard() {
           var tc = TYPE_COLORS[rb.type] || 'var(--grey)';
           var d = rb.date ? new Date(rb.date) : null;
           var timeStr = d ? (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes() : '';
-          return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">' +
+          return '<div class="activity-item" style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid rgba(255,255,255,.04);border-radius:var(--radius-sm);cursor:default;">' +
             '<div style="width:4px;height:28px;border-radius:var(--radius-sm);background:' + tc + ';flex-shrink:0;"></div>' +
             '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--light);">' + (rb.title || rb.type).replace(/</g,'&lt;') + '</div>' +
             '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;">' + timeStr + '</div>' +
