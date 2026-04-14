@@ -241,12 +241,13 @@ body {
 .si-hero-cta-sub { font-family:'DM Sans',sans-serif; font-size:var(--fs-sm); color:var(--text-subtle); margin-top:8px; }
 .si-outro-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(24px,5vw,40px); color:var(--white); letter-spacing:2px; line-height:1.2; max-width:500px; }
 .si-outro-desc { font-family:'DM Sans',sans-serif; font-size:var(--fs-base); color:var(--text-muted); margin-top:20px; line-height:1.6; max-width:440px; }
-.si-outro-dots { display:flex; gap:6px; margin-top:32px; }
+.si-outro-dots { display:flex; gap:6px; margin-top:32px; justify-content:center; }
 .si-outro-dot { width:8px; height:8px; border-radius:50%; }
 .si-fade { opacity:0; transition:opacity .8s ease, transform .8s ease; transform:translateY(12px); display:block; width:100%; }
 .si-fade.visible { opacity:1; transform:translateY(0); }
-.si-hero-slide { flex-direction:column; text-align:center; gap:0; }
+.si-hero-slide { flex-direction:column; text-align:center; align-items:center; gap:0; }
 .si-hero-slide > * { width:100%; }
+.si-hero-slide > .si-btn { width:auto; }
 .si-btn { font-family:'Bebas Neue',sans-serif; font-size:var(--fs-lg); letter-spacing:3px; padding:18px 56px; background:var(--red); color:#fff; border:none; border-radius:var(--radius-md); cursor:pointer; transition:transform .15s,box-shadow .2s; }
 .si-btn:hover { transform:scale(1.03); box-shadow:0 0 30px rgba(232,0,13,.2); }
 .si-btn:active { transform:scale(.97); }
