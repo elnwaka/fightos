@@ -46,7 +46,11 @@ function syncToCloud(showFeedback) {
     data: data,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   }, { merge: true }).then(function() {
+    localStorage.setItem('fos_last_sync', new Date().toISOString());
     if (showFeedback) showToast('Daten synchronisiert');
+    // Update sync status display if visible
+    var syncEl = document.getElementById('sync-status');
+    if (syncEl) syncEl.textContent = 'Zuletzt: gerade eben';
   }).catch(function(e) {
     console.warn('Sync failed:', e);
     if (showFeedback) showToast('Sync fehlgeschlagen', 'error');
@@ -6515,7 +6519,10 @@ function renderAccountPage() {
       <div class="account-section" style="margin-top:32px;padding-top:24px;border-top:1px solid var(--surface-2);">
         <div class="account-section-title">CLOUD SYNC</div>
         <div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;line-height:1.6;">Daten manuell mit der Cloud synchronisieren. Nützlich wenn du Daten von einem anderen Gerät übertragen willst.</div>
-        <button onclick="forceSyncNow()" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;">JETZT SYNCHRONISIEREN</button>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <button onclick="forceSyncNow()" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;">JETZT SYNCHRONISIEREN</button>
+          <div id="sync-status" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">${(function(){var ls=localStorage.getItem('fos_last_sync');if(!ls)return'Noch nie synchronisiert';var d=new Date(ls);var now=new Date();var diff=Math.round((now-d)/60000);if(diff<1)return'Zuletzt: gerade eben';if(diff<60)return'Zuletzt: vor '+diff+' Min.';if(diff<1440)return'Zuletzt: vor '+Math.round(diff/60)+' Std.';return'Zuletzt: '+d.toLocaleDateString('de-DE')+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})})()}</div>
+        </div>
       </div>
 
       <div class="account-section" style="margin-top:32px;padding-top:24px;border-top:2px solid rgba(232,0,13,.2);">
