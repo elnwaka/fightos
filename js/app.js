@@ -90,7 +90,7 @@ function applyCloudData(cloud) {
     users[cloud.username] = Object.assign(existing, cloud.profile);
     users[cloud.username].onboardingDone = true;
     users[cloud.username].seenIntro = true;
-    users[cloud.username].pass = 'firebase';
+    if (!users[cloud.username].pass) users[cloud.username].pass = 'firebase';
     localStorage.setItem('fos_users', JSON.stringify(users));
     currentUser = cloud.username;
     localStorage.setItem('fos_current', currentUser);
@@ -217,7 +217,7 @@ document.addEventListener('keydown', function(e) {
     document.querySelectorAll('.modal-overlay.active').forEach(function(m) { closeModal(m); });
     document.querySelectorAll('.nav-hub.open').forEach(function(h) { h.classList.remove('open'); });
     var mm = document.getElementById('mobile-menu');
-    if (mm && mm.classList.contains('open')) mm.classList.remove('open');
+    if (mm && mm.style.display !== 'none') mm.style.display = 'none';
     return;
   }
   // Focus trap inside active modal
@@ -1161,11 +1161,10 @@ function showPage(pageId) {
   // Bottom tab bar highlight
   document.querySelectorAll('.btab').forEach(function(b) { b.classList.remove('active'); });
   var btabPage = pageId;
-  if (btabPage === 'dashboard') btabPage = 'dashboard';
-  else if (['wochenplan','uebungen','log','periodisierung','uebung-detail','block-detail'].indexOf(btabPage) !== -1) btabPage = 'wochenplan';
+  if (['wochenplan','uebungen','log','periodisierung','uebung-detail','block-detail'].indexOf(btabPage) !== -1) btabPage = 'wochenplan';
   else if (['fights','fight-detail'].indexOf(btabPage) !== -1) btabPage = 'fights';
   else if (btabPage === 'tests') btabPage = 'tests';
-  else btabPage = ''; // Keine der 4 Haupt-Tabs → keiner aktiv
+  else if (btabPage !== 'dashboard') btabPage = ''; // Keine der 4 Haupt-Tabs → keiner aktiv
   if (btabPage) {
     var activeTab = document.querySelector('.btab[data-page="' + btabPage + '"]');
     if (activeTab) activeTab.classList.add('active');
@@ -1743,9 +1742,11 @@ function logHRV() {
 }
 
 function renderHRV() {
+  const container = document.getElementById('hrv-display');
+  if (!container) return;
   const data = getData();
   if (!data || !data.hrv || !data.hrv.length) {
-    document.getElementById('hrv-display').innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine Daten. RMSSD findest du in deiner Pulsuhr-App (Garmin, Whoop, Polar). Hoher Wert = erholt, niedriger Wert = muede. Trage ihn morgens ein.</div>';
+    container.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine Daten. RMSSD findest du in deiner Pulsuhr-App (Garmin, Whoop, Polar). Hoher Wert = erholt, niedriger Wert = muede. Trage ihn morgens ein.</div>';
     return;
   }
   const recent = data.hrv.slice(0, 7);
@@ -1757,7 +1758,7 @@ function renderHRV() {
   else if (pctDiff <= -5) { status = 'ROT'; color = 'var(--red)'; advice = 'Intensität reduzieren! Zone 2 statt Kraft. Bei 3 roten Tagen → komplette Ruhe.'; }
   else { status = 'GELB'; color = 'var(--gold)'; advice = 'Training wie geplant. Beobachte den Trend.'; }
 
-  document.getElementById('hrv-display').innerHTML = `
+  container.innerHTML = `
     <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
       <div style="text-align:center;">
         <div style="width:48px;height:48px;border-radius:50%;background:${color};margin:0 auto 8px;box-shadow:0 0 20px ${color}40;"></div>
@@ -2924,7 +2925,7 @@ function renderFightsTab3(contentEl, data) {
 // ===== KAMPF DETAIL =====
 function openFightDetail(idx) {
   const data = getData();
-  if (!data || !data.fights || !data.fights[idx]) return;
+  if (!data || !data.fights || !data.fights[idx]) { showToast('Kampf nicht gefunden', 'error'); showPage('fights'); return; }
   const f = data.fights[idx];
   const el = document.getElementById('page-fight-detail');
   const color = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
@@ -6296,7 +6297,8 @@ function renderDashboard() {
   renderDailyCombined();
   renderFightLog();
   if (recentBlocks.length === 0) renderRecentLog();
-  renderSaeulenSelfRating();
+  if (!isMobile()) renderSaeulenSelfRating();
+  renderBenchSummary();
 
   // ═══ ANIMATION CHOREOGRAPHY ═══
 
