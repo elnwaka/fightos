@@ -624,7 +624,7 @@ function initNotifications() {
       banner.innerHTML = '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:var(--white);margin-bottom:6px;">ERINNERUNGEN AKTIVIEREN?</div>' +
         '<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;line-height:1.5;">FightOS kann dich täglich an Training, HRV und Checklist erinnern.</div>' +
         '<div style="display:flex;gap:8px;">' +
-          '<button onclick="requestNotifPermission(this.closest(\'div[style]\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:8px 16px;border-radius:var(--radius-md);cursor:pointer;">JA, AKTIVIEREN</button>' +
+          '<button onclick="requestNotifPermission(this.closest(\'div[style]\'))" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:8px 16px;border-radius:var(--radius-md);cursor:pointer;">JA, AKTIVIEREN</button>' +
           '<button onclick="this.closest(\'div[style]\').remove();localStorage.setItem(\'fos_notif_dismissed\',\'1\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);background:none;border:1px solid var(--surface-3);padding:8px 16px;border-radius:var(--radius-md);cursor:pointer;">NEIN DANKE</button>' +
         '</div>';
       if (!localStorage.getItem('fos_notif_dismissed')) {
