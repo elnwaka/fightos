@@ -15,6 +15,7 @@ const PRECACHE = [
   './js/firebase-app.js',
   './js/firebase-auth.js',
   './js/firebase-firestore.js',
+  './js/firebase-storage.js',
   './img/icons/icon.svg',
   './img/icons/icon-192x192.png',
   './img/icons/icon-512x512.png'

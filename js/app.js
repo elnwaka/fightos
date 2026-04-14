@@ -7,6 +7,7 @@
 var _fb = null;
 var _fbAuth = null;
 var _fbDb = null;
+var _fbStorage = null;
 var _fbUser = null;
 var _fbSyncEnabled = false;
 
@@ -24,6 +25,7 @@ var _fbSyncEnabled = false;
     _fbAuth = firebase.auth();
     _fbDb = firebase.firestore();
     _fbDb.enablePersistence({ synchronizeTabs: true }).catch(function() {});
+    _fbStorage = firebase.storage();
     _fbSyncEnabled = true;
   } catch(e) { console.warn('Firebase init failed:', e); }
 })();
@@ -2871,24 +2873,33 @@ function openFightDetail(idx) {
   ];
 
   // Video section – with YouTube API for seeking
+  var isUploadedVideo = f.videoType === 'upload' && f.videoLink && !ytId;
   let videoHTML;
-  if (ytId) {
+  if (isUploadedVideo) {
+    // Uploaded video — native HTML5 player
+    videoHTML = `
+      <div style="width:100%;border-radius:var(--radius-md);overflow:hidden;background:#000;box-shadow:0 0 40px rgba(232,0,13,.08);">
+        <video id="fight-video-player" src="${escapeHTML(f.videoLink)}" controls playsinline preload="metadata" style="width:100%;display:block;border-radius:var(--radius-md);"></video>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;">
+        <span onclick="showVideoInput(${idx})" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);cursor:pointer;">Video ändern</span>
+      </div>
+      <div id="video-input-area" style="display:none;margin-top:8px;"></div>`;
+  } else if (ytId) {
     videoHTML = `
       <div style="width:100%;aspect-ratio:16/9;border-radius:var(--radius-md);overflow:hidden;background:#000;box-shadow:0 0 40px rgba(232,0,13,.08);">
         <div id="fight-yt-container" style="width:100%;height:100%;"></div>
       </div>
       <div style="display:flex;gap:16px;margin-top:8px;">
-        <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;text-decoration:none;">Auf YouTube öffnen ↗</a>
-        <span onclick="showVideoInput(${idx})" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;cursor:pointer;">Video ändern</span>
+        <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);text-decoration:none;">Auf YouTube öffnen ↗</a>
+        <span onclick="showVideoInput(${idx})" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);cursor:pointer;">Video ändern</span>
       </div>
       <div id="video-input-area" style="display:none;margin-top:8px;"></div>`;
   } else {
     videoHTML = `
       <div onclick="showVideoInput(${idx})" style="width:100%;aspect-ratio:16/9;border-radius:var(--radius-md);background:var(--surface-0);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;" onmouseenter="this.style.background='var(--surface-1)'" onmouseleave="this.style.background='var(--surface-0)'">
-        <div style="width:48px;height:48px;border-radius:50%;border:2px solid var(--surface-2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-          <span style="font-size:20px;color:#333;margin-left:3px;">▶</span>
-        </div>
-        <div style="font-family:'Space Mono',monospace;font-size:12px;color:#333;letter-spacing:1px;">KAMPFVIDEO HINZUFÜGEN</div>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-subtle)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:1px;">VIDEO HOCHLADEN ODER LINK EINFÜGEN</div>
       </div>
       <div id="video-input-area" style="margin-top:10px;"></div>`;
   }
@@ -3312,14 +3323,76 @@ function saveVideoAnalysis(idx, round, key, value) {
   saveData(data);
 }
 
-// Inline video URL input
+// Video input — YouTube URL or file upload
 function showVideoInput(idx) {
   var area = document.getElementById('video-input-area');
   if (!area) return;
   area.style.display = 'block';
-  area.innerHTML = '<div style="display:flex;gap:8px;"><input id="vid-url-input" type="url" placeholder="YouTube-Link einfügen..." style="flex:1;background:var(--surface-1);border:1px solid var(--surface-3);color:var(--white);padding:10px 14px;font-size:13px;border-radius:var(--radius-md);outline:none;min-height:44px;" autofocus><button onclick="saveVideoUrl(' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:10px 16px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;white-space:nowrap;">SPEICHERN</button></div>';
+  area.innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      // Upload button
+      '<label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;background:var(--surface-1);border:1px dashed var(--surface-3);border-radius:var(--radius-md);cursor:pointer;transition:all .2s;" onmouseenter="this.style.borderColor=\'var(--red)\'" onmouseleave="this.style.borderColor=\'var(--surface-3)\'">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
+        '<span style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">VIDEO HOCHLADEN</span>' +
+        '<input type="file" accept="video/*" style="display:none;" onchange="uploadFightVideo(' + idx + ', this.files[0])">' +
+      '</label>' +
+      '<div id="upload-progress" style="display:none;"></div>' +
+      // OR separator
+      '<div style="text-align:center;font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">oder</div>' +
+      // YouTube link input
+      '<div style="display:flex;gap:8px;">' +
+        '<input id="vid-url-input" type="url" placeholder="YouTube-Link einfügen..." style="flex:1;background:var(--surface-1);border:1px solid var(--surface-3);color:var(--white);padding:10px 14px;font-size:var(--fs-sm);border-radius:var(--radius-md);outline:none;min-height:44px;">' +
+        '<button onclick="saveVideoUrl(' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:10px 16px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;white-space:nowrap;">LINK SPEICHERN</button>' +
+      '</div>' +
+    '</div>';
   var inp = document.getElementById('vid-url-input');
-  if (inp) { inp.focus(); inp.onkeydown = function(e) { if (e.key === 'Enter') saveVideoUrl(idx); }; }
+  if (inp) inp.onkeydown = function(e) { if (e.key === 'Enter') saveVideoUrl(idx); };
+}
+
+// Upload video to Firebase Storage
+function uploadFightVideo(idx, file) {
+  if (!file) return;
+  if (!_fbStorage || !_fbUser) { showToast('Nicht eingeloggt oder kein Storage', 'error'); return; }
+  if (file.size > 500 * 1024 * 1024) { showToast('Max. 500 MB', 'error'); return; }
+
+  var progEl = document.getElementById('upload-progress');
+  if (progEl) {
+    progEl.style.display = 'block';
+    progEl.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:6px;">Wird hochgeladen...</div><div style="height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden;"><div id="upload-bar" style="height:100%;width:0%;background:var(--red);border-radius:2px;transition:width .3s ease;"></div></div>';
+  }
+
+  var ext = file.name.split('.').pop() || 'mp4';
+  var path = 'fights/' + _fbUser.uid + '/' + Date.now() + '.' + ext;
+  var ref = _fbStorage.ref(path);
+  var task = ref.put(file);
+
+  task.on('state_changed',
+    function(snapshot) {
+      var pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+      var bar = document.getElementById('upload-bar');
+      if (bar) bar.style.width = pct + '%';
+      if (progEl) {
+        var progText = progEl.querySelector('div');
+        if (progText) progText.textContent = 'Wird hochgeladen... ' + pct + '%';
+      }
+    },
+    function(error) {
+      showToast('Upload fehlgeschlagen: ' + error.message, 'error');
+      if (progEl) progEl.style.display = 'none';
+    },
+    function() {
+      task.snapshot.ref.getDownloadURL().then(function(url) {
+        var data = getData();
+        if (data && data.fights[idx]) {
+          data.fights[idx].videoLink = url;
+          data.fights[idx].videoType = 'upload';
+          saveData(data);
+          showToast('Video hochgeladen!');
+          openFightDetail(idx);
+        }
+      });
+    }
+  );
 }
 
 function saveVideoUrl(idx) {
@@ -3328,6 +3401,7 @@ function saveVideoUrl(idx) {
   var data = getData();
   if (!data || !data.fights[idx]) return;
   data.fights[idx].videoLink = inp.value.trim();
+  data.fights[idx].videoType = 'youtube';
   saveData(data);
   openFightDetail(idx);
 }
