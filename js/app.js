@@ -5783,131 +5783,149 @@ function renderDashboard() {
   var hasHRV = hrvArr.length > 0;
 
   el.innerHTML =
-    '<div class="dash-stagger dash-noise" style="display:flex;flex-direction:column;gap:20px;">' +
+    '<div class="dash-wrap">' +
 
     // ── GREETING ──
-    '<div style="padding:8px 0 4px;">' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:var(--fs-sm);color:var(--text-muted);font-weight:300;">Willkommen zurück,</div>' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(32px,6vw,48px);color:var(--white);letter-spacing:2px;line-height:.9;">' + escapeHTML(getDisplayName()).toUpperCase() + '</div>' +
+    '<div class="dash-section" style="text-align:center;padding-top:8px;">' +
+      '<div class="dash-greet">' + (new Date().getHours() < 12 ? 'Guten Morgen' : new Date().getHours() < 18 ? 'Guten Tag' : 'Guten Abend') + '</div>' +
+      '<div class="dash-name">' + escapeHTML(getDisplayName()).toUpperCase() + '</div>' +
     '</div>' +
 
-    // ── TOP METRICS (3 floating cards) ──
-    '<div class="dash-grid dash-grid-3">' +
-      '<div class="acard metric-card">' +
-        (hasScores ?
-          '<div class="metric-val" style="color:var(--gold);">' + (overall || 0) + '</div>' :
-          '<div class="metric-val" style="color:var(--text-subtle);">\u2014</div>'
-        ) +
-        '<div class="metric-label">FIGHT SCORE</div>' +
-      '</div>' +
-      '<div class="acard metric-card">' +
-        '<div class="metric-val">' + (data.fights ? data.fights.length : 0) + '</div>' +
-        '<div class="metric-label">K\u00c4MPFE</div>' +
-      '</div>' +
-      '<div class="acard metric-card">' +
-        '<div class="metric-val">' + (data.log ? data.log.length : 0) + '</div>' +
-        '<div class="metric-label">SESSIONS</div>' +
-      '</div>' +
-    '</div>' +
-
-    // ── FIGHT COUNTDOWN (if set) ──
-    '<div id="dash-countdown-hero"></div>' +
-
-    // ── HERO BLOCK: RADAR or CTA ──
+    // ── SCORE RING HERO ──
     (hasScores ?
-      '<div class="acard acard-lg">' +
-        '<div class="dash-title">PERFORMANCE</div>' +
-        '<div id="rpg-radar" style="max-width:400px;height:320px;margin:0 auto;"></div>' +
-        '<div id="dash-stats" style="margin-top:20px;"></div>' +
+      '<div class="dash-section dash-score-hero">' +
+        '<div class="dash-score-ring-wrap">' +
+          '<svg width="180" height="180" viewBox="0 0 180 180">' +
+            '<defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8000d"/><stop offset="100%" stop-color="#f5c518"/></linearGradient></defs>' +
+            '<circle cx="90" cy="90" r="80" stroke="var(--surface-2)" stroke-width="8" fill="none"/>' +
+            '<circle id="dash-ring-fg" cx="90" cy="90" r="80" stroke="url(#rg)" stroke-width="6" fill="none" stroke-dasharray="' + (2*Math.PI*80).toFixed(1) + '" stroke-dashoffset="' + (2*Math.PI*80).toFixed(1) + '" stroke-linecap="round" transform="rotate(-90 90 90)"/>' +
+          '</svg>' +
+          '<div class="dash-score-val" id="dash-ring-num">0</div>' +
+        '</div>' +
+        '<div class="dash-score-label">FIGHT READY SCORE</div>' +
+        weekDiff +
       '</div>'
     :
-      '<div class="acard acard-lg" style="text-align:center;padding:48px 24px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--text-subtle);letter-spacing:2px;">DEIN PROFIL</div>' +
-        '<div style="font-size:var(--fs-sm);color:var(--text-muted);margin:12px auto 24px;max-width:400px;line-height:1.6;">Trage Leistungstests ein um dein Radar-Profil zu sehen.</div>' +
-        '<button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);padding:12px 28px;border-radius:var(--radius-lg);cursor:pointer;">TESTS STARTEN</button>' +
+      '<div class="dash-section dash-cta">' +
+        '<div class="dash-cta-title">DEIN PROFIL</div>' +
+        '<div class="dash-cta-desc">Trage Leistungstests ein um deinen Fight Ready Score zu berechnen.</div>' +
+        '<button class="dash-cta-btn" onclick="showPage(\'tests\')">TESTS STARTEN</button>' +
       '</div>'
     ) +
 
     // ── WEEK PROGRESS ──
-    '<div class="acard">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
-        '<div class="dash-title" style="margin-bottom:0;">DIESE WOCHE</div>' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:' + (totalPlanned > 0 && totalDone >= totalPlanned ? 'var(--gold)' : 'var(--text-muted)') + ';">' + totalDone + '/' + totalPlanned + '</div>' +
-      '</div>' +
-      '<div style="display:flex;justify-content:space-between;gap:4px;">' +
+    '<div class="dash-section">' +
+      '<div class="dash-week-row">' +
         DAY_SHORT.map(function(d, i) {
           var dc = dayCompletion[i];
           var pct = dc.total > 0 ? dc.done / dc.total : 0;
-          var c = 2 * Math.PI * 12;
+          var c = 2 * Math.PI * 14;
           var off = c * (1 - pct);
           var col = pct >= 1 ? 'var(--green)' : pct > 0 ? 'var(--gold)' : 'var(--surface-3)';
           var isToday = i === todayDow;
-          return '<div style="text-align:center;' + (isToday ? 'opacity:1;' : 'opacity:.5;') + '">' +
-            '<svg width="32" height="32" viewBox="0 0 28 28">' +
-              '<circle cx="14" cy="14" r="12" stroke="var(--surface-2)" stroke-width="2.5" fill="none"/>' +
-              '<circle id="week-ring-' + i + '" data-target="' + off + '" cx="14" cy="14" r="12" stroke="' + col + '" stroke-width="2.5" fill="none" stroke-dasharray="' + c + '" stroke-dashoffset="' + c + '" stroke-linecap="round" transform="rotate(-90 14 14)" style="transition:stroke-dashoffset .6s ease;"/>' +
+          return '<div class="dash-week-day' + (isToday ? ' today' : '') + '">' +
+            '<svg width="32" height="32" viewBox="0 0 32 32">' +
+              '<circle cx="16" cy="16" r="14" stroke="var(--surface-2)" stroke-width="2.5" fill="none"/>' +
+              '<circle id="week-ring-' + i + '" data-target="' + off + '" cx="16" cy="16" r="14" stroke="' + col + '" stroke-width="2.5" fill="none" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + c.toFixed(1) + '" stroke-linecap="round" transform="rotate(-90 16 16)" style="transition:stroke-dashoffset .6s ease;"/>' +
             '</svg>' +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:' + (isToday ? 'var(--white)' : 'var(--text-subtle)') + ';margin-top:2px;">' + d + '</div>' +
+            '<div class="dash-week-lbl">' + d + '</div>' +
           '</div>';
         }).join('') +
       '</div>' +
+      '<div style="text-align:center;margin-top:8px;"><span class="dash-sec-meta">' + totalDone + ' / ' + totalPlanned + ' Blocks</span></div>' +
     '</div>' +
 
-    // ── TODAY (Training + Checklist) ──
-    '<div class="acard">' +
-      '<div class="dash-title">HEUTE</div>' +
-      '<div id="daily-combined"></div>' +
-      '<div id="checklist-score" style="margin-top:12px;"></div>' +
-    '</div>' +
+    '<div class="dash-divider"></div>' +
 
     // ── HRV (if data) ──
     (hasHRV ?
-      '<div class="acard acard-sm" style="display:flex;align-items:center;gap:16px;">' +
-        '<div style="font-size:24px;">' + hrvStatus + '</div>' +
-        '<div style="flex:1;">' +
-          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-base);color:' + hrvColor + ';">HRV ' + hrvLabel + '</div>' +
+      '<div class="dash-section">' +
+        '<div class="dash-hrv-bar' + (hrvLabel === 'GELB' ? ' hrv-yellow' : hrvLabel === 'ROT' ? ' hrv-red' : '') + '">' +
+          '<div style="font-size:20px;">' + hrvStatus + '</div>' +
+          '<div style="flex:1;">' +
+            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-base);color:' + hrvColor + ';">' + hrvLabel + '</div>' +
+            '<div style="font-size:var(--fs-xs);color:var(--text-muted);">Heart Rate Variability</div>' +
+          '</div>' +
+          '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--white);">0<span style="font-size:var(--fs-xs);color:var(--text-subtle);"> ms</span></div>' +
         '</div>' +
-        '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--white);">0<span style="font-size:var(--fs-xs);color:var(--text-subtle);"> ms</span></div>' +
-      '</div>'
+      '</div>' +
+      '<div class="dash-divider"></div>'
+    : '') +
+
+    // ── FIGHT COUNTDOWN ──
+    '<div class="dash-section" id="dash-countdown-hero"></div>' +
+
+    // ── HEUTE ──
+    '<div class="dash-section">' +
+      '<div class="dash-sec-hd">' +
+        '<div class="dash-sec-title">HEUTE</div>' +
+        '<div id="checklist-score" class="dash-sec-meta"></div>' +
+      '</div>' +
+      '<div id="daily-combined"></div>' +
+    '</div>' +
+
+    '<div class="dash-divider"></div>' +
+
+    // ── PERFORMANCE BARS (if scores) ──
+    (hasScores ?
+      '<div class="dash-section">' +
+        '<div class="dash-sec-hd">' +
+          '<div class="dash-sec-title">PERFORMANCE</div>' +
+          '<div class="dash-sec-meta" style="cursor:pointer;" onclick="showPage(\'tests\')">\u2192</div>' +
+        '</div>' +
+        '<div id="rpg-radar" style="max-width:400px;height:300px;margin:0 auto 16px;"></div>' +
+        '<div id="dash-stats"></div>' +
+      '</div>' +
+      '<div class="dash-divider"></div>'
     : '') +
 
     // ── HINWEISE ──
-    '<div id="dash-hinweise"></div>' +
+    '<div class="dash-section" id="dash-hinweise"></div>' +
 
-    // ── BOTTOM: Asymmetric grid (Aktivität + Kämpfe) ──
-    '<div class="dash-grid dash-grid-asym">' +
-      '<div class="acard">' +
-        '<div class="dash-title">AKTIVIT\u00c4T</div>' +
-        (recentBlocks.length > 0 ?
-          recentBlocks.map(function(rb) {
-            var tc = TYPE_COLORS[rb.type] || 'var(--grey)';
-            return '<div class="activity-item" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">' +
-              '<div style="width:3px;height:20px;border-radius:2px;background:' + tc + ';"></div>' +
-              '<div style="flex:1;font-size:var(--fs-sm);color:var(--light);">' + escapeHTML(rb.title || rb.type) + '</div>' +
-            '</div>';
-          }).join('') :
-          (hasLog ? '<div id="recent-log"></div>' : '<div style="font-size:var(--fs-xs);color:var(--text-subtle);">Noch keine Aktivit\u00e4t.</div>')
-        ) +
+    // ── AKTIVITÄT ──
+    '<div class="dash-section">' +
+      '<div class="dash-sec-hd">' +
+        '<div class="dash-sec-title">AKTIVIT\u00c4T</div>' +
       '</div>' +
-      '<div class="acard">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
-          '<div class="dash-title" style="margin-bottom:0;cursor:pointer;" onclick="showPage(\'fights\')">K\u00c4MPFE</div>' +
-          '<button class="submit-btn" style="padding:3px 10px;font-size:var(--fs-xs);" onclick="openFightModal()">+</button>' +
-        '</div>' +
-        '<div id="fight-log-list"></div>' +
+      (recentBlocks.length > 0 ?
+        recentBlocks.map(function(rb) {
+          var tc = TYPE_COLORS[rb.type] || 'var(--grey)';
+          var d = rb.date ? new Date(rb.date) : null;
+          var timeStr = d ? (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes() : '';
+          return '<div class="dash-activity">' +
+            '<div class="dash-activity-dot" style="background:' + tc + ';"></div>' +
+            '<div class="dash-activity-text">' + escapeHTML(rb.title || rb.type) + '</div>' +
+            '<div class="dash-activity-time">' + timeStr + '</div>' +
+          '</div>';
+        }).join('') :
+        (hasLog ? '<div id="recent-log"></div>' : '<div style="font-size:var(--fs-xs);color:var(--text-subtle);">Noch keine Aktivit\u00e4t diese Woche.</div>')
+      ) +
+    '</div>' +
+
+    '<div class="dash-divider"></div>' +
+
+    // ── KÄMPFE ──
+    '<div class="dash-section">' +
+      '<div class="dash-sec-hd">' +
+        '<div class="dash-sec-title" style="cursor:pointer;" onclick="showPage(\'fights\')">K\u00c4MPFE</div>' +
+        '<button class="submit-btn" style="padding:3px 10px;font-size:var(--fs-xs);" onclick="openFightModal()">+</button>' +
       '</div>' +
+      '<div id="fight-log-list"></div>' +
     '</div>' +
 
     // ── BENCHMARKS (if data) ──
     (topBench.length > 0 ?
-      '<div class="acard">' +
-        '<div class="dash-title" style="cursor:pointer;" onclick="showPage(\'tests\')">BENCHMARKS</div>' +
-        '<div style="display:flex;gap:16px;overflow-x:auto;padding-bottom:4px;">' +
+      '<div class="dash-divider"></div>' +
+      '<div class="dash-section">' +
+        '<div class="dash-sec-hd">' +
+          '<div class="dash-sec-title" style="cursor:pointer;" onclick="showPage(\'tests\')">BENCHMARKS</div>' +
+        '</div>' +
+        '<div class="dash-bench-row">' +
           topBench.map(function(b) {
             var h = hist[b.id] || [];
             var val = data.benchmarks[b.id] || 0;
             var trend = getBenchTrend(h, b.inverse);
-            return '<div style="flex-shrink:0;min-width:100px;cursor:pointer;" onclick="showPage(\'tests\')">' +
+            return '<div class="dash-bench-item" onclick="showPage(\'tests\')">' +
               '<canvas id="dash-spark-' + b.id + '" width="100" height="36" style="display:block;width:100px;height:36px;"></canvas>' +
               '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--white);margin-top:4px;">' + val + ' <span style="color:' + trend.color + ';">' + trend.arrow + '</span></div>' +
               '<div style="font-family:\'Space Mono\',monospace;font-size:8px;color:var(--text-subtle);">' + b.name.replace(/\s.*/, '') + '</div>' +
@@ -5918,25 +5936,17 @@ function renderDashboard() {
     : '') +
 
     // ── FOOTER ──
-    '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">' +
+    '<div class="dash-divider"></div>' +
+    '<div class="dash-section" style="display:flex;align-items:center;gap:8px;">' +
       '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:5px 8px;font-size:var(--fs-xs);" onchange="updateFightDate()">' +
       '<button class="submit-btn" style="padding:3px 8px;font-size:var(--fs-xs);" onclick="clearFightDate()">\u00d7</button>' +
       '<div id="bench-summary" style="margin-left:auto;font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
     '</div>' +
     '<div class="dash-hide-mobile"><div id="saeulen-self-rating"></div></div>' +
 
-    (isNewUser ? '<div class="acard acard-lg" style="text-align:center;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--white);margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div><div style="font-size:var(--fs-base);color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Dein pers\u00f6nlicher Boxing-Coach.</div><div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;"><button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);padding:10px 20px;border-radius:var(--radius-lg);cursor:pointer;">Wochenplan</button><button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);padding:10px 20px;border-radius:var(--radius-lg);cursor:pointer;">Erster Test</button><button onclick="showPage(\'mental\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);padding:10px 20px;border-radius:var(--radius-lg);cursor:pointer;">Alter Ego</button></div></div>' : '') +
+    (isNewUser ? '<div class="dash-divider"></div><div class="dash-section dash-cta"><div class="dash-cta-title">WILLKOMMEN</div><div class="dash-cta-desc">Dein persönlicher Boxing-Coach.</div><div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;"><button class="dash-cta-btn" onclick="showPage(\'wochenplan\')">Wochenplan</button><button class="dash-cta-btn" style="color:var(--gold);border-color:rgba(245,197,24,.2);" onclick="showPage(\'tests\')">Erster Test</button><button class="dash-cta-btn" style="color:var(--blue);border-color:rgba(41,121,255,.2);" onclick="showPage(\'mental\')">Alter Ego</button></div></div>' : '') +
 
-    '</div>';
-
-  // Card glow tracking
-  el.querySelectorAll('.acard').forEach(function(card) {
-    card.addEventListener('mousemove', function(e) {
-      var rect = card.getBoundingClientRect();
-      card.style.setProperty('--glow-x', ((e.clientX - rect.left) / rect.width * 100) + '%');
-      card.style.setProperty('--glow-y', ((e.clientY - rect.top) / rect.height * 100) + '%');
-    });
-  });
+    '</div>'; // close dash-wrap
 
   // Render sub-components
   renderFightCountdown();
@@ -5955,7 +5965,7 @@ function renderDashboard() {
     var ringNum = document.getElementById('dash-ring-num');
     if (ringFg && ringNum && overall !== null) {
       ringFg.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.25,.8,.25,1)';
-      var ringCirc = 2 * Math.PI * 34;
+      var ringCirc = 2 * Math.PI * 80;
       ringFg.style.strokeDashoffset = ringCirc * (1 - ringPct / 100);
       animateValue(ringNum, 0, overall, 1200);
     }
