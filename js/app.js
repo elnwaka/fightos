@@ -302,15 +302,19 @@ async function doLogin() {
     var users = {};
     users[user] = { pass: 'firebase', onboardingDone: false, created: new Date().toISOString(), firebaseUid: _fbUser.uid };
     localStorage.setItem('fos_users', JSON.stringify(users));
-    // Sync from cloud
-    msg.className = 'auth-msg success'; msg.textContent = 'Daten werden synchronisiert...';
-    syncFromCloud(function() {
+    // Sync from cloud with timeout — don't block login
+    var syncDone = false;
+    function finishLogin() {
+      if (syncDone) return;
+      syncDone = true;
       var u2 = safeParse('fos_users', {});
       if (u2[currentUser] && !u2[currentUser].onboardingDone) {
         showOnboarding(); return;
       }
       enterApp();
-    });
+    }
+    syncFromCloud(finishLogin);
+    setTimeout(finishLogin, 3000); // Don't wait longer than 3s
   } catch(e) {
     msg.className = 'auth-msg error';
     if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
