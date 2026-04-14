@@ -127,6 +127,65 @@
 input:focus, textarea:focus, select:focus, [contenteditable]:focus { caret-color: var(--white); }
 html { scroll-behavior: smooth; }
 
+/* ===== BUTTON SYSTEM ===== */
+.btn, .submit-btn, .calc-btn, .si-btn, .mt-ego-save, .wk-btn, .ob-btn-next, .ob-btn-back, .back-link {
+  font-family: 'Bebas Neue', sans-serif;
+  border-radius: var(--radius-md);
+  min-height: 44px;
+  cursor: pointer;
+  transition: var(--trans);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  white-space: nowrap;
+  letter-spacing: 2px;
+}
+/* Primary (Red CTA) */
+.btn-primary, .submit-btn, .calc-btn, .ob-btn-next, .mt-ego-save {
+  font-size: var(--fs-md);
+  padding: 12px 28px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+}
+.btn-primary:hover, .submit-btn:hover, .calc-btn:hover, .ob-btn-next:hover, .mt-ego-save:hover {
+  background: var(--red-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(232,0,13,.25);
+}
+.btn-primary:active, .submit-btn:active, .calc-btn:active, .ob-btn-next:active, .mt-ego-save:active {
+  transform: translateY(0) scale(.97);
+  transition-duration: .08s;
+}
+/* Secondary (Outlined) */
+.btn-secondary, .wk-btn {
+  font-size: var(--fs-sm);
+  padding: 8px 18px;
+  background: transparent;
+  border: 1px solid var(--surface-3);
+  color: var(--light);
+}
+.btn-secondary:hover, .wk-btn:hover {
+  background: var(--surface-3);
+  color: var(--white);
+}
+/* Ghost (Text-only) */
+.btn-ghost, .back-link, .ob-btn-back {
+  font-size: var(--fs-sm);
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--surface-3);
+  color: var(--text-muted);
+}
+.btn-ghost:hover, .back-link:hover, .ob-btn-back:hover {
+  border-color: var(--surface-4);
+  color: var(--white);
+}
+/* Sizes */
+.btn-sm { font-size: var(--fs-sm) !important; padding: 8px 18px !important; min-height: 36px; }
+.btn-lg { font-size: var(--fs-lg) !important; padding: 16px 48px !important; letter-spacing: 3px; }
+
 /* Animations */
 @keyframes fadeSlideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
 @keyframes fadeSlideOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-8px); } }
@@ -1366,19 +1425,8 @@ body::before {
 }
 .calc-group input:focus, .calc-group select:focus { border-color: var(--red); }
 .calc-group select option { background: var(--surface-2); }
-.calc-btn {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--fs-lg);
-  letter-spacing: 3px;
-  background: var(--red);
-  color: var(--white);
-  border: none;
-  padding: 12px 30px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: var(--trans);
-}
-.calc-btn:hover { background: #c00010; }
+/* .calc-btn inherits from button system */
+.calc-btn { letter-spacing: 3px; }
 .calc-results {
   margin-top: 22px;
   display: grid;
@@ -1487,25 +1535,9 @@ body::before {
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
-.wk-btn {
-  font-family: 'Space Mono', monospace;
-  font-size: var(--fs-xs);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 10px 16px;
-  min-height: 36px;
-  border-radius: var(--radius);
-  border: 1px solid var(--surface-3);
-  background: transparent;
-  color: var(--grey);
-  cursor: pointer;
-  transition: var(--trans);
-}
-.wk-btn:hover, .wk-btn.active {
-  background: var(--red);
-  color: var(--white);
-  border-color: var(--red);
-}
+/* .wk-btn inherits from button system (secondary) */
+.wk-btn { font-family: 'Space Mono', monospace; font-size: var(--fs-xs); letter-spacing: 2px; text-transform: uppercase; }
+.wk-btn.active { background: var(--red); color: var(--white); border-color: var(--red); }
 .week-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 3fr 1fr 1fr 1fr;
@@ -1732,20 +1764,8 @@ body::before {
 .form-group-inline select:focus,
 .form-group-inline textarea:focus { border-color: var(--red); }
 .form-group-inline select option { background: var(--surface-2); }
-.submit-btn {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--fs-md);
-  letter-spacing: 3px;
-  background: var(--red);
-  color: var(--white);
-  border: none;
-  padding: 12px 32px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: var(--trans);
-}
-.submit-btn:hover { background: #c00010; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(232,0,13,.25); }
-.submit-btn:active { transform: translateY(0) scale(.97); transition-duration: .08s; }
+/* .submit-btn inherits from button system */
+.submit-btn { letter-spacing: 3px; }
 
 /* Log entries */
 .log-entries { display: flex; flex-direction: column; gap: 10px; }
@@ -2994,12 +3014,9 @@ body::before {
 .saeule-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,.4); }
 
 /* ===== DETAIL PAGES (Säulen + Übungen) ===== */
-.back-link {
-  background: none; border: 1px solid var(--surface-3); color: var(--light); cursor: pointer;
-  font-family: 'Space Mono', monospace; font-size: var(--fs-xs); letter-spacing: 1px;
-  padding: 8px 16px; border-radius: var(--radius-md); transition: all .15s;
-}
-.back-link:hover { border-color: var(--red); color: var(--white); }
+/* .back-link inherits from button system (ghost) */
+.back-link { font-family: 'Space Mono', monospace; letter-spacing: 1px; }
+.back-link:hover { border-color: var(--red); }
 .detail-content { max-width: 900px; }
 .detail-section { margin-bottom: 32px; }
 .detail-section-title {
