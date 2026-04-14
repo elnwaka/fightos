@@ -243,8 +243,9 @@ body {
 .si-outro-desc { font-family:'DM Sans',sans-serif; font-size:var(--fs-base); color:var(--text-muted); margin-top:20px; line-height:1.6; max-width:440px; }
 .si-outro-dots { display:flex; gap:6px; margin-top:32px; }
 .si-outro-dot { width:8px; height:8px; border-radius:50%; }
-.si-fade { opacity:0; transition:opacity .8s ease, transform .8s ease; transform:translateY(12px); }
+.si-fade { opacity:0; transition:opacity .8s ease, transform .8s ease; transform:translateY(12px); display:block; width:100%; }
 .si-fade.visible { opacity:1; transform:translateY(0); }
+.si-hero-slide { flex-direction:column; text-align:center; }
 .si-btn { font-family:'Bebas Neue',sans-serif; font-size:var(--fs-lg); letter-spacing:3px; padding:18px 56px; background:var(--red); color:#fff; border:none; border-radius:var(--radius-md); cursor:pointer; transition:transform .15s,box-shadow .2s; }
 .si-btn:hover { transform:scale(1.03); box-shadow:0 0 30px rgba(232,0,13,.2); }
 .si-btn:active { transform:scale(.97); }
