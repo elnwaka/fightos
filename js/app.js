@@ -836,11 +836,28 @@ function showPage(pageId) {
     if (logBtn) logBtn.classList.add('active');
   }
   // Special render for certain pages
+  var heavyPages = ['dashboard', 'tests', 'fights', 'account'];
+  if (heavyPages.indexOf(pageId) !== -1) {
+    var target = document.getElementById('page-' + pageId);
+    var inner = pageId === 'dashboard' ? document.getElementById('dash-app') : target;
+    if (inner && !inner.querySelector('.skeleton')) {
+      var skel = '<div style="padding:20px;">' +
+        '<div class="skeleton skeleton-title"></div>' +
+        '<div class="skeleton-row"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>' +
+        '<div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text" style="width:60%;"></div>' +
+        '</div>';
+      inner.innerHTML = skel;
+    }
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        if (pageId === 'dashboard') renderDashboard();
+        else if (pageId === 'tests') renderTestsPage();
+        else if (pageId === 'account') renderAccountPage();
+        else if (pageId === 'fights') renderFightsPage();
+      });
+    });
+  }
   if (pageId === 'wochenplan') renderWeekPlan();
-  if (pageId === 'dashboard') renderDashboard();
-  if (pageId === 'tests') renderTestsPage();
-  if (pageId === 'account') renderAccountPage();
-  if (pageId === 'fights') renderFightsPage();
   // Stop YouTube player when leaving fight-detail
   if (pageId !== 'fight-detail' && window._fightPlayer) {
     try { window._fightPlayer.pauseVideo(); } catch(e) {}

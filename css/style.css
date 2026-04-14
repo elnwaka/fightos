@@ -3782,6 +3782,24 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   color: var(--text-subtle);
 }
 
+/* ===== SKELETON LOADING ===== */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.2s ease infinite;
+  border-radius: var(--radius-md);
+}
+.skeleton-text { height: 16px; width: 80%; margin-bottom: var(--space-2); }
+.skeleton-title { height: 32px; width: 60%; margin-bottom: var(--space-4); }
+.skeleton-card { height: 120px; width: 100%; margin-bottom: var(--space-4); }
+.skeleton-circle { width: 48px; height: 48px; border-radius: 50%; }
+.skeleton-row { display: flex; gap: var(--space-4); margin-bottom: var(--space-4); }
+.skeleton-row > * { flex: 1; }
+
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
