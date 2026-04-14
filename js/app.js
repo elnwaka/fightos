@@ -3430,12 +3430,99 @@ function showVideoInput(idx) {
   if (inp) inp.onkeydown = function(e) { if (e.key === 'Enter') saveVideoUrl(idx); };
 }
 
+// Compress video before upload using canvas + MediaRecorder
+function compressVideo(file, callback) {
+  // Skip if already small (<50MB) or browser doesn't support
+  if (file.size < 50 * 1024 * 1024 || !window.MediaRecorder) {
+    callback(file); return;
+  }
+
+  var progEl = document.getElementById('upload-progress');
+  if (progEl) {
+    progEl.style.display = 'block';
+    progEl.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:6px;">Video wird komprimiert...</div><div style="height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden;"><div id="upload-bar" style="height:100%;width:0%;background:var(--gold);border-radius:2px;transition:width .3s ease;"></div></div>';
+  }
+
+  var video = document.createElement('video');
+  video.muted = true;
+  video.playsInline = true;
+  video.src = URL.createObjectURL(file);
+
+  video.onloadedmetadata = function() {
+    // Target: 720p, lower bitrate
+    var scale = Math.min(1, 720 / Math.max(video.videoWidth, video.videoHeight));
+    var w = Math.round(video.videoWidth * scale);
+    var h = Math.round(video.videoHeight * scale);
+    if (w % 2 !== 0) w++;
+    if (h % 2 !== 0) h++;
+
+    var canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+
+    var stream = canvas.captureStream(30);
+    // Try to get audio
+    try {
+      var audioCtx = new AudioContext();
+      var source = audioCtx.createMediaElementSource(video);
+      var dest = audioCtx.createMediaStreamDestination();
+      source.connect(dest);
+      source.connect(audioCtx.destination);
+      dest.stream.getAudioTracks().forEach(function(t) { stream.addTrack(t); });
+    } catch(e) {}
+
+    var mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' :
+                   MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4';
+    var recorder = new MediaRecorder(stream, { mimeType: mimeType, videoBitsPerSecond: 1500000 });
+    var chunks = [];
+
+    recorder.ondataavailable = function(e) { if (e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = function() {
+      var blob = new Blob(chunks, { type: mimeType });
+      var ext = mimeType.indexOf('webm') !== -1 ? 'webm' : 'mp4';
+      var compressed = new File([blob], 'fight.' + ext, { type: mimeType });
+      URL.revokeObjectURL(video.src);
+      var saved = Math.round((1 - compressed.size / file.size) * 100);
+      if (saved > 10) {
+        showToast('Komprimiert: ' + Math.round(compressed.size/1024/1024) + 'MB (' + saved + '% kleiner)');
+      }
+      callback(compressed.size < file.size ? compressed : file);
+    };
+
+    recorder.start(100);
+    video.play();
+
+    // Draw frames
+    var duration = video.duration;
+    function drawFrame() {
+      if (video.ended || video.paused) { recorder.stop(); return; }
+      ctx.drawImage(video, 0, 0, w, h);
+      var bar = document.getElementById('upload-bar');
+      if (bar) bar.style.width = Math.round((video.currentTime / duration) * 100) + '%';
+      var progText = progEl ? progEl.querySelector('div') : null;
+      if (progText) progText.textContent = 'Komprimiere... ' + Math.round((video.currentTime / duration) * 100) + '%';
+      requestAnimationFrame(drawFrame);
+    }
+    drawFrame();
+    video.onended = function() { setTimeout(function() { recorder.stop(); }, 200); };
+  };
+
+  video.onerror = function() { callback(file); }; // Fallback: upload original
+}
+
 // Upload video to Firebase Storage
 function uploadFightVideo(idx, file) {
   if (!file) return;
   if (!_fbStorage || !_fbUser) { showToast('Nicht eingeloggt oder kein Storage', 'error'); return; }
   if (file.size > 500 * 1024 * 1024) { showToast('Max. 500 MB', 'error'); return; }
 
+  compressVideo(file, function(finalFile) {
+    doUpload(idx, finalFile);
+  });
+}
+
+function doUpload(idx, file) {
   var progEl = document.getElementById('upload-progress');
   if (progEl) {
     progEl.style.display = 'block';
