@@ -5708,27 +5708,38 @@ function renderDashboard() {
 
   // ═══ DASHBOARD — flowing layout, no boxy grid ═══
   var radarSize = window.innerWidth >= 768 ? 400 : 280;
+  var hasScores = filled.length > 0;
+  var hasLog = data.log && data.log.length > 0;
+  var hasFights = data.fights && data.fights.length > 0;
+  var hasHRV = hrvArr.length > 0;
 
   el.innerHTML =
     '<div class="stagger">' +
 
-    // ── HERO: Name + Ring side by side, no box ──
-    '<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:8px 0 32px;">' +
-      '<div style="flex:1;min-width:200px;">' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);letter-spacing:4px;margin-bottom:4px;">DASHBOARD</div>' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(40px,8vw,64px);line-height:.88;color:var(--white);letter-spacing:3px;">' + escapeHTML(getDisplayName()).toUpperCase() + '</div>' +
-        '<div id="dash-countdown-hero" style="margin-top:12px;"></div>' +
-      '</div>' +
-      '<div style="flex-shrink:0;filter:drop-shadow(0 0 16px rgba(232,0,13,.2));">' +
-        '<svg width="' + ringSize + '" height="' + ringSize + '" viewBox="0 0 120 120">' +
-          '<defs><linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="var(--red)"/><stop offset="100%" stop-color="var(--gold)"/></linearGradient></defs>' +
-          '<circle cx="60" cy="60" r="' + ringR + '" stroke="var(--surface-2)" stroke-width="8" fill="none"/>' +
-          '<circle id="dash-ring-fg" cx="60" cy="60" r="' + ringR + '" stroke="url(#ring-grad)" stroke-width="6" fill="none" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + circumference + '" stroke-linecap="round" transform="rotate(-90 60 60)"/>' +
-          '<text id="dash-ring-num" x="60" y="54" text-anchor="middle" style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;fill:var(--white);">0</text>' +
-          '<text x="60" y="72" text-anchor="middle" style="font-family:\'Space Mono\',monospace;font-size:8px;fill:var(--text-subtle);letter-spacing:2px;">GESAMT</text>' +
-        '</svg>' +
+    // ── HERO: Full-width with background image ──
+    '<div class="dash-hero-img" style="position:relative;margin:-32px -24px 0;padding:48px 32px 40px;overflow:hidden;border-radius:0 0 var(--radius-lg) var(--radius-lg);">' +
+      '<div style="position:absolute;inset:0;background:url(\'img/hero/boxing-ring.jpg\') center/cover no-repeat;opacity:.15;"></div>' +
+      '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,.3) 0%,rgba(8,8,8,.95) 100%);"></div>' +
+      '<div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">' +
+        '<div style="flex:1;min-width:200px;">' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);letter-spacing:4px;margin-bottom:4px;">DASHBOARD</div>' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(40px,8vw,64px);line-height:.88;color:var(--white);letter-spacing:3px;">' + escapeHTML(getDisplayName()).toUpperCase() + '</div>' +
+          '<div id="dash-countdown-hero" style="margin-top:12px;"></div>' +
+        '</div>' +
+        (hasScores ?
+          '<div style="flex-shrink:0;filter:drop-shadow(0 0 16px rgba(232,0,13,.2));">' +
+            '<svg width="' + ringSize + '" height="' + ringSize + '" viewBox="0 0 120 120">' +
+              '<defs><linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="var(--red)"/><stop offset="100%" stop-color="var(--gold)"/></linearGradient></defs>' +
+              '<circle cx="60" cy="60" r="' + ringR + '" stroke="rgba(255,255,255,.08)" stroke-width="8" fill="none"/>' +
+              '<circle id="dash-ring-fg" cx="60" cy="60" r="' + ringR + '" stroke="url(#ring-grad)" stroke-width="6" fill="none" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + circumference + '" stroke-linecap="round" transform="rotate(-90 60 60)"/>' +
+              '<text id="dash-ring-num" x="60" y="54" text-anchor="middle" style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;fill:var(--white);">0</text>' +
+              '<text x="60" y="72" text-anchor="middle" style="font-family:\'Space Mono\',monospace;font-size:8px;fill:rgba(255,255,255,.5);letter-spacing:2px;">GESAMT</text>' +
+            '</svg>' +
+          '</div>'
+        : '') +
       '</div>' +
     '</div>' +
+    '<div style="height:24px;"></div>' +
 
     // ── WEEK RINGS — inline, no box ──
     '<div style="display:flex;align-items:center;justify-content:space-between;padding:0 0 24px;">' +
@@ -5762,36 +5773,45 @@ function renderDashboard() {
 
     '<div class="divider-gradient"></div>' +
 
-    // ── PERFORMANCE: Radar links + Stats rechts (Desktop), gestapelt (Mobile) ──
-    '<div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;padding:24px 0;">' +
-      '<div style="flex-shrink:0;">' +
-        '<canvas id="rpg-radar" width="' + radarSize + '" height="' + radarSize + '" style="max-width:' + radarSize + 'px;display:block;"></canvas>' +
-      '</div>' +
-      '<div style="flex:1;min-width:200px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:2px;margin-bottom:16px;">PERFORMANCE</div>' +
-        '<div id="dash-stats"></div>' +
-        // HRV inline under stats
-        '<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--surface-2);">' +
-          '<div style="display:flex;align-items:center;gap:12px;">' +
-            '<div style="font-size:24px;">' + hrvStatus + '</div>' +
-            '<div>' +
-              '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:' + hrvColor + ';">HRV ' + hrvLabel + '</div>' +
-              (hrvArr.length > 0 ? '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">0 ms</div>' : '') +
+    // ── PERFORMANCE: Only show when there's data ──
+    (hasScores ?
+      '<div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;padding:24px 0;">' +
+        '<div style="flex-shrink:0;">' +
+          '<canvas id="rpg-radar" width="' + radarSize + '" height="' + radarSize + '" style="max-width:' + radarSize + 'px;display:block;"></canvas>' +
+        '</div>' +
+        '<div style="flex:1;min-width:200px;">' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:2px;margin-bottom:16px;">PERFORMANCE</div>' +
+          '<div id="dash-stats"></div>' +
+          (hasHRV ? '<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--surface-2);">' +
+            '<div style="display:flex;align-items:center;gap:12px;">' +
+              '<div style="font-size:24px;">' + hrvStatus + '</div>' +
+              '<div>' +
+                '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:' + hrvColor + ';">HRV ' + hrvLabel + '</div>' +
+                '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">0 ms</div>' +
+              '</div>' +
             '</div>' +
-          '</div>' +
+          '</div>' : '') +
         '</div>' +
       '</div>' +
-    '</div>' +
-
-    '<div class="divider-gradient"></div>' +
+      '<div class="divider-gradient"></div>'
+    :
+      // No scores — show CTA instead of empty radar
+      '<div style="padding:32px 0;text-align:center;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--text-subtle);letter-spacing:2px;margin-bottom:8px;">DEIN PROFIL IST LEER</div>' +
+        '<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6;">Trage Benchmarks ein um dein Radar-Profil und deinen Fight-Score zu sehen.</div>' +
+        '<button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;">ERSTEN TEST MACHEN \u2192</button>' +
+      '</div>' +
+      '<div class="divider-gradient"></div>'
+    ) +
 
     // ── HINWEISE ──
     '<div id="dash-hinweise" style="padding:16px 0;"></div>' +
 
     '<div class="divider-gradient"></div>' +
 
-    // ── AKTIVITÄT + KÄMPFE — side by side ──
+    // ── AKTIVITÄT + KÄMPFE — only show sections with data ──
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;padding:20px 0;">' +
+      // Aktivität
       '<div>' +
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:var(--white);letter-spacing:1px;margin-bottom:12px;">AKTIVIT\u00c4T</div>' +
         (recentBlocks.length > 0 ?
@@ -5805,9 +5825,13 @@ function renderDashboard() {
               '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">' + timeStr + '</div>' +
             '</div>';
           }).join('') :
-          '<div id="recent-log"></div>'
+          (hasLog ?
+            '<div id="recent-log"></div>' :
+            '<div style="font-size:var(--fs-sm);color:var(--text-subtle);padding:8px 0;">Noch keine Aktivit\u00e4t. <span style="color:var(--red);cursor:pointer;" onclick="showPage(\'wochenplan\')">Wochenplan starten \u2192</span></div>'
+          )
         ) +
       '</div>' +
+      // Kämpfe
       '<div>' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
           '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:var(--white);letter-spacing:1px;cursor:pointer;" onclick="showPage(\'fights\')">K\u00c4MPFE</div>' +
