@@ -384,9 +384,9 @@ function doLogout() {
   currentUser = null;
   localStorage.removeItem('fos_current');
   document.getElementById('app-screen').classList.remove('active');
-  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('app-screen').style.cssText = 'display:none!important';
   document.getElementById('auth-screen').classList.add('active');
-  document.getElementById('auth-screen').style.display = '';
+  document.getElementById('auth-screen').style.cssText = 'display:flex!important';
 }
 
 // ===== ONBOARDING WIZARD =====
@@ -718,9 +718,9 @@ function getDisplayName() {
 
 function enterApp() {
   document.getElementById('auth-screen').classList.remove('active');
-  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.cssText = 'display:none!important';
   document.getElementById('app-screen').classList.add('active');
-  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('app-screen').style.cssText = 'display:block!important';
   document.getElementById('user-pill').textContent = getDisplayName();
   // Prevent any input from stealing focus on load
   setTimeout(function() { document.activeElement && document.activeElement.blur(); }, 150);
