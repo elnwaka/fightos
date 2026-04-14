@@ -46,6 +46,7 @@ function syncToCloud(showFeedback) {
     data: data,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   }, { merge: true }).then(function() {
+    _ignoreNextSnapshot = true; // Don't re-apply our own write
     localStorage.setItem('fos_last_sync', new Date().toISOString());
     if (showFeedback) showToast('Daten synchronisiert');
     // Update sync status display if visible
@@ -64,32 +65,54 @@ function forceSyncNow() {
   syncToCloud(true);
 }
 
-// Sync data FROM Firestore
+// Sync data FROM Firestore (one-time pull)
 function syncFromCloud(callback) {
   if (!_fbSyncEnabled || !_fbUser) { if (callback) callback(); return; }
   _fbDb.collection('users').doc(_fbUser.uid).get().then(function(doc) {
-    if (doc.exists) {
-      var cloud = doc.data();
-      if (cloud.data) {
-        localStorage.setItem('fos_data_' + (cloud.username || currentUser), JSON.stringify(cloud.data));
-      }
-      if (cloud.profile && cloud.username) {
-        var users = safeParse('fos_users', {});
-        var existing = users[cloud.username] || {};
-        users[cloud.username] = Object.assign(existing, cloud.profile);
-        // Always keep these flags true once set
-        users[cloud.username].onboardingDone = true;
-        users[cloud.username].seenIntro = true;
-        users[cloud.username].pass = 'firebase';
-        localStorage.setItem('fos_users', JSON.stringify(users));
-        currentUser = cloud.username;
-        localStorage.setItem('fos_current', currentUser);
-      }
-    }
+    if (doc.exists) applyCloudData(doc.data());
     if (callback) callback();
   }).catch(function(e) {
     console.warn('Cloud fetch failed:', e);
     if (callback) callback();
+  });
+}
+
+// Apply cloud data to localStorage
+var _ignoreNextSnapshot = false;
+function applyCloudData(cloud) {
+  if (!cloud) return;
+  if (cloud.data) {
+    localStorage.setItem('fos_data_' + (cloud.username || currentUser), JSON.stringify(cloud.data));
+  }
+  if (cloud.profile && cloud.username) {
+    var users = safeParse('fos_users', {});
+    var existing = users[cloud.username] || {};
+    users[cloud.username] = Object.assign(existing, cloud.profile);
+    users[cloud.username].onboardingDone = true;
+    users[cloud.username].seenIntro = true;
+    users[cloud.username].pass = 'firebase';
+    localStorage.setItem('fos_users', JSON.stringify(users));
+    currentUser = cloud.username;
+    localStorage.setItem('fos_current', currentUser);
+  }
+  localStorage.setItem('fos_last_sync', new Date().toISOString());
+}
+
+// Real-time listener — auto-receives changes from other devices
+var _snapshotUnsub = null;
+function startRealtimeSync() {
+  if (!_fbSyncEnabled || !_fbUser || _snapshotUnsub) return;
+  _snapshotUnsub = _fbDb.collection('users').doc(_fbUser.uid).onSnapshot(function(doc) {
+    if (!doc.exists) return;
+    // Skip if we just wrote (to avoid loop)
+    if (_ignoreNextSnapshot) { _ignoreNextSnapshot = false; return; }
+    applyCloudData(doc.data());
+    // Refresh UI with new data
+    if (document.getElementById('app-screen') && document.getElementById('app-screen').style.display !== 'none') {
+      refreshVisiblePages();
+    }
+  }, function(err) {
+    console.warn('Realtime sync error:', err);
   });
 }
 
@@ -353,7 +376,8 @@ async function doLogin() {
 // Legacy migration removed — only Firebase auth now
 
 function doLogout() {
-  // Sync before logout
+  // Stop realtime listener + sync before logout
+  if (_snapshotUnsub) { _snapshotUnsub(); _snapshotUnsub = null; }
   if (_fbSyncEnabled && _fbUser) syncToCloud();
   if (_fbAuth) _fbAuth.signOut().catch(function() {});
   _fbUser = null;
@@ -731,9 +755,10 @@ function enterApp() {
     showPage(getPageFromHash());
   }
 
-  // Force sync existing data to cloud on every app entry
+  // Force sync existing data to cloud + start realtime listener
   if (_fbSyncEnabled && _fbUser) {
     setTimeout(syncToCloud, 1000);
+    startRealtimeSync();
   }
 
   // Request notification permission + schedule daily reminders
