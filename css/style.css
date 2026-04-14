@@ -3854,22 +3854,22 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   position: relative;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
-  min-height: 50vh;
+  min-height: 55vh;
   display: flex;
   align-items: flex-end;
-  padding: 0 0 40px;
+  padding: 0 0 60px;
   overflow: hidden;
 }
 .db-hero-img {
   position: absolute;
   inset: 0;
-  background: center/cover no-repeat;
-  filter: grayscale(80%) brightness(.6);
+  background: center 30%/cover no-repeat;
+  filter: grayscale(60%) brightness(.5) contrast(1.1);
 }
 .db-hero-fade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 20%, var(--black) 95%);
+  background: linear-gradient(180deg, rgba(8,8,8,.1) 0%, rgba(8,8,8,.4) 40%, var(--black) 92%);
 }
 .db-hero-inner {
   position: relative;
@@ -3896,18 +3896,21 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   margin-top: 8px;
 }
 
-/* Quick stats row under hero */
+/* Quick stats row — overlaps hero significantly */
 .db-stats-row {
   display: flex;
   gap: 0;
-  margin: -24px auto 0;
-  max-width: 600px;
+  margin: -48px auto 0;
+  max-width: 640px;
   position: relative;
   z-index: 2;
-  background: var(--surface-1);
+  background: rgba(17,17,17,.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--surface-3);
+  border: 1px solid rgba(255,255,255,.06);
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
 }
 .db-stat-cell {
   flex: 1;

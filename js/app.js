@@ -5805,7 +5805,7 @@ function renderDashboard() {
 
     // ══ FULL-BLEED HERO WITH IMAGE ══
     '<div class="db-hero">' +
-      '<div class="db-hero-img" style="background-image:url(\'img/hero/boxer-dark.jpg\');"></div>' +
+      '<div class="db-hero-img" style="background-image:url(\'img/hero/gym-dark.jpg\');"></div>' +
       '<div class="db-hero-fade"></div>' +
       '<div class="db-hero-inner">' +
         '<div class="db-hero-name">' + escapeHTML(getDisplayName()) + '</div>' +
