@@ -55,6 +55,17 @@ function showFieldError(inputEl, message) {
 }
 
 // Animated modal close
+var _modalPreviousFocus = null;
+
+function openModalFocus(modalEl) {
+  if (!modalEl) return;
+  _modalPreviousFocus = document.activeElement;
+  setTimeout(function() {
+    var first = modalEl.querySelector('input:not([type="hidden"]), textarea, select, button:not(.modal-close)');
+    if (first) first.focus();
+  }, 100);
+}
+
 function closeModal(modalEl) {
   if (!modalEl || !modalEl.classList.contains('active')) return;
   modalEl.classList.remove('active');
@@ -63,6 +74,9 @@ function closeModal(modalEl) {
   setTimeout(function() {
     modalEl.classList.remove('closing');
   }, 200);
+  if (_modalPreviousFocus && typeof _modalPreviousFocus.focus === 'function') {
+    setTimeout(function() { _modalPreviousFocus.focus(); _modalPreviousFocus = null; }, 220);
+  }
 }
 
 document.addEventListener('keydown', function(e) {
@@ -71,6 +85,21 @@ document.addEventListener('keydown', function(e) {
     document.querySelectorAll('.nav-hub.open').forEach(function(h) { h.classList.remove('open'); });
     var mm = document.getElementById('mobile-menu');
     if (mm && mm.classList.contains('open')) mm.classList.remove('open');
+    return;
+  }
+  // Focus trap inside active modal
+  if (e.key === 'Tab') {
+    var activeModal = document.querySelector('.modal-overlay.active .modal');
+    if (!activeModal) return;
+    var focusable = activeModal.querySelectorAll('input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
   }
 });
 
@@ -2053,7 +2082,7 @@ function openFightModal() {
   modal.classList.add('active');
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
-  setTimeout(function() { var first = modal.querySelector('input, textarea, select'); if (first) first.focus(); }, 100);
+  openModalFocus(modal);
   document.getElementById('fight-log-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('fight-log-opponent').value = '';
   // Reset extra fields
@@ -4724,7 +4753,7 @@ function editBlock(day, idx) {
   modal.classList.add('active');
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
-  setTimeout(function() { var first = modal.querySelector('input, textarea, select'); if (first) first.focus(); }, 100);
+  openModalFocus(modal);
 }
 
 function addBlock(day) {
@@ -4742,7 +4771,7 @@ function addBlock(day) {
   modal.classList.add('active');
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
-  setTimeout(function() { var first = modal.querySelector('input, textarea, select'); if (first) first.focus(); }, 100);
+  openModalFocus(modal);
 }
 
 function saveBlock() {
@@ -4931,7 +4960,12 @@ function sharePlan() {
   var shareLinkEl = document.getElementById('share-link');
   var shareModalEl = document.getElementById('share-modal');
   if (shareLinkEl) shareLinkEl.value = url;
-  if (shareModalEl) shareModalEl.classList.add('active');
+  if (shareModalEl) {
+    shareModalEl.classList.add('active');
+    shareModalEl.setAttribute('role', 'dialog');
+    shareModalEl.setAttribute('aria-modal', 'true');
+    openModalFocus(shareModalEl);
+  }
 }
 
 function copyShareLink() {
@@ -4987,7 +5021,7 @@ function openSettingsModal() {
   modal.classList.add('active');
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
-  setTimeout(function() { var first = modal.querySelector('input, textarea, select'); if (first) first.focus(); }, 100);
+  openModalFocus(modal);
 }
 
 function closeSettingsModal() { closeModal(document.getElementById('settings-modal')); }
