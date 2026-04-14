@@ -12,6 +12,9 @@ const PRECACHE = [
   './js/chart.min.js',
   './js/apexcharts.min.js',
   './css/apexcharts.css',
+  './js/firebase-app.js',
+  './js/firebase-auth.js',
+  './js/firebase-firestore.js',
   './img/icons/icon.svg',
   './img/icons/icon-192x192.png',
   './img/icons/icon-512x512.png'

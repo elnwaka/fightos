@@ -3,6 +3,74 @@
    Auth, Navigation, Fight Date, HRV, Logs
    ============================================ */
 
+// ===== FIREBASE =====
+var _fb = null;
+var _fbAuth = null;
+var _fbDb = null;
+var _fbUser = null;
+var _fbSyncEnabled = false;
+
+(function initFirebase() {
+  if (typeof firebase === 'undefined') return;
+  try {
+    _fb = firebase.initializeApp({
+      apiKey: "AIzaSyCDMAQUlUNNT9NdTu3_X2WDYyGr67UJoiw",
+      authDomain: "fightos-85652.firebaseapp.com",
+      projectId: "fightos-85652",
+      storageBucket: "fightos-85652.firebasestorage.app",
+      messagingSenderId: "150772112911",
+      appId: "1:150772112911:web:529261ab8c7bc6ccc78d7a"
+    });
+    _fbAuth = firebase.auth();
+    _fbDb = firebase.firestore();
+    _fbDb.enablePersistence({ synchronizeTabs: true }).catch(function() {});
+    _fbSyncEnabled = true;
+  } catch(e) { console.warn('Firebase init failed:', e); }
+})();
+
+// Sync data TO Firestore
+function syncToCloud() {
+  if (!_fbSyncEnabled || !_fbUser || !currentUser) return;
+  var data = getData();
+  if (!data) return;
+  var users = safeParse('fos_users', {});
+  var userData = users[currentUser] || {};
+  _fbDb.collection('users').doc(_fbUser.uid).set({
+    username: currentUser,
+    profile: userData,
+    data: data,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true }).catch(function(e) { console.warn('Sync failed:', e); });
+}
+
+// Sync data FROM Firestore
+function syncFromCloud(callback) {
+  if (!_fbSyncEnabled || !_fbUser) { if (callback) callback(); return; }
+  _fbDb.collection('users').doc(_fbUser.uid).get().then(function(doc) {
+    if (doc.exists) {
+      var cloud = doc.data();
+      if (cloud.data) {
+        localStorage.setItem('fos_data_' + (cloud.username || currentUser), JSON.stringify(cloud.data));
+      }
+      if (cloud.profile && cloud.username) {
+        var users = safeParse('fos_users', {});
+        users[cloud.username] = Object.assign(users[cloud.username] || {}, cloud.profile);
+        localStorage.setItem('fos_users', JSON.stringify(users));
+        currentUser = cloud.username;
+        localStorage.setItem('fos_current', currentUser);
+      }
+    }
+    if (callback) callback();
+  }).catch(function(e) {
+    console.warn('Cloud fetch failed:', e);
+    if (callback) callback();
+  });
+}
+
+// Auto-sync on data save (debounced)
+var _syncTimer = null;
+var _origSaveData = null;
+
 // ===== MOBILE HELPER =====
 function isMobile() { return window.innerWidth < 768; }
 
@@ -186,36 +254,99 @@ function switchAuthTab(tab) {
 }
 
 async function doRegister() {
-  const user = document.getElementById('reg-user').value.trim();
-  const pass = document.getElementById('reg-pass').value;
-  const msg = document.getElementById('auth-msg');
+  var user = document.getElementById('reg-user').value.trim();
+  var pass = document.getElementById('reg-pass').value;
+  var msg = document.getElementById('auth-msg');
   if (!user || !pass) { msg.className = 'auth-msg error'; msg.textContent = 'Alle Felder ausfüllen!'; return; }
-  if (pass.length < 3) { msg.className = 'auth-msg error'; msg.textContent = 'Passwort zu kurz!'; return; }
-  const users = safeParse('fos_users', {});
+  if (pass.length < 6) { msg.className = 'auth-msg error'; msg.textContent = 'Passwort mind. 6 Zeichen!'; return; }
+
+  // Firebase Auth
+  if (_fbAuth) {
+    try {
+      var email = user.indexOf('@') !== -1 ? user : user + '@fightos.app';
+      var cred = await _fbAuth.createUserWithEmailAndPassword(email, pass);
+      _fbUser = cred.user;
+      // Also save locally
+      var users = safeParse('fos_users', {});
+      users[user] = { pass: 'firebase', onboardingDone: false, created: new Date().toISOString(), firebaseUid: _fbUser.uid };
+      localStorage.setItem('fos_users', JSON.stringify(users));
+      var data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
+      localStorage.setItem('fos_data_' + user, JSON.stringify(data));
+      msg.className = 'auth-msg success'; msg.textContent = 'Account erstellt! Logge dich ein.';
+      switchAuthTab('login');
+    } catch(e) {
+      msg.className = 'auth-msg error';
+      if (e.code === 'auth/email-already-in-use') msg.textContent = 'Name bereits vergeben!';
+      else if (e.code === 'auth/weak-password') msg.textContent = 'Passwort zu schwach!';
+      else msg.textContent = e.message || 'Registrierung fehlgeschlagen.';
+    }
+    return;
+  }
+
+  // Fallback: localStorage only
+  var users = safeParse('fos_users', {});
   if (users[user]) { msg.className = 'auth-msg error'; msg.textContent = 'Name bereits vergeben!'; return; }
   var hashed = await hashPassword(pass, user);
   users[user] = { pass: hashed, onboardingDone: false, created: new Date().toISOString() };
   localStorage.setItem('fos_users', JSON.stringify(users));
-  const data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
+  var data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
   localStorage.setItem('fos_data_' + user, JSON.stringify(data));
   msg.className = 'auth-msg success'; msg.textContent = 'Account erstellt! Logge dich ein.';
   switchAuthTab('login');
 }
 
 async function doLogin() {
-  const user = document.getElementById('login-user').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  const msg = document.getElementById('auth-msg');
+  var user = document.getElementById('login-user').value.trim();
+  var pass = document.getElementById('login-pass').value;
+  var msg = document.getElementById('auth-msg');
   if (!user || !pass) { msg.className = 'auth-msg error'; msg.textContent = 'Alle Felder ausfüllen!'; return; }
-  const users = safeParse('fos_users', {});
+
+  // Firebase Auth
+  if (_fbAuth) {
+    try {
+      var email = user.indexOf('@') !== -1 ? user : user + '@fightos.app';
+      var cred = await _fbAuth.signInWithEmailAndPassword(email, pass);
+      _fbUser = cred.user;
+      currentUser = user;
+      localStorage.setItem('fos_current', user);
+      // Ensure local user entry exists
+      var users = safeParse('fos_users', {});
+      if (!users[user]) users[user] = { onboardingDone: false, created: new Date().toISOString() };
+      users[user].firebaseUid = _fbUser.uid;
+      users[user].pass = 'firebase';
+      localStorage.setItem('fos_users', JSON.stringify(users));
+      // Sync from cloud
+      msg.className = 'auth-msg success'; msg.textContent = 'Daten werden synchronisiert...';
+      syncFromCloud(function() {
+        var u2 = safeParse('fos_users', {});
+        if (u2[currentUser] && !u2[currentUser].onboardingDone) {
+          showOnboarding(); return;
+        }
+        enterApp();
+      });
+      return;
+    } catch(e) {
+      // If Firebase fails, try local fallback
+      msg.className = 'auth-msg error';
+      if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+        msg.textContent = 'Falsche Daten!';
+      } else if (e.code === 'auth/too-many-requests') {
+        msg.textContent = 'Zu viele Versuche. Warte kurz.';
+      } else {
+        msg.textContent = e.message || 'Login fehlgeschlagen.';
+      }
+      return;
+    }
+  }
+
+  // Fallback: localStorage only
+  var users = safeParse('fos_users', {});
   if (!users[user]) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
   var storedPass = users[user].pass;
   if (isHashed(storedPass)) {
-    // Already hashed – compare hash
     var hashed = await hashPassword(pass, user);
     if (storedPass !== hashed) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
-  } else {
-    // Legacy plaintext – compare then migrate
+  } else if (storedPass !== 'firebase') {
     if (storedPass !== pass) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
     users[user].pass = await hashPassword(pass, user);
     localStorage.setItem('fos_users', JSON.stringify(users));
@@ -240,6 +371,10 @@ async function doLogin() {
 }
 
 function doLogout() {
+  // Sync before logout
+  if (_fbSyncEnabled && _fbUser) syncToCloud();
+  if (_fbAuth) _fbAuth.signOut().catch(function() {});
+  _fbUser = null;
   currentUser = null;
   localStorage.removeItem('fos_current');
   document.getElementById('app-screen').classList.remove('active');
@@ -874,6 +1009,11 @@ function getData() {
 function saveData(data) {
   if (!currentUser) return;
   localStorage.setItem('fos_data_' + currentUser, JSON.stringify(data));
+  // Debounced cloud sync
+  if (_fbSyncEnabled && _fbUser) {
+    clearTimeout(_syncTimer);
+    _syncTimer = setTimeout(syncToCloud, 2000);
+  }
 }
 
 // ===== SCROLL REVEAL (Intersection Observer) =====

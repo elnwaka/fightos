@@ -17,6 +17,9 @@
 <link rel="stylesheet" href="css/apexcharts.css">
 <script src="js/chart.min.js"></script>
 <script src="js/apexcharts.min.js"></script>
+<script src="js/firebase-app.js"></script>
+<script src="js/firebase-auth.js"></script>
+<script src="js/firebase-firestore.js"></script>
 </head>
 <body>
 
@@ -619,29 +622,49 @@
   // Default log date
   var ld = document.getElementById('log-date');
   if (ld) ld.value = new Date().toISOString().split('T')[0];
-  // Auto-login
-  var saved = localStorage.getItem('fos_current');
-  if (saved) {
-    var users = JSON.parse(localStorage.getItem('fos_users') || '{}');
-    if (users[saved]) {
-      currentUser = saved;
-      if (!users[saved].onboardingDone && !users[saved].weight) {
-        showOnboarding();
-      } else {
-        // Migration for old users
-        if (users[saved].weight && !users[saved].onboardingDone) {
-          users[saved].onboardingDone = true;
-          users[saved].nickname = users[saved].nickname || saved;
-          users[saved].experienceLevel = users[saved].experienceLevel || 'fortgeschritten';
-          users[saved].boxingYears = users[saved].boxingYears || 1;
-          users[saved].height = users[saved].height || 175;
-          users[saved].goal = users[saved].goal || 'fitness';
-          users[saved].fitnessLevel = users[saved].fitnessLevel || 'mittel';
-          localStorage.setItem('fos_users', JSON.stringify(users));
+  // Auto-login: Firebase auth state listener + localStorage fallback
+  function localAutoLogin() {
+    var saved = localStorage.getItem('fos_current');
+    if (saved) {
+      var users = safeParse('fos_users', {});
+      if (users[saved]) {
+        currentUser = saved;
+        if (!users[saved].onboardingDone && !users[saved].weight) {
+          showOnboarding();
+        } else {
+          if (users[saved].weight && !users[saved].onboardingDone) {
+            users[saved].onboardingDone = true;
+            users[saved].nickname = users[saved].nickname || saved;
+            users[saved].experienceLevel = users[saved].experienceLevel || 'fortgeschritten';
+            users[saved].boxingYears = users[saved].boxingYears || 1;
+            users[saved].height = users[saved].height || 175;
+            users[saved].goal = users[saved].goal || 'fitness';
+            users[saved].fitnessLevel = users[saved].fitnessLevel || 'mittel';
+            localStorage.setItem('fos_users', JSON.stringify(users));
+          }
+          enterApp();
         }
-        enterApp();
       }
     }
+  }
+
+  if (_fbAuth) {
+    _fbAuth.onAuthStateChanged(function(fbUser) {
+      if (fbUser && !currentUser) {
+        _fbUser = fbUser;
+        var saved = localStorage.getItem('fos_current');
+        if (saved) {
+          currentUser = saved;
+          syncFromCloud(function() { enterApp(); });
+        } else {
+          localAutoLogin();
+        }
+      } else if (!fbUser) {
+        localAutoLogin();
+      }
+    });
+  } else {
+    localAutoLogin();
   }
 })();
 </script>
