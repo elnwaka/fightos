@@ -607,6 +607,99 @@ function enterApp() {
   } else {
     showPage(getPageFromHash());
   }
+
+  // Request notification permission + schedule daily reminders
+  initNotifications();
+}
+
+// ===== NOTIFICATION SYSTEM =====
+function initNotifications() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+  // Ask permission after 3 seconds (not immediately on load)
+  setTimeout(function() {
+    if (Notification.permission === 'default') {
+      // Show a soft prompt first
+      var banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface-1);border:1px solid var(--surface-3);border-radius:var(--radius-md);padding:16px 20px;z-index:9998;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.5);';
+      banner.innerHTML = '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:var(--white);margin-bottom:6px;">ERINNERUNGEN AKTIVIEREN?</div>' +
+        '<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;line-height:1.5;">FightOS kann dich täglich an Training, HRV und Checklist erinnern.</div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button onclick="requestNotifPermission(this.closest(\'div[style]\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:8px 16px;border-radius:var(--radius-md);cursor:pointer;">JA, AKTIVIEREN</button>' +
+          '<button onclick="this.closest(\'div[style]\').remove();localStorage.setItem(\'fos_notif_dismissed\',\'1\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);background:none;border:1px solid var(--surface-3);padding:8px 16px;border-radius:var(--radius-md);cursor:pointer;">NEIN DANKE</button>' +
+        '</div>';
+      if (!localStorage.getItem('fos_notif_dismissed')) {
+        document.body.appendChild(banner);
+        setTimeout(function() { if (banner.parentNode) banner.remove(); }, 15000);
+      }
+    } else if (Notification.permission === 'granted') {
+      scheduleDailyReminders();
+    }
+  }, 3000);
+}
+
+function requestNotifPermission(bannerEl) {
+  if (bannerEl) bannerEl.remove();
+  Notification.requestPermission().then(function(result) {
+    if (result === 'granted') {
+      showToast('Erinnerungen aktiviert');
+      scheduleDailyReminders();
+    }
+  });
+}
+
+function scheduleDailyReminders() {
+  if (Notification.permission !== 'granted') return;
+  var sw = navigator.serviceWorker.controller;
+  if (!sw) return;
+
+  var now = new Date();
+  var hour = now.getHours();
+
+  // Morning reminder (07:00) — if before 7am, schedule for today; else skip
+  if (hour < 7) {
+    var morning = new Date(now);
+    morning.setHours(7, 0, 0, 0);
+    var morningDelay = morning.getTime() - now.getTime();
+    sw.postMessage({
+      type: 'SCHEDULE_NOTIFICATION',
+      delay: morningDelay,
+      title: 'Guten Morgen, ' + getDisplayName(),
+      body: 'Trage deine HRV ein und check deinen Tagesplan.',
+      tag: 'fightos-morning'
+    });
+  }
+
+  // Evening reminder (20:00) — checklist
+  if (hour < 20) {
+    var evening = new Date(now);
+    evening.setHours(20, 0, 0, 0);
+    var eveningDelay = evening.getTime() - now.getTime();
+    sw.postMessage({
+      type: 'SCHEDULE_NOTIFICATION',
+      delay: eveningDelay,
+      title: 'Tages-Check',
+      body: 'Hast du heute alle Checklist-Punkte erledigt?',
+      tag: 'fightos-evening'
+    });
+  }
+
+  // Fight countdown — if fight in 1-7 days
+  var data = getData();
+  if (data && data.fightDate) {
+    var fightDay = new Date(data.fightDate + 'T00:00:00');
+    var diff = Math.ceil((fightDay - now) / 86400000);
+    if (diff > 0 && diff <= 7 && hour < 9) {
+      var fightReminder = new Date(now);
+      fightReminder.setHours(9, 0, 0, 0);
+      sw.postMessage({
+        type: 'SCHEDULE_NOTIFICATION',
+        delay: fightReminder.getTime() - now.getTime(),
+        title: diff === 1 ? 'MORGEN IST KAMPFTAG' : 'Noch ' + diff + ' Tage bis zum Kampf',
+        body: diff <= 3 ? 'Schärfungsphase. Qualität über Quantität.' : 'Bleib fokussiert. Alles läuft nach Plan.',
+        tag: 'fightos-fight'
+      });
+    }
+  }
 }
 
 function showSaeulenIntro() {

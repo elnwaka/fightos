@@ -122,3 +122,31 @@ self.addEventListener('fetch', function(event) {
     })
   );
 });
+
+// ===== NOTIFICATIONS =====
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window' }).then(function(clients) {
+      for (var i = 0; i < clients.length; i++) {
+        if ('focus' in clients[i]) return clients[i].focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow('./');
+    })
+  );
+});
+
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'SCHEDULE_NOTIFICATION') {
+    var delay = event.data.delay || 0;
+    setTimeout(function() {
+      self.registration.showNotification(event.data.title || 'FightOS', {
+        body: event.data.body || '',
+        icon: './img/icons/icon-192x192.png',
+        badge: './img/icons/icon-192x192.png',
+        tag: event.data.tag || 'fightos-reminder',
+        vibrate: [100, 50, 100]
+      });
+    }, delay);
+  }
+});
