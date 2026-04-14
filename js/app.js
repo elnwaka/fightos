@@ -5762,27 +5762,31 @@ function renderDashboard() {
 
     '<div class="divider-gradient"></div>' +
 
-    // ── RADAR — full width, prominent ──
-    '<div style="text-align:center;padding:24px 0;">' +
-      '<canvas id="rpg-radar" width="' + radarSize + '" height="' + radarSize + '" style="max-width:' + radarSize + 'px;display:block;margin:0 auto;"></canvas>' +
+    // ── PERFORMANCE: Radar links + Stats rechts (Desktop), gestapelt (Mobile) ──
+    '<div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;padding:24px 0;">' +
+      '<div style="flex-shrink:0;">' +
+        '<canvas id="rpg-radar" width="' + radarSize + '" height="' + radarSize + '" style="max-width:' + radarSize + 'px;display:block;"></canvas>' +
+      '</div>' +
+      '<div style="flex:1;min-width:200px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:2px;margin-bottom:16px;">PERFORMANCE</div>' +
+        '<div id="dash-stats"></div>' +
+        // HRV inline under stats
+        '<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--surface-2);">' +
+          '<div style="display:flex;align-items:center;gap:12px;">' +
+            '<div style="font-size:24px;">' + hrvStatus + '</div>' +
+            '<div>' +
+              '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:' + hrvColor + ';">HRV ' + hrvLabel + '</div>' +
+              (hrvArr.length > 0 ? '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">0 ms</div>' : '') +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
     '</div>' +
 
     '<div class="divider-gradient"></div>' +
 
-    // ── HRV + HINWEISE — side by side on desktop, stacked on mobile ──
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;padding:20px 0;">' +
-      '<div>' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:var(--white);letter-spacing:1px;margin-bottom:12px;">RECOVERY</div>' +
-        '<div style="display:flex;align-items:center;gap:16px;">' +
-          '<div style="font-size:28px;">' + hrvStatus + '</div>' +
-          '<div>' +
-            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:' + hrvColor + ';">' + hrvLabel + '</div>' +
-            (hrvArr.length > 0 ? '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">0 ms</div>' : '') +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div id="dash-hinweise"></div>' +
-    '</div>' +
+    // ── HINWEISE ──
+    '<div id="dash-hinweise" style="padding:16px 0;"></div>' +
 
     '<div class="divider-gradient"></div>' +
 
@@ -5836,15 +5840,14 @@ function renderDashboard() {
       '</div>'
     : '') +
 
-    // ── DESKTOP EXTRAS ──
-    '<div class="dash-hide-mobile" style="padding:20px 0;border-top:1px solid var(--surface-2);">' +
-      '<div id="dash-stats"></div>' +
-      '<div id="saeulen-self-rating" style="margin-top:16px;"></div>' +
-      '<div id="bench-summary" style="margin-top:12px;font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
-      '<div style="margin-top:16px;display:flex;align-items:center;gap:8px;">' +
-        '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:6px 10px;font-size:var(--fs-xs);" onchange="updateFightDate()">' +
-        '<button class="submit-btn" style="padding:4px 10px;font-size:var(--fs-xs);" onclick="clearFightDate()">\u00d7</button>' +
-      '</div>' +
+    // ── EXTRAS ──
+    '<div class="dash-hide-mobile" style="padding:16px 0;">' +
+      '<div id="saeulen-self-rating"></div>' +
+    '</div>' +
+    '<div style="padding:8px 0;display:flex;align-items:center;gap:8px;">' +
+      '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:6px 10px;font-size:var(--fs-xs);" onchange="updateFightDate()">' +
+      '<button class="submit-btn" style="padding:4px 10px;font-size:var(--fs-xs);" onclick="clearFightDate()">\u00d7</button>' +
+      '<div id="bench-summary" style="margin-left:auto;font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
     '</div>' +
 
     (isNewUser ? '<div style="text-align:center;padding:40px 0;border-top:1px solid var(--surface-2);"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--white);margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div><div style="font-size:var(--fs-base);color:var(--text-muted);max-width:500px;margin:0 auto 24px;line-height:1.6;">Dein persönlicher Boxing-Coach.</div><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"><button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;">Wochenplan</button><button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--gold);background:none;border:1px solid rgba(245,197,24,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;">Erster Test</button><button onclick="showPage(\'mental\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;">Alter Ego</button></div></div>' : '') +
