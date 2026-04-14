@@ -969,6 +969,7 @@ function getData() {
   return data;
 }
 
+var _refreshTimer = null;
 function saveData(data) {
   if (!currentUser) return;
   localStorage.setItem('fos_data_' + currentUser, JSON.stringify(data));
@@ -977,6 +978,25 @@ function saveData(data) {
     clearTimeout(_syncTimer);
     _syncTimer = setTimeout(syncToCloud, 2000);
   }
+  // Debounced UI refresh — updates all visible pages
+  clearTimeout(_refreshTimer);
+  _refreshTimer = setTimeout(refreshVisiblePages, 300);
+}
+
+function refreshVisiblePages() {
+  var active = document.querySelector('.page.active');
+  if (!active) return;
+  var id = active.id.replace('page-', '');
+  // Always refresh dashboard data if it has rendered elements
+  if (document.getElementById('fight-log-list')) renderFightLog();
+  if (document.getElementById('recent-log')) renderRecentLog();
+  if (document.getElementById('dash-stats') && id === 'dashboard') renderDashStats();
+  if (document.getElementById('checklist-score')) renderDailyCombined();
+  // Refresh the active page
+  if (id === 'fights' && typeof renderFightsPage === 'function') renderFightsPage();
+  if (id === 'tests' && typeof renderTestsPage === 'function') renderTestsPage();
+  if (id === 'log') renderLogEntries();
+  if (id === 'account' && typeof renderAccountPage === 'function') renderAccountPage();
 }
 
 // ===== SCROLL REVEAL (Intersection Observer) =====
