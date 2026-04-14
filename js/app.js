@@ -1348,51 +1348,101 @@ function renderRadarChart(canvasOrScores, scoresArg) {
   var values = keys.map(function(k) { return scores[k] || 0; });
   var colors = RADAR_AXES.map(function(a) { return a.hex; });
   var theme = getChartTheme();
+  var isMob = window.innerWidth < 480;
 
   // Destroy old chart
   if (_radarChart) { _radarChart.destroy(); _radarChart = null; }
+
+  // Radial gradient fill
+  var ctx = canvas.getContext('2d');
+  var cx = canvas.width / 2;
+  var cy = canvas.height / 2;
+  var r = Math.min(cx, cy) * 0.6;
+  var gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+  gradient.addColorStop(0, 'rgba(232,0,13,.25)');
+  gradient.addColorStop(1, 'rgba(232,0,13,.02)');
+
+  // Ghost layer (last week's scores)
+  var datasets = [{
+    label: 'Aktuell',
+    data: values,
+    backgroundColor: gradient,
+    borderColor: 'rgba(232,0,13,.7)',
+    borderWidth: 2,
+    pointBackgroundColor: colors,
+    pointBorderColor: theme.pointBorder,
+    pointBorderWidth: 1.5,
+    pointRadius: 4,
+    pointHoverRadius: 6
+  }];
+
+  // Add ghost dataset if weekly snapshot exists
+  var data = typeof getData === 'function' ? getData() : null;
+  if (data && data.weeklySnapshots && data.weeklySnapshots.length >= 1) {
+    var snap = data.weeklySnapshots[0];
+    if (snap.overallScore !== null && snap.overallScore !== undefined) {
+      // Use snapshot scores or estimate from overall
+      var ghostValues = keys.map(function() { return snap.overallScore || 0; });
+      datasets.push({
+        label: 'Letzte Woche',
+        data: ghostValues,
+        backgroundColor: 'transparent',
+        borderColor: 'rgba(255,255,255,.12)',
+        borderWidth: 1.5,
+        borderDash: [4, 4],
+        pointRadius: 0,
+        pointHoverRadius: 3
+      });
+    }
+  }
 
   _radarChart = new Chart(canvas, {
     type: 'radar',
     data: {
       labels: labels,
-      datasets: [{
-        data: values,
-        backgroundColor: 'rgba(232,0,13,.12)',
-        borderColor: 'rgba(232,0,13,.7)',
-        borderWidth: 2,
-        pointBackgroundColor: colors,
-        pointBorderColor: theme.pointBorder,
-        pointBorderWidth: 1.5,
-        pointRadius: 4,
-        pointHoverRadius: 6
-      }]
+      datasets: datasets
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
+      animation: {
+        duration: 1200,
+        easing: 'easeOutQuart',
+        delay: 500
+      },
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,.85)',
+          titleFont: { family: "'Space Mono', monospace", size: 11 },
+          bodyFont: { family: "'Bebas Neue', sans-serif", size: 18 },
+          cornerRadius: 8,
+          padding: 12,
+          displayColors: false,
+          callbacks: {
+            label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw + '/100'; }
+          }
+        }
       },
       scales: {
         r: {
           beginAtZero: true,
           max: 100,
           ticks: {
-            stepSize: 25,
+            stepSize: 20,
             color: theme.tick,
             font: { family: "'Space Mono', monospace", size: 9 },
-            backdropColor: theme.backdrop
+            backdropColor: 'transparent'
           },
           grid: {
-            color: theme.grid
+            color: 'rgba(255,255,255,.04)'
           },
           angleLines: {
-            color: theme.grid
+            color: 'rgba(255,255,255,.08)'
           },
           pointLabels: {
-            color: theme.label,
-            font: { family: "'Space Mono', monospace", size: 10, weight: '600' }
+            color: colors,
+            font: { family: "'Space Mono', monospace", size: isMob ? 10 : 12, weight: '700' }
           }
         }
       }
@@ -5773,8 +5823,13 @@ function renderDashboard() {
     : '') +
 
     // ── DESKTOP EXTRAS (inside bento grid) ──
+    // ── RADAR CHART (own row) ──
+    '<div class="bento-cell bento-full glass" style="text-align:center;padding:var(--space-6);">' +
+      '<div class="sec-label">PERFORMANCE PROFIL</div>' +
+      '<canvas id="rpg-radar" width="' + (window.innerWidth >= 768 ? 400 : 300) + '" height="' + (window.innerWidth >= 768 ? 400 : 300) + '" style="max-width:' + (window.innerWidth >= 768 ? 400 : 300) + 'px;display:block;margin:0 auto;"></canvas>' +
+    '</div>' +
+
     '<div class="bento-cell bento-full dash-hide-mobile" style="background:transparent;border:none;backdrop-filter:none;">' +
-      '<div style="text-align:center;margin-bottom:20px;"><canvas id="rpg-radar" width="320" height="320" style="max-width:320px;"></canvas></div>' +
       '<div id="dash-stats" style="margin-top:0;"></div>' +
       '<div id="saeulen-self-rating" style="margin-top:16px;"></div>' +
       '<div id="bench-summary" style="margin-top:12px;font-family:\'Space Mono\',monospace;font-size:11px;color:#555;cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
