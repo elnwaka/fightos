@@ -259,40 +259,28 @@ async function doRegister() {
   var msg = document.getElementById('auth-msg');
   if (!user || !pass) { msg.className = 'auth-msg error'; msg.textContent = 'Alle Felder ausfüllen!'; return; }
   if (pass.length < 6) { msg.className = 'auth-msg error'; msg.textContent = 'Passwort mind. 6 Zeichen!'; return; }
+  if (!_fbAuth) { msg.className = 'auth-msg error'; msg.textContent = 'Keine Verbindung zum Server.'; return; }
 
-  // Firebase Auth
-  if (_fbAuth) {
-    try {
-      var email = user.indexOf('@') !== -1 ? user : user + '@fightos.app';
-      var cred = await _fbAuth.createUserWithEmailAndPassword(email, pass);
-      _fbUser = cred.user;
-      // Also save locally
-      var users = safeParse('fos_users', {});
-      users[user] = { pass: 'firebase', onboardingDone: false, created: new Date().toISOString(), firebaseUid: _fbUser.uid };
-      localStorage.setItem('fos_users', JSON.stringify(users));
-      var data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
-      localStorage.setItem('fos_data_' + user, JSON.stringify(data));
-      msg.className = 'auth-msg success'; msg.textContent = 'Account erstellt! Logge dich ein.';
-      switchAuthTab('login');
-    } catch(e) {
-      msg.className = 'auth-msg error';
-      if (e.code === 'auth/email-already-in-use') msg.textContent = 'Name bereits vergeben!';
-      else if (e.code === 'auth/weak-password') msg.textContent = 'Passwort zu schwach!';
-      else msg.textContent = e.message || 'Registrierung fehlgeschlagen.';
-    }
-    return;
+  try {
+    var email = user.indexOf('@') !== -1 ? user : user + '@fightos.app';
+    var cred = await _fbAuth.createUserWithEmailAndPassword(email, pass);
+    _fbUser = cred.user;
+    // Clear old localStorage users + create fresh local entry
+    localStorage.removeItem('fos_users');
+    var users = {};
+    users[user] = { pass: 'firebase', onboardingDone: false, created: new Date().toISOString(), firebaseUid: _fbUser.uid };
+    localStorage.setItem('fos_users', JSON.stringify(users));
+    var data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
+    localStorage.setItem('fos_data_' + user, JSON.stringify(data));
+    msg.className = 'auth-msg success'; msg.textContent = 'Account erstellt! Logge dich ein.';
+    switchAuthTab('login');
+  } catch(e) {
+    msg.className = 'auth-msg error';
+    if (e.code === 'auth/email-already-in-use') msg.textContent = 'Name bereits vergeben!';
+    else if (e.code === 'auth/weak-password') msg.textContent = 'Passwort zu schwach (mind. 6 Zeichen)!';
+    else if (e.code === 'auth/configuration-not-found') msg.textContent = 'Firebase Auth nicht aktiviert. Aktiviere E-Mail/Passwort in der Firebase Console.';
+    else msg.textContent = e.message || 'Registrierung fehlgeschlagen.';
   }
-
-  // Fallback: localStorage only
-  var users = safeParse('fos_users', {});
-  if (users[user]) { msg.className = 'auth-msg error'; msg.textContent = 'Name bereits vergeben!'; return; }
-  var hashed = await hashPassword(pass, user);
-  users[user] = { pass: hashed, onboardingDone: false, created: new Date().toISOString() };
-  localStorage.setItem('fos_users', JSON.stringify(users));
-  var data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
-  localStorage.setItem('fos_data_' + user, JSON.stringify(data));
-  msg.className = 'auth-msg success'; msg.textContent = 'Account erstellt! Logge dich ein.';
-  switchAuthTab('login');
 }
 
 async function doLogin() {
@@ -300,75 +288,42 @@ async function doLogin() {
   var pass = document.getElementById('login-pass').value;
   var msg = document.getElementById('auth-msg');
   if (!user || !pass) { msg.className = 'auth-msg error'; msg.textContent = 'Alle Felder ausfüllen!'; return; }
+  if (!_fbAuth) { msg.className = 'auth-msg error'; msg.textContent = 'Keine Verbindung zum Server.'; return; }
 
-  // Firebase Auth
-  if (_fbAuth) {
-    try {
-      var email = user.indexOf('@') !== -1 ? user : user + '@fightos.app';
-      var cred = await _fbAuth.signInWithEmailAndPassword(email, pass);
-      _fbUser = cred.user;
-      currentUser = user;
-      localStorage.setItem('fos_current', user);
-      // Ensure local user entry exists
-      var users = safeParse('fos_users', {});
-      if (!users[user]) users[user] = { onboardingDone: false, created: new Date().toISOString() };
-      users[user].firebaseUid = _fbUser.uid;
-      users[user].pass = 'firebase';
-      localStorage.setItem('fos_users', JSON.stringify(users));
-      // Sync from cloud
-      msg.className = 'auth-msg success'; msg.textContent = 'Daten werden synchronisiert...';
-      syncFromCloud(function() {
-        var u2 = safeParse('fos_users', {});
-        if (u2[currentUser] && !u2[currentUser].onboardingDone) {
-          showOnboarding(); return;
-        }
-        enterApp();
-      });
-      return;
-    } catch(e) {
-      // If Firebase fails, try local fallback
-      msg.className = 'auth-msg error';
-      if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        msg.textContent = 'Falsche Daten!';
-      } else if (e.code === 'auth/too-many-requests') {
-        msg.textContent = 'Zu viele Versuche. Warte kurz.';
-      } else {
-        msg.textContent = e.message || 'Login fehlgeschlagen.';
+  try {
+    var email = user.indexOf('@') !== -1 ? user : user + '@fightos.app';
+    var cred = await _fbAuth.signInWithEmailAndPassword(email, pass);
+    _fbUser = cred.user;
+    currentUser = user;
+    localStorage.setItem('fos_current', user);
+    // Clear old users, create fresh entry
+    var users = {};
+    users[user] = { pass: 'firebase', onboardingDone: false, created: new Date().toISOString(), firebaseUid: _fbUser.uid };
+    localStorage.setItem('fos_users', JSON.stringify(users));
+    // Sync from cloud
+    msg.className = 'auth-msg success'; msg.textContent = 'Daten werden synchronisiert...';
+    syncFromCloud(function() {
+      var u2 = safeParse('fos_users', {});
+      if (u2[currentUser] && !u2[currentUser].onboardingDone) {
+        showOnboarding(); return;
       }
-      return;
+      enterApp();
+    });
+  } catch(e) {
+    msg.className = 'auth-msg error';
+    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+      msg.textContent = 'Falsche Daten!';
+    } else if (e.code === 'auth/too-many-requests') {
+      msg.textContent = 'Zu viele Versuche. Warte kurz.';
+    } else if (e.code === 'auth/configuration-not-found') {
+      msg.textContent = 'Firebase Auth nicht aktiviert. Aktiviere E-Mail/Passwort in der Firebase Console.';
+    } else {
+      msg.textContent = e.message || 'Login fehlgeschlagen.';
     }
   }
-
-  // Fallback: localStorage only
-  var users = safeParse('fos_users', {});
-  if (!users[user]) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
-  var storedPass = users[user].pass;
-  if (isHashed(storedPass)) {
-    var hashed = await hashPassword(pass, user);
-    if (storedPass !== hashed) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
-  } else if (storedPass !== 'firebase') {
-    if (storedPass !== pass) { msg.className = 'auth-msg error'; msg.textContent = 'Falsche Daten!'; return; }
-    users[user].pass = await hashPassword(pass, user);
-    localStorage.setItem('fos_users', JSON.stringify(users));
-  }
-  currentUser = user;
-  localStorage.setItem('fos_current', user);
-  if (users[user].weight && !users[user].onboardingDone) {
-    users[user].onboardingDone = true;
-    users[user].nickname = users[user].nickname || user;
-    users[user].experienceLevel = users[user].experienceLevel || 'fortgeschritten';
-    users[user].boxingYears = users[user].boxingYears || 1;
-    users[user].height = users[user].height || 175;
-    users[user].goal = users[user].goal || 'fitness';
-    users[user].fitnessLevel = users[user].fitnessLevel || 'mittel';
-    localStorage.setItem('fos_users', JSON.stringify(users));
-  }
-  if (!users[user].onboardingDone) {
-    showOnboarding();
-    return;
-  }
-  enterApp();
 }
+
+// Legacy migration removed — only Firebase auth now
 
 function doLogout() {
   // Sync before logout
