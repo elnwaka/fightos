@@ -5704,7 +5704,7 @@ function renderDashboard() {
     (isNewUser ? '<div class="bento-full bento-cell glass" style="text-align:center;padding:40px 24px;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:var(--white);margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div><div style="font-size:15px;color:#666;max-width:500px;margin:0 auto 24px;line-height:1.6;">Dein persönlicher Boxing-Coach. Starte mit deinem ersten Schritt:</div><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"><button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;">Wochenplan ansehen</button><button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;">Ersten Test machen</button><button onclick="showPage(\'mental\')" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;">Alter Ego erstellen</button></div></div>' : '') +
 
     // ── ROW 1: HERO (wide) + SCORE RING ──
-    '<div class="bento-cell bento-wide glass glow-card" style="background:linear-gradient(135deg,rgba(232,0,13,.06),rgba(245,197,24,.03));">' +
+    '<div class="bento-cell bento-wide bento-hero glass glow-card" style="background:linear-gradient(135deg,rgba(232,0,13,.06),rgba(245,197,24,.03));">' +
       '<div style="display:flex;align-items:center;gap:20px;">' +
         '<div style="flex:1;">' +
           '<div class="glow-text" style="font-family:\'Bebas Neue\',sans-serif;font-size:52px;line-height:1;color:var(--white);">' + getDisplayName() + '</div>' +
@@ -5713,7 +5713,7 @@ function renderDashboard() {
       '</div>' +
     '</div>' +
 
-    '<div class="bento-cell glass" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
+    '<div class="bento-cell bento-hero glass" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
       '<div style="display:inline-block;filter:drop-shadow(0 0 12px rgba(232,0,13,.25));">' +
         '<svg width="' + ringSize + '" height="' + ringSize + '" viewBox="0 0 120 120">' +
           '<defs><linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="var(--red)"/><stop offset="100%" stop-color="var(--gold)"/></linearGradient></defs>' +
@@ -5771,7 +5771,7 @@ function renderDashboard() {
     '</div>' +
 
     // ── ROW 4: AKTIVIT\u00c4T (wide) + K\u00c4MPFE ──
-    '<div class="bento-cell bento-wide glass">' +
+    '<div class="bento-cell bento-wide bento-subtle glass">' +
       '<div class="sec-label">AKTIVIT\u00c4T</div>' +
       '<div style="margin-top:8px;">' +
       (recentBlocks.length > 0 ?
@@ -5791,7 +5791,7 @@ function renderDashboard() {
       '</div>' +
     '</div>' +
 
-    '<div class="bento-cell glass">' +
+    '<div class="bento-cell bento-subtle glass">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;">' +
         '<div class="sec-label" style="cursor:pointer;" onclick="showPage(\'fights\')">K\u00c4MPFE</div>' +
         '<button class="submit-btn" style="padding:6px 14px;font-size:11px;border-radius:var(--radius-md);" onclick="openFightModal()">+</button>' +
@@ -5824,7 +5824,7 @@ function renderDashboard() {
 
     // ── DESKTOP EXTRAS (inside bento grid) ──
     // ── RADAR CHART (own row) ──
-    '<div class="bento-cell bento-full glass" style="text-align:center;padding:var(--space-6);">' +
+    '<div class="bento-cell bento-full bento-hero glass" style="text-align:center;padding:var(--space-6);">' +
       '<div class="sec-label">PERFORMANCE PROFIL</div>' +
       '<canvas id="rpg-radar" width="' + (window.innerWidth >= 768 ? 400 : 300) + '" height="' + (window.innerWidth >= 768 ? 400 : 300) + '" style="max-width:' + (window.innerWidth >= 768 ? 400 : 300) + 'px;display:block;margin:0 auto;"></canvas>' +
     '</div>' +
