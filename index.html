@@ -623,49 +623,36 @@
   // Default log date
   var ld = document.getElementById('log-date');
   if (ld) ld.value = new Date().toISOString().split('T')[0];
-  // Auto-login: Firebase auth state listener + localStorage fallback
-  function localAutoLogin() {
+  // Auto-login
+  function doAutoLogin() {
     var saved = localStorage.getItem('fos_current');
-    if (saved) {
-      var users = safeParse('fos_users', {});
-      if (users[saved]) {
-        currentUser = saved;
-        if (!users[saved].onboardingDone && !users[saved].weight) {
-          showOnboarding();
-        } else {
-          if (users[saved].weight && !users[saved].onboardingDone) {
-            users[saved].onboardingDone = true;
-            users[saved].nickname = users[saved].nickname || saved;
-            users[saved].experienceLevel = users[saved].experienceLevel || 'fortgeschritten';
-            users[saved].boxingYears = users[saved].boxingYears || 1;
-            users[saved].height = users[saved].height || 175;
-            users[saved].goal = users[saved].goal || 'fitness';
-            users[saved].fitnessLevel = users[saved].fitnessLevel || 'mittel';
-            localStorage.setItem('fos_users', JSON.stringify(users));
-          }
-          enterApp();
-        }
-      }
+    if (!saved) return;
+    currentUser = saved;
+    // Ensure user entry exists
+    var users = safeParse('fos_users', {});
+    if (!users[saved]) {
+      users[saved] = { pass: 'firebase', onboardingDone: true, created: new Date().toISOString() };
+      localStorage.setItem('fos_users', JSON.stringify(users));
     }
+    enterApp();
+    // Background sync (don't block)
+    if (_fbUser) syncFromCloud(function() {});
   }
 
   if (_fbAuth) {
+    var authHandled = false;
     _fbAuth.onAuthStateChanged(function(fbUser) {
-      if (fbUser && !currentUser) {
-        _fbUser = fbUser;
-        var saved = localStorage.getItem('fos_current');
-        if (saved) {
-          currentUser = saved;
-          syncFromCloud(function() { enterApp(); });
-        } else {
-          localAutoLogin();
-        }
-      } else if (!fbUser) {
-        localAutoLogin();
-      }
+      if (authHandled) return;
+      authHandled = true;
+      _fbUser = fbUser;
+      doAutoLogin();
     });
+    // If Firebase takes too long, go ahead with localStorage
+    setTimeout(function() {
+      if (!authHandled) { authHandled = true; doAutoLogin(); }
+    }, 2000);
   } else {
-    localAutoLogin();
+    doAutoLogin();
   }
 })();
 </script>
