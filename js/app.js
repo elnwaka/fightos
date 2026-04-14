@@ -5890,11 +5890,61 @@ function renderAccountPage() {
 
   const ws = u.weekSchedule || getDefaultWeekSchedule('18:00');
 
+  // Hero stats
+  var displayName = getDisplayName();
+  var initials = displayName.substring(0, 2).toUpperCase();
+  var created = u.created ? new Date(u.created) : null;
+  var memberSince = created ? created.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' }) : 'Unbekannt';
+  var totalFights = (data && data.fights) ? data.fights.length : 0;
+  var totalSessions = (data && data.log) ? data.log.length : 0;
+  var firstLog = (data && data.log && data.log.length) ? data.log[data.log.length - 1].date : null;
+  var daysActive = firstLog ? Math.max(1, Math.round((Date.now() - new Date(firstLog + 'T00:00:00').getTime()) / 86400000)) : 0;
+
+  // Achievements
+  var achievements = [
+    { id: 'first-log', name: 'Erste Session', desc: 'Erstes Training geloggt', done: totalSessions >= 1 },
+    { id: '10-sessions', name: '10 Sessions', desc: '10 Trainings absolviert', done: totalSessions >= 10 },
+    { id: '50-sessions', name: '50 Sessions', desc: '50 Trainings absolviert', done: totalSessions >= 50 },
+    { id: 'first-fight', name: 'Erster Kampf', desc: 'Ersten Kampf eingetragen', done: totalFights >= 1 },
+    { id: '5-fights', name: '5 Kämpfe', desc: '5 Kämpfe absolviert', done: totalFights >= 5 },
+    { id: 'alter-ego', name: 'Alter Ego', desc: 'Kampf-Identität erstellt', done: !!(data && data.alterEgo && data.alterEgo.name) },
+    { id: '30-days', name: '30 Tage aktiv', desc: 'Seit 30+ Tagen dabei', done: daysActive >= 30 },
+    { id: 'benchmark', name: 'Getestet', desc: 'Ersten Benchmark eingetragen', done: !!(data && data.benchmarks && Object.values(data.benchmarks).some(function(v){return v > 0;})) }
+  ];
+  var doneCount = achievements.filter(function(a){return a.done;}).length;
+
   el.innerHTML = `
-    <div class="page-header">
-      <div class="page-title">MEIN <span>ACCOUNT</span></div>
-      <div class="page-sub">Alle Einstellungen an einem Ort. Änderungen passen das gesamte System an.</div>
+    <!-- HERO -->
+    <div style="display:flex;align-items:center;gap:24px;padding:32px 0;border-bottom:1px solid var(--surface-2);margin-bottom:28px;flex-wrap:wrap;">
+      <div style="width:80px;height:80px;border-radius:50%;background:var(--surface-1);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-xl);color:var(--white);letter-spacing:2px;">${escapeHTML(initials)}</span>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-2xl);color:var(--white);letter-spacing:2px;line-height:1;">${escapeHTML(displayName).toUpperCase()}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-top:4px;">Mitglied seit ${memberSince}</div>
+      </div>
+      <div style="display:flex;gap:20px;">
+        <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-xl);color:var(--white);">${totalFights}</div><div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">KÄMPFE</div></div>
+        <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-xl);color:var(--white);">${totalSessions}</div><div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">SESSIONS</div></div>
+        <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-xl);color:var(--white);">${daysActive}</div><div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">TAGE</div></div>
+      </div>
     </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1.5px;margin-bottom:4px;">MEILENSTEINE <span style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">${doneCount}/${achievements.length}</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+        ${achievements.map(function(a) {
+          return '<div style="padding:10px 14px;border-radius:var(--radius-md);border:1px solid ' + (a.done ? 'rgba(0,200,83,.3)' : 'var(--surface-2)') + ';background:' + (a.done ? 'rgba(0,200,83,.06)' : 'var(--surface-1)') + ';min-width:120px;flex:1;">' +
+            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-base);color:' + (a.done ? 'var(--green)' : 'var(--text-subtle)') + ';">' + (a.done ? '\u2713 ' : '') + a.name + '</div>' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">' + a.desc + '</div>' +
+          '</div>';
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- EINSTELLUNGEN -->
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1.5px;margin-bottom:16px;">EINSTELLUNGEN</div>
     <div class="account-wrap">
       <div class="account-section">
         <div class="account-section-title">PERSÖNLICHE DATEN</div>
@@ -5972,6 +6022,12 @@ function renderAccountPage() {
 
       <button class="btn btn-red" onclick="saveAccountPage()" style="margin-bottom:16px;">SPEICHERN</button>
       <div id="acc-msg" class="auth-msg" style="margin-bottom:24px;"></div>
+
+      <div class="account-section" style="margin-top:32px;padding-top:24px;border-top:2px solid rgba(232,0,13,.2);">
+        <div class="account-section-title" style="color:var(--red);">DANGER ZONE</div>
+        <div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;line-height:1.6;">Alle Trainingsdaten, Kämpfe, Benchmarks und Einstellungen werden unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.</div>
+        <button onclick="deleteAllData()" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;">ALLE DATEN LÖSCHEN</button>
+      </div>
     </div>`;
 }
 
@@ -6036,6 +6092,20 @@ function saveAccountPage() {
   if (typeof renderWeekPlan === 'function') renderWeekPlan();
   if (typeof renderErnTimeline === 'function') renderErnTimeline();
   if (typeof renderDashStats === 'function') renderDashStats();
+}
+
+function deleteAllData() {
+  if (!confirm('ACHTUNG: Alle Trainingsdaten, Kämpfe, Benchmarks und Einstellungen werden UNWIDERRUFLICH gelöscht. Fortfahren?')) return;
+  if (!confirm('Bist du WIRKLICH sicher? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
+  localStorage.removeItem('fos_data_' + currentUser);
+  // Clear all checklist keys for this user
+  for (var i = localStorage.length - 1; i >= 0; i--) {
+    var key = localStorage.key(i);
+    if (key && key.startsWith('fos_checklist_' + currentUser)) localStorage.removeItem(key);
+  }
+  showToast('Alle Daten gelöscht', 'info');
+  renderAccountPage();
+  renderDashboard();
 }
 
 // ===== TESTS PAGE =====
