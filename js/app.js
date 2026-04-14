@@ -5783,87 +5783,105 @@ function renderDashboard() {
   var hasHRV = hrvArr.length > 0;
 
   el.innerHTML =
+    '<div class="dash-stagger dash-noise" style="display:flex;flex-direction:column;gap:20px;">' +
 
-    // ── HERO: Clean, no image ──
-    '<div style="padding:0 0 28px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(36px,7vw,56px);line-height:.9;color:var(--white);letter-spacing:2px;">' + escapeHTML(getDisplayName()).toUpperCase() + '</div>' +
-      '<div id="dash-countdown-hero" style="margin-top:8px;"></div>' +
+    // ── GREETING ──
+    '<div style="padding:8px 0 4px;">' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:var(--fs-sm);color:var(--text-muted);font-weight:300;">Willkommen zurück,</div>' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(32px,6vw,48px);color:var(--white);letter-spacing:2px;line-height:.9;">' + escapeHTML(getDisplayName()).toUpperCase() + '</div>' +
     '</div>' +
 
-    // ── SCORE + WEEK in one row ──
-    '<div style="display:flex;align-items:center;gap:24px;padding-bottom:24px;border-bottom:1px solid var(--surface-2);">' +
-      (hasScores ?
-        '<div style="flex-shrink:0;filter:drop-shadow(0 0 12px rgba(232,0,13,.15));">' +
-          '<svg width="80" height="80" viewBox="0 0 80 80">' +
-            '<defs><linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="var(--red)"/><stop offset="100%" stop-color="var(--gold)"/></linearGradient></defs>' +
-            '<circle cx="40" cy="40" r="34" stroke="var(--surface-2)" stroke-width="5" fill="none"/>' +
-            '<circle id="dash-ring-fg" cx="40" cy="40" r="34" stroke="url(#ring-grad)" stroke-width="4" fill="none" stroke-dasharray="' + (2*Math.PI*34) + '" stroke-dashoffset="' + (2*Math.PI*34) + '" stroke-linecap="round" transform="rotate(-90 40 40)"/>' +
-            '<text id="dash-ring-num" x="40" y="44" text-anchor="middle" style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;fill:var(--white);">0</text>' +
-          '</svg>' +
-        '</div>'
-      : '') +
-      '<div style="flex:1;display:flex;justify-content:space-between;align-items:center;gap:4px;">' +
+    // ── TOP METRICS (3 floating cards) ──
+    '<div class="dash-grid dash-grid-3">' +
+      '<div class="acard metric-card">' +
+        (hasScores ?
+          '<div class="metric-val" style="color:var(--gold);">' + (overall || 0) + '</div>' :
+          '<div class="metric-val" style="color:var(--text-subtle);">\u2014</div>'
+        ) +
+        '<div class="metric-label">FIGHT SCORE</div>' +
+      '</div>' +
+      '<div class="acard metric-card">' +
+        '<div class="metric-val">' + (data.fights ? data.fights.length : 0) + '</div>' +
+        '<div class="metric-label">K\u00c4MPFE</div>' +
+      '</div>' +
+      '<div class="acard metric-card">' +
+        '<div class="metric-val">' + (data.log ? data.log.length : 0) + '</div>' +
+        '<div class="metric-label">SESSIONS</div>' +
+      '</div>' +
+    '</div>' +
+
+    // ── FIGHT COUNTDOWN (if set) ──
+    '<div id="dash-countdown-hero"></div>' +
+
+    // ── HERO BLOCK: RADAR or CTA ──
+    (hasScores ?
+      '<div class="acard acard-lg">' +
+        '<div class="dash-title">PERFORMANCE</div>' +
+        '<div id="rpg-radar" style="max-width:400px;height:320px;margin:0 auto;"></div>' +
+        '<div id="dash-stats" style="margin-top:20px;"></div>' +
+      '</div>'
+    :
+      '<div class="acard acard-lg" style="text-align:center;padding:48px 24px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--text-subtle);letter-spacing:2px;">DEIN PROFIL</div>' +
+        '<div style="font-size:var(--fs-sm);color:var(--text-muted);margin:12px auto 24px;max-width:400px;line-height:1.6;">Trage Leistungstests ein um dein Radar-Profil zu sehen.</div>' +
+        '<button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);padding:12px 28px;border-radius:var(--radius-lg);cursor:pointer;">TESTS STARTEN</button>' +
+      '</div>'
+    ) +
+
+    // ── WEEK PROGRESS ──
+    '<div class="acard">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
+        '<div class="dash-title" style="margin-bottom:0;">DIESE WOCHE</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:' + (totalPlanned > 0 && totalDone >= totalPlanned ? 'var(--gold)' : 'var(--text-muted)') + ';">' + totalDone + '/' + totalPlanned + '</div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;gap:4px;">' +
         DAY_SHORT.map(function(d, i) {
           var dc = dayCompletion[i];
           var pct = dc.total > 0 ? dc.done / dc.total : 0;
           var c = 2 * Math.PI * 12;
           var off = c * (1 - pct);
-          var col = pct >= 1 ? 'var(--green)' : pct > 0 ? 'var(--gold)' : 'var(--surface-2)';
+          var col = pct >= 1 ? 'var(--green)' : pct > 0 ? 'var(--gold)' : 'var(--surface-3)';
           var isToday = i === todayDow;
           return '<div style="text-align:center;' + (isToday ? 'opacity:1;' : 'opacity:.5;') + '">' +
-            '<svg width="28" height="28" viewBox="0 0 28 28">' +
-              '<circle cx="14" cy="14" r="12" stroke="var(--surface-2)" stroke-width="2" fill="none"/>' +
-              '<circle id="week-ring-' + i + '" data-target="' + off + '" cx="14" cy="14" r="12" stroke="' + col + '" stroke-width="2" fill="none" stroke-dasharray="' + c + '" stroke-dashoffset="' + c + '" stroke-linecap="round" transform="rotate(-90 14 14)" style="transition:stroke-dashoffset .6s ease;"/>' +
+            '<svg width="32" height="32" viewBox="0 0 28 28">' +
+              '<circle cx="14" cy="14" r="12" stroke="var(--surface-2)" stroke-width="2.5" fill="none"/>' +
+              '<circle id="week-ring-' + i + '" data-target="' + off + '" cx="14" cy="14" r="12" stroke="' + col + '" stroke-width="2.5" fill="none" stroke-dasharray="' + c + '" stroke-dashoffset="' + c + '" stroke-linecap="round" transform="rotate(-90 14 14)" style="transition:stroke-dashoffset .6s ease;"/>' +
             '</svg>' +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:' + (isToday ? 'var(--white)' : 'var(--text-subtle)') + ';margin-top:1px;">' + d + '</div>' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:' + (isToday ? 'var(--white)' : 'var(--text-subtle)') + ';margin-top:2px;">' + d + '</div>' +
           '</div>';
         }).join('') +
       '</div>' +
     '</div>' +
 
-    // ── HEUTE ──
-    '<div style="padding:20px 0;border-bottom:1px solid var(--surface-2);">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:var(--white);letter-spacing:1px;margin-bottom:10px;">HEUTE</div>' +
+    // ── TODAY (Training + Checklist) ──
+    '<div class="acard">' +
+      '<div class="dash-title">HEUTE</div>' +
       '<div id="daily-combined"></div>' +
-      '<div id="checklist-score" style="margin-top:8px;"></div>' +
+      '<div id="checklist-score" style="margin-top:12px;"></div>' +
     '</div>' +
 
-    // ── RADAR + STATS (only if data) ──
-    (hasScores ?
-      '<div style="padding:20px 0;border-bottom:1px solid var(--surface-2);">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:var(--white);letter-spacing:1px;margin-bottom:12px;">PERFORMANCE</div>' +
-        '<div id="rpg-radar" style="max-width:360px;height:300px;margin:0 auto;"></div>' +
-        '<div id="dash-stats" style="margin-top:16px;"></div>' +
-      '</div>'
-    :
-      '<div style="padding:24px 0;border-bottom:1px solid var(--surface-2);text-align:center;">' +
-        '<div style="font-size:var(--fs-sm);color:var(--text-subtle);margin-bottom:12px;">Trage Benchmarks ein um dein Profil zu sehen.</div>' +
-        '<button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);padding:10px 20px;border-radius:var(--radius-md);cursor:pointer;">TESTS \u2192</button>' +
-      '</div>'
-    ) +
-
-    // ── HRV (only if data) ──
+    // ── HRV (if data) ──
     (hasHRV ?
-      '<div style="padding:16px 0;border-bottom:1px solid var(--surface-2);display:flex;align-items:center;gap:12px;">' +
-        '<div style="font-size:20px;">' + hrvStatus + '</div>' +
+      '<div class="acard acard-sm" style="display:flex;align-items:center;gap:16px;">' +
+        '<div style="font-size:24px;">' + hrvStatus + '</div>' +
         '<div style="flex:1;">' +
           '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-base);color:' + hrvColor + ';">HRV ' + hrvLabel + '</div>' +
         '</div>' +
-        '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);">0<span style="font-size:var(--fs-xs);color:var(--text-subtle);"> ms</span></div>' +
+        '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--white);">0<span style="font-size:var(--fs-xs);color:var(--text-subtle);"> ms</span></div>' +
       '</div>'
     : '') +
 
     // ── HINWEISE ──
-    '<div id="dash-hinweise" style="padding:12px 0;"></div>' +
+    '<div id="dash-hinweise"></div>' +
 
-    // ── AKTIVITÄT + KÄMPFE ──
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;padding:16px 0;border-bottom:1px solid var(--surface-2);">' +
-      '<div>' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-base);color:var(--white);letter-spacing:1px;margin-bottom:8px;">AKTIVIT\u00c4T</div>' +
+    // ── BOTTOM: Asymmetric grid (Aktivität + Kämpfe) ──
+    '<div class="dash-grid dash-grid-asym">' +
+      '<div class="acard">' +
+        '<div class="dash-title">AKTIVIT\u00c4T</div>' +
         (recentBlocks.length > 0 ?
           recentBlocks.map(function(rb) {
             var tc = TYPE_COLORS[rb.type] || 'var(--grey)';
-            return '<div class="activity-item" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);">' +
+            return '<div class="activity-item" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">' +
               '<div style="width:3px;height:20px;border-radius:2px;background:' + tc + ';"></div>' +
               '<div style="flex:1;font-size:var(--fs-sm);color:var(--light);">' + escapeHTML(rb.title || rb.type) + '</div>' +
             '</div>';
@@ -5871,19 +5889,19 @@ function renderDashboard() {
           (hasLog ? '<div id="recent-log"></div>' : '<div style="font-size:var(--fs-xs);color:var(--text-subtle);">Noch keine Aktivit\u00e4t.</div>')
         ) +
       '</div>' +
-      '<div>' +
+      '<div class="acard">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
-          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-base);color:var(--white);letter-spacing:1px;cursor:pointer;" onclick="showPage(\'fights\')">K\u00c4MPFE</div>' +
+          '<div class="dash-title" style="margin-bottom:0;cursor:pointer;" onclick="showPage(\'fights\')">K\u00c4MPFE</div>' +
           '<button class="submit-btn" style="padding:3px 10px;font-size:var(--fs-xs);" onclick="openFightModal()">+</button>' +
         '</div>' +
         '<div id="fight-log-list"></div>' +
       '</div>' +
     '</div>' +
 
-    // ── BENCHMARKS ──
+    // ── BENCHMARKS (if data) ──
     (topBench.length > 0 ?
-      '<div style="padding:16px 0;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-base);color:var(--white);letter-spacing:1px;margin-bottom:8px;cursor:pointer;" onclick="showPage(\'tests\')">BENCHMARKS</div>' +
+      '<div class="acard">' +
+        '<div class="dash-title" style="cursor:pointer;" onclick="showPage(\'tests\')">BENCHMARKS</div>' +
         '<div style="display:flex;gap:16px;overflow-x:auto;padding-bottom:4px;">' +
           topBench.map(function(b) {
             var h = hist[b.id] || [];
@@ -5900,12 +5918,25 @@ function renderDashboard() {
     : '') +
 
     // ── FOOTER ──
-    '<div style="padding:12px 0;display:flex;align-items:center;gap:8px;">' +
+    '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">' +
       '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:5px 8px;font-size:var(--fs-xs);" onchange="updateFightDate()">' +
       '<button class="submit-btn" style="padding:3px 8px;font-size:var(--fs-xs);" onclick="clearFightDate()">\u00d7</button>' +
       '<div id="bench-summary" style="margin-left:auto;font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
     '</div>' +
-    '<div class="dash-hide-mobile"><div id="saeulen-self-rating"></div></div>';
+    '<div class="dash-hide-mobile"><div id="saeulen-self-rating"></div></div>' +
+
+    (isNewUser ? '<div class="acard acard-lg" style="text-align:center;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--white);margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div><div style="font-size:var(--fs-base);color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Dein pers\u00f6nlicher Boxing-Coach.</div><div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;"><button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);padding:10px 20px;border-radius:var(--radius-lg);cursor:pointer;">Wochenplan</button><button onclick="showPage(\'tests\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);padding:10px 20px;border-radius:var(--radius-lg);cursor:pointer;">Erster Test</button><button onclick="showPage(\'mental\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);padding:10px 20px;border-radius:var(--radius-lg);cursor:pointer;">Alter Ego</button></div></div>' : '') +
+
+    '</div>';
+
+  // Card glow tracking
+  el.querySelectorAll('.acard').forEach(function(card) {
+    card.addEventListener('mousemove', function(e) {
+      var rect = card.getBoundingClientRect();
+      card.style.setProperty('--glow-x', ((e.clientX - rect.left) / rect.width * 100) + '%');
+      card.style.setProperty('--glow-y', ((e.clientY - rect.top) / rect.height * 100) + '%');
+    });
+  });
 
   // Render sub-components
   renderFightCountdown();
