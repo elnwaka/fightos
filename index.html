@@ -21,6 +21,19 @@
 <script src="js/firebase-auth.js"></script>
 <script src="js/firebase-firestore.js"></script>
 <script src="js/firebase-storage.js"></script>
+<script>
+// Prevent login flash — if user is saved, hide auth screen immediately
+if (localStorage.getItem('fos_current')) {
+  document.documentElement.style.setProperty('--auth-display', 'none');
+  document.documentElement.style.setProperty('--app-display', 'block');
+}
+</script>
+<style>
+#auth-screen { display: var(--auth-display, flex); }
+#auth-screen.active { display: var(--auth-display, flex); }
+#app-screen { display: var(--app-display, none); }
+#app-screen.active { display: var(--app-display, block); }
+</style>
 </head>
 <body>
 
