@@ -641,12 +641,14 @@ if (localStorage.getItem('fos_current')) {
     var saved = localStorage.getItem('fos_current');
     if (!saved) return;
     currentUser = saved;
-    // Ensure user entry exists
+    // Ensure user entry exists with all flags
     var users = safeParse('fos_users', {});
-    if (!users[saved]) {
-      users[saved] = { pass: 'firebase', onboardingDone: true, created: new Date().toISOString() };
-      localStorage.setItem('fos_users', JSON.stringify(users));
-    }
+    if (!users[saved]) users[saved] = {};
+    users[saved].pass = 'firebase';
+    if (!users[saved].onboardingDone) users[saved].onboardingDone = true;
+    if (!users[saved].seenIntro) users[saved].seenIntro = true;
+    if (!users[saved].created) users[saved].created = new Date().toISOString();
+    localStorage.setItem('fos_users', JSON.stringify(users));
     enterApp();
     // Background sync (don't block)
     if (_fbUser) syncFromCloud(function() {});

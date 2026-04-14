@@ -56,7 +56,12 @@ function syncFromCloud(callback) {
       }
       if (cloud.profile && cloud.username) {
         var users = safeParse('fos_users', {});
-        users[cloud.username] = Object.assign(users[cloud.username] || {}, cloud.profile);
+        var existing = users[cloud.username] || {};
+        users[cloud.username] = Object.assign(existing, cloud.profile);
+        // Always keep these flags true once set
+        users[cloud.username].onboardingDone = true;
+        users[cloud.username].seenIntro = true;
+        users[cloud.username].pass = 'firebase';
         localStorage.setItem('fos_users', JSON.stringify(users));
         currentUser = cloud.username;
         localStorage.setItem('fos_current', currentUser);
@@ -298,33 +303,48 @@ async function doLogin() {
     _fbUser = cred.user;
     currentUser = user;
     localStorage.setItem('fos_current', user);
-    // Clear old users, create fresh entry
-    var users = {};
-    users[user] = { pass: 'firebase', onboardingDone: false, created: new Date().toISOString(), firebaseUid: _fbUser.uid };
+    // Ensure local user entry — keep onboardingDone if already set
+    var users = safeParse('fos_users', {});
+    if (!users[user]) users[user] = {};
+    users[user].pass = 'firebase';
+    users[user].firebaseUid = _fbUser.uid;
+    if (!users[user].created) users[user].created = new Date().toISOString();
     localStorage.setItem('fos_users', JSON.stringify(users));
-    // Sync from cloud with timeout — don't block login
+    // Sync from cloud then enter — with timeout
     var syncDone = false;
     function finishLogin() {
       if (syncDone) return;
       syncDone = true;
+      // After sync, check onboarding
       var u2 = safeParse('fos_users', {});
-      if (u2[currentUser] && !u2[currentUser].onboardingDone) {
+      var profile = u2[currentUser] || {};
+      if (!profile.onboardingDone && !profile.weight && !profile.nickname) {
         showOnboarding(); return;
+      }
+      // Mark as done if they have data
+      if (!profile.onboardingDone) {
+        profile.onboardingDone = true;
+        u2[currentUser] = profile;
+        localStorage.setItem('fos_users', JSON.stringify(u2));
       }
       enterApp();
     }
     syncFromCloud(finishLogin);
-    setTimeout(finishLogin, 3000); // Don't wait longer than 3s
+    setTimeout(finishLogin, 3000);
   } catch(e) {
     msg.className = 'auth-msg error';
-    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-      msg.textContent = 'Falsche Daten!';
+    if (e.code === 'auth/user-not-found') {
+      msg.textContent = 'Kein Account mit diesem Namen gefunden. Erst registrieren?';
+    } else if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+      msg.textContent = 'Falsches Passwort. Versuche es erneut.';
     } else if (e.code === 'auth/too-many-requests') {
       msg.textContent = 'Zu viele Versuche. Warte kurz.';
+    } else if (e.code === 'auth/invalid-email') {
+      msg.textContent = 'Ung\u00fcltiger Benutzername.';
     } else if (e.code === 'auth/configuration-not-found') {
-      msg.textContent = 'Firebase Auth nicht aktiviert. Aktiviere E-Mail/Passwort in der Firebase Console.';
+      msg.textContent = 'Firebase Auth nicht aktiviert.';
     } else {
-      msg.textContent = e.message || 'Login fehlgeschlagen.';
+      msg.textContent = (e.code || '') + ' ' + (e.message || 'Login fehlgeschlagen.');
     }
   }
 }
