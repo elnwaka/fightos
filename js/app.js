@@ -1626,94 +1626,124 @@ function renderRadarChart(scoresOrEl, scoresArg) {
     scores = scoresOrEl;
   }
   if (!el) return;
-  if (typeof ApexCharts === 'undefined') return;
 
   if (scores) _lastRadarScores = scores;
   else if (_lastRadarScores) scores = _lastRadarScores;
   else return;
+
+  if (_radarChart && _radarChart.destroy) { _radarChart.destroy(); }
+  _radarChart = { destroy: function() { el.innerHTML = ''; } };
 
   var keys = RADAR_AXES.map(function(a) { return a.key; });
   var labels = RADAR_AXES.map(function(a) { return a.label; });
   var values = keys.map(function(k) { return scores[k] || 0; });
   var colors = RADAR_AXES.map(function(a) { return a.hex; });
   var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  var isMob = window.innerWidth < 480;
-  var chartH = isMob ? 260 : window.innerWidth < 768 ? 300 : 350;
+  var n = labels.length;
+  var cx = 200, cy = 200, maxR = 140, labelR = 172;
+  var gridColor = isLight ? 'rgba(0,0,0,.07)' : 'rgba(255,255,255,.05)';
+  var axisColor = isLight ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.04)';
+  var fillColor = isLight ? 'rgba(213,0,0,.1)' : 'rgba(232,0,13,.1)';
+  var strokeColor = '#e8000d';
+  var tension = 0.35;
 
-  if (_radarChart) { _radarChart.destroy(); _radarChart = null; }
-  el.innerHTML = '';
+  // Polar coords
+  function polar(i, r) {
+    var a = (i / n) * Math.PI * 2 - Math.PI / 2;
+    return { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r };
+  }
 
-  var series = [{ name: 'Aktuell', data: values }];
+  // Smooth closed path using Catmull-Rom → cubic Bézier
+  function smoothPath(points) {
+    var m = points.length;
+    if (m < 3) return '';
+    var d = 'M ' + points[0].x.toFixed(1) + ',' + points[0].y.toFixed(1);
+    for (var i = 0; i < m; i++) {
+      var p0 = points[(i - 1 + m) % m];
+      var p1 = points[i];
+      var p2 = points[(i + 1) % m];
+      var p3 = points[(i + 2) % m];
+      var cp1x = p1.x + (p2.x - p0.x) * tension / 3;
+      var cp1y = p1.y + (p2.y - p0.y) * tension / 3;
+      var cp2x = p2.x - (p3.x - p1.x) * tension / 3;
+      var cp2y = p2.y - (p3.y - p1.y) * tension / 3;
+      d += ' C ' + cp1x.toFixed(1) + ',' + cp1y.toFixed(1) + ' ' + cp2x.toFixed(1) + ',' + cp2y.toFixed(1) + ' ' + p2.x.toFixed(1) + ',' + p2.y.toFixed(1);
+    }
+    return d + ' Z';
+  }
 
-  _radarChart = new ApexCharts(el, {
-    series: series,
-    chart: {
-      type: 'radar',
-      height: chartH,
-      background: 'transparent',
-      fontFamily: "'DM Sans', sans-serif",
-      toolbar: { show: false },
-      animations: {
-        enabled: true,
-        easing: 'easeinout',
-        speed: 800
-      }
-    },
-    colors: ['#e8000d'],
-    fill: {
-      opacity: 0.15
-    },
-    stroke: {
-      width: 2,
-      curve: 'smooth'
-    },
-    markers: {
-      size: 4,
-      colors: colors,
-      strokeColors: isLight ? '#fff' : '#111',
-      strokeWidth: 2,
-      hover: { size: 6 }
-    },
-    xaxis: {
-      categories: labels,
-      labels: {
-        style: {
-          colors: colors,
-          fontSize: isMob ? '9px' : '11px',
-          fontFamily: "'Space Mono', monospace",
-          fontWeight: 700
-        }
-      }
-    },
-    yaxis: {
-      show: false,
-      min: 0,
-      max: 100,
-      tickAmount: 4
-    },
-    plotOptions: {
-      radar: {
-        polygons: {
-          strokeColors: isLight ? 'rgba(0,0,0,.08)' : 'rgba(255,255,255,.06)',
-          connectorColors: isLight ? 'rgba(0,0,0,.06)' : 'rgba(255,255,255,.04)',
-          fill: { colors: ['transparent'] }
-        }
-      }
-    },
-    legend: { show: false },
-    tooltip: {
-      enabled: true,
-      theme: isLight ? 'light' : 'dark',
-      style: { fontSize: '13px', fontFamily: "'Space Mono', monospace" },
-      y: { formatter: function(val) { return val + ' / 100'; } }
-    },
-    grid: { show: false },
-    responsive: [{
-      breakpoint: 480,
-      options: { chart: { height: 240 } }
-    }]
+  // Guide circles
+  var guides = '';
+  [25, 50, 75, 100].forEach(function(pct) {
+    var r = maxR * pct / 100;
+    guides += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + gridColor + '" stroke-width="1"/>';
   });
-  _radarChart.render();
+
+  // Axis lines
+  var axes = '';
+  for (var i = 0; i < n; i++) {
+    var p = polar(i, maxR);
+    axes += '<line x1="' + cx + '" y1="' + cy + '" x2="' + p.x.toFixed(1) + '" y2="' + p.y.toFixed(1) + '" stroke="' + axisColor + '" stroke-width="1"/>';
+  }
+
+  // Data points
+  var pts = [];
+  for (var i = 0; i < n; i++) {
+    pts.push(polar(i, maxR * Math.max(values[i], 2) / 100));
+  }
+
+  // Data path (smooth)
+  var pathD = smoothPath(pts);
+
+  // Dots + Labels
+  var dots = '';
+  var lbls = '';
+  for (var i = 0; i < n; i++) {
+    var dp = pts[i];
+    var lp = polar(i, labelR);
+    // Dot — starts at center, animates to position via CSS
+    dots += '<circle class="radar-dot" cx="' + dp.x.toFixed(1) + '" cy="' + dp.y.toFixed(1) + '" r="5" fill="' + colors[i] + '" stroke="' + (isLight ? '#fff' : '#111') + '" stroke-width="2" style="opacity:0;animation:radarDotIn .6s ease ' + (0.3 + i * 0.06).toFixed(2) + 's forwards;"' +
+      ' onmouseenter="showRadarTip(evt,\'' + escapeHTML(labels[i]) + '\',' + values[i] + ',\'' + colors[i] + '\')" onmouseleave="hideRadarTip()"/>';
+    // Label
+    var anchor = 'middle';
+    var dx = 0;
+    var angle = (i / n) * 360;
+    if (angle > 20 && angle < 160) { anchor = 'start'; dx = 4; }
+    else if (angle > 200 && angle < 340) { anchor = 'end'; dx = -4; }
+    lbls += '<text x="' + (lp.x + dx).toFixed(1) + '" y="' + (lp.y + 4).toFixed(1) + '" text-anchor="' + anchor + '" fill="' + colors[i] + '" style="font-family:\'Space Mono\',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;">' + labels[i] + '</text>';
+  }
+
+  // Build SVG
+  el.innerHTML =
+    '<div style="position:relative;width:100%;max-width:400px;margin:0 auto;">' +
+      '<svg viewBox="0 0 400 400" style="width:100%;height:auto;display:block;">' +
+        guides + axes +
+        '<path d="' + pathD + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="2" stroke-linejoin="round" style="opacity:0;animation:radarPathIn .8s ease .1s forwards;"/>' +
+        dots + lbls +
+      '</svg>' +
+      '<div id="radar-tooltip" style="display:none;position:absolute;padding:6px 12px;background:rgba(0,0,0,.85);border-radius:6px;font-family:\'Space Mono\',monospace;font-size:11px;color:#fff;pointer-events:none;white-space:nowrap;z-index:10;"></div>' +
+    '</div>' +
+    '<style>' +
+      '@keyframes radarPathIn { from { opacity:0; } to { opacity:1; } }' +
+      '@keyframes radarDotIn { from { opacity:0; r:0; } to { opacity:1; r:5; } }' +
+    '</style>';
+}
+
+function showRadarTip(evt, label, val, color) {
+  var tip = document.getElementById('radar-tooltip');
+  if (!tip) return;
+  tip.style.display = 'block';
+  tip.innerHTML = '<span style="color:' + color + ';">' + label + '</span>: ' + val + ' / 100';
+  var parent = tip.parentElement;
+  var rect = parent.getBoundingClientRect();
+  var x = evt.clientX - rect.left;
+  var y = evt.clientY - rect.top;
+  tip.style.left = (x + 12) + 'px';
+  tip.style.top = (y - 30) + 'px';
+}
+function hideRadarTip() {
+  var tip = document.getElementById('radar-tooltip');
+  if (tip) tip.style.display = 'none';
 }
 
 // ===== HRV =====
