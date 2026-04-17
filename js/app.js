@@ -4444,22 +4444,21 @@ function generateSmartWeekPlan() {
   };
 
   // ===== S&C SESSION TEMPLATES (A/B/C rotation) =====
-  // Evidence-based S&C templates for boxers
-  // Sources: Boxing Science (Danny Wilson), Phil Daru, Loturco et al. 2016/2022, Chaabene et al. 2018
+  // Evidence-based S&C for boxers (Boxing Science, Phil Daru, Loturco et al.)
   var scTemplates = [
     {
       key: 'A', title: 'Maximalkraft', rpe: 9,
-      warmup: 'Foam Rolling 2 Min. + Shoulder Dislocates + Aufwärmsätze: 5×50%, 3×70%, 2×80%',
-      cooldown: 'Statisches Stretching: Hüftbeuger, Schultern, Brust — je 30 Sek.',
+      warmup: 'Foam Rolling 2 Min. + Shoulder Dislocates + 2-3 Aufwärmsätze mit steigendem Gewicht',
+      cooldown: 'Stretching: Hüftbeuger, Schultern, Brust — je 30 Sek.',
       exercises: [
-        { id: 'overcoming-iso', sets: '4 × 6 Sek. max', rest: '90 Sek.', note: 'ZNS-Priming: Mid-Thigh Pull + Iso-Squat + Wand-Push. 100% Intensität' },
-        { id: 'trap-bar-deadlift', sets: '4 × 3 @ 88-93%', rest: '3-5 Min.', note: 'Hauptübung. Triples, keine Singles — sicherer für Boxer (Boxing Science)' },
-        { id: 'bench-press', sets: '4 × 3 @ 85-90%', rest: '3 Min.', note: 'Barspeed maximieren. Kontrolliert runter, explosiv drücken' },
-        { id: 'pull-ups', sets: '4 × 3-5 gewichtet', rest: '2 Min.', note: 'Zugübung als Gegengewicht zum Schlagen. +10-25 kg' },
-        { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'Core Stiffness — Kraft vom Bein zur Faust übertragen' },
-        { id: 'face-pulls', sets: '3 × 15', rest: '45 Sek.', note: 'Bei jedem Training. Schulter-Prehab ist Pflicht' }
+        { id: 'overcoming-iso', sets: '3 × 6 Sek.', rest: '90 Sek.', note: 'Maximal gegen Wand/Boden drücken. Aktiviert das Nervensystem' },
+        { id: 'trap-bar-deadlift', sets: '4 × 3', rest: '3-5 Min.', note: 'Schwer, aber keine Maximallast. Saubere Technik ist Pflicht' },
+        { id: 'bench-press', sets: '4 × 3', rest: '3 Min.', note: 'Kontrolliert runter, so schnell wie möglich hoch' },
+        { id: 'pull-ups', sets: '4 × 3-5 gewichtet', rest: '2 Min.', note: 'Gegengewicht zum Schlagen. Rucksack oder Gürtel mit Gewicht' },
+        { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'Überträgt Beinkraft auf die Faust' },
+        { id: 'face-pulls', sets: '3 × 15', rest: '45 Sek.', note: 'Schulter-Schutz. Leicht, bei jedem Training' }
       ],
-      hint: 'Triples bei 88-93%. Keine 1RM-Singles — Verletzungsrisiko zu hoch für Boxer. 3-5 Min. Pause. Min. 48h vor Sparring.',
+      hint: 'Wenige Wdh., schwer, lange Pausen. Alternativ: 5×5 mit moderatem Gewicht wenn du Kraft-Basis aufbaust.',
       hasHeavyLegs: true, duration: 50
     },
     {
@@ -4467,14 +4466,14 @@ function generateSmartWeekPlan() {
       warmup: 'Seilspringen 3 Min. + Hip CARs + Pogo Jumps 2×20 Sek.',
       cooldown: 'Lockeres Ausschütteln + Dehnung Hüftbeuger und Schultern',
       exercises: [
-        { id: 'jump-squat', sets: '4 × 4 @ 40-60% 1RM', rest: '2-3 Min.', note: 'Optimaler Power-Load (Loturco 2016). So hoch wie möglich!' },
-        { id: 'med-ball-rotation', sets: '4 × 5 pro Seite', rest: '90 Sek.', note: 'Hüfte rotiert, Ball fliegt — exakt wie ein Haken. 4-5 kg' },
-        { id: 'power-clean', sets: '4 × 3 @ 70-80%', rest: '2-3 Min.', note: 'Triple Extension: Knöchel-Knie-Hüfte. Schnellste Ganzkörperübung' },
-        { id: 'landmine-press', sets: '3 × 5 pro Arm', rest: '90 Sek.', note: 'Explosiv drücken wie einen Cross. Imitiert Schlagbewegung' },
-        { id: 'explosive-pushup', sets: '4 × 5', rest: '90 Sek.', note: 'Hände müssen abheben. Stoppen wenn Geschwindigkeit sinkt' },
-        { id: 'face-pulls', sets: '2 × 20', rest: '30 Sek.', note: 'Schulter-Prehab' }
+        { id: 'jump-squat', sets: '4 × 4', rest: '2-3 Min.', note: 'Leicht bis mittel. So hoch wie möglich springen' },
+        { id: 'power-clean', sets: '4 × 3', rest: '2-3 Min.', note: 'Hüfte explodiert. Arme sind nur Haken, keine Kraft aus den Armen' },
+        { id: 'med-ball-rotation', sets: '4 × 5 pro Seite', rest: '90 Sek.', note: 'Wirf wie einen Haken. Kraft kommt aus der Hüfte, nicht den Armen' },
+        { id: 'landmine-press', sets: '3 × 5 pro Arm', rest: '90 Sek.', note: 'Drücke explosiv wie einen Cross' },
+        { id: 'explosive-pushup', sets: '4 × 5', rest: '90 Sek.', note: 'Hände vom Boden lösen. Wirst du langsam → aufhören' },
+        { id: 'face-pulls', sets: '2 × 20', rest: '30 Sek.', note: 'Schulter-Schutz' }
       ],
-      hint: 'Geschwindigkeit ist alles. Wenn die Bewegung langsam wird → Set beenden. Qualität vor Quantität.',
+      hint: 'Geschwindigkeit zählt, nicht Gewicht. Wirst du langsam → Set sofort beenden.',
       hasHeavyLegs: false, duration: 45
     },
     {
@@ -4482,14 +4481,14 @@ function generateSmartWeekPlan() {
       warmup: 'Seilspringen 3 Min. + dynamisches Stretching + 10 Kniebeugen',
       cooldown: 'Foam Rolling Beine + Rücken, Dehnung 5 Min.',
       exercises: [
-        { id: 'hip-thrust', sets: '3 × 10 @ 60%', rest: '60 Sek.', note: 'Hüftpower über mehrere Reps aufrechterhalten' },
-        { id: 'pull-ups', sets: '3 × max Reps', rest: '60 Sek.', note: 'Bodyweight, volle Range — Kraft über Wiederholungen' },
-        { id: 'landmine-press', sets: '3 × 8 pro Arm @ 50%', rest: '45 Sek.', note: 'Leichter als Power-Tag, dafür mehr Reps' },
-        { id: 'lateral-bounds', sets: '3 × 8 pro Bein', rest: '45 Sek.', note: 'Seitliche Explosivität — Footwork-Transfer' },
-        { id: 'battle-ropes', sets: '6 × 20 Sek. on / 40 Sek. off', rest: '', note: 'Schulter-Ausdauer wie im Kampf. Guard bleibt oben in Runde 3' },
-        { id: 'pallof-press', sets: '3 × 12 pro Seite', rest: '30 Sek.', note: 'Höhere Reps für Core-Ausdauer' }
+        { id: 'hip-thrust', sets: '3 × 10', rest: '60 Sek.', note: 'Moderates Gewicht. Kraft über alle Reps gleichmäßig halten' },
+        { id: 'pull-ups', sets: '3 × max', rest: '60 Sek.', note: 'Ohne Gewicht, so viele saubere Reps wie möglich' },
+        { id: 'landmine-press', sets: '3 × 8 pro Arm', rest: '45 Sek.', note: 'Leichter als sonst, dafür mehr Reps' },
+        { id: 'lateral-bounds', sets: '3 × 8 pro Bein', rest: '45 Sek.', note: 'Weich landen, 1 Sek. stabil stehen' },
+        { id: 'battle-ropes', sets: '6 × 20 Sek. / 40 Sek. Pause', rest: '', note: 'Hält deine Guard oben in Runde 3' },
+        { id: 'pallof-press', sets: '3 × 12 pro Seite', rest: '30 Sek.', note: 'Core-Ausdauer' }
       ],
-      hint: 'Rundenstruktur: Kraft unter Ermüdung aufrechterhalten. Kürzere Pausen, moderate Last, mehr Wiederholungen.',
+      hint: 'Kraft unter Ermüdung. Kürzere Pausen, mehr Wiederholungen, Tempo halten.',
       hasHeavyLegs: true, duration: 40
     }
   ];
