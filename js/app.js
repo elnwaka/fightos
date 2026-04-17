@@ -4444,23 +4444,50 @@ function generateSmartWeekPlan() {
   };
 
   // ===== S&C SESSION TEMPLATES (A/B/C rotation) =====
-  const scTemplates = [
+  var scTemplates = [
     {
-      key: 'A', title: 'Krafttraining (Maximalkraft)', rpe: 9,
-      exercises: ['Kniebeugen-Sprünge: 3 Sätze × 4 Wdh. (leichtes Gewicht)', 'Kreuzheben: 4 Sätze × 4 Wdh. (schwer, 85% vom Maximum)', 'Bankdrücken: 4 Sätze × 4 Wdh. (schwer)', 'Klimmzüge mit Gewicht: 3 Sätze × 5 Wdh.', 'Rumpfstabilität (Pallof Press): 3 × 8 pro Seite', 'Schultergesundheit (Face Pulls): 3 × 15'],
-      hint: 'Fokus: Maximalkraft. 2 Min. Pause zwischen Hauptübungen. Warm-Up: 2 Sätze leicht. 🔴 Sehr hart — maximale Intensität',
+      key: 'A', title: 'Maximalkraft', rpe: 9,
+      exercises: [
+        '🔥 Aufwärmen: Foam Rolling 2 Min. + 2 leichte Aufwärmsätze pro Übung',
+        '1. Kniebeugen-Sprünge — 3 Sätze × 4 Wdh. mit leichtem Gewicht. Explosiv nach oben springen, weich landen. 90 Sek. Pause.',
+        '2. Kreuzheben (Trap Bar) — 4 Sätze × 4 Wdh. bei 85% deines Maximums. Rücken gerade, Hüfte nach vorne drücken. 2 Min. Pause.',
+        '3. Bankdrücken — 4 Sätze × 4 Wdh. bei 82%. Kontrolliert runter, explosiv hoch. 2 Min. Pause.',
+        '4. Klimmzüge mit Gewicht — 3 Sätze × 5 Wdh. Gewichtsgürtel oder Kurzhantel zwischen den Füßen. 90 Sek. Pause.',
+        '5. Rumpf: Pallof Press — 3 × 8 pro Seite. Kabel oder Band auf Brusthöhe, Arme strecken und halten. 60 Sek. Pause.',
+        '6. Schultern: Face Pulls — 3 × 15 am Kabelzug. Leichtes Gewicht, Ellbogen hoch. Verletzungsprävention!',
+        '🧊 Cool-Down: Dehnung Hüfte, Schultern, Brust — je 30 Sek. halten'
+      ],
+      hint: 'Schweres Krafttraining. Ziel: So stark wie möglich werden. Zwischen den Hauptübungen 2 Minuten Pause — das ist wichtig für die Erholung. 🔴 Sehr hart',
       hasHeavyLegs: true, duration: 45
     },
     {
-      key: 'B', title: 'Krafttraining (Explosivität)', rpe: 8,
-      exercises: ['Explosive Liegestütze: 3 × 5', 'Kniebeugen-Sprünge: 4 Sätze × 3 Wdh. (leichtes Gewicht)', 'Medizinball-Drehwurf: 3 × 5 pro Seite', 'Einarm-Drücken (Landmine): 3 × 5 pro Seite', 'Kettlebell Swing: 3 × 8', 'Schulterband-Züge: 2 × 20'],
-      hint: 'Fokus: Explosivität. Maximale Geschwindigkeit bei jeder Wiederholung. 90 Sek. Pause. 🔴 Sehr hart — maximale Intensität',
+      key: 'B', title: 'Explosivität', rpe: 8,
+      exercises: [
+        '🔥 Aufwärmen: Seilspringen 2 Min. + Armkreise + 10 Kniebeugen ohne Gewicht',
+        '1. Explosive Liegestütze — 3 × 5. Hände vom Boden lösen! Maximal schnell drücken. 90 Sek. Pause.',
+        '2. Kniebeugen-Sprünge — 4 × 3 mit leichtem Gewicht. So hoch wie möglich springen. 2 Min. Pause.',
+        '3. Medizinball-Drehwurf — 3 × 5 pro Seite. Seitlich zur Wand stehen, aus der Hüfte werfen wie einen Haken. 60 Sek. Pause.',
+        '4. Einarm-Drücken (Landmine) — 3 × 5 pro Arm. Stangenende in die Ecke, mit einer Hand nach oben drücken. 60 Sek. Pause.',
+        '5. Kettlebell Swing — 3 × 8. Hüfte explosiv nach vorne, Arme sind nur Halterung. 60 Sek. Pause.',
+        '6. Schulterband-Züge — 2 × 20. Band vor der Brust auseinanderziehen. Leicht, für Schultergesundheit.',
+        '🧊 Cool-Down: Lockeres Schütteln + Dehnung Hüftbeuger und Schultern'
+      ],
+      hint: 'Schnellkraft-Training. Ziel: Jede Bewegung so schnell und explosiv wie möglich. Nicht bis zur Erschöpfung — Qualität vor Quantität. 🔴 Sehr hart',
       hasHeavyLegs: false, duration: 40
     },
     {
-      key: 'C', title: 'Krafttraining (Kraft-Ausdauer)', rpe: 7,
-      exercises: ['Kettlebell Kniebeuge: 3 × 10', 'Vorgebeugtes Rudern: 3 × 8', 'Stoßdrücken: 3 × 6', 'Ausfallschritte: 3 × 8 pro Seite', 'Unterarmstütz: 3 × 30 Sekunden', 'Handgelenk-Rolle: 2 × 30 Sek.'],
-      hint: 'Fokus: Kraft-Ausdauer. 60 Sek. Pause. Gewicht moderat, saubere Form. 🟠 Hart — voller Einsatz',
+      key: 'C', title: 'Kraft-Ausdauer', rpe: 7,
+      exercises: [
+        '🔥 Aufwärmen: 3 Min. leichtes Seilspringen oder Hampelmänner + Gelenke mobilisieren',
+        '1. Kettlebell Kniebeuge (Goblet) — 3 × 10. Kettlebell vor der Brust halten, tief runter, Rücken gerade. 60 Sek. Pause.',
+        '2. Vorgebeugtes Rudern — 3 × 8. Kurzhantel oder Langhantel. Rücken gerade, Ellbogen nah am Körper. 60 Sek. Pause.',
+        '3. Stoßdrücken (Push Press) — 3 × 6. Kurz in die Knie, dann explosiv über Kopf drücken. 60 Sek. Pause.',
+        '4. Ausfallschritte — 3 × 8 pro Bein. Großer Schritt nach vorne, Knie berührt fast den Boden. 60 Sek. Pause.',
+        '5. Unterarmstütz (Plank) — 3 × 30 Sek. Körper gerade wie ein Brett, Bauch anspannen. 30 Sek. Pause.',
+        '6. Handgelenk-Rolle — 2 × 30 Sek. Stange mit Seil und Gewicht auf/abrollen. Für starke Fäuste.',
+        '🧊 Cool-Down: Dehnung + Foam Rolling Oberschenkel und Rücken'
+      ],
+      hint: 'Kraft-Ausdauer. Ziel: Muskeln arbeiten länger unter Last — wichtig für späte Runden. Moderates Gewicht, saubere Ausführung. 🟠 Hart',
       hasHeavyLegs: true, duration: 40
     }
   ];
@@ -4848,13 +4875,6 @@ function _renderWeekPlanInner() {
       <span style="font-family:'Space Mono',monospace;font-size:12px;color:#555;margin-left:12px;">${diff > 0 ? diff + ' Tage bis Kampf · ' + formatDate(data.fightDate) : 'Kampf vorbei'}</span></div>`;
   }
 
-  function renderExerciseChips(exercises) {
-    if (!exercises || !exercises.length) return '';
-    return `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">${exercises.map(ex =>
-      `<span class="ex-chip" onclick="event.stopPropagation();if(typeof openExerciseDetail==='function')openExerciseDetail('${ex.id}')" title="→ ${ex.label} Details">${ex.label}</span>`
-    ).join('')}</div>`;
-  }
-
   el.innerHTML = `
     <div class="page-header">
       <div class="page-title">WOCHEN<span>PLAN</span></div>
@@ -5001,9 +5021,8 @@ function _renderWeekPlanInner() {
                 </div>
                 ${isToday || done ? `<button class="block-check-btn${done ? ' checked' : ''}" onclick="event.stopPropagation();toggleBlockDone('${day}',${bi},'${b.type}','${b.title.replace(/'/g,'\\&#39;')}')" title="${done ? 'Erledigt' : 'Als erledigt markieren'}">${done ? '✓' : '○'}</button>` : ''}
               </div>
-              ${b.title}
-              ${b.hint ? '<div class="block-hint" style="font-family:\'DM Sans\',sans-serif;font-size:10px;color:#444;margin-top:2px;line-height:1.3;">' + b.hint + '</div>' : ''}
-              ${renderExerciseChips(b.exercises)}
+              <div style="font-size:13px;color:var(--white);line-height:1.3;">${b.title}</div>
+              ${b.duration > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;margin-top:2px;">' + b.duration + ' Min.' + (b.rpe > 0 ? ' · RPE ' + b.rpe : '') + '</div>' : ''}
             </div>`}).join('')}
           </div>
           <button class="add-block-btn" onclick="addBlock('${day}')">+ Block</button>
@@ -5014,7 +5033,7 @@ function _renderWeekPlanInner() {
       <button class="submit-btn" style="padding:8px 16px;font-size:12px;" onclick="regenerateWeekPlan()">NEU GENERIEREN</button>
       <span style="font-family:'Space Mono',monospace;font-size:12px;color:#555;">Erstellt den Plan basierend auf Trainingszeiten + Kampfdatum</span>
     </div>
-    <div class="info-box info-tip"><span>💡</span><div>Der Plan wird automatisch neu generiert wenn du ein Kampfdatum einträgst oder änderst. Klicke auf die <strong>blauen Übungs-Tags</strong> um direkt zur Übung mit Details und Muskelgruppen zu navigieren.</div></div>`;
+    <div class="info-box info-tip"><span>💡</span><div>Klicke auf einen <strong>Block</strong> um die vollständige Trainingsanleitung zu sehen. Der Plan wird automatisch neu generiert wenn du ein Kampfdatum einträgst oder änderst.</div></div>`;
 }
 
 function regenerateWeekPlan() {
@@ -5022,7 +5041,8 @@ function regenerateWeekPlan() {
   const data = getData();
   if (!data) return;
   data.weekPlan = generateSmartWeekPlan();
-  if (!data.weekPlanGenerated) data.weekPlanGenerated = new Date().toISOString();
+  data.weekPlanGenerated = new Date().toISOString();
+  data._weekPlanKey = null;
   saveData(data);
   renderWeekPlan();
 }
@@ -5084,30 +5104,19 @@ function openBlockDetail(day, idx) {
 
   var DAY_LABEL_MAP = { mo:'Montag', di:'Dienstag', mi:'Mittwoch', do:'Donnerstag', fr:'Freitag', sa:'Samstag', so:'Sonntag' };
 
-  // Übungen aus der Übungsbibliothek holen
+  // Workout-Anleitung — Schritt für Schritt
   var exerciseHTML = '';
   if (block.exercises && block.exercises.length) {
     exerciseHTML = '<div style="margin-top:24px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">UEBUNGEN</div>';
-    block.exercises.forEach(function(ex) {
-      var exData = typeof getExerciseById === 'function' ? getExerciseById(ex.id) : null;
-      exerciseHTML += '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;margin-bottom:10px;">';
-      exerciseHTML += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
-      exerciseHTML += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">' + (ex.label || ex.id).replace(/</g,'&lt;') + '</div>';
-      if (exData) {
-        exerciseHTML += '<span class="ex-chip" onclick="if(typeof openExerciseDetail===\'function\')openExerciseDetail(\'' + ex.id + '\')" style="cursor:pointer;">DETAILS →</span>';
-      }
-      exerciseHTML += '</div>';
-      if (exData) {
-        if (exData.desc) exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;margin-bottom:8px;">' + exData.desc + '</div>';
-        if (exData.sets && exData.sets.length) exerciseHTML += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' + exData.sets.map(function(s) { return '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);background:#1a1a0a;padding:4px 10px;border-radius:var(--radius-sm);">' + s + '</span>'; }).join('') + '</div>';
-        if (exData.tip) exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;line-height:1.5;"><strong style="color:var(--gold);">' + (exData.tipLabel || 'Tipp') + ':</strong> ' + exData.tip + '</div>';
-        if (exData.boxingConnection) exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#444;line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--surface-1);"><strong style="color:#555;">Boxing:</strong> ' + exData.boxingConnection + '</div>';
-        if (exData.video) exerciseHTML += '<a href="' + exData.video + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-family:\'Space Mono\',monospace;font-size:10px;color:var(--red);text-decoration:none;letter-spacing:1px;">VIDEO ANLEITUNG \u2197</a>';
-      } else {
-        exerciseHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;">' + (ex.label || ex.id) + '</div>';
-      }
-      exerciseHTML += '</div>';
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1px;margin-bottom:16px;">DEIN WORKOUT</div>';
+    block.exercises.forEach(function(ex, ei) {
+      var exStr = typeof ex === 'string' ? ex : (ex.label || ex.id || '');
+      exerciseHTML += '<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--surface-2);align-items:flex-start;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--red);opacity:.4;min-width:24px;line-height:1;">' + (ei + 1) + '</div>' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:var(--fs-base);color:var(--white);line-height:1.4;">' + escapeHTML(exStr) + '</div>' +
+        '</div>' +
+      '</div>';
     });
     exerciseHTML += '</div>';
   }
@@ -5128,8 +5137,8 @@ function openBlockDetail(day, idx) {
     '</div>' +
   '</div>' +
 
-  // Warm-up
-  (typeDetail.warmup ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
+  // Warm-up (only show if block has no inline exercises — exercises already include warm-up/cool-down)
+  (typeDetail.warmup && !(block.exercises && block.exercises.length) ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px;margin-bottom:8px;">WARM-UP</div>' +
     '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.7;">' + typeDetail.warmup + '</div>' +
   '</div>' : '') +
@@ -5137,8 +5146,8 @@ function openBlockDetail(day, idx) {
   // Übungen
   exerciseHTML +
 
-  // Cool-down
-  (typeDetail.cooldown ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:16px;margin-top:16px;margin-bottom:16px;">' +
+  // Cool-down (only show if block has no inline exercises)
+  (typeDetail.cooldown && !(block.exercises && block.exercises.length) ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:16px;margin-top:16px;margin-bottom:16px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">COOL-DOWN</div>' +
     '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.7;">' + typeDetail.cooldown + '</div>' +
   '</div>' : '') +
@@ -5322,51 +5331,89 @@ function toggleBlockDone(day, idx, type, title) {
     delete data.completedBlocks[logKey];
     saveData(data);
     showToast('Block rückgängig', 'info', 1500);
-  } else {
-    // Mark done + auto-log training
-    data.completedBlocks[logKey] = { date: new Date().toISOString(), type, title };
-    if (!data.log) data.log = [];
-    var block = data.weekPlan && data.weekPlan[day] ? data.weekPlan[day][idx] : null;
-    var blockDuration = block && block.duration ? block.duration : estimateBlockDuration(type);
-    // If duration is 0 (Vereins-Session), ask user
-    if (blockDuration === 0) {
-      var userDur = prompt('Wie lange war das Training? (Minuten)');
-      blockDuration = parseInt(userDur) || 60;
-    }
-    var blockRpe = block && block.rpe ? block.rpe : 0;
-    if (blockRpe === 0 && (type === 'boxing' || type === 'sparring' || type === 'boxen')) {
-      var userRpe = prompt('Wie hart war es? (1-10, 1=leicht, 10=maximum)');
-      blockRpe = parseInt(userRpe) || 0;
-      if (blockRpe > 10) blockRpe = 10;
-      if (blockRpe < 0) blockRpe = 0;
-    }
-    data.log.unshift({
-      date: new Date().toISOString().split('T')[0],
-      type: mapBlockTypeToLogType(type),
-      duration: blockDuration,
-      rpe: blockRpe,
-      weight: null,
-      notes: title + ' (via Wochenplan)'
-    });
-    saveData(data);
-    showToast('Block erledigt \u2713', 'success', 2000);
-  }
-  // Animate the block before re-render
-  var blockEl = document.querySelector('[data-block-key="' + logKey + '"]');
-  if (!blockEl) {
-    // Fallback: find by day+idx
-    var dayCol = document.querySelector('.day-col[data-day="' + day + '"]');
-    if (dayCol) {
-      var blocks = dayCol.querySelectorAll('.day-block');
-      blockEl = blocks[idx];
-    }
-  }
-  if (blockEl) {
-    blockEl.classList.add(wasCompleted ? 'just-undone' : 'just-completed');
-    setTimeout(function() { renderWeekPlan(); }, 400);
-  } else {
     renderWeekPlan();
+    return;
   }
+  var block = data.weekPlan && data.weekPlan[day] ? data.weekPlan[day][idx] : null;
+  var blockDuration = block && block.duration ? block.duration : estimateBlockDuration(type);
+  var blockRpe = block && block.rpe ? block.rpe : 0;
+  var needsDuration = (blockDuration === 0);
+  var needsRpe = (blockRpe === 0 && (type === 'boxing' || type === 'sparring' || type === 'boxen'));
+
+  if (needsDuration || needsRpe) {
+    // Show in-app modal instead of browser prompt
+    showBlockDoneModal(day, idx, type, title, needsDuration, needsRpe);
+  } else {
+    completeBlock(day, idx, type, title, blockDuration, blockRpe);
+  }
+}
+
+function showBlockDoneModal(day, idx, type, title, needsDuration, needsRpe) {
+  var existing = document.getElementById('block-done-modal');
+  if (existing) existing.remove();
+  var modal = document.createElement('div');
+  modal.id = 'block-done-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);';
+  modal.innerHTML =
+    '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:24px;width:min(340px,90vw);">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">SESSION ERLEDIGT</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;margin-bottom:16px;">' + (title || '').replace(/</g,'&lt;') + '</div>' +
+      (needsDuration ? '<label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;display:block;margin-bottom:4px;">DAUER (MINUTEN)</label>' +
+        '<input type="number" id="bd-duration" class="form-input" placeholder="z.B. 60" min="1" max="300" style="margin-bottom:12px;width:100%;">' : '') +
+      (needsRpe ? '<label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;display:block;margin-bottom:4px;">WIE HART WAR ES? (1-10)</label>' +
+        '<div id="bd-rpe-row" style="display:flex;gap:6px;margin-bottom:16px;">' +
+          [1,2,3,4,5,6,7,8,9,10].map(function(n) {
+            var col = n <= 3 ? 'var(--green)' : n <= 6 ? 'var(--gold)' : n <= 8 ? 'var(--orange)' : 'var(--red)';
+            return '<button class="bd-rpe-btn" data-rpe="' + n + '" onclick="this.parentNode.querySelectorAll(\'.bd-rpe-btn\').forEach(function(b){b.style.background=\'var(--surface-1)\';b.style.color=\'#555\';});this.style.background=\'' + col + '\';this.style.color=\'#000\';this.dataset.selected=\'1\'" ' +
+              'style="flex:1;min-width:0;padding:8px 0;border:none;border-radius:var(--radius-sm);background:var(--surface-1);color:#555;font-family:\'Space Mono\',monospace;font-size:12px;font-weight:700;cursor:pointer;">' + n + '</button>';
+          }).join('') +
+        '</div>' : '') +
+      '<div style="display:flex;gap:8px;">' +
+        '<button onclick="document.getElementById(\'block-done-modal\').remove()" style="flex:1;padding:10px;border:1px solid var(--surface-3);background:none;color:#888;border-radius:var(--radius-sm);font-family:\'Space Mono\',monospace;font-size:11px;cursor:pointer;">ABBRECHEN</button>' +
+        '<button onclick="submitBlockDone(\'' + day + '\',' + idx + ',\'' + type + '\',\'' + (title || '').replace(/'/g,'') + '\')" class="submit-btn" style="flex:1;padding:10px;font-size:13px;">FERTIG ✓</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+  var durInput = document.getElementById('bd-duration');
+  if (durInput) durInput.focus();
+}
+
+function submitBlockDone(day, idx, type, title) {
+  var durInput = document.getElementById('bd-duration');
+  var duration = durInput ? (parseInt(durInput.value) || 60) : 0;
+  var rpe = 0;
+  var rpeRow = document.getElementById('bd-rpe-row');
+  if (rpeRow) {
+    var sel = rpeRow.querySelector('[data-selected="1"]');
+    rpe = sel ? parseInt(sel.dataset.rpe) : 0;
+  }
+  var modal = document.getElementById('block-done-modal');
+  if (modal) modal.remove();
+  var block = (function(){ var d = getData(); return d && d.weekPlan && d.weekPlan[day] ? d.weekPlan[day][idx] : null; })();
+  var finalDur = duration || (block && block.duration ? block.duration : estimateBlockDuration(type));
+  var finalRpe = rpe || (block && block.rpe ? block.rpe : 0);
+  completeBlock(day, idx, type, title, finalDur, finalRpe);
+}
+
+function completeBlock(day, idx, type, title, duration, rpe) {
+  const data = getData();
+  if (!data) return;
+  if (!data.completedBlocks) data.completedBlocks = {};
+  const logKey = day + '_' + idx + '_' + getWeekId();
+  data.completedBlocks[logKey] = { date: new Date().toISOString(), type, title };
+  if (!data.log) data.log = [];
+  data.log.unshift({
+    date: new Date().toISOString().split('T')[0],
+    type: mapBlockTypeToLogType(type),
+    duration: duration,
+    rpe: rpe,
+    weight: null,
+    notes: title + ' (via Wochenplan)'
+  });
+  saveData(data);
+  showToast('Block erledigt ✓', 'success', 2000);
+  renderWeekPlan();
 }
 
 function estimateBlockDuration(type) {
@@ -6086,8 +6133,11 @@ function renderDashboard() {
   var ringC80 = 2 * Math.PI * 80;
 
   // Find next undone block from the weekly plan
+  var DAY_NAMES_DE = { mo: 'Montag', di: 'Dienstag', mi: 'Mittwoch', do: 'Donnerstag', fr: 'Freitag', sa: 'Samstag', so: 'Sonntag' };
   var nextBlock = null;
   var nextBlockDay = '';
+  var nextBlockDayKey = '';
+  var nextBlockIdx = 0;
   var nowH = new Date().getHours();
   var nowM = new Date().getMinutes();
   var nowMinutes = nowH * 60 + nowM;
@@ -6115,10 +6165,11 @@ function renderDashboard() {
       }
       nextBlock = bk;
       nextBlockDay = doi === 0 ? 'Heute' : doi === 1 ? 'Morgen' : DAY_NAMES_DE[dayOrder[doi]] || dName;
+      nextBlockDayKey = dayOrder[doi];
+      nextBlockIdx = bi;
       break;
     }
   }
-  var DAY_NAMES_DE = { mo: 'Montag', di: 'Dienstag', mi: 'Mittwoch', do: 'Donnerstag', fr: 'Freitag', sa: 'Samstag', so: 'Sonntag' };
 
   el.innerHTML =
 
@@ -6167,7 +6218,7 @@ function renderDashboard() {
     (nextBlock ?
       '<div class="db-sec" style="padding:28px 0;">' +
         '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:3px;margin-bottom:8px;">N\u00c4CHSTE SESSION</div>' +
-        '<div class="db-next-block" onclick="showPage(\'wochenplan\')" style="position:relative;overflow:hidden;">' +
+        '<div class="db-next-block" onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" style="position:relative;overflow:hidden;cursor:pointer;">' +
           '<div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--red);border-radius:2px;"></div>' +
           '<div style="padding-left:16px;">' +
             '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">' +
