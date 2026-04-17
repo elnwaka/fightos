@@ -4447,18 +4447,18 @@ function generateSmartWeekPlan() {
   var scTemplates = [
     {
       key: 'A', title: 'Maximalkraft', rpe: 9,
-      warmup: 'Foam Rolling 2 Min. + Shoulder Dislocates + 2 leichte Aufwärmsätze',
+      warmup: 'Foam Rolling 2 Min. + Shoulder Dislocates + 3 Aufwärmsätze (50%, 70%, 80%)',
       cooldown: 'Dehnung Hüfte, Schultern, Brust — je 30 Sek. halten',
       exercises: [
-        { id: 'jump-squat', sets: '3 × 4', rest: '90 Sek.', note: 'Leichtes Gewicht, explosiv springen' },
-        { id: 'trap-bar-deadlift', sets: '4 × 4 @ 85%', rest: '2 Min.', note: 'Rücken gerade, Hüfte nach vorne' },
-        { id: 'bench-press', sets: '4 × 4 @ 82%', rest: '2 Min.', note: 'Kontrolliert runter, explosiv hoch' },
-        { id: 'pull-ups', sets: '3 × 5 (gewichtet)', rest: '90 Sek.', note: 'Gewichtsgürtel oder Kurzhantel' },
-        { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'Arme strecken und halten' },
-        { id: 'face-pulls', sets: '3 × 15', rest: '60 Sek.', note: 'Leicht! Verletzungsprävention' }
+        { id: 'overcoming-iso', sets: '3 × 6 Sek. @ 100%', rest: '90 Sek.', note: 'ZNS-Aktivierung: Wand-Push + Boden-Squat + Türrahmen-Pull' },
+        { id: 'trap-bar-deadlift', sets: '5 × 3 @ 90%', rest: '3 Min.', note: 'Schwer! Rücken gerade, Hüfte explosiv' },
+        { id: 'bench-press', sets: '5 × 3 @ 88%', rest: '3 Min.', note: 'Kontrolliert runter (2 Sek.), maximal schnell hoch' },
+        { id: 'pull-ups', sets: '4 × 3 (schwer gewichtet)', rest: '2 Min.', note: '+15-25 kg, volle Range of Motion' },
+        { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'Core-Stabilität unter Spannung' },
+        { id: 'face-pulls', sets: '3 × 15', rest: '60 Sek.', note: 'Prehab — leichtes Gewicht, immer' }
       ],
-      hint: 'Schweres Krafttraining — so stark wie möglich werden. 2 Min. Pause zwischen Hauptübungen.',
-      hasHeavyLegs: true, duration: 45
+      hint: 'Maximale Intensität. Wenige Wiederholungen, schweres Gewicht, lange Pausen. Qualität jeder Rep zählt.',
+      hasHeavyLegs: true, duration: 50
     },
     {
       key: 'B', title: 'Explosivität', rpe: 8,
