@@ -4260,6 +4260,10 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
 .skeleton-row { display: flex; gap: var(--space-4); margin-bottom: var(--space-4); }
 .skeleton-row > * { flex: 1; }
 
+/* ===== WORKOUT CARDS (Block Detail) ===== */
+.wo-card:active { transform: scale(.97); }
+@media (hover: hover) { .wo-card:hover { border-color: var(--surface-3); transform: translateY(-1px); } }
+
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

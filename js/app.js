@@ -5114,28 +5114,30 @@ function openBlockDetail(day, idx) {
   var typeDetail = BLOCK_DETAIL_CONTENT[block.type] || BLOCK_DETAIL_CONTENT['meta'];
   var DAY_LABEL_MAP = { mo:'Montag', di:'Dienstag', mi:'Mittwoch', do:'Donnerstag', fr:'Freitag', sa:'Samstag', so:'Sonntag' };
 
-  // Helper: render a single exercise row (object with id/sets/rest/note)
-  function renderExRow(ex, num) {
+  // Helper: render exercise card
+  function renderExCard(ex, num) {
     var libEx = (typeof getExerciseById === 'function') ? getExerciseById(ex.id) : null;
     var name = libEx ? libEx.name : (ex.id || '').replace(/-/g,' ').toUpperCase();
     var hasLib = !!libEx;
-    return '<div class="bd-ex-row" style="padding:12px 0;border-bottom:1px solid var(--surface-1);">' +
-      '<div style="display:flex;align-items:center;gap:10px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--red);opacity:.35;min-width:24px;text-align:center;">' + num + '</div>' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-            (hasLib ?
-              '<span onclick="openExerciseDetail(\'' + ex.id + '\')" style="font-family:\'DM Sans\',sans-serif;font-size:15px;color:var(--white);cursor:pointer;text-decoration:underline;text-decoration-color:var(--surface-3);text-underline-offset:3px;">' + escapeHTML(name) + '</span>' :
-              '<span style="font-family:\'DM Sans\',sans-serif;font-size:15px;color:var(--white);">' + escapeHTML(name) + '</span>') +
-            (hasLib ? '<span style="font-size:10px;color:var(--red);cursor:pointer;" onclick="openExerciseDetail(\'' + ex.id + '\')">INFO →</span>' : '') +
+    var muscles = libEx ? (libEx.muscle || '').split('·')[0].replace('PRIMÄR: ','').trim() : '';
+    return '<div class="wo-card" onclick="' + (hasLib ? "openExerciseDetail('" + ex.id + "')" : '') + '" style="background:var(--surface-0);border:1px solid var(--surface-1);border-radius:12px;padding:14px 16px;cursor:' + (hasLib ? 'pointer' : 'default') + ';transition:transform .15s,border-color .15s;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
+        '<div style="display:flex;align-items:center;gap:12px;min-width:0;">' +
+          '<div style="width:32px;height:32px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+            '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:#fff;">' + num + '</span>' +
           '</div>' +
-          '<div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap;">' +
-            (ex.sets ? '<span style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--gold);">' + escapeHTML(ex.sets) + '</span>' : '') +
-            (ex.rest ? '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">Pause: ' + escapeHTML(ex.rest) + '</span>' : '') +
+          '<div style="min-width:0;">' +
+            '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHTML(name) + '</div>' +
+            (muscles ? '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:#555;margin-top:1px;">' + escapeHTML(muscles) + '</div>' : '') +
           '</div>' +
-          (ex.note ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#666;margin-top:3px;line-height:1.4;">' + escapeHTML(ex.note) + '</div>' : '') +
         '</div>' +
+        (hasLib ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>' : '') +
       '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">' +
+        (ex.sets ? '<span style="font-family:\'Space Mono\',monospace;font-size:11px;padding:4px 10px;border-radius:6px;background:var(--gold);color:#000;font-weight:700;">' + escapeHTML(ex.sets) + '</span>' : '') +
+        (ex.rest ? '<span style="font-family:\'Space Mono\',monospace;font-size:11px;padding:4px 10px;border-radius:6px;background:var(--surface-1);color:#888;">' + escapeHTML(ex.rest) + ' Pause</span>' : '') +
+      '</div>' +
+      (ex.note ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#666;margin-top:8px;line-height:1.4;padding-left:44px;">' + escapeHTML(ex.note) + '</div>' : '') +
     '</div>';
   }
 
@@ -5148,98 +5150,122 @@ function openBlockDetail(day, idx) {
   var exerciseHTML = '';
 
   if (hasStructuredEx) {
-    // Block-level warmup/cooldown
     var wu = block.warmup || '';
     var cd = block.cooldown || '';
     if (wu) {
-      warmupHTML = '<div style="background:var(--surface-0);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;">WARM-UP</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;">' + escapeHTML(wu) + '</div>' +
+      warmupHTML = '<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(135deg,#1a150a,var(--surface-0));border-radius:12px;margin-bottom:12px;">' +
+        '<div style="width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;">&#x1F525;</div>' +
+        '<div><div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--gold);letter-spacing:1px;">WARM-UP</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#999;margin-top:2px;">' + escapeHTML(wu) + '</div></div>' +
       '</div>';
     }
     if (cd) {
-      cooldownHTML = '<div style="background:var(--surface-0);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:14px 16px;margin-top:16px;margin-bottom:16px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--blue);letter-spacing:1px;margin-bottom:4px;">COOL-DOWN</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;">' + escapeHTML(cd) + '</div>' +
+      cooldownHTML = '<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(135deg,#0a0f1a,var(--surface-0));border-radius:12px;margin-top:12px;">' +
+        '<div style="width:28px;height:28px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;">&#x1F9CA;</div>' +
+        '<div><div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);letter-spacing:1px;">COOL-DOWN</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#999;margin-top:2px;">' + escapeHTML(cd) + '</div></div>' +
       '</div>';
     }
 
-    // Before exercises (e.g. IMT)
     var allEx = (block.exercisesBefore || []).concat(block.exercises).concat(block.exercisesAfter || []);
-    exerciseHTML = '<div style="margin-top:20px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1px;margin-bottom:12px;">ÜBUNGEN</div>';
+    exerciseHTML = '<div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">';
     allEx.forEach(function(ex, ei) {
-      exerciseHTML += renderExRow(ex, ei + 1);
+      exerciseHTML += renderExCard(ex, ei + 1);
     });
     exerciseHTML += '</div>';
 
   } else if (hasExercises) {
-    // Fallback: old string-based exercises
-    exerciseHTML = '<div style="margin-top:20px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1px;margin-bottom:12px;">ÜBUNGEN</div>';
+    exerciseHTML = '<div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">';
     block.exercises.forEach(function(ex, ei) {
       var exStr = typeof ex === 'string' ? ex : (ex.label || ex.id || '');
-      exerciseHTML += '<div style="padding:10px 0;border-bottom:1px solid var(--surface-1);font-size:14px;color:var(--white);line-height:1.4;">' + escapeHTML(exStr) + '</div>';
+      exerciseHTML += '<div style="background:var(--surface-0);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--white);line-height:1.4;">' + escapeHTML(exStr) + '</div>';
     });
     exerciseHTML += '</div>';
 
   } else {
-    // No exercises (e.g. Vereinstraining) — show type-level warmup/cooldown
+    // No exercises (e.g. Vereinstraining)
     if (typeDetail.warmup) {
-      warmupHTML = '<div style="background:var(--surface-0);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;">VOR DEM TRAINING</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;">' + typeDetail.warmup + '</div>' +
+      warmupHTML = '<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(135deg,#1a150a,var(--surface-0));border-radius:12px;margin-bottom:12px;">' +
+        '<div style="width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;">&#x1F525;</div>' +
+        '<div><div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--gold);letter-spacing:1px;">VOR DEM TRAINING</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#999;margin-top:2px;">' + typeDetail.warmup + '</div></div>' +
       '</div>';
     }
     if (typeDetail.cooldown) {
-      cooldownHTML = '<div style="background:var(--surface-0);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--blue);letter-spacing:1px;margin-bottom:4px;">NACH DEM TRAINING</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;">' + typeDetail.cooldown + '</div>' +
+      cooldownHTML = '<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(135deg,#0a0f1a,var(--surface-0));border-radius:12px;margin-top:12px;">' +
+        '<div style="width:28px;height:28px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;">&#x1F9CA;</div>' +
+        '<div><div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);letter-spacing:1px;">NACH DEM TRAINING</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#999;margin-top:2px;">' + typeDetail.cooldown + '</div></div>' +
       '</div>';
     }
   }
 
-  // RPE indicator
+  // RPE bar
   var rpeHTML = '';
   if (block.rpe > 0) {
     var rpeCol = block.rpe >= 8 ? 'var(--red)' : block.rpe >= 6 ? 'var(--orange)' : block.rpe >= 4 ? 'var(--gold)' : 'var(--green)';
-    rpeHTML = '<div style="display:flex;align-items:center;gap:8px;margin-top:12px;">' +
-      '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">INTENSITÄT</span>' +
-      '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:' + rpeCol + ';">RPE ' + block.rpe + '/10</span>' +
-      (block.duration > 0 ? '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;margin-left:8px;">' + block.duration + ' Min.</span>' : '') +
+    var rpePct = block.rpe * 10;
+    rpeHTML = '<div style="margin-top:16px;padding:12px 16px;background:var(--surface-0);border-radius:12px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+        '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:1px;">INTENSITÄT</span>' +
+        '<div style="display:flex;align-items:baseline;gap:6px;">' +
+          '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:' + rpeCol + ';">' + block.rpe + '</span>' +
+          '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">/10</span>' +
+          (block.duration > 0 ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;margin-left:8px;">' + block.duration + ' Min.</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div style="height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden;">' +
+        '<div style="height:100%;width:' + rpePct + '%;background:' + rpeCol + ';border-radius:2px;transition:width .4s ease;"></div>' +
+      '</div>' +
     '</div>';
   }
 
-  el.innerHTML = '<div style="padding-bottom:12px;">' +
-    '<button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">\u2190 WOCHENPLAN</button>' +
-  '</div>' +
+  var logKey = day + '_' + idx + '_' + getWeekId();
+  var isDone = data.completedBlocks && data.completedBlocks[logKey];
 
-  // Header
-  '<div style="margin-bottom:20px;">' +
-    '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;letter-spacing:1px;margin-bottom:4px;">' + (DAY_LABEL_MAP[day] || day).toUpperCase() + ' \u00b7 ' + block.time + '</div>' +
-    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(28px,5vw,40px);color:var(--white);letter-spacing:2px;line-height:1;">' + (block.title || '').replace(/</g,'&lt;') + '</div>' +
-    (block.hint ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#666;margin-top:8px;line-height:1.5;">' + block.hint.replace(/</g,'&lt;') + '</div>' : '') +
-    rpeHTML +
-    '<div style="display:flex;gap:6px;margin-top:12px;">' +
-      blockSaeulen.map(function(si) {
-        return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);background:' + saeulenColors[si] + '22;color:' + saeulenColors[si] + ';border:1px solid ' + saeulenColors[si] + '44;">' + saeulenLabels[si] + '</span>';
-      }).join('') +
+  el.innerHTML =
+  // Back + Header
+  '<div style="display:flex;align-items:center;gap:12px;padding-bottom:16px;">' +
+    '<button onclick="showPage(\'wochenplan\')" style="width:36px;height:36px;border-radius:50%;background:var(--surface-0);border:1px solid var(--surface-2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>' +
+    '<div style="min-width:0;">' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:1px;">' + (DAY_LABEL_MAP[day] || day).toUpperCase() + ' \u00b7 ' + block.time + '</div>' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(24px,5vw,36px);color:var(--white);letter-spacing:2px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (block.title || '').replace(/</g,'&lt;') + '</div>' +
     '</div>' +
   '</div>' +
 
+  // Hint
+  (block.hint ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#666;line-height:1.5;margin-bottom:12px;">' + block.hint.replace(/</g,'&lt;') + '</div>' : '') +
+
+  // Säulen pills
+  (blockSaeulen.length ? '<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">' +
+    blockSaeulen.map(function(si) {
+      return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:4px 10px;border-radius:20px;background:' + saeulenColors[si] + '15;color:' + saeulenColors[si] + ';border:1px solid ' + saeulenColors[si] + '30;">' + saeulenLabels[si] + '</span>';
+    }).join('') +
+  '</div>' : '') +
+
+  // RPE bar
+  rpeHTML +
+
+  // Warm-up
   warmupHTML +
+
+  // Exercises
   exerciseHTML +
+
+  // Cool-down
   cooldownHTML +
 
   // Hinweise (only for blocks without structured exercises)
-  (typeDetail.notes && !hasStructuredEx ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">' +
-    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--white);letter-spacing:1px;margin-bottom:6px;">HINWEISE</div>' +
+  (typeDetail.notes && !hasStructuredEx ? '<div style="background:var(--surface-0);border-radius:12px;padding:14px 16px;margin-top:12px;">' +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:1px;margin-bottom:6px;">HINWEISE</div>' +
     '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;line-height:1.7;">' + typeDetail.notes + '</div>' +
   '</div>' : '') +
 
-  // Action buttons
-  '<div style="display:flex;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--surface-2);">' +
-    '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\')" class="submit-btn" style="flex:1;padding:12px 20px;font-size:14px;">ERLEDIGT \u2713</button>' +
+  // Action button — sticky feel
+  '<div style="margin-top:24px;padding:16px 0;">' +
+    '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\')" style="width:100%;padding:16px;font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;border:none;border-radius:12px;cursor:pointer;' +
+      (isDone ? 'background:var(--surface-1);color:var(--green);">ERLEDIGT \u2713' : 'background:var(--red);color:#fff;">SESSION STARTEN \u2192') +
+    '</button>' +
   '</div>';
 
   showPage('block-detail');
