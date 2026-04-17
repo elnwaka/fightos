@@ -5108,127 +5108,121 @@ function openBlockDetail(day, idx) {
   var el = document.getElementById('page-block-detail');
   if (!el) return;
 
-  var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNAEHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITAET'];
-  var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
-  var blockSaeulen = BLOCK_SAEULEN[block.type] || [];
   var typeDetail = BLOCK_DETAIL_CONTENT[block.type] || BLOCK_DETAIL_CONTENT['meta'];
   var DAY_LABEL_MAP = { mo:'Montag', di:'Dienstag', mi:'Mittwoch', do:'Donnerstag', fr:'Freitag', sa:'Samstag', so:'Sonntag' };
+  var logKey = day + '_' + idx + '_' + getWeekId();
+  var isDone = data.completedBlocks && data.completedBlocks[logKey];
+  var rpeCol = block.rpe >= 8 ? '#e8000d' : block.rpe >= 6 ? '#ff6d00' : block.rpe >= 4 ? '#f5c518' : '#4caf50';
 
-  // Helper: render one exercise row — clean, minimal
-  function renderExRow(ex, num) {
-    var libEx = (typeof getExerciseById === 'function') ? getExerciseById(ex.id) : null;
-    var name = libEx ? libEx.name : (ex.id || '').replace(/-/g,' ').toUpperCase();
-    var hasLib = !!libEx;
-    return '<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--surface-1);' + (hasLib ? 'cursor:pointer;' : '') + '" ' + (hasLib ? 'onclick="openExerciseDetail(\'' + ex.id + '\')"' : '') + '>' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--red);min-width:20px;text-align:right;padding-top:1px;">' + num + '</div>' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);font-weight:600;">' + escapeHTML(name) + '</div>' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--gold);margin-top:3px;">' + escapeHTML(ex.sets || '') +
-          (ex.rest ? '<span style="color:#444;"> · </span><span style="color:#666;">' + escapeHTML(ex.rest) + '</span>' : '') +
-        '</div>' +
-        (ex.note ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#555;margin-top:2px;">' + escapeHTML(ex.note) + '</div>' : '') +
-      '</div>' +
-      (hasLib ? '<div style="color:#333;padding-top:2px;flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>' : '') +
-    '</div>';
-  }
-
-  // Build exercises HTML
   var hasExercises = block.exercises && block.exercises.length > 0;
   var hasStructuredEx = hasExercises && typeof block.exercises[0] === 'object';
 
-  var warmupHTML = '';
-  var cooldownHTML = '';
-  var exerciseHTML = '';
+  // ── Section builder ──
+  function section(label, color, content) {
+    return '<div class="bd-section">' +
+      '<div class="bd-section-bar" style="background:' + color + ';"></div>' +
+      '<div class="bd-section-body">' +
+        '<div class="bd-section-label" style="color:' + color + ';">' + label + '</div>' +
+        content +
+      '</div>' +
+    '</div>';
+  }
+
+  // ── Exercise row ──
+  function exRow(ex) {
+    var libEx = (typeof getExerciseById === 'function') ? getExerciseById(ex.id) : null;
+    var name = libEx ? libEx.name : (ex.id || '').replace(/-/g,' ').toUpperCase();
+    var hasLib = !!libEx;
+    return '<div class="bd-ex" ' + (hasLib ? 'onclick="openExerciseDetail(\'' + ex.id + '\')"' : '') + '>' +
+      '<div class="bd-ex-main">' +
+        '<div class="bd-ex-name">' + escapeHTML(name) + '</div>' +
+        (ex.note ? '<div class="bd-ex-note">' + escapeHTML(ex.note) + '</div>' : '') +
+      '</div>' +
+      '<div class="bd-ex-meta">' +
+        (ex.sets ? '<div class="bd-ex-sets">' + escapeHTML(ex.sets) + '</div>' : '') +
+        (ex.rest ? '<div class="bd-ex-rest">' + escapeHTML(ex.rest) + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  // ── Build sections ──
+  var sectionsHTML = '';
 
   if (hasStructuredEx) {
     var wu = block.warmup || '';
     var cd = block.cooldown || '';
-    if (wu) {
-      warmupHTML = '<div style="padding:10px 0;border-bottom:1px solid var(--surface-1);margin-bottom:4px;">' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:3px;">WARM-UP</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#777;">' + escapeHTML(wu) + '</div>' +
-      '</div>';
-    }
-    if (cd) {
-      cooldownHTML = '<div style="padding:10px 0;margin-top:4px;">' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);letter-spacing:1px;margin-bottom:3px;">COOL-DOWN</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#777;">' + escapeHTML(cd) + '</div>' +
-      '</div>';
+    var beforeEx = block.exercisesBefore || [];
+    var mainEx = block.exercises;
+    var afterEx = block.exercisesAfter || [];
+
+    // PHASE 1: Warm-up
+    if (wu || beforeEx.length) {
+      var wuContent = '';
+      if (wu) wuContent += '<div class="bd-phase-text">' + escapeHTML(wu) + '</div>';
+      beforeEx.forEach(function(ex) { wuContent += exRow(ex); });
+      sectionsHTML += section('AUFWÄRMEN', '#f5c518', wuContent);
     }
 
-    var allEx = (block.exercisesBefore || []).concat(block.exercises).concat(block.exercisesAfter || []);
-    exerciseHTML = '<div style="margin-top:8px;">';
-    allEx.forEach(function(ex, ei) {
-      exerciseHTML += renderExRow(ex, ei + 1);
-    });
-    exerciseHTML += '</div>';
+    // PHASE 2: Main workout
+    var mainContent = '';
+    mainEx.forEach(function(ex) { mainContent += exRow(ex); });
+    sectionsHTML += section('HAUPTTEIL', '#e8000d', mainContent);
+
+    // PHASE 3: After + cool-down
+    if (cd || afterEx.length) {
+      var cdContent = '';
+      afterEx.forEach(function(ex) { cdContent += exRow(ex); });
+      if (cd) cdContent += '<div class="bd-phase-text">' + escapeHTML(cd) + '</div>';
+      sectionsHTML += section('ABSCHLUSS', '#2979ff', cdContent);
+    }
 
   } else if (hasExercises) {
-    exerciseHTML = '<div style="margin-top:8px;">';
-    block.exercises.forEach(function(ex, ei) {
-      var exStr = typeof ex === 'string' ? ex : (ex.label || ex.id || '');
-      exerciseHTML += '<div style="padding:10px 0;border-bottom:1px solid var(--surface-1);font-size:14px;color:var(--white);">' + escapeHTML(exStr) + '</div>';
+    // String-based fallback
+    var fbContent = '';
+    block.exercises.forEach(function(ex) {
+      var s = typeof ex === 'string' ? ex : (ex.label || '');
+      fbContent += '<div class="bd-phase-text">' + escapeHTML(s) + '</div>';
     });
-    exerciseHTML += '</div>';
+    sectionsHTML += section('WORKOUT', '#e8000d', fbContent);
 
   } else {
-    // No exercises (e.g. Vereinstraining)
+    // Vereinstraining — no exercises
     if (typeDetail.warmup) {
-      warmupHTML = '<div style="padding:10px 0;border-bottom:1px solid var(--surface-1);">' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:3px;">VOR DEM TRAINING</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#777;">' + typeDetail.warmup + '</div>' +
-      '</div>';
+      sectionsHTML += section('VOR DEM TRAINING', '#f5c518', '<div class="bd-phase-text">' + typeDetail.warmup + '</div>');
+    }
+    if (typeDetail.notes) {
+      sectionsHTML += section('HINWEISE', '#888', '<div class="bd-phase-text">' + typeDetail.notes + '</div>');
     }
     if (typeDetail.cooldown) {
-      cooldownHTML = '<div style="padding:10px 0;">' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--blue);letter-spacing:1px;margin-bottom:3px;">NACH DEM TRAINING</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#777;">' + typeDetail.cooldown + '</div>' +
-      '</div>';
+      sectionsHTML += section('NACH DEM TRAINING', '#2979ff', '<div class="bd-phase-text">' + typeDetail.cooldown + '</div>');
     }
   }
 
-  // Meta line (RPE + Duration)
-  var metaHTML = '';
-  if (block.rpe > 0 || block.duration > 0) {
-    var rpeCol = block.rpe >= 8 ? 'var(--red)' : block.rpe >= 6 ? 'var(--orange)' : block.rpe >= 4 ? 'var(--gold)' : 'var(--green)';
-    metaHTML = '<div style="display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--surface-1);">' +
-      (block.duration > 0 ? '<div><div style="font-family:\'Space Mono\',monospace;font-size:9px;color:#444;letter-spacing:1px;">DAUER</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);">' + block.duration + ' <span style="font-size:12px;color:#555;">Min.</span></div></div>' : '') +
-      (block.rpe > 0 ? '<div><div style="font-family:\'Space Mono\',monospace;font-size:9px;color:#444;letter-spacing:1px;">RPE</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:' + rpeCol + ';">' + block.rpe + '<span style="font-size:12px;color:#555;">/10</span></div></div>' : '') +
-    '</div>';
-  }
-
-  var logKey = day + '_' + idx + '_' + getWeekId();
-  var isDone = data.completedBlocks && data.completedBlocks[logKey];
-
   el.innerHTML =
-  // Back button
-  '<div style="padding-bottom:20px;">' +
-    '<button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">\u2190 WOCHENPLAN</button>' +
+  // ── Hero header ──
+  '<div class="bd-hero">' +
+    '<button onclick="showPage(\'wochenplan\')" class="bd-back">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' +
+    '</button>' +
+    '<div class="bd-hero-content">' +
+      '<div class="bd-day">' + (DAY_LABEL_MAP[day] || day).toUpperCase() + '</div>' +
+      '<div class="bd-title">' + (block.title || '').replace(/</g,'&lt;') + '</div>' +
+      (block.hint ? '<div class="bd-hint">' + block.hint.replace(/</g,'&lt;') + '</div>' : '') +
+      '<div class="bd-stats">' +
+        (block.duration > 0 ? '<div class="bd-stat"><span class="bd-stat-val">' + block.duration + '</span><span class="bd-stat-unit">Min.</span></div>' : '') +
+        (block.rpe > 0 ? '<div class="bd-stat"><span class="bd-stat-val" style="color:' + rpeCol + ';">' + block.rpe + '/10</span><span class="bd-stat-unit">RPE</span></div>' : '') +
+        (hasStructuredEx ? '<div class="bd-stat"><span class="bd-stat-val">' + ((block.exercisesBefore||[]).length + block.exercises.length + (block.exercisesAfter||[]).length) + '</span><span class="bd-stat-unit">Übungen</span></div>' : '') +
+      '</div>' +
+    '</div>' +
   '</div>' +
 
-  // Title
-  '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(28px,6vw,42px);color:var(--white);letter-spacing:2px;line-height:1;">' + (block.title || '').replace(/</g,'&lt;') + '</div>' +
-  '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;letter-spacing:1px;margin-top:6px;">' + (DAY_LABEL_MAP[day] || day).toUpperCase() + ' \u00b7 ' + block.time + '</div>' +
-  (block.hint ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-top:10px;line-height:1.5;">' + block.hint.replace(/</g,'&lt;') + '</div>' : '') +
+  // ── Sections ──
+  sectionsHTML +
 
-  // Meta
-  metaHTML +
-
-  // Warm-up → Exercises → Cool-down
-  warmupHTML +
-  exerciseHTML +
-  cooldownHTML +
-
-  // Hinweise (only for blocks without structured exercises)
-  (typeDetail.notes && !hasStructuredEx ? '<div style="padding:10px 0;margin-top:8px;">' +
-    '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;letter-spacing:1px;margin-bottom:4px;">HINWEISE</div>' +
-    '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;line-height:1.6;">' + typeDetail.notes + '</div>' +
-  '</div>' : '') +
-
-  // Action button
-  '<div style="margin-top:28px;padding-top:16px;border-top:1px solid var(--surface-1);">' +
-    '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\')" class="submit-btn" style="width:100%;padding:14px;font-size:14px;">' +
-      (isDone ? 'ERLEDIGT \u2713' : 'ALS ERLEDIGT MARKIEREN') +
+  // ── Bottom action ──
+  '<div class="bd-action">' +
+    '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\')" class="bd-done-btn' + (isDone ? ' done' : '') + '">' +
+      (isDone ? '\u2713 ERLEDIGT' : 'ALS ERLEDIGT MARKIEREN') +
     '</button>' +
   '</div>';
 
