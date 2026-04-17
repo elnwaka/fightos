@@ -4291,6 +4291,13 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
 .bd-ex-sets { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--white); font-weight: 700; }
 .bd-ex-rest { font-family: 'Space Mono', monospace; font-size: 10px; color: #444; margin-top: 2px; }
 
+/* Weight input per exercise */
+.bd-ex-weight { flex-shrink: 0; }
+.bd-weight-input { width: 56px; padding: 6px 4px; text-align: center; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--white); background: var(--surface-1); border: 1px solid var(--surface-2); border-radius: var(--radius-sm); -moz-appearance: textfield; }
+.bd-weight-input::-webkit-inner-spin-button, .bd-weight-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.bd-weight-input:focus { border-color: var(--red); outline: none; }
+.bd-weight-input::placeholder { color: #333; }
+
 /* Done button */
 .bd-action { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--surface-1); }
 .bd-done-btn { width: 100%; padding: 16px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; border: 2px solid var(--red); background: transparent; color: var(--red); border-radius: var(--radius-md); cursor: pointer; transition: background .2s, color .2s; }

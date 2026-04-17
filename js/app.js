@@ -5136,18 +5136,31 @@ function openBlockDetail(day, idx) {
   }
 
   // ── Exercise row ──
-  function exRow(ex) {
+  // Last logged weight for this exercise
+  var liftLog = (data && data.liftLog) || {};
+  function lastWeight(exId) {
+    var entries = liftLog[exId];
+    if (!entries || !entries.length) return '';
+    return entries[entries.length - 1].weight || '';
+  }
+
+  function exRow(ex, rowIdx) {
     var libEx = (typeof getExerciseById === 'function') ? getExerciseById(ex.id) : null;
     var name = libEx ? libEx.name : (ex.id || '').replace(/-/g,' ').toUpperCase();
     var hasLib = !!libEx;
-    return '<div class="bd-ex" ' + (hasLib ? 'onclick="openExerciseDetail(\'' + ex.id + '\')"' : '') + '>' +
-      '<div class="bd-ex-main">' +
+    var prev = lastWeight(ex.id);
+    var prevHint = prev ? ' (zuletzt: ' + prev + ' kg)' : '';
+    return '<div class="bd-ex">' +
+      '<div class="bd-ex-main" ' + (hasLib ? 'onclick="openExerciseDetail(\'' + ex.id + '\')" style="cursor:pointer;"' : '') + '>' +
         '<div class="bd-ex-name">' + escapeHTML(name) + '</div>' +
         (ex.note ? '<div class="bd-ex-note">' + escapeHTML(ex.note) + '</div>' : '') +
       '</div>' +
       '<div class="bd-ex-meta">' +
         (ex.sets ? '<div class="bd-ex-sets">' + escapeHTML(ex.sets) + '</div>' : '') +
         (ex.rest ? '<div class="bd-ex-rest">' + escapeHTML(ex.rest) + '</div>' : '') +
+      '</div>' +
+      '<div class="bd-ex-weight">' +
+        '<input type="number" class="bd-weight-input" data-exid="' + (ex.id || '') + '" placeholder="kg" value="' + prev + '" title="Gewicht' + escapeHTML(prevHint) + '" step="0.5" min="0">' +
       '</div>' +
     '</div>';
   }
@@ -5480,9 +5493,34 @@ function completeBlock(day, idx, type, title, duration, rpe) {
     weight: null,
     notes: title + ' (via Wochenplan)'
   });
+
+  // Save lift weights from block detail inputs
+  saveLiftWeights(data);
+
   saveData(data);
   showToast('Block erledigt ✓', 'success', 2000);
   renderWeekPlan();
+}
+
+function saveLiftWeights(data) {
+  if (!data.liftLog) data.liftLog = {};
+  var inputs = document.querySelectorAll('.bd-weight-input');
+  var today = new Date().toISOString().split('T')[0];
+  inputs.forEach(function(inp) {
+    var exId = inp.dataset.exid;
+    var w = parseFloat(inp.value);
+    if (!exId || isNaN(w) || w <= 0) return;
+    if (!data.liftLog[exId]) data.liftLog[exId] = [];
+    // Don't duplicate same day
+    var existing = data.liftLog[exId].find(function(e) { return e.date === today; });
+    if (existing) {
+      existing.weight = w;
+    } else {
+      data.liftLog[exId].push({ date: today, weight: w });
+    }
+    // Keep max 52 entries (1 year weekly)
+    if (data.liftLog[exId].length > 52) data.liftLog[exId] = data.liftLog[exId].slice(-52);
+  });
 }
 
 function estimateBlockDuration(type) {

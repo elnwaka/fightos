@@ -1391,10 +1391,71 @@ function openExerciseDetail(id) {
           '<span class="muscle-tag" style="background:'+color+'15;color:'+color+';">'+label+'</span>'
         ).join('')}
       </div>
+
+      <!-- Progression Chart -->
+      <div id="ex-progression-wrap" style="margin-top:24px;"></div>
     </div>
   </div>`;
 
   showPage('uebung-detail');
+  renderExProgression(id, color);
+}
+
+var _exProgChart = null;
+function renderExProgression(exId, color) {
+  var wrap = document.getElementById('ex-progression-wrap');
+  if (!wrap) return;
+  if (_exProgChart) { _exProgChart.destroy(); _exProgChart = null; }
+
+  var data = (typeof getData === 'function') ? getData() : null;
+  if (!data || !data.liftLog || !data.liftLog[exId] || data.liftLog[exId].length < 2) {
+    wrap.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;text-align:center;padding:16px;">Noch keine Gewichtsdaten. Trage dein Gewicht im Wochenplan ein.</div>';
+    return;
+  }
+
+  var entries = data.liftLog[exId].slice(-20);
+  var labels = entries.map(function(e) {
+    var d = e.date.split('-');
+    return d[2] + '.' + d[1];
+  });
+  var weights = entries.map(function(e) { return e.weight; });
+  var minW = Math.min.apply(null, weights);
+  var maxW = Math.max.apply(null, weights);
+  var diff = maxW - weights[0];
+
+  wrap.innerHTML =
+    '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:2px;margin-bottom:8px;">PROGRESSION</div>' +
+    (diff !== 0 ? '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:' + (diff > 0 ? 'var(--green)' : 'var(--red)') + ';margin-bottom:8px;">' + (diff > 0 ? '+' : '') + diff.toFixed(1) + ' kg</div>' : '') +
+    '<canvas id="ex-prog-canvas" height="140"></canvas>';
+
+  var ctx = document.getElementById('ex-prog-canvas');
+  if (!ctx || typeof Chart === 'undefined') return;
+
+  _exProgChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: weights,
+        borderColor: color || '#e8000d',
+        borderWidth: 2,
+        pointBackgroundColor: color || '#e8000d',
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        tension: 0.3,
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return c.parsed.y + ' kg'; } } } },
+      scales: {
+        x: { ticks: { color: '#333', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' } },
+        y: { min: Math.floor(minW * 0.9), ticks: { color: '#444', font: { family: 'Space Mono', size: 10 }, callback: function(v) { return v + ' kg'; } }, grid: { color: '#111' } }
+      }
+    }
+  });
 }
 
 // ===== ERNÄHRUNG =====
