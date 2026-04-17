@@ -4446,21 +4446,21 @@ function generateSmartWeekPlan() {
   // ===== S&C SESSION TEMPLATES (A/B/C rotation) =====
   const scTemplates = [
     {
-      key: 'A', title: 'S&C: Maximalkraft', rpe: 9,
-      exercises: ['Jump Squat 3x4 @30% BW', 'Trap Bar DL 4x4 @85%', 'Bench Press 4x4 @82%', 'Weighted Pull-Up 3x5', 'Pallof Press 3x8/side', 'Face Pulls 3x15'],
-      hint: 'Fokus: Maximalkraft. 2 Min. Pause zwischen Hauptuebungen. Warm-Up: 2 Saetze leicht.',
+      key: 'A', title: 'Krafttraining (Maximalkraft)', rpe: 9,
+      exercises: ['Kniebeugen-Sprünge: 3 Sätze × 4 Wdh. (leichtes Gewicht)', 'Kreuzheben: 4 Sätze × 4 Wdh. (schwer, 85% vom Maximum)', 'Bankdrücken: 4 Sätze × 4 Wdh. (schwer)', 'Klimmzüge mit Gewicht: 3 Sätze × 5 Wdh.', 'Rumpfstabilität (Pallof Press): 3 × 8 pro Seite', 'Schultergesundheit (Face Pulls): 3 × 15'],
+      hint: 'Fokus: Maximalkraft. 2 Min. Pause zwischen Hauptübungen. Warm-Up: 2 Sätze leicht. 🔴 Sehr hart — maximale Intensität',
       hasHeavyLegs: true, duration: 45
     },
     {
-      key: 'B', title: 'S&C: Power', rpe: 8,
-      exercises: ['Plyo Push-Up 3x5', 'Jump Squat 4x3 @30%', 'Med Ball Rotation Throw 3x5/side', 'Landmine Press 3x5/side', 'KB Swing 3x8', 'Band Pull-Aparts 2x20'],
-      hint: 'Fokus: Explosivitaet. Maximale Geschwindigkeit bei jeder Wiederholung. 90s Pause.',
+      key: 'B', title: 'Krafttraining (Explosivität)', rpe: 8,
+      exercises: ['Explosive Liegestütze: 3 × 5', 'Kniebeugen-Sprünge: 4 Sätze × 3 Wdh. (leichtes Gewicht)', 'Medizinball-Drehwurf: 3 × 5 pro Seite', 'Einarm-Drücken (Landmine): 3 × 5 pro Seite', 'Kettlebell Swing: 3 × 8', 'Schulterband-Züge: 2 × 20'],
+      hint: 'Fokus: Explosivität. Maximale Geschwindigkeit bei jeder Wiederholung. 90 Sek. Pause. 🔴 Sehr hart — maximale Intensität',
       hasHeavyLegs: false, duration: 40
     },
     {
-      key: 'C', title: 'S&C: Kraft-Ausdauer', rpe: 7,
-      exercises: ['KB Goblet Squat 3x10', 'Bent Over Row 3x8', 'Push Press 3x6', 'Walking Lunge 3x8/side', 'Plank 3x30s', 'Wrist Roller 2x30s'],
-      hint: 'Fokus: Kraft-Ausdauer. 60s Pause. Gewicht moderat, saubere Form.',
+      key: 'C', title: 'Krafttraining (Kraft-Ausdauer)', rpe: 7,
+      exercises: ['Kettlebell Kniebeuge: 3 × 10', 'Vorgebeugtes Rudern: 3 × 8', 'Stoßdrücken: 3 × 6', 'Ausfallschritte: 3 × 8 pro Seite', 'Unterarmstütz: 3 × 30 Sekunden', 'Handgelenk-Rolle: 2 × 30 Sek.'],
+      hint: 'Fokus: Kraft-Ausdauer. 60 Sek. Pause. Gewicht moderat, saubere Form. 🟠 Hart — voller Einsatz',
       hasHeavyLegs: true, duration: 40
     }
   ];
@@ -4611,50 +4611,47 @@ function generateSmartWeekPlan() {
     // =============================================
     if (phase === 'fight-day') {
       var fightTime = eveningTime;
-      blocks.push({ type: 'meta', title: 'Letzte grosse Mahlzeit (KH-Loading)', time: timeBefore(fightTime, 4, 0), hint: 'Reis, Nudeln, Kartoffeln – Glykogenspeicher fuellen. 4h vor Kampf.', rpe: 1, duration: 30 });
-      blocks.push({ type: 'strength', title: 'PAPE Warm-Up: Squats 3x3 -> 10 Min. Pause -> Jump Squats 3x3', time: timeBefore(fightTime, 1, 0), hint: 'Schwere Kniebeugen aktivieren Nervensystem (Post-Activation Potentiation). 10 Min. Pause, dann explosive Spruenge.', rpe: 7, duration: 20,
-        exercises: ['Back Squat 3x3 @85%', 'Pause 10 Min.', 'Jump Squat 3x3 explosiv'] });
-      blocks.push({ type: 'boxing', title: 'Shadow Boxing + Pratzen + Box-Breathing', time: timeBefore(fightTime, 0, 20), hint: '2 Runden Shadow, 1 Runde Pratzen locker, 4-4-4-4 Atemrhythmus zur Aktivierung.', rpe: 4, duration: 15,
-        exercises: ['Shadow Boxing 2 Runden', 'Pratzen 1 Runde locker', 'Box-Breathing 2 Min.'] });
-      blocks.push({ type: 'fight', title: 'KAMPF', time: fightTime, hint: 'Alles geben.', rpe: 10, duration: 30 });
-      blocks.push({ type: 'recovery', title: 'Post-Kampf: Protein + KH + Elektrolyte', time: timeAdd(fightTime, 1, 0), hint: '30-40g Protein + 60-80g schnelle KH + Elektrolyte innerhalb 30 Min.', rpe: 1, duration: 15 });
+      blocks.push({ type: 'meta', title: 'Letzte große Mahlzeit vor dem Kampf', time: timeBefore(fightTime, 4, 0), hint: 'Reis, Nudeln, Kartoffeln – Energiespeicher füllen. 4 Stunden vor Kampf. 💚 Leicht — locker bleiben', rpe: 1, duration: 30 });
+      blocks.push({ type: 'strength', title: 'Aufwärm-Ritual vor dem Kampf', time: timeBefore(fightTime, 1, 0), hint: 'Schwere Kniebeugen wecken dein Nervensystem auf — danach bist du 5-8% explosiver. 10 Min. Pause, dann explosive Sprünge und Schattenboxen. 🟠 Hart — voller Einsatz', rpe: 7, duration: 20,
+        exercises: ['Schwere Kniebeugen: 3 × 3 (85% vom Maximum)', 'Pause 10 Min.', 'Kniebeugen-Sprünge: 3 × 3 explosiv'] });
+      blocks.push({ type: 'boxing', title: 'Schattenboxen + Pratzen + Atemübung', time: timeBefore(fightTime, 0, 20), hint: '2 Runden Schattenboxen, 1 Runde Pratzen locker, 4-4-4-4 Atemrhythmus zur Aktivierung. 💛 Moderat — fokussiert arbeiten', rpe: 4, duration: 15,
+        exercises: ['Schattenboxen 2 Runden', 'Pratzen 1 Runde locker', 'Atemübung (Box-Breathing) 2 Min.'] });
+      blocks.push({ type: 'fight', title: 'KAMPF', time: fightTime, hint: 'Alles geben. ⚫ Maximum — alles geben', rpe: 10, duration: 30 });
+      blocks.push({ type: 'recovery', title: 'Erholung nach dem Kampf', time: timeAdd(fightTime, 1, 0), hint: 'Dein Körper braucht jetzt Ruhe. 30-40g Protein + schnelle Kohlenhydrate + Elektrolyte innerhalb 30 Min. Viel Schlaf! 💚 Leicht — locker bleiben', rpe: 1, duration: 15 });
 
     // =============================================
     // POST-FIGHT RECOVERY (1-2 days after)
     // =============================================
     } else if (phase === 'post-fight') {
-      blocks.push({ type: 'meta', title: 'IMT Session (leicht)', time: amStart, hint: '30 Atemzuege bei 40% MIP – leichter als normal.', rpe: 3, duration: 5 });
-      blocks.push({ type: 'recovery', title: 'Sanfte Mobility', time: timeAdd(amStart, 0, 10), hint: 'Hip 90/90, T-Spine Rotation, Schulter CARs. Kein Krafttraining.', rpe: 2, duration: 15,
-        exercises: ['Hip 90/90', 'T-Spine Rotation', 'Schulter CARs', 'Deep Squat Hold 60s'] });
-      blocks.push({ type: 'cardio', title: 'Leichte Zone 2: 20 Min.', time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), hint: 'Lockeres Gehen oder Radfahren bei Puls 110-130. Foerdert Regeneration.', rpe: 3, duration: 20,
+      blocks.push({ type: 'recovery', title: 'Leichte Morgenroutine (Erholung)', time: amStart, hint: 'Dein Körper braucht jetzt Ruhe. Leichte Bewegung, viel Protein, viel Schlaf. Du wirst stärker durch die Erholung, nicht durch mehr Training. 💚 Leicht — locker bleiben', rpe: 2, duration: 25,
+        exercises: ['Atemtraining (IMT): 30 tiefe Atemzüge (leicht)', 'Sanfte Dehnung: Hüfte, Brustwirbelsäule, Schultern (15 Min.)', 'Tiefe Kniebeuge halten: 60 Sek.'] });
+      blocks.push({ type: 'cardio', title: 'Leichte Bewegung', time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), hint: 'Lockeres Gehen oder Radfahren bei Puls 110-130. Fördert Regeneration. 💚 Leicht — locker bleiben', rpe: 3, duration: 20,
         exercises: ['Lockeres Radfahren oder Spaziergang 20 Min.'] });
 
     // =============================================
     // REST BEFORE FIGHT (1-2 days)
     // =============================================
     } else if (phase === 'rest-before') {
-      blocks.push({ type: 'meta', title: 'IMT Session (leicht)', time: amStart, hint: '30 Atemzuege bei 40% MIP.', rpe: 3, duration: 5 });
-      blocks.push({ type: 'meta', title: 'Mobility', time: timeAdd(amStart, 0, 10), hint: 'Hip 90/90, T-Spine, Schulter CARs, Deep Squat Hold. Locker bleiben.', rpe: 2, duration: 10,
-        exercises: ['Hip 90/90', 'T-Spine Rotation', 'Schulter CARs', 'Deep Squat Hold 60s'] });
-      blocks.push({ type: 'boxing', title: 'Leichtes Shadow Boxing + Visualisierung', time: isWeekend ? '11:00' : timeAdd(s.workEnd, 0, 30), hint: '2 Runden Shadow locker, Kombis visualisieren. Kein hartes Training.', rpe: 3, duration: 15,
-        exercises: ['Shadow Boxing 2 Runden locker', 'Visualisierung 5 Min.'] });
-      blocks.push({ type: 'meta', title: 'Visualisierung + Box-Breathing', time: '21:00', hint: '10 Min. Kampf mental durchgehen, 4-4-4-4 Atmung, frueh schlafen.', rpe: 2, duration: 10 });
+      blocks.push({ type: 'recovery', title: 'Leichte Morgenroutine', time: amStart, hint: 'Nur Atemtraining und Dehnung. Locker bleiben vor dem Kampf. 💚 Leicht — locker bleiben', rpe: 2, duration: 20,
+        exercises: ['Atemtraining (IMT): 30 tiefe Atemzüge (leicht)', 'Dehnung: Hüfte, Brustwirbelsäule, Schultern (10 Min.)', 'Tiefe Kniebeuge halten: 60 Sek.'] });
+      blocks.push({ type: 'boxing', title: 'Leichtes Schattenboxen + Visualisierung', time: isWeekend ? '11:00' : timeAdd(s.workEnd, 0, 30), hint: '2 Runden Schattenboxen locker, Kombinationen visualisieren. Kein hartes Training. 💚 Leicht — locker bleiben', rpe: 3, duration: 15,
+        exercises: ['Schattenboxen 2 Runden locker', 'Visualisierung 5 Min.'] });
+      blocks.push({ type: 'meta', title: 'Mentale Vorbereitung + Atemübung', time: '21:00', hint: '10 Min. Kampf mental durchgehen, 4-4-4-4 Atmung, früh schlafen. 💚 Leicht — locker bleiben', rpe: 2, duration: 10 });
 
     // =============================================
     // TAPER PHASE (3-4 days before fight)
     // =============================================
     } else if (phase === 'taper') {
-      blocks.push({ type: 'meta', title: 'IMT Session', time: amStart, hint: '30 Atemzuege bei 50% MIP.', rpe: 4, duration: 5 });
-      blocks.push({ type: 'meta', title: 'Mobility', time: timeAdd(amStart, 0, 10), hint: 'Hip 90/90, T-Spine, Schulter CARs, Deep Squat Hold.', rpe: 2, duration: 10,
-        exercises: ['Hip 90/90', 'T-Spine Rotation', 'Schulter CARs', 'Deep Squat Hold 60s'] });
+      blocks.push({ type: 'recovery', title: 'Leichte Morgenroutine', time: amStart, hint: 'Atemtraining und Dehnung. Körper schärfen, nicht belasten. 💛 Moderat — fokussiert arbeiten', rpe: 3, duration: 20,
+        exercises: ['Atemtraining (IMT): 30 tiefe Atemzüge', 'Dehnung: Hüfte, Brustwirbelsäule, Schultern (10 Min.)', 'Tiefe Kniebeuge halten: 60 Sek.'] });
       if (isSparringDay) {
         // No sparring within 5 days of fight — downgrade to technical work
-        blocks.push({ type: 'boxing', title: 'Technik statt Sparring (Kampfnaehe)', time: eveningTime, hint: 'Kein Sparring innerhalb 5 Tagen vor Kampf. Pratzen/Shadow mit Gameplan-Fokus.', rpe: 5, duration: 45,
-          exercises: ['Pratzenarbeit 4 Runden', 'Shadow Boxing 2 Runden', 'Defensive Drills'] });
+        blocks.push({ type: 'boxing', title: 'Techniktraining (kein Sparring vor Kampf)', time: eveningTime, hint: 'Kein Sparring innerhalb 5 Tagen vor Kampf. Pratzen und Schattenboxen mit Gameplan-Fokus. 💛 Moderat — fokussiert arbeiten', rpe: 5, duration: 45,
+          exercises: ['Pratzenarbeit 4 Runden', 'Schattenboxen 2 Runden', 'Defensive Übungen'] });
       } else if (isBoxingDay) {
-        blocks.push({ type: 'boxing', title: trainingLabel + ' (reduziert)', time: eveningTime, hint: 'Volumen -30%, Fokus auf Timing und Schaerfe. Keine neuen Techniken.', rpe: 6, duration: 45 });
+        blocks.push({ type: 'boxing', title: 'Boxtraining (reduziert)', time: eveningTime, hint: 'Weniger Volumen, Fokus auf Timing und Schärfe. Keine neuen Techniken. 🟠 Hart — voller Einsatz', rpe: 6, duration: 45 });
       } else if (!isFreeDay) {
-        blocks.push({ type: 'cardio', title: 'Leichte Zone 2: 25 Min.', time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), hint: 'Lockeres Laufen bei Puls 120-140.', rpe: 3, duration: 25,
+        blocks.push({ type: 'cardio', title: 'Lockeres Laufen', time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), hint: 'Lockeres Laufen bei Puls 120-140. 💚 Leicht — locker bleiben', rpe: 3, duration: 25,
           exercises: ['Lockeres Laufen oder Radfahren 25 Min.'] });
       }
 
@@ -4667,65 +4664,84 @@ function generateSmartWeekPlan() {
     // SUNDAY — COMPLETE REST
     // =============================================
     } else if (di === 6) {
-      blocks.push({ type: 'off', title: 'Kompletter Ruhetag', time: '09:00', hint: 'Kein Training. Schlaf, Essen, Erholung. Der Koerper wird im Schlaf staerker.', rpe: 0, duration: 0 });
+      blocks.push({ type: 'off', title: 'Kompletter Ruhetag', time: '09:00', hint: 'Kein Training. Schlaf, Essen, Erholung. Der Körper wird im Schlaf stärker. 💚 Leicht — locker bleiben', rpe: 0, duration: 0 });
 
     // =============================================
     // NORMAL TRAINING DAYS
     // =============================================
     } else {
 
-      // ---- AM BLOCK: IMT (daily) ----
-      blocks.push({ type: 'meta', title: 'IMT Session', time: cursor, hint: '30 Atemzuege bei 50% MIP. Progressiver Widerstand alle 2 Wochen.', rpe: 4, duration: 5 });
-      cursor = timeAdd(cursor, 0, 5);
-
-      // ---- AM BLOCK: S&C or Zone 2 ----
+      // ---- AM BLOCK: Merged morning block ----
       if (hasSC && totalSessions < MAX_TOTAL_SESSIONS) {
         var scTemplate = scTemplates[scAssignments[di]];
+        var morningExercises = [
+          'Atemtraining (IMT): 30 tiefe Atemzüge mit Widerstand'
+        ].concat(scTemplate.exercises.slice());
+        if (hasNacken) {
+          morningExercises.push('Nackentraining: Isometrisch 3×10 Sek. pro Richtung');
+        }
+        morningExercises.push('Dehnung: Hüfte, Schultern, Brustwirbelsäule (10 Min.)');
+        var scDuration = 5 + scTemplate.duration + (hasNacken ? 10 : 0) + 10;
         blocks.push({
           type: 'strength',
-          title: scTemplate.title + ' (' + scTemplate.key + ')',
-          time: cursor,
-          hint: scTemplate.hint,
+          title: 'Morgentraining',
+          time: amStart,
+          duration: scDuration,
           rpe: scTemplate.rpe,
-          duration: scTemplate.duration,
-          exercises: scTemplate.exercises.slice()
+          hint: 'Heute: ' + scTemplate.title + '. Starte mit Atemtraining, dann Kraft, dann Nacken und Dehnung. ' + scTemplate.hint.split('. ').slice(0, -1).join('. ') + '. ' + (scTemplate.rpe >= 8 ? '🔴 Sehr hart — maximale Intensität' : '🟠 Hart — voller Einsatz'),
+          exercises: morningExercises
         });
-        cursor = timeAdd(cursor, 0, scTemplate.duration);
         totalSessions++;
       } else if (!isFreeDay || isCardioDay) {
-        // Non-S&C morning: Zone 2 Cardio
-        blocks.push({ type: 'cardio', title: 'Zone 2 Cardio', time: cursor, hint: 'Lockeres Laufen oder Radfahren bei Puls 120-140. Aerobe Basis staerken.', rpe: 3, duration: 30,
-          exercises: ['Lockeres Laufen/Radfahren 30 Min. bei HR 120-140'] });
-        cursor = timeAdd(cursor, 0, 30);
+        // Non-S&C morning with cardio
+        var morningCardioExercises = [
+          'Atemtraining (IMT): 30 tiefe Atemzüge',
+          'Lockeres Laufen oder Radfahren: 30 Min. (Puls 120-140)',
+          'Dehnung: Hüfte, Schultern, Brustwirbelsäule (10 Min.)'
+        ];
+        blocks.push({
+          type: 'cardio',
+          title: 'Morgenroutine',
+          time: amStart,
+          duration: 45,
+          rpe: 3,
+          hint: 'Leichter Start: Atemtraining + lockeres Laufen + Dehnung. Puls unter 140. 💚 Leicht — locker bleiben',
+          exercises: morningCardioExercises
+        });
+      } else {
+        // Free day, no S&C, no cardio — light morning only
+        var lightMorningExercises = [
+          'Atemtraining (IMT): 30 tiefe Atemzüge',
+          'Nackentraining: Isometrisch 3×10 Sek.',
+          'Dehnung: 10 Min.'
+        ];
+        blocks.push({
+          type: 'recovery',
+          title: 'Leichte Morgenroutine',
+          time: amStart,
+          duration: 20,
+          rpe: 2,
+          hint: 'Nur Atemtraining, Nacken und Dehnung. Erholung hat Priorität. 💚 Leicht — locker bleiben',
+          exercises: lightMorningExercises
+        });
       }
-
-      // ---- AM BLOCK: Neck Training (Mon, Wed, Fri) ----
-      if (hasNacken) {
-        blocks.push({ type: 'meta', title: 'Nackentraining', time: cursor, hint: '4-Weg Isometrics: 3x10s je Richtung + Band Neck Flexion 2x12. KO-Praevention.', rpe: 5, duration: 10,
-          exercises: ['Isometric Neck Flexion 3x10s', 'Isometric Neck Extension 3x10s', 'Isometric Neck Lateral 3x10s/side', 'Band Neck Flexion 2x12'] });
-        cursor = timeAdd(cursor, 0, 10);
-      }
-
-      // ---- AM BLOCK: Mobility (daily) ----
-      blocks.push({ type: 'meta', title: 'Mobility', time: cursor, hint: 'Hip 90/90, T-Spine Rotation, Schulter CARs, Deep Squat Hold 60s.', rpe: 2, duration: 10,
-        exercises: ['Hip 90/90', 'T-Spine Rotation', 'Schulter CARs', 'Deep Squat Hold 60s'] });
 
       // ---- PM BLOCK: Evening Training ----
       if (isSparringDay) {
         // Sparring evening — NO S&C this morning is already enforced above
-        blocks.push({ type: 'boxing', title: 'Sparring im Verein', time: eveningTime, hint: 'Sparring-Tag: Morgens kein schweres S&C. Voller Fokus auf den Ring. Schutzausruestung!', rpe: 9, duration: 75,
-          exercises: ['Aufwaermen: Seil 3 Min. + Shadow 2 Runden', 'Sparring 4-6 Runden', 'Cool-Down + Dehnung 10 Min.'] });
+        blocks.push({ type: 'boxing', title: 'Sparring', time: eveningTime, hint: 'Technisches Sparring (50-60% Intensität). Fokus: Distanzkontrolle und Jab. Schutzausrüstung Pflicht! 🔴 Sehr hart — maximale Intensität', rpe: 9, duration: 75,
+          exercises: ['Aufwärmen: Seilspringen 3 Min. + Schattenboxen 2 Runden', 'Sparring 4-6 Runden', 'Cool-Down + Dehnung 10 Min.'] });
         totalSessions++;
 
       } else if (isBoxingDay) {
         // Regular boxing evening
-        blocks.push({ type: 'boxing', title: 'Boxtraining: ' + trainingLabel, time: eveningTime, hint: 'Vereinstraining – dein Trainer gibt den Inhalt vor. Min. 6h Abstand zum S&C.', rpe: 7, duration: 75 });
+        blocks.push({ type: 'boxing', title: 'Boxtraining im Verein', time: eveningTime, hint: 'Dein Trainer gibt das Training vor. Fokus heute: Technik und Pratzenarbeit. 🟠 Hart — voller Einsatz', rpe: 7, duration: 75 });
         totalSessions++;
 
       } else if (isCardioDay) {
         // Cardio evening — morning can have S&C
-        blocks.push({ type: 'cardio', title: 'Cardio-Training', time: eveningTime, hint: 'Ausdauer-Session: Laufen, Seilspringen, oder Assault Bike.', rpe: 6, duration: 45,
-          exercises: ['Laufen/Seilspringen/Bike 40-45 Min. bei HR 140-160'] });
+        blocks.push({ type: 'cardio', title: 'Ausdauertraining', time: eveningTime, hint: 'Ausdauer-Session: Laufen, Seilspringen oder Fahrrad-Ergometer. 🟠 Hart — voller Einsatz', rpe: 6, duration: 45,
+          exercises: ['Laufen/Seilspringen/Radfahren 40-45 Min. bei Puls 140-160'] });
         totalSessions++;
 
       } else if (isFreeDay) {
@@ -4742,8 +4758,8 @@ function generateSmartWeekPlan() {
           // Morning blocks already added above (IMT, Zone2/SC, neck, mobility)
           // Remove S&C if it was added (shouldn't be on sparring recovery, but safety)
           // Add explicit recovery note
-          blocks.push({ type: 'recovery', title: 'Aktive Erholung', time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), hint: prevWasSparring ? 'Erholung nach Sparring: lockerer Spaziergang 20 Min., Foam Rolling.' : 'Erholung nach 3 Trainingstagen: lockerer Spaziergang, Dehnung.', rpe: 2, duration: 20,
-            exercises: ['Lockerer Spaziergang 20 Min.', 'Foam Rolling 10 Min.'] });
+          blocks.push({ type: 'recovery', title: 'Aktive Erholung', time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), hint: (prevWasSparring ? 'Erholung nach Sparring: lockerer Spaziergang 20 Min., Faszienrolle.' : 'Erholung nach 3 Trainingstagen: lockerer Spaziergang, Dehnung.') + ' 💚 Leicht — locker bleiben', rpe: 2, duration: 20,
+            exercises: ['Lockerer Spaziergang 20 Min.', 'Faszienrolle (Foam Rolling) 10 Min.'] });
         }
         // Otherwise: free day with only morning routine (already added), no PM block
       }
