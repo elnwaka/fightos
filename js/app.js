@@ -4433,7 +4433,7 @@ function generateSmartWeekPlan() {
 
   // ===== CONSTANTS =====
   const MAX_SPARRING_PER_WEEK = 2;
-  const MAX_SC_PER_WEEK = 2; // Boxing Science + Daru: max 2 S&C bei 3-4x Boxen
+  const MAX_SC_PER_WEEK = 3; // 2× Maximalkraft + 1× Power (Boxing Science Aufbauphase)
   const MAX_TOTAL_SESSIONS = 8;
   const MIN_REST_DAYS = 1;
   const MAX_CONSECUTIVE_TRAINING = 3;
@@ -4578,24 +4578,25 @@ function generateSmartWeekPlan() {
     return true;
   });
 
-  // Assign S&C templates to days, respecting heavy-legs constraint
+  // Assign S&C templates: 2× Maximalkraft (A) + 1× Power (B)
+  // Pattern: A, B, A — Kraft-Ausdauer (C) wird durch Boxtraining abgedeckt
+  var scPattern = [0, 1, 0]; // Maximalkraft, Power, Maximalkraft
   var scAssignments = {}; // di -> template index
-  scDays.forEach(di => {
-    const nextDi = (di + 1) % 7;
-    const next2Di = (di + 2) % 7;
-    const nextIsSparring = allowedSparring.indexOf(nextDi) !== -1;
-    const next2IsSparring = allowedSparring.indexOf(next2Di) !== -1;
-    var templateIdx = scRotation % scTemplates.length;
-    // Max Strength (A) needs 48h+ before sparring — don't place day before or 2 days before sparring
+  scDays.forEach(function(di, slotIdx) {
+    var nextDi = (di + 1) % 7;
+    var next2Di = (di + 2) % 7;
+    var nextIsSparring = allowedSparring.indexOf(nextDi) !== -1;
+    var next2IsSparring = allowedSparring.indexOf(next2Di) !== -1;
+    var templateIdx = scPattern[slotIdx % scPattern.length];
+    // Max Strength (A) needs 48h+ before sparring
     if (templateIdx === 0 && (nextIsSparring || next2IsSparring)) {
-      templateIdx = 1; // Switch to Power (lighter CNS load)
+      templateIdx = 1; // Switch to Power
     }
     // Heavy legs day before sparring → switch to Power
     if (nextIsSparring && scTemplates[templateIdx].hasHeavyLegs) {
       templateIdx = 1;
     }
     scAssignments[di] = templateIdx;
-    scRotation++;
   });
 
   // Persist rotation index
