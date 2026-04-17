@@ -4447,47 +4447,47 @@ function generateSmartWeekPlan() {
   var scTemplates = [
     {
       key: 'A', title: 'Maximalkraft', rpe: 9,
+      warmup: 'Foam Rolling 2 Min. + Shoulder Dislocates + 2 leichte Aufwärmsätze',
+      cooldown: 'Dehnung Hüfte, Schultern, Brust — je 30 Sek. halten',
       exercises: [
-        '🔥 Aufwärmen: Foam Rolling 2 Min. + 2 leichte Aufwärmsätze pro Übung',
-        '1. Kniebeugen-Sprünge — 3 Sätze × 4 Wdh. mit leichtem Gewicht. Explosiv nach oben springen, weich landen. 90 Sek. Pause.',
-        '2. Kreuzheben (Trap Bar) — 4 Sätze × 4 Wdh. bei 85% deines Maximums. Rücken gerade, Hüfte nach vorne drücken. 2 Min. Pause.',
-        '3. Bankdrücken — 4 Sätze × 4 Wdh. bei 82%. Kontrolliert runter, explosiv hoch. 2 Min. Pause.',
-        '4. Klimmzüge mit Gewicht — 3 Sätze × 5 Wdh. Gewichtsgürtel oder Kurzhantel zwischen den Füßen. 90 Sek. Pause.',
-        '5. Rumpf: Pallof Press — 3 × 8 pro Seite. Kabel oder Band auf Brusthöhe, Arme strecken und halten. 60 Sek. Pause.',
-        '6. Schultern: Face Pulls — 3 × 15 am Kabelzug. Leichtes Gewicht, Ellbogen hoch. Verletzungsprävention!',
-        '🧊 Cool-Down: Dehnung Hüfte, Schultern, Brust — je 30 Sek. halten'
+        { id: 'jump-squat', sets: '3 × 4', rest: '90 Sek.', note: 'Leichtes Gewicht, explosiv springen' },
+        { id: 'trap-bar-deadlift', sets: '4 × 4 @ 85%', rest: '2 Min.', note: 'Rücken gerade, Hüfte nach vorne' },
+        { id: 'bench-press', sets: '4 × 4 @ 82%', rest: '2 Min.', note: 'Kontrolliert runter, explosiv hoch' },
+        { id: 'pull-ups', sets: '3 × 5 (gewichtet)', rest: '90 Sek.', note: 'Gewichtsgürtel oder Kurzhantel' },
+        { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'Arme strecken und halten' },
+        { id: 'face-pulls', sets: '3 × 15', rest: '60 Sek.', note: 'Leicht! Verletzungsprävention' }
       ],
-      hint: 'Schweres Krafttraining. Ziel: So stark wie möglich werden. Zwischen den Hauptübungen 2 Minuten Pause — das ist wichtig für die Erholung. 🔴 Sehr hart',
+      hint: 'Schweres Krafttraining — so stark wie möglich werden. 2 Min. Pause zwischen Hauptübungen.',
       hasHeavyLegs: true, duration: 45
     },
     {
       key: 'B', title: 'Explosivität', rpe: 8,
+      warmup: 'Seilspringen 2 Min. + Armkreise + 10 Kniebeugen ohne Gewicht',
+      cooldown: 'Lockeres Schütteln + Dehnung Hüftbeuger und Schultern',
       exercises: [
-        '🔥 Aufwärmen: Seilspringen 2 Min. + Armkreise + 10 Kniebeugen ohne Gewicht',
-        '1. Explosive Liegestütze — 3 × 5. Hände vom Boden lösen! Maximal schnell drücken. 90 Sek. Pause.',
-        '2. Kniebeugen-Sprünge — 4 × 3 mit leichtem Gewicht. So hoch wie möglich springen. 2 Min. Pause.',
-        '3. Medizinball-Drehwurf — 3 × 5 pro Seite. Seitlich zur Wand stehen, aus der Hüfte werfen wie einen Haken. 60 Sek. Pause.',
-        '4. Einarm-Drücken (Landmine) — 3 × 5 pro Arm. Stangenende in die Ecke, mit einer Hand nach oben drücken. 60 Sek. Pause.',
-        '5. Kettlebell Swing — 3 × 8. Hüfte explosiv nach vorne, Arme sind nur Halterung. 60 Sek. Pause.',
-        '6. Schulterband-Züge — 2 × 20. Band vor der Brust auseinanderziehen. Leicht, für Schultergesundheit.',
-        '🧊 Cool-Down: Lockeres Schütteln + Dehnung Hüftbeuger und Schultern'
+        { id: 'explosive-pushup', sets: '3 × 5', rest: '90 Sek.', note: 'Hände müssen vom Boden abheben!' },
+        { id: 'jump-squat', sets: '4 × 3', rest: '2 Min.', note: 'So hoch wie möglich springen' },
+        { id: 'med-ball-rotation', sets: '3 × 5 pro Seite', rest: '60 Sek.', note: 'Aus der Hüfte werfen wie einen Haken' },
+        { id: 'landmine-press', sets: '3 × 5 pro Arm', rest: '60 Sek.', note: 'Explosiv nach oben-vorne drücken' },
+        { id: 'hip-thrust', sets: '3 × 8', rest: '60 Sek.', note: 'Hüfte explosiv nach oben, 2 Sek. halten' },
+        { id: 'face-pulls', sets: '2 × 20', rest: '30 Sek.', note: 'Leicht, für Schultergesundheit' }
       ],
-      hint: 'Schnellkraft-Training. Ziel: Jede Bewegung so schnell und explosiv wie möglich. Nicht bis zur Erschöpfung — Qualität vor Quantität. 🔴 Sehr hart',
+      hint: 'Schnellkraft — jede Bewegung maximal explosiv. Qualität vor Quantität.',
       hasHeavyLegs: false, duration: 40
     },
     {
       key: 'C', title: 'Kraft-Ausdauer', rpe: 7,
+      warmup: '3 Min. leichtes Seilspringen + Gelenke mobilisieren',
+      cooldown: 'Dehnung + Foam Rolling Oberschenkel und Rücken',
       exercises: [
-        '🔥 Aufwärmen: 3 Min. leichtes Seilspringen oder Hampelmänner + Gelenke mobilisieren',
-        '1. Kettlebell Kniebeuge (Goblet) — 3 × 10. Kettlebell vor der Brust halten, tief runter, Rücken gerade. 60 Sek. Pause.',
-        '2. Vorgebeugtes Rudern — 3 × 8. Kurzhantel oder Langhantel. Rücken gerade, Ellbogen nah am Körper. 60 Sek. Pause.',
-        '3. Stoßdrücken (Push Press) — 3 × 6. Kurz in die Knie, dann explosiv über Kopf drücken. 60 Sek. Pause.',
-        '4. Ausfallschritte — 3 × 8 pro Bein. Großer Schritt nach vorne, Knie berührt fast den Boden. 60 Sek. Pause.',
-        '5. Unterarmstütz (Plank) — 3 × 30 Sek. Körper gerade wie ein Brett, Bauch anspannen. 30 Sek. Pause.',
-        '6. Handgelenk-Rolle — 2 × 30 Sek. Stange mit Seil und Gewicht auf/abrollen. Für starke Fäuste.',
-        '🧊 Cool-Down: Dehnung + Foam Rolling Oberschenkel und Rücken'
+        { id: 'hip-thrust', sets: '3 × 10', rest: '60 Sek.', note: 'Kontrolliert, Rücken gerade' },
+        { id: 'pull-ups', sets: '3 × 8', rest: '60 Sek.', note: 'Ohne Gewicht, volle Range of Motion' },
+        { id: 'landmine-press', sets: '3 × 6 pro Arm', rest: '60 Sek.', note: 'Explosiv drücken' },
+        { id: 'lateral-bounds', sets: '3 × 8 pro Bein', rest: '60 Sek.', note: 'Leise landen, 1 Sek. stabilisieren' },
+        { id: 'pallof-press', sets: '3 × 10 pro Seite', rest: '30 Sek.', note: 'Anti-Rotation halten' },
+        { id: 'wrist-roller', sets: '2 × hoch + runter', rest: '30 Sek.', note: 'Für starke Fäuste' }
       ],
-      hint: 'Kraft-Ausdauer. Ziel: Muskeln arbeiten länger unter Last — wichtig für späte Runden. Moderates Gewicht, saubere Ausführung. 🟠 Hart',
+      hint: 'Kraft-Ausdauer — Muskeln arbeiten länger unter Last. Moderates Gewicht.',
       hasHeavyLegs: true, duration: 40
     }
   ];
@@ -4701,13 +4701,12 @@ function generateSmartWeekPlan() {
       // ---- AM BLOCK: Merged morning block ----
       if (hasSC && totalSessions < MAX_TOTAL_SESSIONS) {
         var scTemplate = scTemplates[scAssignments[di]];
-        var morningExercises = [
-          'Atemtraining (IMT): 30 tiefe Atemzüge mit Widerstand'
-        ].concat(scTemplate.exercises.slice());
+        var morningExercises = scTemplate.exercises.slice();
+        var extraBefore = [{ id: 'imt', sets: '30 Atemzüge', rest: '', note: 'Atemtraining mit Widerstand' }];
+        var extraAfter = [];
         if (hasNacken) {
-          morningExercises.push('Nackentraining: Isometrisch 3×10 Sek. pro Richtung');
+          extraAfter.push({ id: 'iso-nacken', sets: '3 × 10 Sek. pro Richtung', rest: '', note: 'Isometrisch halten' });
         }
-        morningExercises.push('Dehnung: Hüfte, Schultern, Brustwirbelsäule (10 Min.)');
         var scDuration = 5 + scTemplate.duration + (hasNacken ? 10 : 0) + 10;
         blocks.push({
           type: 'strength',
@@ -4715,41 +4714,45 @@ function generateSmartWeekPlan() {
           time: amStart,
           duration: scDuration,
           rpe: scTemplate.rpe,
-          hint: 'Heute: ' + scTemplate.title + '. Starte mit Atemtraining, dann Kraft, dann Nacken und Dehnung. ' + scTemplate.hint.split('. ').slice(0, -1).join('. ') + '. ' + (scTemplate.rpe >= 8 ? '🔴 Sehr hart — maximale Intensität' : '🟠 Hart — voller Einsatz'),
-          exercises: morningExercises
+          hint: scTemplate.hint,
+          warmup: scTemplate.warmup,
+          cooldown: scTemplate.cooldown,
+          exercisesBefore: extraBefore,
+          exercises: morningExercises,
+          exercisesAfter: extraAfter
         });
         totalSessions++;
       } else if (!isFreeDay || isCardioDay) {
         // Non-S&C morning with cardio
-        var morningCardioExercises = [
-          'Atemtraining (IMT): 30 tiefe Atemzüge',
-          'Lockeres Laufen oder Radfahren: 30 Min. (Puls 120-140)',
-          'Dehnung: Hüfte, Schultern, Brustwirbelsäule (10 Min.)'
-        ];
         blocks.push({
           type: 'cardio',
           title: 'Ausdauer + Atemtraining',
           time: amStart,
           duration: 45,
           rpe: 3,
-          hint: 'Leichter Start: Atemtraining + lockeres Laufen + Dehnung. Puls unter 140. 💚 Leicht — locker bleiben',
-          exercises: morningCardioExercises
+          hint: 'Leichter Start: Puls unter 140.',
+          warmup: '5 Min. locker einlaufen',
+          cooldown: 'Dehnung Hüfte, Schultern, BWS (10 Min.)',
+          exercises: [
+            { id: 'imt', sets: '30 Atemzüge', rest: '', note: 'Atemtraining mit Widerstand' },
+            { id: 'zone2', sets: '30 Min.', rest: '', note: 'Laufen oder Radfahren, Puls 120-140' }
+          ]
         });
       } else {
         // Free day, no S&C, no cardio — light morning only
-        var lightMorningExercises = [
-          'Atemtraining (IMT): 30 tiefe Atemzüge',
-          'Nackentraining: Isometrisch 3×10 Sek.',
-          'Dehnung: 10 Min.'
-        ];
         blocks.push({
           type: 'recovery',
           title: 'Dehnung + Atemtraining',
           time: amStart,
           duration: 20,
           rpe: 2,
-          hint: 'Nur Atemtraining, Nacken und Dehnung. Erholung hat Priorität. 💚 Leicht — locker bleiben',
-          exercises: lightMorningExercises
+          hint: 'Erholung hat Priorität.',
+          warmup: '',
+          cooldown: 'Dehnung 10 Min.',
+          exercises: [
+            { id: 'imt', sets: '30 Atemzüge', rest: '', note: 'Atemtraining' },
+            { id: 'iso-nacken', sets: '3 × 10 Sek. pro Richtung', rest: '', note: 'Isometrisch halten' }
+          ]
         });
       }
 
@@ -4767,8 +4770,12 @@ function generateSmartWeekPlan() {
 
       } else if (isCardioDay) {
         // Cardio evening — morning can have S&C
-        blocks.push({ type: 'cardio', title: 'Ausdauertraining', time: eveningTime, hint: 'Ausdauer-Session: Laufen, Seilspringen oder Fahrrad-Ergometer. 🟠 Hart — voller Einsatz', rpe: 6, duration: 45,
-          exercises: ['Laufen/Seilspringen/Radfahren 40-45 Min. bei Puls 140-160'] });
+        blocks.push({ type: 'cardio', title: 'Ausdauertraining', time: eveningTime, hint: 'Ausdauer-Session. Voller Einsatz.', rpe: 6, duration: 45,
+          warmup: '5 Min. locker einlaufen + dynamisches Stretching',
+          cooldown: '5 Min. auslaufen + Dehnung Waden, Oberschenkel',
+          exercises: [
+            { id: 'zone2', sets: '40-45 Min.', rest: '', note: 'Laufen, Seilspringen oder Radfahren. Puls 140-160' }
+          ] });
         totalSessions++;
 
       } else if (isFreeDay) {
@@ -4785,8 +4792,12 @@ function generateSmartWeekPlan() {
           // Morning blocks already added above (IMT, Zone2/SC, neck, mobility)
           // Remove S&C if it was added (shouldn't be on sparring recovery, but safety)
           // Add explicit recovery note
-          blocks.push({ type: 'recovery', title: 'Aktive Erholung', time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), hint: (prevWasSparring ? 'Erholung nach Sparring: lockerer Spaziergang 20 Min., Faszienrolle.' : 'Erholung nach 3 Trainingstagen: lockerer Spaziergang, Dehnung.') + ' 💚 Leicht — locker bleiben', rpe: 2, duration: 20,
-            exercises: ['Lockerer Spaziergang 20 Min.', 'Faszienrolle (Foam Rolling) 10 Min.'] });
+          blocks.push({ type: 'recovery', title: 'Aktive Erholung', time: isWeekend ? '14:00' : timeAdd(s.workEnd, 0, 30), hint: prevWasSparring ? 'Erholung nach Sparring.' : 'Erholung nach 3 Trainingstagen.', rpe: 2, duration: 20,
+            warmup: '', cooldown: '',
+            exercises: [
+              { id: 'hip-cars', sets: '5 Kreise pro Richtung', rest: '', note: 'Lockere Mobilisation' },
+              { id: 'thoracic-rotation', sets: '3 × 8 pro Seite', rest: '', note: 'BWS öffnen' }
+            ] });
         }
         // Otherwise: free day with only morning routine (already added), no PM block
       }
@@ -5101,35 +5112,114 @@ function openBlockDetail(day, idx) {
   var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
   var blockSaeulen = BLOCK_SAEULEN[block.type] || [];
   var typeDetail = BLOCK_DETAIL_CONTENT[block.type] || BLOCK_DETAIL_CONTENT['meta'];
-
   var DAY_LABEL_MAP = { mo:'Montag', di:'Dienstag', mi:'Mittwoch', do:'Donnerstag', fr:'Freitag', sa:'Samstag', so:'Sonntag' };
 
-  // Workout-Anleitung — Schritt für Schritt
-  var exerciseHTML = '';
-  if (block.exercises && block.exercises.length) {
-    exerciseHTML = '<div style="margin-top:24px;">' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1px;margin-bottom:16px;">DEIN WORKOUT</div>';
-    block.exercises.forEach(function(ex, ei) {
-      var exStr = typeof ex === 'string' ? ex : (ex.label || ex.id || '');
-      exerciseHTML += '<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--surface-2);align-items:flex-start;">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--red);opacity:.4;min-width:24px;line-height:1;">' + (ei + 1) + '</div>' +
-        '<div style="flex:1;">' +
-          '<div style="font-size:var(--fs-base);color:var(--white);line-height:1.4;">' + escapeHTML(exStr) + '</div>' +
+  // Helper: render a single exercise row (object with id/sets/rest/note)
+  function renderExRow(ex, num) {
+    var libEx = (typeof getExerciseById === 'function') ? getExerciseById(ex.id) : null;
+    var name = libEx ? libEx.name : (ex.id || '').replace(/-/g,' ').toUpperCase();
+    var hasLib = !!libEx;
+    return '<div class="bd-ex-row" style="padding:12px 0;border-bottom:1px solid var(--surface-1);">' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--red);opacity:.35;min-width:24px;text-align:center;">' + num + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+            (hasLib ?
+              '<span onclick="openExerciseDetail(\'' + ex.id + '\')" style="font-family:\'DM Sans\',sans-serif;font-size:15px;color:var(--white);cursor:pointer;text-decoration:underline;text-decoration-color:var(--surface-3);text-underline-offset:3px;">' + escapeHTML(name) + '</span>' :
+              '<span style="font-family:\'DM Sans\',sans-serif;font-size:15px;color:var(--white);">' + escapeHTML(name) + '</span>') +
+            (hasLib ? '<span style="font-size:10px;color:var(--red);cursor:pointer;" onclick="openExerciseDetail(\'' + ex.id + '\')">INFO →</span>' : '') +
+          '</div>' +
+          '<div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap;">' +
+            (ex.sets ? '<span style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--gold);">' + escapeHTML(ex.sets) + '</span>' : '') +
+            (ex.rest ? '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">Pause: ' + escapeHTML(ex.rest) + '</span>' : '') +
+          '</div>' +
+          (ex.note ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#666;margin-top:3px;line-height:1.4;">' + escapeHTML(ex.note) + '</div>' : '') +
         '</div>' +
-      '</div>';
-    });
-    exerciseHTML += '</div>';
+      '</div>' +
+    '</div>';
   }
 
-  el.innerHTML = '<div style="padding-bottom:16px;">' +
-    '<button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">\u2190 Wochenplan</button>' +
+  // Build exercises HTML
+  var hasExercises = block.exercises && block.exercises.length > 0;
+  var hasStructuredEx = hasExercises && typeof block.exercises[0] === 'object';
+
+  var warmupHTML = '';
+  var cooldownHTML = '';
+  var exerciseHTML = '';
+
+  if (hasStructuredEx) {
+    // Block-level warmup/cooldown
+    var wu = block.warmup || '';
+    var cd = block.cooldown || '';
+    if (wu) {
+      warmupHTML = '<div style="background:var(--surface-0);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;">WARM-UP</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;">' + escapeHTML(wu) + '</div>' +
+      '</div>';
+    }
+    if (cd) {
+      cooldownHTML = '<div style="background:var(--surface-0);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:14px 16px;margin-top:16px;margin-bottom:16px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--blue);letter-spacing:1px;margin-bottom:4px;">COOL-DOWN</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;">' + escapeHTML(cd) + '</div>' +
+      '</div>';
+    }
+
+    // Before exercises (e.g. IMT)
+    var allEx = (block.exercisesBefore || []).concat(block.exercises).concat(block.exercisesAfter || []);
+    exerciseHTML = '<div style="margin-top:20px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1px;margin-bottom:12px;">ÜBUNGEN</div>';
+    allEx.forEach(function(ex, ei) {
+      exerciseHTML += renderExRow(ex, ei + 1);
+    });
+    exerciseHTML += '</div>';
+
+  } else if (hasExercises) {
+    // Fallback: old string-based exercises
+    exerciseHTML = '<div style="margin-top:20px;">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1px;margin-bottom:12px;">ÜBUNGEN</div>';
+    block.exercises.forEach(function(ex, ei) {
+      var exStr = typeof ex === 'string' ? ex : (ex.label || ex.id || '');
+      exerciseHTML += '<div style="padding:10px 0;border-bottom:1px solid var(--surface-1);font-size:14px;color:var(--white);line-height:1.4;">' + escapeHTML(exStr) + '</div>';
+    });
+    exerciseHTML += '</div>';
+
+  } else {
+    // No exercises (e.g. Vereinstraining) — show type-level warmup/cooldown
+    if (typeDetail.warmup) {
+      warmupHTML = '<div style="background:var(--surface-0);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;">VOR DEM TRAINING</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;">' + typeDetail.warmup + '</div>' +
+      '</div>';
+    }
+    if (typeDetail.cooldown) {
+      cooldownHTML = '<div style="background:var(--surface-0);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--blue);letter-spacing:1px;margin-bottom:4px;">NACH DEM TRAINING</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.5;">' + typeDetail.cooldown + '</div>' +
+      '</div>';
+    }
+  }
+
+  // RPE indicator
+  var rpeHTML = '';
+  if (block.rpe > 0) {
+    var rpeCol = block.rpe >= 8 ? 'var(--red)' : block.rpe >= 6 ? 'var(--orange)' : block.rpe >= 4 ? 'var(--gold)' : 'var(--green)';
+    rpeHTML = '<div style="display:flex;align-items:center;gap:8px;margin-top:12px;">' +
+      '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">INTENSITÄT</span>' +
+      '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:' + rpeCol + ';">RPE ' + block.rpe + '/10</span>' +
+      (block.duration > 0 ? '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;margin-left:8px;">' + block.duration + ' Min.</span>' : '') +
+    '</div>';
+  }
+
+  el.innerHTML = '<div style="padding-bottom:12px;">' +
+    '<button onclick="showPage(\'wochenplan\')" style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">\u2190 WOCHENPLAN</button>' +
   '</div>' +
 
   // Header
-  '<div style="margin-bottom:24px;">' +
+  '<div style="margin-bottom:20px;">' +
     '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;letter-spacing:1px;margin-bottom:4px;">' + (DAY_LABEL_MAP[day] || day).toUpperCase() + ' \u00b7 ' + block.time + '</div>' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(28px,5vw,40px);color:var(--white);letter-spacing:2px;line-height:1;">' + (block.title || '').replace(/</g,'&lt;') + '</div>' +
     (block.hint ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#666;margin-top:8px;line-height:1.5;">' + block.hint.replace(/</g,'&lt;') + '</div>' : '') +
+    rpeHTML +
     '<div style="display:flex;gap:6px;margin-top:12px;">' +
       blockSaeulen.map(function(si) {
         return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);background:' + saeulenColors[si] + '22;color:' + saeulenColors[si] + ';border:1px solid ' + saeulenColors[si] + '44;">' + saeulenLabels[si] + '</span>';
@@ -5137,31 +5227,19 @@ function openBlockDetail(day, idx) {
     '</div>' +
   '</div>' +
 
-  // Warm-up (only show if block has no inline exercises — exercises already include warm-up/cool-down)
-  (typeDetail.warmup && !(block.exercises && block.exercises.length) ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
-    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px;margin-bottom:8px;">WARM-UP</div>' +
-    '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.7;">' + typeDetail.warmup + '</div>' +
-  '</div>' : '') +
-
-  // Übungen
+  warmupHTML +
   exerciseHTML +
+  cooldownHTML +
 
-  // Cool-down (only show if block has no inline exercises)
-  (typeDetail.cooldown && !(block.exercises && block.exercises.length) ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:16px;margin-top:16px;margin-bottom:16px;">' +
-    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">COOL-DOWN</div>' +
-    '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;line-height:1.7;">' + typeDetail.cooldown + '</div>' +
-  '</div>' : '') +
-
-  // Hinweise
-  (typeDetail.notes ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
-    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">HINWEISE</div>' +
+  // Hinweise (only for blocks without structured exercises)
+  (typeDetail.notes && !hasStructuredEx ? '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--white);letter-spacing:1px;margin-bottom:6px;">HINWEISE</div>' +
     '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;line-height:1.7;">' + typeDetail.notes + '</div>' +
   '</div>' : '') +
 
-  // Bearbeiten-Button
+  // Action buttons
   '<div style="display:flex;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--surface-2);">' +
-    '<button onclick="editBlockFromDetail(\'' + day + '\',' + idx + ')" style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;background:none;border:1px solid var(--surface-3);padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;">BEARBEITEN</button>' +
-    '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\');showPage(\'wochenplan\')" class="submit-btn" style="padding:10px 20px;font-size:13px;">ALS ERLEDIGT MARKIEREN</button>' +
+    '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\')" class="submit-btn" style="flex:1;padding:12px 20px;font-size:14px;">ERLEDIGT \u2713</button>' +
   '</div>';
 
   showPage('block-detail');
