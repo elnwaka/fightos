@@ -4632,7 +4632,7 @@ function generateSmartWeekPlan() {
     // REST BEFORE FIGHT (1-2 days)
     // =============================================
     } else if (phase === 'rest-before') {
-      blocks.push({ type: 'recovery', title: 'Leichte Morgenroutine', time: amStart, hint: 'Nur Atemtraining und Dehnung. Locker bleiben vor dem Kampf. 💚 Leicht — locker bleiben', rpe: 2, duration: 20,
+      blocks.push({ type: 'recovery', title: 'Dehnung + Atemtraining', time: amStart, hint: 'Nur Atemtraining und Dehnung. Locker bleiben vor dem Kampf. 💚 Leicht — locker bleiben', rpe: 2, duration: 20,
         exercises: ['Atemtraining (IMT): 30 tiefe Atemzüge (leicht)', 'Dehnung: Hüfte, Brustwirbelsäule, Schultern (10 Min.)', 'Tiefe Kniebeuge halten: 60 Sek.'] });
       blocks.push({ type: 'boxing', title: 'Leichtes Schattenboxen + Visualisierung', time: isWeekend ? '11:00' : timeAdd(s.workEnd, 0, 30), hint: '2 Runden Schattenboxen locker, Kombinationen visualisieren. Kein hartes Training. 💚 Leicht — locker bleiben', rpe: 3, duration: 15,
         exercises: ['Schattenboxen 2 Runden locker', 'Visualisierung 5 Min.'] });
@@ -4642,7 +4642,7 @@ function generateSmartWeekPlan() {
     // TAPER PHASE (3-4 days before fight)
     // =============================================
     } else if (phase === 'taper') {
-      blocks.push({ type: 'recovery', title: 'Leichte Morgenroutine', time: amStart, hint: 'Atemtraining und Dehnung. Körper schärfen, nicht belasten. 💛 Moderat — fokussiert arbeiten', rpe: 3, duration: 20,
+      blocks.push({ type: 'recovery', title: 'Dehnung + Atemtraining', time: amStart, hint: 'Atemtraining und Dehnung. Körper schärfen, nicht belasten. 💛 Moderat — fokussiert arbeiten', rpe: 3, duration: 20,
         exercises: ['Atemtraining (IMT): 30 tiefe Atemzüge', 'Dehnung: Hüfte, Brustwirbelsäule, Schultern (10 Min.)', 'Tiefe Kniebeuge halten: 60 Sek.'] });
       if (isSparringDay) {
         // No sparring within 5 days of fight — downgrade to technical work
@@ -4684,7 +4684,7 @@ function generateSmartWeekPlan() {
         var scDuration = 5 + scTemplate.duration + (hasNacken ? 10 : 0) + 10;
         blocks.push({
           type: 'strength',
-          title: 'Morgentraining',
+          title: 'Krafttraining: ' + scTemplate.title,
           time: amStart,
           duration: scDuration,
           rpe: scTemplate.rpe,
@@ -4701,7 +4701,7 @@ function generateSmartWeekPlan() {
         ];
         blocks.push({
           type: 'cardio',
-          title: 'Morgenroutine',
+          title: 'Ausdauer + Atemtraining',
           time: amStart,
           duration: 45,
           rpe: 3,
@@ -4717,7 +4717,7 @@ function generateSmartWeekPlan() {
         ];
         blocks.push({
           type: 'recovery',
-          title: 'Leichte Morgenroutine',
+          title: 'Dehnung + Atemtraining',
           time: amStart,
           duration: 20,
           rpe: 2,
@@ -6085,11 +6085,40 @@ function renderDashboard() {
   var greeting = greetTime < 5 ? 'Late Night' : greetTime < 12 ? 'Guten Morgen' : greetTime < 18 ? '' : 'Guten Abend';
   var ringC80 = 2 * Math.PI * 80;
 
-  // Next training block
-  var todaySchedule = typeof getTodaySchedule === 'function' ? getTodaySchedule() : { time: '18:00', type: 'boxen' };
-  var nextBlockTime = todaySchedule.time || '18:00';
-  var nextBlockType = todaySchedule.type || 'boxen';
-  var nextBlockLabel = TYPE_LABELS[nextBlockType] || nextBlockType;
+  // Find next undone block from the weekly plan
+  var nextBlock = null;
+  var nextBlockDay = '';
+  var nowH = new Date().getHours();
+  var nowM = new Date().getMinutes();
+  var nowMinutes = nowH * 60 + nowM;
+  var wp = data.weekPlan || {};
+  var wkId = getWeekId();
+  // Check today first, then upcoming days
+  var dayOrder = [];
+  for (var di = 0; di < 7; di++) {
+    dayOrder.push(DAY_NAMES[(todayDow + di) % 7]);
+  }
+  for (var doi = 0; doi < dayOrder.length && !nextBlock; doi++) {
+    var dName = dayOrder[doi];
+    var blocks = wp[dName] || [];
+    for (var bi = 0; bi < blocks.length; bi++) {
+      var bk = blocks[bi];
+      if (bk.type === 'meta' || bk.type === 'off') continue;
+      var logKey = dName + '_' + bi + '_' + wkId;
+      var isDone = data.completedBlocks && data.completedBlocks[logKey];
+      if (isDone) continue;
+      // If today, skip blocks whose time has passed
+      if (doi === 0 && bk.time) {
+        var parts = bk.time.split(':');
+        var blockMin = parseInt(parts[0]) * 60 + parseInt(parts[1] || 0);
+        if (blockMin < nowMinutes - 30) continue; // 30 min grace
+      }
+      nextBlock = bk;
+      nextBlockDay = doi === 0 ? 'Heute' : doi === 1 ? 'Morgen' : DAY_NAMES_DE[dayOrder[doi]] || dName;
+      break;
+    }
+  }
+  var DAY_NAMES_DE = { mo: 'Montag', di: 'Dienstag', mi: 'Mittwoch', do: 'Donnerstag', fr: 'Freitag', sa: 'Samstag', so: 'Sonntag' };
 
   el.innerHTML =
 
@@ -6134,18 +6163,24 @@ function renderDashboard() {
       '<div id="dash-countdown-hero"></div>' +
     '</div>' +
 
-    // ══ NEXT TRAINING BLOCK (NEW) ══
-    (nextBlockType !== 'frei' ?
-      '<div class="db-sec">' +
-        '<div class="db-next-block" onclick="showPage(\'wochenplan\')">' +
-          '<div class="db-next-time">' + nextBlockTime + '</div>' +
-          '<div>' +
-            '<div class="db-next-title">' + nextBlockLabel + '</div>' +
-            '<div class="db-next-meta">N\u00e4chster Trainingsblock heute</div>' +
+    // ══ NÄCHSTE SESSION (prominent) ══
+    (nextBlock ?
+      '<div class="db-sec" style="padding:28px 0;">' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:3px;margin-bottom:8px;">N\u00c4CHSTE SESSION</div>' +
+        '<div class="db-next-block" onclick="showPage(\'wochenplan\')" style="position:relative;overflow:hidden;">' +
+          '<div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--red);border-radius:2px;"></div>' +
+          '<div style="padding-left:16px;">' +
+            '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">' +
+              '<div class="db-next-time">' + (nextBlock.time || '') + '</div>' +
+              '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">' + nextBlockDay + '</div>' +
+            '</div>' +
+            '<div class="db-next-title" style="font-size:clamp(20px,4vw,28px);">' + escapeHTML(nextBlock.title) + '</div>' +
+            (nextBlock.hint ? '<div class="db-next-meta" style="margin-top:4px;line-height:1.5;max-width:500px;">' + escapeHTML(nextBlock.hint).substring(0, 120) + '</div>' : '') +
+            (nextBlock.duration > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-top:6px;">' + nextBlock.duration + ' Min.' + (nextBlock.rpe > 0 ? ' \u00b7 RPE ' + nextBlock.rpe : '') + '</div>' : '') +
           '</div>' +
         '</div>' +
       '</div>'
-    : '') +
+    : '<div class="db-sec" style="padding:20px 0;text-align:center;"><div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">Alle Bl\u00f6cke diese Woche erledigt \u2713</div></div>') +
 
     // ══ WEEK STRIP ══
     '<div class="db-sec">' +
