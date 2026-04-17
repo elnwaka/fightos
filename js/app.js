@@ -1625,7 +1625,6 @@ function renderRadarChart(scoresOrEl, scoresArg) {
     el = document.getElementById('rpg-radar');
     scores = scoresOrEl;
   }
-  // Support both canvas and div — ApexCharts needs div
   if (!el) return;
   if (typeof ApexCharts === 'undefined') return;
 
@@ -1638,41 +1637,41 @@ function renderRadarChart(scoresOrEl, scoresArg) {
   var values = keys.map(function(k) { return scores[k] || 0; });
   var colors = RADAR_AXES.map(function(a) { return a.hex; });
   var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  var isMob = window.innerWidth < 480;
+  var chartH = isMob ? 260 : window.innerWidth < 768 ? 300 : 350;
 
   if (_radarChart) { _radarChart.destroy(); _radarChart = null; }
+  el.innerHTML = '';
 
-  // Ghost series
   var series = [{ name: 'Aktuell', data: values }];
-  var data = typeof getData === 'function' ? getData() : null;
-  if (data && data.weeklySnapshots && data.weeklySnapshots.length >= 1) {
-    var snap = data.weeklySnapshots[0];
-    if (snap.overallScore !== null && snap.overallScore !== undefined) {
-      series.push({ name: 'Letzte Woche', data: keys.map(function() { return snap.overallScore || 0; }) });
-    }
-  }
 
-  var opts = {
+  _radarChart = new ApexCharts(el, {
     series: series,
     chart: {
       type: 'radar',
-      height: el.offsetHeight || (window.innerWidth >= 768 ? 400 : 280),
+      height: chartH,
       background: 'transparent',
+      fontFamily: "'DM Sans', sans-serif",
       toolbar: { show: false },
-      animations: { enabled: true, easing: 'easeinout', speed: 1200 },
-      dropShadow: { enabled: true, blur: 4, left: 0, top: 2, color: '#e8000d', opacity: 0.15 }
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800
+      }
     },
-    colors: ['#e8000d', 'rgba(255,255,255,.15)'],
+    colors: ['#e8000d'],
     fill: {
-      type: ['gradient', 'solid'],
-      gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.3, gradientToColors: ['#f5c518'], stops: [0, 100], opacityFrom: 0.3, opacityTo: 0.05 },
-      opacity: [0.25, 0]
+      opacity: 0.15
     },
-    stroke: { width: [2.5, 1.5], dashArray: [0, 4] },
+    stroke: {
+      width: 2,
+      curve: 'smooth'
+    },
     markers: {
-      size: [4, 0],
+      size: 4,
       colors: colors,
-      strokeColors: isLight ? '#333' : '#fff',
-      strokeWidth: 1.5,
+      strokeColors: isLight ? '#fff' : '#111',
+      strokeWidth: 2,
       hover: { size: 6 }
     },
     xaxis: {
@@ -1680,7 +1679,7 @@ function renderRadarChart(scoresOrEl, scoresArg) {
       labels: {
         style: {
           colors: colors,
-          fontSize: window.innerWidth < 480 ? '10px' : '12px',
+          fontSize: isMob ? '9px' : '11px',
           fontFamily: "'Space Mono', monospace",
           fontWeight: 700
         }
@@ -1690,28 +1689,30 @@ function renderRadarChart(scoresOrEl, scoresArg) {
       show: false,
       min: 0,
       max: 100,
-      tickAmount: 5
+      tickAmount: 4
     },
     plotOptions: {
       radar: {
-        size: undefined,
         polygons: {
-          strokeColors: isLight ? 'rgba(0,0,0,.06)' : 'rgba(255,255,255,.04)',
-          connectorColors: isLight ? 'rgba(0,0,0,.08)' : 'rgba(255,255,255,.08)',
+          strokeColors: isLight ? 'rgba(0,0,0,.08)' : 'rgba(255,255,255,.06)',
+          connectorColors: isLight ? 'rgba(0,0,0,.06)' : 'rgba(255,255,255,.04)',
           fill: { colors: ['transparent'] }
         }
       }
     },
     legend: { show: false },
     tooltip: {
-      theme: 'dark',
-      style: { fontSize: '14px', fontFamily: "'Bebas Neue', sans-serif" },
+      enabled: true,
+      theme: isLight ? 'light' : 'dark',
+      style: { fontSize: '13px', fontFamily: "'Space Mono', monospace" },
       y: { formatter: function(val) { return val + ' / 100'; } }
     },
-    grid: { show: false }
-  };
-
-  _radarChart = new ApexCharts(el, opts);
+    grid: { show: false },
+    responsive: [{
+      breakpoint: 480,
+      options: { chart: { height: 240 } }
+    }]
+  });
   _radarChart.render();
 }
 
