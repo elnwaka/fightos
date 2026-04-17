@@ -1552,9 +1552,10 @@ body::before {
   font-size: var(--fs-sm);
   color: #999;
   line-height: 1.85;
+  overflow: hidden;
 }
 .faq-item.open .faq-a { grid-template-rows: 1fr; }
-.faq-a > * { overflow: hidden; }
+.faq-a > * { overflow: hidden; min-height: 0; }
 .faq-a-inner { padding: 0 0 18px; }
 .faq-a strong { color: var(--white); }
 
@@ -2656,12 +2657,14 @@ body::before {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows .35s ease;
+  overflow: hidden;
 }
 .mt-acc.open .mt-acc-body {
   grid-template-rows: 1fr;
 }
 .mt-acc-body > * {
   overflow: hidden;
+  min-height: 0;
 }
 .mt-acc-inner {
   padding: 8px 4px 32px 46px;
@@ -2794,6 +2797,7 @@ body::before {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows .35s ease;
+  overflow: hidden;
 }
 .pd-section.open .pd-body,
 .pd-section.open-default .pd-body {
@@ -2801,6 +2805,7 @@ body::before {
 }
 .pd-body > * {
   overflow: hidden;
+  min-height: 0;
 }
 .pd-inner {
   padding: 0 4px 28px;
@@ -3749,6 +3754,7 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
 /* ===== DASHBOARD v4 ===== */
 
 /* Full-bleed hero banner */
+#page-dashboard.page { padding-top: 0; }
 .db-hero {
   position: relative;
   width: 100vw;
@@ -4296,10 +4302,21 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
 
 /* Weight input per exercise */
 .bd-ex-weight { flex-shrink: 0; }
-.bd-weight-input { width: 56px; padding: 6px 4px; text-align: center; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--white); background: var(--surface-1); border: 1px solid var(--surface-2); border-radius: var(--radius-sm); -moz-appearance: textfield; }
+.bd-weight-input { width: 56px; padding: 10px 4px; text-align: center; font-family: 'Space Mono', monospace; font-size: 13px; color: var(--white); background: var(--surface-1); border: 1px solid var(--surface-2); border-radius: var(--radius-sm); min-height: 40px; -moz-appearance: textfield; }
 .bd-weight-input::-webkit-inner-spin-button, .bd-weight-input::-webkit-outer-spin-button { -webkit-appearance: none; }
 .bd-weight-input:focus { border-color: var(--red); outline: none; }
 .bd-weight-input::placeholder { color: #333; }
+
+/* Block detail mobile */
+@media (max-width: 480px) {
+  .bd-ex { flex-wrap: wrap; gap: 8px; }
+  .bd-ex-meta { order: 2; }
+  .bd-ex-weight { order: 3; }
+  .bd-section { gap: 0; }
+  .bd-section-body { padding-left: 12px; }
+  .bd-title { font-size: clamp(24px, 7vw, 36px) !important; }
+  .bd-stats { gap: 16px; }
+}
 
 /* Done button */
 .bd-action { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--surface-1); }
