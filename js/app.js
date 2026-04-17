@@ -4729,13 +4729,13 @@ function generateSmartWeekPlan() {
       // ---- PM BLOCK: Evening Training ----
       if (isSparringDay) {
         // Sparring evening — NO S&C this morning is already enforced above
-        blocks.push({ type: 'boxing', title: 'Sparring', time: eveningTime, hint: 'Technisches Sparring (50-60% Intensität). Fokus: Distanzkontrolle und Jab. Schutzausrüstung Pflicht! 🔴 Sehr hart — maximale Intensität', rpe: 9, duration: 75,
-          exercises: ['Aufwärmen: Seilspringen 3 Min. + Schattenboxen 2 Runden', 'Sparring 4-6 Runden', 'Cool-Down + Dehnung 10 Min.'] });
+        blocks.push({ type: 'boxing', title: 'Sparring im Verein', time: eveningTime, hint: 'Sparring-Tag. Dauer und Intensit\u00e4t bestimmt dein Trainer. Trage danach die echte Dauer und RPE im Training-Log ein. Schutzausr\u00fcstung Pflicht!', rpe: 0, duration: 0,
+          exercises: [] });
         totalSessions++;
 
       } else if (isBoxingDay) {
         // Regular boxing evening
-        blocks.push({ type: 'boxing', title: 'Boxtraining im Verein', time: eveningTime, hint: 'Dein Trainer gibt das Training vor. Fokus heute: Technik und Pratzenarbeit. 🟠 Hart — voller Einsatz', rpe: 7, duration: 75 });
+        blocks.push({ type: 'boxing', title: 'Boxtraining im Verein', time: eveningTime, hint: 'Training im Verein \u2013 dein Trainer gibt Inhalt und Dauer vor. Trage danach die echte Dauer im Training-Log ein.', rpe: 0, duration: 0 });
         totalSessions++;
 
       } else if (isCardioDay) {
@@ -5326,13 +5326,25 @@ function toggleBlockDone(day, idx, type, title) {
     // Mark done + auto-log training
     data.completedBlocks[logKey] = { date: new Date().toISOString(), type, title };
     if (!data.log) data.log = [];
-    const block = data.weekPlan && data.weekPlan[day] ? data.weekPlan[day][idx] : null;
-    const duration = estimateBlockDuration(type);
+    var block = data.weekPlan && data.weekPlan[day] ? data.weekPlan[day][idx] : null;
+    var blockDuration = block && block.duration ? block.duration : estimateBlockDuration(type);
+    // If duration is 0 (Vereins-Session), ask user
+    if (blockDuration === 0) {
+      var userDur = prompt('Wie lange war das Training? (Minuten)');
+      blockDuration = parseInt(userDur) || 60;
+    }
+    var blockRpe = block && block.rpe ? block.rpe : 0;
+    if (blockRpe === 0 && (type === 'boxing' || type === 'sparring' || type === 'boxen')) {
+      var userRpe = prompt('Wie hart war es? (1-10, 1=leicht, 10=maximum)');
+      blockRpe = parseInt(userRpe) || 0;
+      if (blockRpe > 10) blockRpe = 10;
+      if (blockRpe < 0) blockRpe = 0;
+    }
     data.log.unshift({
       date: new Date().toISOString().split('T')[0],
       type: mapBlockTypeToLogType(type),
-      duration: duration,
-      rpe: 0,
+      duration: blockDuration,
+      rpe: blockRpe,
       weight: null,
       notes: title + ' (via Wochenplan)'
     });
