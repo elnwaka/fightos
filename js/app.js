@@ -743,13 +743,13 @@ function enterApp() {
   // Init pages content
   if (typeof renderAllPages === 'function') renderAllPages();
   renderLogEntries();
-  if (typeof updateQlogSaeulen === 'function') updateQlogSaeulen();
+  if (typeof updateQlogSäulen === 'function') updateQlogSäulen();
 
   // Show 8 Säulen intro only on very first visit (skip for Firebase returning users)
   var users = safeParse('fos_users', {});
   var isReturning = _fbUser || (users[currentUser] && users[currentUser].pass === 'firebase');
   if (!isReturning && users[currentUser] && !users[currentUser].seenIntro) {
-    showSaeulenIntro();
+    showSäulenIntro();
   } else {
     if (users[currentUser]) { users[currentUser].seenIntro = true; localStorage.setItem('fos_users', JSON.stringify(users)); }
     showPage(getPageFromHash());
@@ -857,7 +857,7 @@ function scheduleDailyReminders() {
   }
 }
 
-function showSaeulenIntro() {
+function showSäulenIntro() {
   var el = document.getElementById('saeulen-intro');
   if (!el) { showPage(getPageFromHash()); return; }
   el.style.display = 'block';
@@ -2133,7 +2133,7 @@ function getBenchmarks() {
   ];
 }
 
-function renderSaeulenProgress() {
+function renderSäulenProgress() {
   const data = getData();
   if (!data) return;
   if (!data.benchmarks) data.benchmarks = {};
@@ -3115,7 +3115,7 @@ function openFightDetail(idx) {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);letter-spacing:1.5px;">VIDEO-ANALYSE</div>
       <span style="font-family:'Space Mono',monospace;font-size:10px;color:#333;letter-spacing:1px;">${f.videoAnalysis ? Object.keys(f.videoAnalysis).filter(k => f.videoAnalysis[k]).length + '/15 BEANTWORTET' : '0/15 BEANTWORTET'}</span>
     </div>
-    <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:#444;margin-bottom:20px;">Schau dir den Kampf an und beantworte die Fragen Runde fuer Runde. Nimm dir Zeit – ehrliche Analyse macht dich besser.</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:#444;margin-bottom:20px;">Schau dir den Kampf an und beantworte die Fragen Runde fürRunde. Nimm dir Zeit – ehrliche Analyse macht dich besser.</div>
 
     ${[1,2,3].map(r => {
       const va = (f.videoAnalysis && f.videoAnalysis['r'+r]) || {};
@@ -3123,19 +3123,19 @@ function openFightDetail(idx) {
       const questions = r === 1 ? [
         { key: 'distance', q: 'Wer hat die Distanz kontrolliert?', ph: 'Ich / Gegner / Wechselnd – beschreibe warum' },
         { key: 'jab', q: 'Wie war dein Jab?', ph: 'Schnell genug? Hat er getroffen? Hat der Gegner ihn gelesen?' },
-        { key: 'firstImpression', q: 'Was hast du in den ersten 30 Sekunden ueber den Gegner gelernt?', ph: 'Stance, Tempo, Aggressivitaet, schwache Seite...' },
+        { key: 'firstImpression', q: 'Was hast du in den ersten 30 Sekunden überden Gegner gelernt?', ph: 'Stance, Tempo, Aggressivität, schwache Seite...' },
         { key: 'ringPosition', q: 'Wo hast du gestanden? Mitte oder Seile?', ph: 'Wenn Seile – wann und warum bist du dort gelandet?' },
         { key: 'adjustment', q: 'Hast du etwas angepasst während der Runde?', ph: 'z.B. Distanz geändert, mehr Körper, Tempo hoch...' }
       ] : r === 2 ? [
-        { key: 'combos', q: 'Welche Kombinationen haben funktioniert?', ph: 'z.B. Jab-Cross-Hook, 1-2 Koerper, Aufwaerts...' },
+        { key: 'combos', q: 'Welche Kombinationen haben funktioniert?', ph: 'z.B. Jab-Cross-Hook, 1-2 Körper, Aufwärts...' },
         { key: 'gegnermuster', q: 'Welche Muster hat der Gegner gezeigt?', ph: 'z.B. senkt linke Hand nach Cross, geht immer rechts raus...' },
         { key: 'defense', q: 'Wie bist du getroffen worden?', ph: 'Welche Schlaege? Von welcher Seite? Wann warst du offen?' },
         { key: 'tempo', q: 'Wer hat das Tempo bestimmt?', ph: 'Warst du aktiv oder hast du reagiert? Wolltest du das?' },
-        { key: 'bodywork', q: 'Wie war die Koerperarbeit?', ph: 'Genug zum Koerper geschlagen? Hat der Gegner den Koerper attackiert?' }
+        { key: 'bodywork', q: 'Wie war die Körperarbeit?', ph: 'Genug zum Körper geschlagen? Hat der Gegner den Körper attackiert?' }
       ] : [
-        { key: 'energy', q: 'Wie war deine Kondition?', ph: 'Muede? Schlaege noch mit Power? Atemnot?' },
+        { key: 'energy', q: 'Wie war deine Kondition?', ph: 'Müde? Schlaege noch mit Power? Atemnot?' },
         { key: 'clinch', q: 'Wie hast du den Clinch gemanagt?', ph: 'Zu viel geclinct? Konnte der Gegner rausfighten?' },
-        { key: 'finish', q: 'Hast du den Kampf dominiert oder ueberlebt?', ph: 'Letzte 30 Sek: Hast du Gas gegeben oder durchgehalten?' },
+        { key: 'finish', q: 'Hast du den Kampf dominiert oder überlebt?', ph: 'Letzte 30 Sek: Hast du Gas gegeben oder durchgehalten?' },
         { key: 'gameplan', q: 'Hat dein Gameplan funktioniert?', ph: 'Was vom Plan hast du umgesetzt? Was nicht und warum?' },
         { key: 'lesson', q: 'Die wichtigste Lektion aus dieser Runde?', ph: 'Eine Sache die du beim naechsten Mal anders machst' }
       ];
@@ -3171,7 +3171,7 @@ function openFightDetail(idx) {
         }
         if (total === 0) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#222;text-align:center;">Beantworte die Fragen oben um deine Analyse zu starten.</div>';
         if (total < 10) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;text-align:center;">' + total + '/15 – Mach weiter, je ehrlicher desto besser.</div>';
-        if (total < 15) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);text-align:center;">' + total + '/15 – Fast fertig. Fuell die letzten Fragen aus.</div>';
+        if (total < 15) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);text-align:center;">' + total + '/15 – Fast fertig. Füll die letzten Fragen aus.</div>';
         return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--green);text-align:center;">\\u2713 ANALYSE KOMPLETT – Gute Arbeit. Nutze die Erkenntnisse im Training.</div>';
       })()}
     </div>
@@ -4183,7 +4183,7 @@ function renderPrepWizard(data) {
     // Fight Day Notes
     contentHTML += '<div style="' + cardStyle + 'margin-top:16px;">' +
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">EIGENE NOTIZEN</div>' +
-      '<textarea style="' + textareaStyle + '" oninput="savePrepField(\'fightDayNotes\', this.value)" placeholder="Persoenliche Notizen fuer den Kampftag...">' + (prep.fightDayNotes || '') + '</textarea>' +
+      '<textarea style="' + textareaStyle + '" oninput="savePrepField(\'fightDayNotes\', this.value)" placeholder="Persönliche Notizen fürden Kampftag...">' + (prep.fightDayNotes || '') + '</textarea>' +
     '</div>';
 
     // Readiness Overview
@@ -4215,7 +4215,7 @@ function renderPrepWizard(data) {
 }
 
 // ===== QUICK LOG (Dashboard) =====
-function updateQlogSaeulen() {
+function updateQlogSäulen() {
   var el = document.getElementById('qlog-saeulen');
   if (!el) return;
   var type = document.getElementById('qlog-type').value;
@@ -4902,14 +4902,14 @@ function _renderWeekPlanInner() {
     </div>
     ${(function() {
       var hints = [];
-      if (!s.gymAccess || s.gymAccess === 'none') hints.push('Equipment: Koerpergewicht');
+      if (!s.gymAccess || s.gymAccess === 'none') hints.push('Equipment: Körpergewicht');
       else if (s.gymAccess === 'basic') hints.push('Equipment: Basis');
       else hints.push('Equipment: Volles Gym');
       hints.push('Level: ' + (s.experienceLevel === 'anfaenger' ? 'Anfaenger' : s.experienceLevel === 'wettkampf' ? 'Wetkaempfer' : 'Fortgeschritten'));
       hints.push('S&C: max ' + (s.experienceLevel === 'anfaenger' ? '2' : '3') + 'x/Woche');
       // Shift-Work Warnung
       var wh = parseInt((s.workStart || '08:00').split(':')[0]);
-      if (wh >= 12 || wh < 5) hints.push('\u26A0 Ungewoehnliche Arbeitszeiten – pruefe ob Trainingszeiten passen');
+      if (wh >= 12 || wh < 5) hints.push('\u26A0 Ungewöhnliche Arbeitszeiten – prüfe ob Trainingszeiten passen');
       return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">' +
         hints.map(function(h) { return '<span style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:var(--surface-1);border:1px solid var(--surface-2);border-radius:var(--radius-sm);color:#555;">' + h + '</span>'; }).join('') +
         '<span onclick="showPage(\'account\')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:transparent;border:1px solid var(--surface-3);border-radius:var(--radius-sm);color:var(--red);cursor:pointer;">AENDERN \u2192</span>' +
@@ -4929,7 +4929,7 @@ function _renderWeekPlanInner() {
       if (fb.typeNotes) fb.typeNotes.forEach(function(n) { lines.push('\u2192 ' + n); });
       if (fb.rpeWarning) lines.push('\u26A0 ' + fb.rpeWarning);
       if (fb.rpeLow) lines.push('\u2192 ' + fb.rpeLow);
-      if (fb.missedSaeulen && fb.missedSaeulen.length) lines.push('\u2192 VERSAEUMT: ' + fb.missedSaeulen.map(function(si){return saeulenLabels[si];}).join(', ') + ' (extra Fokus)');
+      if (fb.missedSäulen && fb.missedSäulen.length) lines.push('\u2192 VERSAEUMT: ' + fb.missedSäulen.map(function(si){return saeulenLabels[si];}).join(', ') + ' (extra Fokus)');
       if (lines.length === 0 && pct >= 80) lines.push('\u2713 Gute Woche! Weiter so.');
       return '<div style="background:#0d0d0d;border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
@@ -4950,11 +4950,11 @@ function _renderWeekPlanInner() {
         kraft: 'S&C-Bloecke betont, Kraftfokus-Hinweise',
         metabol: 'Mehr HIIT statt Zone 2, extra Cardio-Einheiten',
         kognitiv: 'Reaktions-Drills + Blickverhalten-Hinweise im Training',
-        ernaehr: 'Ernaehrungs-Checks + Post-Training Protein-Erinnerungen',
-        recovery: 'Volumen reduziert (-15%), Schlaf-Hinweise verstaerkt',
+        ernaehr: 'Ernährungs-Checks + Post-Training Protein-Erinnerungen',
+        recovery: 'Volumen reduziert (-15%), Schlaf-Hinweise verstärkt',
         ringiQ: 'Kampf-Analysen an Ruhetagen, Taktik-Fokus beim Boxen',
         psyche: 'Visualisierungs-Bloecke + Box-Breathing abends',
-        mobil: 'Mobility-Sessions von 15 auf 25 Min. verlaengert'
+        mobil: 'Mobility-Sessions von 15 auf 25 Min. verlängert'
       };
       var pills = wi.map(function(e) {
         var key = e[0], score = e[1];
@@ -4969,7 +4969,7 @@ function _renderWeekPlanInner() {
           '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:2px;color:var(--red);">FASS-PRINZIP AKTIV</span>' +
           pills +
         '</div>' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-bottom:8px;">Dein Plan wurde automatisch angepasst um deine schwachen Saeulen zu staerken:</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-bottom:8px;">Dein Plan wurde automatisch angepasst um deine schwachen Säulen zu stärken:</div>' +
         actions +
       '</div>';
     })()}
@@ -5001,13 +5001,13 @@ function _renderWeekPlanInner() {
         const dp = dayPhases[day];
         const isToday = di === todayDow;
         // Day Säulen coverage
-        var daySaeulen = {};
+        var daySäulen = {};
         blocks.forEach(function(b) {
           var bs = BLOCK_SAEULEN[b.type];
-          if (bs) bs.forEach(function(si) { daySaeulen[si] = true; });
+          if (bs) bs.forEach(function(si) { daySäulen[si] = true; });
         });
         var saeulenColors8 = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
-        var daySaeulenDots = Object.keys(daySaeulen).map(function(si) {
+        var daySäulenDots = Object.keys(daySäulen).map(function(si) {
           return '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + saeulenColors8[si] + ';"></span>';
         }).join('');
 
@@ -5019,7 +5019,7 @@ function _renderWeekPlanInner() {
             </div>
             <div style="display:flex;align-items:center;gap:4px;margin-top:4px;">
               ${dp ? `<span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:${dp.color};">${dp.label}</span>` : ''}
-              <span style="display:flex;gap:2px;margin-left:auto;">${daySaeulenDots}</span>
+              <span style="display:flex;gap:2px;margin-left:auto;">${daySäulenDots}</span>
             </div>
           </div>
           ${(s.weekSchedule[day] && s.weekSchedule[day].type === 'sparring' && blocks.some(b => b.type === 'strength')) ? '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--orange);padding:4px 8px;">\u26A0 S&C + Sparring = Verletzungsrisiko</div>' : ''}
@@ -5027,11 +5027,11 @@ function _renderWeekPlanInner() {
             ${blocks.map((b, bi) => {
               const logKey = day + '_' + bi + '_' + getWeekId();
               const done = isBlockLogged(logKey);
-              var blockSaeulen = BLOCK_SAEULEN[b.type] || [];
-              var blockDots = blockSaeulen.map(function(si) {
+              var blockSäulen = BLOCK_SAEULEN[b.type] || [];
+              var blockDots = blockSäulen.map(function(si) {
                 return '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + saeulenColors8[si] + ';"></span>';
               }).join('');
-              return `<div class="day-block ${TYPE_CLASS[b.type] || 'meta'}${done ? ' block-done' : ''}" onclick="openBlockDetail('${day}',${bi})" title="Klicke fuer Details">
+              return `<div class="day-block ${TYPE_CLASS[b.type] || 'meta'}${done ? ' block-done' : ''}" onclick="openBlockDetail('${day}',${bi})" title="Klicke fürDetails">
               <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div style="display:flex;align-items:center;gap:6px;">
                   <span style="font-family:'Space Mono',monospace;font-size:11px;opacity:.7;">${b.time}</span>
@@ -5080,24 +5080,24 @@ function toggleDayCol(el) {
 // ===== BLOCK DETAIL PAGE =====
 var BLOCK_DETAIL_CONTENT = {
   'strength': {
-    warmup: 'Foam Rolling 2 Min. (Oberschenkel, Hueftbeuger) → Band Pull-Aparts 2x15 → Face Pulls 3x15 → 2 Aufwaermsaetze mit leichtem Gewicht',
-    cooldown: 'Statisches Stretching: Hueftbeuger 30s, Schultern 30s, Brustdehnung 30s → Handgelenke kreisen',
-    notes: 'Schwere Saetze: 2-3 Min. Pause. Explosive Uebungen: max. Geschwindigkeit, keine Ermuedung. Immer saubere Technik vor mehr Gewicht.'
+    warmup: 'Foam Rolling 2 Min. (Oberschenkel, Hüftbeuger) → Band Pull-Aparts 2x15 → Face Pulls 3x15 → 2 Aufwärmsätze mit leichtem Gewicht',
+    cooldown: 'Statisches Stretching: Hüftbeuger 30s, Schultern 30s, Brustdehnung 30s → Handgelenke kreisen',
+    notes: 'Schwere Sätze: 2-3 Min. Pause. Explosive Übungen: max. Geschwindigkeit, keine Ermüdung. Immer saubere Technik vor mehr Gewicht.'
   },
   'boxing': {
-    warmup: 'VOR dem Vereinstraining: Seilspringen 3 Min. → Schulterkreise → Face Pulls 3x15 mit Band → Hueften mobilisieren',
-    cooldown: 'NACH dem Vereinstraining: Statisches Stretching (Schultern, Hueftbeuger, Handgelenke) → Haende auslockern → Finger dehnen',
-    notes: 'Dein Trainer gibt den Inhalt im Verein vor. FightOS kuemmert sich um alles drumherum: Aufwaermen, Erholung, Kraft, Ernaehrung.'
+    warmup: 'VOR dem Vereinstraining: Seilspringen 3 Min. → Schulterkreise → Face Pulls 3x15 mit Band → Hüften mobilisieren',
+    cooldown: 'NACH dem Vereinstraining: Statisches Stretching (Schultern, Hüftbeuger, Handgelenke) → Hände auslockern → Finger dehnen',
+    notes: 'Dein Trainer gibt den Inhalt im Verein vor. FightOS kümmert sich um alles drumherum: Aufwärmen, Erholung, Kraft, Ernährung.'
   },
   'cardio': {
-    warmup: '5 Min. locker einlaufen → Dynamisches Stretching: Beinschwingen, Hueftkreise',
-    cooldown: '5 Min. locker auslaufen → Dehnung: Waden, Oberschenkel, Hueftbeuger',
-    notes: 'Zone 2 = du kannst noch reden. HIIT = volle Belastung in den Arbeitsintervallen. Puls kontrollieren wenn moeglich.'
+    warmup: '5 Min. locker einlaufen → Dynamisches Stretching: Beinschwingen, Hüftkreise',
+    cooldown: '5 Min. locker auslaufen → Dehnung: Waden, Oberschenkel, Hüftbeuger',
+    notes: 'Zone 2 = du kannst noch reden. HIIT = volle Belastung in den Arbeitsintervallen. Puls kontrollieren wenn möglich.'
   },
   'recovery': {
-    warmup: 'Nicht noetig – direkt mit lockerer Bewegung starten',
+    warmup: 'Nicht nötig – direkt mit lockerer Bewegung starten',
     cooldown: 'Tiefe Bauchatmung 2 Min. (4-4-4-4)',
-    notes: 'Kein Leistungsdruck. Ziel ist Durchblutung und Beweglichkeit, nicht Erschoepfung.'
+    notes: 'Kein Leistungsdruck. Ziel ist Durchblutung und Beweglichkeit, nicht Erschöpfung.'
   },
   'meta': {
     warmup: '',
@@ -5378,10 +5378,10 @@ function buildLastWeekCompletion(data, lastWeekId) {
   var avgRPE = rpeVals.length ? Math.round(rpeVals.reduce(function(a,b){return a+b;},0) / rpeVals.length * 10) / 10 : 0;
 
   // Missed Säulen (< 50%)
-  var missedSaeulen = [];
+  var missedSäulen = [];
   for (var si = 0; si < 8; si++) {
     if (bySaeule[si].planned > 0 && bySaeule[si].done / bySaeule[si].planned < 0.5) {
-      missedSaeulen.push(si);
+      missedSäulen.push(si);
     }
   }
 
@@ -5392,7 +5392,7 @@ function buildLastWeekCompletion(data, lastWeekId) {
     completionRate: completedCount / totalBlocks,
     byType: byType,
     bySaeule: bySaeule,
-    missedSaeulen: missedSaeulen,
+    missedSäulen: missedSäulen,
     avgRPE: avgRPE
   };
 }
@@ -5788,7 +5788,7 @@ function buildDailyRoutineHTML() {
 
   if (yesterdayWasSparring && isFreeDay) {
     // === TAG NACH SPARRING ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzuege' : 'Atemuebung – 30 tiefe Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzüge' : 'Atemübung – 30 tiefe Atemzüge', color: 'var(--red)' });
     routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Erholungstag: Leichte Mobility 15 Min.', color: 'var(--purple)' });
     routine.push({ time: isWeekend ? '14:00' : timeAdd(today.workEnd, 0, 30), label: 'Zone 2 Cardio 20-30 Min. (Regeneration)', color: 'var(--green)' });
     routine.push({ time: isWeekend ? '17:00' : timeAdd(today.workEnd, 1, 30), label: 'Mobility + Foam Rolling 15 Min.', color: 'var(--purple)' });
@@ -5796,33 +5796,33 @@ function buildDailyRoutineHTML() {
 
   } else if (isSparringDay) {
     // === SPARRING TAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzuege' : 'Atemuebung – 30 tiefe Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzüge' : 'Atemübung – 30 tiefe Atemzüge', color: 'var(--red)' });
     routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Leichte Mobility 10 Min.', color: 'var(--purple)' });
-    routine.push({ time: timeBefore(today.time, 0, 15), label: 'Vor dem Verein: Aufwaermen', color: 'var(--gold)' });
+    routine.push({ time: timeBefore(today.time, 0, 15), label: 'Vor dem Verein: Aufwärmen', color: 'var(--gold)' });
     routine.push({ time: today.time, label: 'Sparring im Verein', color: 'var(--red)' });
     routine.push({ time: timeAdd(today.time, 1, 30), label: 'Nach dem Verein: Dehnung + Foam Rolling', color: 'var(--purple)' });
     warnings.push('Sparring-Tag: Kein schweres S&C heute!');
 
   } else if (isBoxingDay) {
     // === BOXTAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzuege' : 'Atemuebung – 30 tiefe Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzüge' : 'Atemübung – 30 tiefe Atemzüge', color: 'var(--red)' });
     if (gym === 'none') {
-      routine.push({ time: timeAdd(wakeTime, 0, 15), label: isAnfaenger ? 'Knie-Liegestuetze + Core 15 Min.' : 'Liegestuetze + Core 15 Min.', color: 'var(--red)' });
+      routine.push({ time: timeAdd(wakeTime, 0, 15), label: isAnfaenger ? 'Knie-Liegestütze + Core 15 Min.' : 'Liegestütze + Core 15 Min.', color: 'var(--red)' });
     } else if (!isAnfaenger) {
       routine.push({ time: timeAdd(wakeTime, 0, 15), label: 'Overcoming Isometrics + Nacken (~20 Min.)', color: 'var(--red)' });
     } else {
-      routine.push({ time: timeAdd(wakeTime, 0, 15), label: 'Liegestuetze + Core 15 Min.', color: 'var(--red)' });
+      routine.push({ time: timeAdd(wakeTime, 0, 15), label: 'Liegestütze + Core 15 Min.', color: 'var(--red)' });
     }
     if (!isWeekend) {
-      routine.push({ time: timeAdd(lunchTime, 0, 25), label: gym !== 'none' ? 'IMT – 30 Atemzuege (2. Session)' : 'Atemuebung – 30 Atemzuege (2. Session)', color: 'var(--gold)' });
+      routine.push({ time: timeAdd(lunchTime, 0, 25), label: gym !== 'none' ? 'IMT – 30 Atemzüge (2. Session)' : 'Atemübung – 30 Atemzüge (2. Session)', color: 'var(--gold)' });
     }
-    routine.push({ time: timeBefore(today.time, 0, 15), label: 'Vor dem Verein: Aufwaermen + Face Pulls', color: 'var(--gold)' });
+    routine.push({ time: timeBefore(today.time, 0, 15), label: 'Vor dem Verein: Aufwärmen + Face Pulls', color: 'var(--gold)' });
     routine.push({ time: today.time, label: typeLabel + ' im Verein', color: 'var(--red)' });
     routine.push({ time: timeAdd(today.time, 1, 30), label: 'Nach dem Verein: Dehnung + Handpflege', color: 'var(--purple)' });
 
   } else if (isFreeDay) {
     // === FREIER TAG ===
-    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzuege' : 'Atemuebung – 30 tiefe Atemzuege', color: 'var(--red)' });
+    routine.push({ time: timeAdd(wakeTime, 0, 10), label: gym !== 'none' ? 'IMT – 30 Atemzüge' : 'Atemübung – 30 tiefe Atemzüge', color: 'var(--red)' });
 
     if (tomorrowIsSparring) {
       routine.push({ time: timeAdd(wakeTime, 0, 20), label: 'Leichte Mobility 15 Min. (morgen Sparring!)', color: 'var(--purple)' });
@@ -5832,7 +5832,7 @@ function buildDailyRoutineHTML() {
       // Normaler freier Tag: S&C je nach Gym
       var scTime = timeAdd(wakeTime, 0, 20);
       if (gym === 'none') {
-        routine.push({ time: scTime, label: 'Koerpergewicht-Training (Liegestuetze, Kniebeugen, Core)', color: 'var(--red)' });
+        routine.push({ time: scTime, label: 'Körpergewicht-Training (Liegestütze, Kniebeugen, Core)', color: 'var(--red)' });
       } else {
         routine.push({ time: scTime, label: 'S&C: Power / Explosive / Combat Strength', color: 'var(--red)' });
       }
@@ -6102,7 +6102,7 @@ function checkAndSaveWeeklySnapshot() {
   // Completion data from lastWeekCompletion
   var lwc = data.lastWeekCompletion || {};
   var completionRate = lwc.completionRate || 0;
-  var missedSaeulen = lwc.missedSaeulen || [];
+  var missedSäulen = lwc.missedSäulen || [];
   var bySaeule = lwc.bySaeule || {};
 
   // Create snapshot
@@ -6114,7 +6114,7 @@ function checkAndSaveWeeklySnapshot() {
     checklistDays: checklistDays,
     overallScore: overallScore,
     completionRate: completionRate,
-    missedSaeulen: missedSaeulen,
+    missedSäulen: missedSäulen,
     bySaeule: bySaeule,
     date: sunStr
   };
@@ -6440,7 +6440,7 @@ function renderDashboard() {
   renderDailyCombined();
   renderFightLog();
   if (recentBlocks.length === 0) renderRecentLog();
-  if (!isMobile()) renderSaeulenSelfRating();
+  if (!isMobile()) renderSäulenSelfRating();
   renderBenchSummary();
 
   // ═══ ANIMATION CHOREOGRAPHY ═══
@@ -6492,7 +6492,7 @@ function renderDashboard() {
 }
 
 // Selbsteinschätzung der 8 Säulen (1-5 Punkte)
-function renderSaeulenSelfRating() {
+function renderSäulenSelfRating() {
   var el = document.getElementById('saeulen-self-rating');
   if (!el) return;
   var data = getData();
@@ -6533,7 +6533,7 @@ function renderSaeulenSelfRating() {
             var filled = n <= val;
             var axObj = RADAR_AXES.find(function(r) { return r.key === a.key; });
             var color = axObj ? axObj.hex : '#555';
-            return '<span onclick="setSaeulenRating(\'' + a.key + '\',' + n + ')" style="display:inline-block;width:18px;height:18px;border-radius:50%;cursor:pointer;transition:all .15s;' +
+            return '<span onclick="setSäulenRating(\'' + a.key + '\',' + n + ')" style="display:inline-block;width:18px;height:18px;border-radius:50%;cursor:pointer;transition:all .15s;' +
               (filled ? 'background:' + color + ';' : 'background:var(--surface-2);border:1px solid var(--surface-3);') +
             '" title="' + n + '/5"></span>';
           }).join('') +
@@ -6544,14 +6544,14 @@ function renderSaeulenSelfRating() {
   '</div>';
 }
 
-function setSaeulenRating(key, val) {
+function setSäulenRating(key, val) {
   var data = getData();
   if (!data) return;
   if (!data.saeulenRatings) data.saeulenRatings = {};
   data.saeulenRatings[key] = data.saeulenRatings[key] === val ? 0 : val;
   data.saeulenRatingsDate = new Date().toISOString().split('T')[0];
   saveData(data);
-  renderSaeulenSelfRating();
+  renderSäulenSelfRating();
   renderDashStats();
 }
 
@@ -6738,7 +6738,7 @@ function renderAccountPage() {
             <select class="form-select" id="acc-gym">
               <option value="full" ${u.gymAccess==='full'?'selected':''}>Ja, volles Gym</option>
               <option value="basic" ${u.gymAccess==='basic'?'selected':''}>Basis (Hanteln, Klimmzugstange)</option>
-              <option value="none" ${u.gymAccess==='none'||!u.gymAccess?'selected':''}>Nein, nur Koerpergewicht</option>
+              <option value="none" ${u.gymAccess==='none'||!u.gymAccess?'selected':''}>Nein, nur Körpergewicht</option>
             </select>
           </div>
         </div>
@@ -7084,7 +7084,7 @@ function renderTestsPage() {
         if (hist.length >= 2) {
           sparkHTML = '<canvas id="' + sparkId + '" width="120" height="40" style="cursor:pointer;vertical-align:middle;" onclick="showBenchDetail(\'' + b.id + '\')"></canvas>';
         } else if (val > 0) {
-          sparkHTML = '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;">Teste erneut fuer Fortschritt</span>';
+          sparkHTML = '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;">Teste erneut fürFortschritt</span>';
         }
 
         // Due for retest?
@@ -7248,7 +7248,7 @@ function showBenchDetail(benchId) {
       return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surface-1);border-radius:var(--radius-sm);' + (isBest ? 'border-left:2px solid var(--gold);' : '') + '">' +
         '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">' + h.date + '</span>' +
         '<span style="font-family:\'Space Mono\',monospace;font-size:13px;color:' + (isBest ? 'var(--gold)' : 'var(--white)') + ';">' + h.value + ' ' + b.unit + (isBest ? ' \u2605' : '') + '</span>' +
-        '<span onclick="deleteBenchEntry(\'' + benchId + '\',\'' + h.date + '\')" style="font-size:12px;color:#222;cursor:pointer;padding:0 4px;" title="Loeschen">\u00d7</span>' +
+        '<span onclick="deleteBenchEntry(\'' + benchId + '\',\'' + h.date + '\')" style="font-size:12px;color:#222;cursor:pointer;padding:0 4px;" title="Löschen">\u00d7</span>' +
       '</div>';
     }).join('') +
   '</div>';

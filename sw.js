@@ -1,5 +1,5 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-04-17o';
+const BUILD = '2026-04-17p';
 const CACHE_NAME = 'fightos-' + BUILD;
 const PRECACHE = [
   './',
@@ -115,7 +115,7 @@ self.addEventListener('fetch', function(event) {
         // Network failed — return offline fallback if no cache
         if (event.request.mode === 'navigate') {
           return new Response(
-            '<html><body style="background:#080808;color:#E8000D;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;"><div><h1 style="font-size:48px;letter-spacing:4px;">FIGHTOS</h1><p style="color:#555;font-size:14px;">Offline — diese Seite ist nicht gecacht.</p><p style="color:#333;font-size:12px;">Oeffne die App einmal mit Internet.</p></div></body></html>',
+            '<html><body style="background:#080808;color:#E8000D;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;"><div><h1 style="font-size:48px;letter-spacing:4px;">FIGHTOS</h1><p style="color:#555;font-size:14px;">Offline — diese Seite ist nicht gecacht.</p><p style="color:#333;font-size:12px;">Öffne die App einmal mit Internet.</p></div></body></html>',
             { headers: { 'Content-Type': 'text/html' } }
           );
         }
