@@ -773,7 +773,7 @@ body::before {
 .nav-drop {
   display: none;
   position: absolute;
-  top: 54px;
+  top: 100%;
   left: 0;
   background: rgba(14,14,14,.98);
   border: 1px solid var(--surface-3);
@@ -784,12 +784,15 @@ body::before {
   z-index: 200;
   backdrop-filter: blur(12px);
   animation: navDropIn .15s ease;
+  visibility: hidden;
+  opacity: 0;
 }
+.nav-hub.open > .nav-drop { visibility: visible; opacity: 1; }
 @keyframes navDropIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.nav-hub.open > .nav-drop { display: block; }
+.nav-hub.open > .nav-drop { display: block; visibility: visible; opacity: 1; }
 .nav-drop-item {
   display: block;
   width: 100%;
