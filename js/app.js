@@ -4458,7 +4458,7 @@ function generateSmartWeekPlan() {
         { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'Überträgt Beinkraft auf die Faust' },
         { id: 'face-pulls', sets: '3 × 15', rest: '45 Sek.', note: 'Schulter-Schutz. Leicht, bei jedem Training' }
       ],
-      hint: 'Wenige Wdh., schwer, lange Pausen. Alternativ: 5×5 @ 75-80% wenn du Kraft-Basis aufbaust.',
+      hint: 'Schwer aber nie bis zum Versagen — immer 1-2 Wdh. im Tank lassen (RPE 8-9). Alternativ: 5×5 @ 80% und jede Woche +2.5 kg wenn alle Reps sauber sind. Echte 1RM nur alle 8-12 Wochen zum Testen.',
       hasHeavyLegs: true, duration: 50
     },
     {
