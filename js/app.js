@@ -4451,14 +4451,14 @@ function generateSmartWeekPlan() {
       warmup: 'Foam Rolling 2 Min. + Shoulder Dislocates + 2-3 Aufwärmsätze mit steigendem Gewicht',
       cooldown: 'Stretching: Hüftbeuger, Schultern, Brust — je 30 Sek.',
       exercises: [
-        { id: 'overcoming-iso', sets: '3 × 6 Sek.', rest: '90 Sek.', note: 'Maximal gegen Wand/Boden drücken. Aktiviert das Nervensystem' },
-        { id: 'trap-bar-deadlift', sets: '4 × 3', rest: '3-5 Min.', note: 'Schwer, aber keine Maximallast. Saubere Technik ist Pflicht' },
-        { id: 'bench-press', sets: '4 × 3', rest: '3 Min.', note: 'Kontrolliert runter, so schnell wie möglich hoch' },
+        { id: 'overcoming-iso', sets: '3 × 6 Sek. @ 100%', rest: '90 Sek.', note: 'Maximal gegen Wand/Boden drücken. Aktiviert das Nervensystem' },
+        { id: 'trap-bar-deadlift', sets: '4 × 3 @ 88-93%', rest: '3-5 Min.', note: 'Schwer, aber keine Maximallast. Saubere Technik ist Pflicht' },
+        { id: 'bench-press', sets: '4 × 3 @ 85-90%', rest: '3 Min.', note: 'Kontrolliert runter, so schnell wie möglich hoch' },
         { id: 'pull-ups', sets: '4 × 3-5 gewichtet', rest: '2 Min.', note: 'Gegengewicht zum Schlagen. Rucksack oder Gürtel mit Gewicht' },
         { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'Überträgt Beinkraft auf die Faust' },
         { id: 'face-pulls', sets: '3 × 15', rest: '45 Sek.', note: 'Schulter-Schutz. Leicht, bei jedem Training' }
       ],
-      hint: 'Wenige Wdh., schwer, lange Pausen. Alternativ: 5×5 mit moderatem Gewicht wenn du Kraft-Basis aufbaust.',
+      hint: 'Wenige Wdh., schwer, lange Pausen. Alternativ: 5×5 @ 75-80% wenn du Kraft-Basis aufbaust.',
       hasHeavyLegs: true, duration: 50
     },
     {
@@ -4466,8 +4466,8 @@ function generateSmartWeekPlan() {
       warmup: 'Seilspringen 3 Min. + Hip CARs + Pogo Jumps 2×20 Sek.',
       cooldown: 'Lockeres Ausschütteln + Dehnung Hüftbeuger und Schultern',
       exercises: [
-        { id: 'jump-squat', sets: '4 × 4', rest: '2-3 Min.', note: 'Leicht bis mittel. So hoch wie möglich springen' },
-        { id: 'power-clean', sets: '4 × 3', rest: '2-3 Min.', note: 'Hüfte explodiert. Arme sind nur Haken, keine Kraft aus den Armen' },
+        { id: 'jump-squat', sets: '4 × 4 @ 40-60%', rest: '2-3 Min.', note: 'Leicht bis mittel. So hoch wie möglich springen' },
+        { id: 'power-clean', sets: '4 × 3 @ 70-80%', rest: '2-3 Min.', note: 'Hüfte explodiert. Arme sind nur Haken, keine Kraft aus den Armen' },
         { id: 'med-ball-rotation', sets: '4 × 5 pro Seite', rest: '90 Sek.', note: 'Wirf wie einen Haken. Kraft kommt aus der Hüfte, nicht den Armen' },
         { id: 'landmine-press', sets: '3 × 5 pro Arm', rest: '90 Sek.', note: 'Drücke explosiv wie einen Cross' },
         { id: 'explosive-pushup', sets: '4 × 5', rest: '90 Sek.', note: 'Hände vom Boden lösen. Wirst du langsam → aufhören' },
@@ -4481,9 +4481,9 @@ function generateSmartWeekPlan() {
       warmup: 'Seilspringen 3 Min. + dynamisches Stretching + 10 Kniebeugen',
       cooldown: 'Foam Rolling Beine + Rücken, Dehnung 5 Min.',
       exercises: [
-        { id: 'hip-thrust', sets: '3 × 10', rest: '60 Sek.', note: 'Moderates Gewicht. Kraft über alle Reps gleichmäßig halten' },
+        { id: 'hip-thrust', sets: '3 × 10 @ 60%', rest: '60 Sek.', note: 'Moderates Gewicht. Kraft über alle Reps gleichmäßig halten' },
         { id: 'pull-ups', sets: '3 × max', rest: '60 Sek.', note: 'Ohne Gewicht, so viele saubere Reps wie möglich' },
-        { id: 'landmine-press', sets: '3 × 8 pro Arm', rest: '45 Sek.', note: 'Leichter als sonst, dafür mehr Reps' },
+        { id: 'landmine-press', sets: '3 × 8 pro Arm @ 50%', rest: '45 Sek.', note: 'Leichter als sonst, dafür mehr Reps' },
         { id: 'lateral-bounds', sets: '3 × 8 pro Bein', rest: '45 Sek.', note: 'Weich landen, 1 Sek. stabil stehen' },
         { id: 'battle-ropes', sets: '6 × 20 Sek. / 40 Sek. Pause', rest: '', note: 'Hält deine Guard oben in Runde 3' },
         { id: 'pallof-press', sets: '3 × 12 pro Seite', rest: '30 Sek.', note: 'Core-Ausdauer' }
