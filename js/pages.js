@@ -970,7 +970,14 @@ function renderUebungenPage() {
 
   <div style="margin-top:20px;padding:16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);">
     <div style="font-size:12px;color:#444;line-height:1.6;">QUELLEN: Boxing Science (Danny Wilson BSc MSc ASCC) · Phil Daru (Daru Strong) · Ross Enamait · Collins et al. 2014 (Neck/Concussion) · Loturco et al. 2016 (Punch Force) · PMC 2024 (VRT) · ExpertBoxing</div>
-  </div>`;
+  </div>
+
+  ${renderProductCards([
+    { name:'IronMind Twist Yo\' Wrist', cat:'WRIST ROLLER · GRIP', price:'30 €', url:'https://www.amazon.de/s?k=IronMind+Twist+Yo+Wrist', desc:'Unterarm- und Griffkraft. Für härtere Fäuste und Handgelenk-Stabilität.' },
+    { name:'Starpro Boxbandagen 4.5m', cat:'HANDSCHUTZ', price:'9 €', url:'https://www.amazon.de/s?k=Starpro+Hand+Wraps+4.5m', desc:'Elastische Baumwolle. Schützt Knöchel und Handgelenke beim Schlagen.' },
+    { name:'Rounds Pro Timer App', cat:'APP · TRAINING', price:'5 €', url:'https://www.amazon.de/s?k=Rounds+Pro+Boxing+Timer', desc:'Runden-Timer mit konfigurierbaren Intervallen. Für Solo-Training am Sack.' },
+    { name:'MyFitnessPal App', cat:'APP · ERNÄHRUNG', price:'Kostenlos', url:'https://www.myfitnesspal.com', desc:'Makro- und Kalorien-Tracking. Riesige deutsche Lebensmittel-Datenbank.' }
+  ])}`;
 }
 
 function exCard(e, num, color) {
@@ -2335,7 +2342,16 @@ function renderRegenerationPage() {
       <div class="hrv-range">−5% unter 7-Tage-Mittel</div>
       <div class="hrv-desc">Intensität reduzieren. 3 rote Tage = komplette Ruhe, Ursache suchen.</div>
     </div>
-  </div>`;
+  </div>
+
+  ${renderProductCards([
+    { name:'BLACKROLL Standard Faszienrolle', cat:'FOAM ROLLER', price:'30 €', url:'https://www.amazon.de/s?k=BLACKROLL+Standard+Faszienrolle', desc:'Deutsche Qualität. Standard für Myofascial Release. Hält ewig.' },
+    { name:'POWERbreathe Plus Medium', cat:'ATEMTRAINING · IMT', price:'55 €', url:'https://www.amazon.de/s?k=POWERbreathe+Plus+Medium+Resistance', desc:'Inspiratorisches Muskeltraining. Verbessert Ausdauer über die Runden.' },
+    { name:'Elite HRV App', cat:'APP · HRV-TRACKING', price:'Kostenlos', url:'https://elitehrv.com', desc:'HRV morgens messen mit Brustgurt. Erkennt Übertraining bevor du es spürst.' },
+    { name:'DMoose Neck Harness', cat:'NACKENTRAINING', price:'20 €', url:'https://www.amazon.de/s?k=DMoose+Neck+Harness', desc:'Für Nacken-Curls mit Gewichtsscheibe. Ergänzung zu isometrischem Training.' },
+    { name:'Fit Simplify Resistance Bands Set', cat:'BÄNDER · WARM-UP', price:'13 €', url:'https://www.amazon.de/s?k=Fit+Simplify+Resistance+Bands+Set', desc:'5 Stärken für Schulter-Warmup, Rotatorenmanschette, Hip Activation.' },
+    { name:'Buddy Lee Aero Speed Rope', cat:'SPRINGSEIL', price:'40 €', url:'https://www.amazon.de/s?k=Buddy+Lee+Aero+Speed+Jump+Rope', desc:'Das Boxing-Springseil. Leicht, schnelle Rotation, Goldstandard.' }
+  ])}`;
 }
 
 // ===== SUPPLEMENTS =====
@@ -2700,7 +2716,16 @@ function renderSupplementsPage() {
   </table>
   </div>
 
-  <div class="info-box info-tip"><span>*</span><div><strong>Kreatin + Wettkampf:</strong> 1–2 kg Wassereinlagerung. 4–6 Wochen vor Wiegen pausieren. Kraftgewinn bleibt mehrere Wochen erhalten.</div></div>`;
+  <div class="info-box info-tip"><span>*</span><div><strong>Kreatin + Wettkampf:</strong> 1–2 kg Wassereinlagerung. 4–6 Wochen vor Wiegen pausieren. Kraftgewinn bleibt mehrere Wochen erhalten.</div></div>
+
+  ${renderProductCards([
+    { name:'ESN Ultrapure Creatine Monohydrate', cat:'KREATIN · PFLICHT', price:'20 €/500g', url:'https://www.amazon.de/s?k=ESN+Ultrapure+Creatine+Monohydrate', desc:'Creapure-Qualität, laborgetestet. Deutsche Marke. Das Standard-Kreatin.' },
+    { name:'ESN Designer Whey Protein', cat:'PROTEIN · PFLICHT', price:'25 €/1kg', url:'https://www.amazon.de/s?k=ESN+Designer+Whey+Protein', desc:'Bestes Preis-Leistung-Verhältnis in DE. 30g Protein pro Shake.' },
+    { name:'Natural Elements Omega-3', cat:'OMEGA-3 · EMPFOHLEN', price:'20 €/120 Kaps.', url:'https://www.amazon.de/s?k=natural+elements+Omega+3', desc:'Hochdosiert EPA/DHA. Anti-entzündlich — wichtig für Gelenke und Erholung.' },
+    { name:'Natural Elements Magnesium Komplex', cat:'MAGNESIUM · EMPFOHLEN', price:'15 €/240 Kaps.', url:'https://www.amazon.de/s?k=natural+elements+Magnesium+Komplex', desc:'Gegen Krämpfe, besserer Schlaf. Magnesiumcitrat + -oxid Kombination.' },
+    { name:'ESN Caffeine Caps 200mg', cat:'KOFFEIN · OPTIONAL', price:'10 €/120 Kaps.', url:'https://www.amazon.de/s?k=ESN+Caffeine+Caps+200mg', desc:'Saubere Pre-Training-Energie ohne Zucker-Crash. 30 Min. vor dem Training.' },
+    { name:'Brandl Nutrition Elektrolyte', cat:'ELEKTROLYTE · WETTKAMPF', price:'15 €', url:'https://www.amazon.de/s?k=Brandl+Nutrition+Elektrolyte', desc:'Für Rehydration bei Gewicht machen. Deutsche Marke.' }
+  ])}`;
 }
 
 function openSupplementDetail(id) {
@@ -2766,6 +2791,27 @@ function openSupplementDetail(id) {
   `;
 
   showPage('supplement-detail');
+}
+
+// ===== PRODUKTEMPFEHLUNGEN =====
+function renderProductCards(products) {
+  return '<div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--surface-2);">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white);margin-bottom:16px;">EMPFOHLENE PRODUKTE</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">' +
+    products.map(function(p) {
+      return '<a href="' + p.url + '" target="_blank" rel="noopener" style="display:block;background:var(--surface-0);border:1px solid var(--surface-1);border-radius:var(--radius-md);padding:16px;text-decoration:none;transition:border-color .2s;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
+          '<div>' +
+            '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);font-weight:600;">' + p.name + '</div>' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-top:2px;">' + p.cat + '</div>' +
+          '</div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--gold);white-space:nowrap;">~' + p.price + '</div>' +
+        '</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#666;margin-top:8px;line-height:1.4;">' + p.desc + '</div>' +
+      '</a>';
+    }).join('') +
+    '</div>' +
+  '</div>';
 }
 
 // ===== MENTAL =====
@@ -2964,7 +3010,16 @@ function renderMentalPage() {
         <div class="mt-slot-body">Was lief heute gut?<br>Was war mental schwer?<br>${eName ? 'Wie hätte ' + eName + ' reagiert?' : 'Wie hätte mein Alter Ego reagiert?'}</div>
       </div>
     </div>
-  </div>`;
+  </div>
+
+  ${renderProductCards([
+    { name:'The Fighter\'s Mind – Sam Sheridan', cat:'BUCH · MENTAL', price:'15 €', url:'https://www.amazon.de/s?k=The+Fighters+Mind+Sam+Sheridan', desc:'Interviews mit Elite-Kämpfern über mentale Stärke, Angst und Flow im Ring.' },
+    { name:'Iron Ambition – Mike Tyson', cat:'BUCH · MENTAL', price:'14 €', url:'https://www.amazon.de/s?k=Iron+Ambition+Mike+Tyson', desc:'Tysons Weg unter Cus D\'Amato — Visualisierung, Alter Ego, mentale Dominanz.' },
+    { name:'The Inner Game of Tennis – Timothy Gallwey', cat:'BUCH · MENTAL', price:'12 €', url:'https://www.amazon.de/s?k=The+Inner+Game+of+Tennis+Gallwey', desc:'Das Original-Framework für mentale Performance im Sport. Übertragbar auf jede Kampfsportart.' },
+    { name:'With Winning in Mind – Lanny Bassham', cat:'BUCH · MENTAL', price:'18 €', url:'https://www.amazon.de/s?k=With+Winning+in+Mind+Lanny+Bassham', desc:'Mental Management System eines Olympiasiegers. Perfekt für Kampfnacht-Nervosität.' },
+    { name:'Headspace App', cat:'APP · MEDITATION', price:'13 €/Monat', url:'https://www.headspace.com', desc:'Geführte Visualisierung und Fokus-Sessions. Wird von Profi-Athleten weltweit genutzt.' },
+    { name:'Championship Fighting – Jack Dempsey', cat:'BUCH · TECHNIK', price:'16 €', url:'https://www.amazon.de/s?k=Championship+Fighting+Jack+Dempsey', desc:'Zeitlose Schlagtechnik und Power-Mechanik vom Schwergewichts-Champion.' }
+  ])}`;
 }
 
 function toggleMtAcc(head) {
