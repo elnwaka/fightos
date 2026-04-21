@@ -4437,36 +4437,29 @@ function generateSmartWeekPlan() {
   const MIN_REST_DAYS = 2;
   const MAX_CONSECUTIVE_TRAINING = 3;
 
-  // ===== DELOAD: Körpersignale statt fixem 4-Wochen-Schema =====
-  // Kein fixer Deload-Zyklus — Boxer brauchen Deload wenn:
-  // 1. Kampfwoche (Tapering = natürlicher Deload)
-  // 2. Manuell aktiviert (data.deloadActive)
-  // 3. Übertraining-Signale: HRV sinkt, RPE steigt, Completion-Rate fällt
+  // ===== DELOAD: Nutzer entscheidet, System warnt =====
+  // Kein automatischer Deload — nur manuell über Button
+  // System zeigt Warnzeichen an (HRV, Completion-Rate)
   var isDeload = !!(data && data.deloadActive);
-  var deloadReason = '';
+  var deloadWarnings = [];
 
-  // Auto-Detect: HRV-Trend fallend (letzte 5 Einträge)
+  // Warnung: HRV-Trend fallend
   if (!isDeload && data && data.hrv && data.hrv.length >= 5) {
     var recent5 = data.hrv.slice(-5).map(function(h) { return h.value || h; });
     var prev5 = data.hrv.slice(-10, -5).map(function(h) { return h.value || h; });
     if (prev5.length >= 3) {
       var avgRecent = recent5.reduce(function(a,b){return a+b;},0) / recent5.length;
       var avgPrev = prev5.reduce(function(a,b){return a+b;},0) / prev5.length;
-      if (avgRecent < avgPrev * 0.85) { // HRV 15%+ gefallen
-        isDeload = true;
-        deloadReason = 'HRV ist in den letzten Tagen deutlich gefallen — dein Körper braucht Erholung.';
+      if (avgRecent < avgPrev * 0.85) {
+        deloadWarnings.push('HRV ist gefallen (' + Math.round(avgRecent) + ' vs. ' + Math.round(avgPrev) + ' ms)');
       }
     }
   }
 
-  // Auto-Detect: Letzte Woche weniger als 50% der Blöcke geschafft
+  // Warnung: Letzte Woche weniger als 50% geschafft
   if (!isDeload && data && data._lastWeekRate !== undefined && data._lastWeekRate < 0.5) {
-    isDeload = true;
-    deloadReason = 'Letzte Woche weniger als 50% geschafft — Zeit für Erholung statt mehr Druck.';
+    deloadWarnings.push('Letzte Woche nur ' + Math.round(data._lastWeekRate * 100) + '% geschafft');
   }
-
-  // Kampfwoche = automatisch Deload (Tapering)
-  // (wird weiter unten über fight phases gehandhabt)
 
   const MAX_SC_PER_WEEK = isDeload ? 1 : 2;
 
@@ -4895,21 +4888,20 @@ function _renderWeekPlanInner() {
   const plan = data.weekPlan;
   const el = document.getElementById('page-wochenplan');
 
-  // Deload-Status aus generateSmartWeekPlan — körpersignal-basiert, kein fixer Zyklus
+  // Deload-Status: nur manuell aktivierbar, Warnungen werden angezeigt
   var isDeloadActive = !!(data.deloadActive);
-  var deloadAutoReason = '';
-  // Check HRV drop
+  var _deloadWarnings = [];
   if (!isDeloadActive && data.hrv && data.hrv.length >= 5) {
     var _r5 = data.hrv.slice(-5).map(function(h){return h.value||h;});
     var _p5 = data.hrv.slice(-10,-5).map(function(h){return h.value||h;});
     if (_p5.length >= 3) {
       var _ar = _r5.reduce(function(a,b){return a+b;},0)/_r5.length;
       var _ap = _p5.reduce(function(a,b){return a+b;},0)/_p5.length;
-      if (_ar < _ap * 0.85) { isDeloadActive = true; deloadAutoReason = 'HRV gefallen'; }
+      if (_ar < _ap * 0.85) _deloadWarnings.push('HRV gefallen (' + Math.round(_ar) + ' vs. ' + Math.round(_ap) + ' ms)');
     }
   }
   if (!isDeloadActive && data._lastWeekRate !== undefined && data._lastWeekRate < 0.5) {
-    isDeloadActive = true; deloadAutoReason = 'Weniger als 50% geschafft';
+    _deloadWarnings.push('Letzte Woche nur ' + Math.round(data._lastWeekRate * 100) + '% geschafft');
   }
   var weekLabel = isDeloadActive ? 'DELOAD' : 'TRAINING';
   var weekLabelColor = isDeloadActive ? 'var(--green)' : 'var(--blue)';
@@ -4947,8 +4939,11 @@ function _renderWeekPlanInner() {
       <div class="page-sub">Dein Plan passt sich an dein Level, Equipment und Kampfdatum an.</div>
       <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${weekLabelColor};letter-spacing:1px;">${weekLabel}</span>
-        ${isDeloadActive ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--green);">' + (deloadAutoReason || 'Manuell aktiviert') + ' · Reduziertes Volumen</span><button onclick="deactivateDeload()" style="font-family:\'Space Mono\',monospace;font-size:9px;color:#555;background:none;border:1px solid var(--surface-3);padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;">DELOAD BEENDEN</button>' : '<button onclick="activateDeload()" style="font-family:\'Space Mono\',monospace;font-size:9px;color:#555;background:none;border:1px solid var(--surface-3);padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;">DELOAD AKTIVIEREN</button>'}
+        ${isDeloadActive
+          ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--green);">Reduziertes Volumen — nur 1× Power, kein Max Strength</span><button onclick="deactivateDeload()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:32px;">BEENDEN</button>'
+          : '<button onclick="activateDeload()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:32px;">DELOAD</button>'}
       </div>
+      ${_deloadWarnings.length && !isDeloadActive ? '<div style="margin-top:8px;padding:10px 14px;background:#1a1208;border:1px solid var(--orange);border-radius:var(--radius-md);font-size:12px;color:var(--orange);">⚠ Dein Körper zeigt Zeichen von Überbelastung: ' + _deloadWarnings.join(', ') + '. Brauchst du einen Deload?</div>' : ''}
     </div>
     ${(function() {
       var hints = [];
