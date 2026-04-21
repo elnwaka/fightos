@@ -4433,17 +4433,42 @@ function generateSmartWeekPlan() {
 
   // ===== CONSTANTS =====
   const MAX_SPARRING_PER_WEEK = 2;
-  // Boxing Science + Daru: 2 S&C bei 3-4x Boxing, max 8-10 total, min 2 Ruhetage
-  // Deload (Woche 4): nur 1 S&C, Power statt Max Strength (Plisk & Stone 2003)
-  var _weekNum = 1;
-  if (data && data.weekPlanGenerated) {
-    _weekNum = (Math.floor((Date.now() - new Date(data.weekPlanGenerated).getTime()) / (7*86400000)) % 4) + 1;
-  }
-  var isDeload = (_weekNum === 4);
-  const MAX_SC_PER_WEEK = isDeload ? 1 : 2;
   const MAX_TOTAL_SESSIONS = 8;
   const MIN_REST_DAYS = 2;
   const MAX_CONSECUTIVE_TRAINING = 3;
+
+  // ===== DELOAD: Körpersignale statt fixem 4-Wochen-Schema =====
+  // Kein fixer Deload-Zyklus — Boxer brauchen Deload wenn:
+  // 1. Kampfwoche (Tapering = natürlicher Deload)
+  // 2. Manuell aktiviert (data.deloadActive)
+  // 3. Übertraining-Signale: HRV sinkt, RPE steigt, Completion-Rate fällt
+  var isDeload = !!(data && data.deloadActive);
+  var deloadReason = '';
+
+  // Auto-Detect: HRV-Trend fallend (letzte 5 Einträge)
+  if (!isDeload && data && data.hrv && data.hrv.length >= 5) {
+    var recent5 = data.hrv.slice(-5).map(function(h) { return h.value || h; });
+    var prev5 = data.hrv.slice(-10, -5).map(function(h) { return h.value || h; });
+    if (prev5.length >= 3) {
+      var avgRecent = recent5.reduce(function(a,b){return a+b;},0) / recent5.length;
+      var avgPrev = prev5.reduce(function(a,b){return a+b;},0) / prev5.length;
+      if (avgRecent < avgPrev * 0.85) { // HRV 15%+ gefallen
+        isDeload = true;
+        deloadReason = 'HRV ist in den letzten Tagen deutlich gefallen — dein Körper braucht Erholung.';
+      }
+    }
+  }
+
+  // Auto-Detect: Letzte Woche weniger als 50% der Blöcke geschafft
+  if (!isDeload && data && data._lastWeekRate !== undefined && data._lastWeekRate < 0.5) {
+    isDeload = true;
+    deloadReason = 'Letzte Woche weniger als 50% geschafft — Zeit für Erholung statt mehr Druck.';
+  }
+
+  // Kampfwoche = automatisch Deload (Tapering)
+  // (wird weiter unten über fight phases gehandhabt)
+
+  const MAX_SC_PER_WEEK = isDeload ? 1 : 2;
 
   const TYPE_LABEL_MAP = {
     pa: 'Partnerarbeit', pratzen: 'Pratzenarbeit', sparring: 'Sparring',
@@ -4576,9 +4601,9 @@ function generateSmartWeekPlan() {
 
   scDays.sort(function(a, b) { return a - b; }); // chronological order
 
-  // Assign S&C templates: 1× Maximalkraft (A) + 1× Power (B) bei 2 Sessions/Woche
-  // Deload: nur 1× Power (leichtere CNS-Belastung)
-  var scPattern = isDeload ? [1] : [0, 1]; // Deload: nur Power | Normal: Kraft + Power
+  // Normal: 1× Maximalkraft (A) + 1× Power (B)
+  // Deload: nur 1× Power mit reduziertem Volumen (leichtere CNS-Belastung)
+  var scPattern = isDeload ? [1] : [0, 1];
   var scAssignments = {}; // di -> template index
   scDays.forEach(function(di, slotIdx) {
     var nextDi = (di + 1) % 7;
@@ -4870,14 +4895,24 @@ function _renderWeekPlanInner() {
   const plan = data.weekPlan;
   const el = document.getElementById('page-wochenplan');
 
-  // 4-Wochen-Zyklus berechnen
-  var weekNum = 1;
-  if (data.weekPlanGenerated) {
-    var weeksSince = Math.floor((Date.now() - new Date(data.weekPlanGenerated).getTime()) / (7*86400000));
-    weekNum = (weeksSince % 4) + 1;
+  // Deload-Status aus generateSmartWeekPlan — körpersignal-basiert, kein fixer Zyklus
+  var isDeloadActive = !!(data.deloadActive);
+  var deloadAutoReason = '';
+  // Check HRV drop
+  if (!isDeloadActive && data.hrv && data.hrv.length >= 5) {
+    var _r5 = data.hrv.slice(-5).map(function(h){return h.value||h;});
+    var _p5 = data.hrv.slice(-10,-5).map(function(h){return h.value||h;});
+    if (_p5.length >= 3) {
+      var _ar = _r5.reduce(function(a,b){return a+b;},0)/_r5.length;
+      var _ap = _p5.reduce(function(a,b){return a+b;},0)/_p5.length;
+      if (_ar < _ap * 0.85) { isDeloadActive = true; deloadAutoReason = 'HRV gefallen'; }
+    }
   }
-  var volumeMult = weekNum === 4 ? 0.6 : weekNum === 3 ? 1.1 : 1.0;
-  var weekLabel = weekNum === 1 ? 'AUFBAU' : weekNum === 2 ? 'AUFBAU+' : weekNum === 3 ? 'PEAK' : 'DELOAD';
+  if (!isDeloadActive && data._lastWeekRate !== undefined && data._lastWeekRate < 0.5) {
+    isDeloadActive = true; deloadAutoReason = 'Weniger als 50% geschafft';
+  }
+  var weekLabel = isDeloadActive ? 'DELOAD' : 'TRAINING';
+  var weekLabelColor = isDeloadActive ? 'var(--green)' : 'var(--blue)';
 
   // Calculate fight phase per day for header badges
   const today = new Date(); today.setHours(0,0,0,0);
@@ -4910,8 +4945,10 @@ function _renderWeekPlanInner() {
     <div class="page-header">
       <div class="page-title">WOCHEN<span>PLAN</span></div>
       <div class="page-sub">Dein Plan passt sich an dein Level, Equipment und Kampfdatum an.</div>
-      <div style="margin-top:8px;"><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${weekNum===4?'var(--green)':weekNum===3?'var(--red)':'var(--blue)'};letter-spacing:1px;">WOCHE ${weekNum}: ${weekLabel}</span>
-      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;margin-left:8px;">${weekNum===1?'Grundlagen aufbauen':weekNum===2?'Volumen steigern':weekNum===3?'Intensität hoch, Volumen runter':weekNum===4?'Erholung – halbes Volumen':''}${volumeMult<1?' · Volumen x'+volumeMult:''}</span></div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${weekLabelColor};letter-spacing:1px;">${weekLabel}</span>
+        ${isDeloadActive ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--green);">' + (deloadAutoReason || 'Manuell aktiviert') + ' · Reduziertes Volumen</span><button onclick="deactivateDeload()" style="font-family:\'Space Mono\',monospace;font-size:9px;color:#555;background:none;border:1px solid var(--surface-3);padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;">DELOAD BEENDEN</button>' : '<button onclick="activateDeload()" style="font-family:\'Space Mono\',monospace;font-size:9px;color:#555;background:none;border:1px solid var(--surface-3);padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;">DELOAD AKTIVIEREN</button>'}
+      </div>
     </div>
     ${(function() {
       var hints = [];
@@ -5075,6 +5112,28 @@ function regenerateWeekPlan() {
   data.weekPlanGenerated = new Date().toISOString();
   data._weekPlanKey = null;
   saveData(data);
+  renderWeekPlan();
+}
+
+function activateDeload() {
+  const data = getData();
+  if (!data) return;
+  data.deloadActive = true;
+  data.weekPlan = generateSmartWeekPlan();
+  data._weekPlanKey = null;
+  saveData(data);
+  showToast('Deload aktiviert — reduziertes Volumen', 'info', 2000);
+  renderWeekPlan();
+}
+
+function deactivateDeload() {
+  const data = getData();
+  if (!data) return;
+  data.deloadActive = false;
+  data.weekPlan = generateSmartWeekPlan();
+  data._weekPlanKey = null;
+  saveData(data);
+  showToast('Deload beendet — normales Training', 'success', 2000);
   renderWeekPlan();
 }
 

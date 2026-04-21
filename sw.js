@@ -1,5 +1,5 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-04-21d';
+const BUILD = '2026-04-21e';
 const CACHE_NAME = 'fightos-' + BUILD;
 const PRECACHE = [
   './',
