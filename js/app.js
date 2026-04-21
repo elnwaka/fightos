@@ -4433,9 +4433,10 @@ function generateSmartWeekPlan() {
 
   // ===== CONSTANTS =====
   const MAX_SPARRING_PER_WEEK = 2;
-  const MAX_SC_PER_WEEK = 3; // 2× Maximalkraft + 1× Power (Boxing Science Aufbauphase)
+  // Boxing Science + Daru: 2 S&C bei 3-4x Boxing, max 8-10 total, min 2 Ruhetage
+  const MAX_SC_PER_WEEK = 2;
   const MAX_TOTAL_SESSIONS = 8;
-  const MIN_REST_DAYS = 1;
+  const MIN_REST_DAYS = 2;
   const MAX_CONSECUTIVE_TRAINING = 3;
 
   const TYPE_LABEL_MAP = {
@@ -4451,12 +4452,12 @@ function generateSmartWeekPlan() {
       warmup: 'Foam Rolling 2 Min. + Shoulder Dislocates + 2-3 Aufwärmsätze mit steigendem Gewicht',
       cooldown: 'Stretching: Hüftbeuger, Schultern, Brust — je 30 Sek.',
       exercises: [
-        { id: 'overcoming-iso', sets: '3 × 6 Sek. @ 100%', rest: '90 Sek.', note: 'Maximal gegen Wand/Boden drücken. Aktiviert das Nervensystem' },
-        { id: 'trap-bar-deadlift', sets: '4 × 3 @ 88-93%', rest: '3-5 Min.', note: 'Schwer, aber keine Maximallast. Saubere Technik ist Pflicht' },
-        { id: 'bench-press', sets: '4 × 3 @ 85-90%', rest: '3 Min.', note: 'Kontrolliert runter, so schnell wie möglich hoch' },
-        { id: 'pull-ups', sets: '4 × 3-5 gewichtet', rest: '2 Min.', note: 'Gegengewicht zum Schlagen. Rucksack oder Gürtel mit Gewicht' },
-        { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'Überträgt Beinkraft auf die Faust' },
-        { id: 'face-pulls', sets: '3 × 15', rest: '45 Sek.', note: 'Schulter-Schutz. Leicht, bei jedem Training' }
+        { id: 'overcoming-iso', sets: '3 × 6 Sek. @ 100%', rest: '90 Sek.', note: 'ZNS-Priming: Mid-Thigh Pull + Iso-Squat + Wand-Push' },
+        { id: 'trap-bar-deadlift', sets: '4 × 3 @ 88-93%', rest: '3-5 Min.', note: 'Hauptübung. Triples, nie bis zum Versagen (1-2 Reps im Tank)' },
+        { id: 'landmine-press', sets: '4 × 4 pro Arm @ 85%', rest: '2 Min.', note: 'Besserer Boxing-Transfer als Bankdrücken (Phil Daru)' },
+        { id: 'pull-ups', sets: '4 × 3-5 gewichtet', rest: '2 Min.', note: 'Zugübung als Balance zum Schlagen. +10-25 kg' },
+        { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'Core Stiffness — überträgt Beinkraft auf die Faust' },
+        { id: 'face-pulls', sets: '3 × 15', rest: '45 Sek.', note: 'Pflicht bei jedem Training — Schulter-Prehab' }
       ],
       hint: 'Schwer aber nie bis zum Versagen — immer 1-2 Wdh. im Tank lassen (RPE 8-9). Alternativ: 5×5 @ 80% und jede Woche +2.5 kg wenn alle Reps sauber sind. Echte 1RM nur alle 8-12 Wochen zum Testen.',
       hasHeavyLegs: true, duration: 50
@@ -4473,7 +4474,7 @@ function generateSmartWeekPlan() {
         { id: 'explosive-pushup', sets: '4 × 5', rest: '90 Sek.', note: 'Hände vom Boden lösen. Wirst du langsam → aufhören' },
         { id: 'face-pulls', sets: '2 × 20', rest: '30 Sek.', note: 'Schulter-Schutz' }
       ],
-      hint: 'Geschwindigkeit zählt, nicht Gewicht. Wirst du langsam → Set sofort beenden.',
+      hint: 'Geschwindigkeit zählt, nicht Gewicht. Wirst du langsam → Set sofort beenden. Min. 48h nach Maximalkraft.',
       hasHeavyLegs: false, duration: 45
     },
     {
@@ -4533,54 +4534,55 @@ function generateSmartWeekPlan() {
   // Cap sparring at MAX_SPARRING_PER_WEEK (keep first 2)
   var allowedSparring = sparringDays.slice(0, MAX_SPARRING_PER_WEEK);
 
-  // ===== DETERMINE S&C DAYS (morning slots) =====
-  // Rules: no S&C on sparring days, no heavy legs within 24h before sparring, max 3x/week
-  // Preferred: Mo(A), Do(B), Sa(C) — adjusted based on user schedule
-  var preferredSCDays = [0, 3, 5]; // Mo, Do, Sa
-  var scDays = []; // indices that get S&C
+  // ===== DETERMINE S&C DAYS =====
+  // Rules (Boxing Science, Daru, Robineau 2016):
+  // - No S&C on sparring days
+  // - Max strength needs 48h before sparring (CNS recovery)
+  // - 48h+ between S&C sessions (Zatsiorsky: 48-72h CNS recovery)
+  // - S&C morgens, Boxing abends (6h+ Gap)
+  // - No S&C on Sunday
+  var scDays = [];
 
-  preferredSCDays.forEach(di => {
-    if (scDays.length >= MAX_SC_PER_WEEK) return;
-    const day = DAY_NAMES[di];
-    const d = ws[day] || { time: null, type: 'frei' };
-    const phase = getFightPhase(day);
-    // No S&C on sparring days (HARD CONSTRAINT)
-    if (allowedSparring.indexOf(di) !== -1) return;
-    // No S&C during taper/rest/fight/post-fight phases
-    if (['fight-day', 'rest-before', 'post-fight'].indexOf(phase) !== -1) return;
-    // fight-week: max 2x S&C
-    if (phase === 'fight-week' && scDays.length >= 2) return;
-    scDays.push(di);
-  });
+  // Score each day — best S&C days have max distance from sparring
+  var dayScores = [];
+  for (var di = 0; di < 7; di++) {
+    if (di === 6) continue; // Sunday always rest
+    if (allowedSparring.indexOf(di) !== -1) continue; // No S&C on sparring days
+    var phase = getFightPhase(DAY_NAMES[di]);
+    if (['fight-day', 'rest-before', 'post-fight'].indexOf(phase) !== -1) continue;
 
-  // If preferred days were blocked, try filling from remaining weekdays
-  if (scDays.length < MAX_SC_PER_WEEK) {
-    DAY_NAMES.forEach((day, di) => {
-      if (scDays.length >= MAX_SC_PER_WEEK) return;
-      if (scDays.indexOf(di) !== -1) return;
-      if (allowedSparring.indexOf(di) !== -1) return;
-      if (di === 6) return; // Sunday always rest
-      const phase = getFightPhase(day);
-      if (['fight-day', 'rest-before', 'post-fight'].indexOf(phase) !== -1) return;
-      scDays.push(di);
+    // Calculate min distance to any sparring day
+    var minDistToSparring = 7;
+    allowedSparring.forEach(function(si) {
+      var fwd = (si - di + 7) % 7; // days until sparring
+      var bwd = (di - si + 7) % 7; // days since sparring
+      minDistToSparring = Math.min(minDistToSparring, fwd, bwd);
     });
+
+    dayScores.push({ di: di, dist: minDistToSparring });
   }
 
-  // Check heavy-legs-before-sparring constraint and swap if needed
-  scDays = scDays.filter(di => {
-    // If tomorrow is sparring, don't allow heavy-leg S&C
-    const nextDi = (di + 1) % 7;
-    if (allowedSparring.indexOf(nextDi) !== -1) {
-      // Still allowed if the assigned session has no heavy legs
-      // We'll handle this in assignment below by picking session B (no heavy legs)
-      return true;
-    }
-    return true;
+  // Sort by distance to sparring (furthest first = best for S&C)
+  dayScores.sort(function(a, b) { return b.dist - a.dist; });
+
+  // Pick top days, ensure 48h+ between them
+  dayScores.forEach(function(ds) {
+    if (scDays.length >= MAX_SC_PER_WEEK) return;
+    // Check 48h gap to already-picked S&C days (min 2 days apart)
+    var tooClose = scDays.some(function(existingDi) {
+      var gap = Math.abs(ds.di - existingDi);
+      gap = Math.min(gap, 7 - gap); // wrap around
+      return gap < 2;
+    });
+    if (tooClose) return;
+    scDays.push(ds.di);
   });
 
-  // Assign S&C templates: 2× Maximalkraft (A) + 1× Power (B)
-  // Pattern: A, B, A — Kraft-Ausdauer (C) wird durch Boxtraining abgedeckt
-  var scPattern = [0, 1, 0]; // Maximalkraft, Power, Maximalkraft
+  scDays.sort(function(a, b) { return a - b; }); // chronological order
+
+  // Assign S&C templates: 1× Maximalkraft (A) + 1× Power (B) bei 2 Sessions/Woche
+  // Boxing Science Standard-Split für 3-4x Boxing
+  var scPattern = [0, 1]; // Maximalkraft, Power
   var scAssignments = {}; // di -> template index
   scDays.forEach(function(di, slotIdx) {
     var nextDi = (di + 1) % 7;
@@ -4599,11 +4601,7 @@ function generateSmartWeekPlan() {
     scAssignments[di] = templateIdx;
   });
 
-  // Persist rotation index
-  if (data) {
-    data.scRotation = scRotation;
-    saveData(data);
-  }
+  // S&C pattern is now fixed (A, B) — no rotation tracking needed
 
   // ===== NECK TRAINING DAYS: Mon, Wed, Fri (indices 0, 2, 4) =====
   var nackenDayIndices = [0, 2, 4];
