@@ -5327,14 +5327,33 @@ function openBlockDetail(day, idx) {
     }
   }
 
+  // Day select options
+  var daySelectHTML = '<select id="bd-move-day" onchange="moveBlockToDay(\'' + day + '\',' + idx + ',this.value)" style="font-family:\'Space Mono\',monospace;font-size:11px;background:var(--surface-0);color:var(--white);border:1px solid var(--surface-2);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;">';
+  ['mo','di','mi','do','fr','sa','so'].forEach(function(d) {
+    daySelectHTML += '<option value="' + d + '"' + (d === day ? ' selected' : '') + '>' + (DAY_LABEL_MAP[d] || d) + '</option>';
+  });
+  daySelectHTML += '</select>';
+
   el.innerHTML =
-  // ── Hero header ──
-  '<div class="bd-hero">' +
+  // ── Top bar: back + done toggle ──
+  '<div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;">' +
     '<button onclick="showPage(\'wochenplan\')" class="bd-back">' +
-      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> <span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">ZURÜCK</span>' +
     '</button>' +
+    '<div style="display:flex;gap:8px;align-items:center;">' +
+      '<button onclick="editBlockFromDetail(\'' + day + '\',' + idx + ')" style="background:none;border:1px solid var(--surface-2);border-radius:var(--radius-sm);padding:6px 12px;cursor:pointer;font-family:\'Space Mono\',monospace;font-size:10px;color:#555;min-height:36px;">BEARBEITEN</button>' +
+      '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\')" style="background:' + (isDone ? 'var(--green)' : 'var(--red)') + ';border:none;border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;font-family:\'Space Mono\',monospace;font-size:11px;color:' + (isDone ? '#000' : '#fff') + ';min-height:36px;font-weight:700;">' + (isDone ? '\u2713 ERLEDIGT' : 'ERLEDIGT?') + '</button>' +
+    '</div>' +
+  '</div>' +
+
+  // ── Header ──
+  '<div class="bd-hero">' +
     '<div class="bd-hero-content">' +
-      '<div class="bd-day">' + (DAY_LABEL_MAP[day] || day).toUpperCase() + '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+        daySelectHTML +
+        '<input type="time" value="' + (block.time || '08:00') + '" onchange="changeBlockTime(\'' + day + '\',' + idx + ',this.value)" style="font-family:\'Space Mono\',monospace;font-size:12px;background:var(--surface-0);color:var(--white);border:1px solid var(--surface-2);border-radius:var(--radius-sm);padding:4px 8px;">' +
+        (block.pinned ? '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--gold);border:1px solid var(--gold);padding:2px 6px;border-radius:var(--radius-sm);">MANUELL</span>' : '') +
+      '</div>' +
       '<div class="bd-title">' + (block.title || '').replace(/</g,'&lt;') + '</div>' +
       (block.hint ? '<div class="bd-hint">' + block.hint.replace(/</g,'&lt;') + '</div>' : '') +
       '<div class="bd-stats">' +
@@ -5346,20 +5365,44 @@ function openBlockDetail(day, idx) {
   '</div>' +
 
   // ── Sections ──
-  sectionsHTML +
-
-  // ── Bottom action ──
-  '<div class="bd-action">' +
-    '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\')" class="bd-done-btn' + (isDone ? ' done' : '') + '">' +
-      (isDone ? '\u2713 ERLEDIGT' : 'ALS ERLEDIGT MARKIEREN') +
-    '</button>' +
-  '</div>';
+  sectionsHTML;
 
   showPage('block-detail');
 }
 
 function editBlockFromDetail(day, idx) {
   editBlock(day, idx);
+}
+
+function moveBlockToDay(fromDay, idx, toDay) {
+  if (fromDay === toDay) return;
+  var data = getData();
+  if (!data || !data.weekPlan) return;
+  var block = data.weekPlan[fromDay][idx];
+  if (!block) return;
+  block.pinned = true;
+  data.weekPlan[fromDay].splice(idx, 1);
+  if (!data.weekPlan[toDay]) data.weekPlan[toDay] = [];
+  data.weekPlan[toDay].push(block);
+  data.weekPlan[toDay].sort(function(a, b) { return (a.time || '').localeCompare(b.time || ''); });
+  autoAdjustWeekPlan(data, toDay, data.weekPlan[toDay].indexOf(block));
+  saveData(data);
+  var DAY_MAP = { mo:'Montag', di:'Dienstag', mi:'Mittwoch', do:'Donnerstag', fr:'Freitag', sa:'Samstag', so:'Sonntag' };
+  showToast('Verschoben nach ' + DAY_MAP[toDay], 'success', 2000);
+  showPage('wochenplan');
+  renderWeekPlan();
+}
+
+function changeBlockTime(day, idx, newTime) {
+  var data = getData();
+  if (!data || !data.weekPlan || !data.weekPlan[day]) return;
+  data.weekPlan[day][idx].time = newTime;
+  data.weekPlan[day][idx].pinned = true;
+  data.weekPlan[day].sort(function(a, b) { return (a.time || '').localeCompare(b.time || ''); });
+  saveData(data);
+  // Re-open at new position
+  var newIdx = data.weekPlan[day].findIndex(function(b) { return b === data.weekPlan[day].find(function(bb) { return bb.time === newTime && bb.pinned; }); });
+  openBlockDetail(day, newIdx >= 0 ? newIdx : idx);
 }
 
 function editBlock(day, idx) {
