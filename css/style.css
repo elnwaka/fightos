@@ -1548,12 +1548,12 @@ body::before {
 .faq-a {
   max-height: 0;
   overflow: hidden;
-  transition: max-height .4s ease;
+  transition: max-height .4s ease, overflow 0s .4s;
   font-size: var(--fs-sm);
   color: #999;
   line-height: 1.85;
 }
-.faq-item.open .faq-a { max-height: 3000px; transition: max-height .6s ease; }
+.faq-item.open .faq-a { max-height: 3000px; overflow: visible; transition: max-height .6s ease, overflow 0s 0s; }
 .faq-a-inner { padding: 0 0 18px; }
 .faq-a strong { color: var(--white); }
 
@@ -2654,11 +2654,12 @@ body::before {
 .mt-acc-body {
   max-height: 0;
   overflow: hidden;
-  transition: max-height .4s ease;
+  transition: max-height .4s ease, overflow 0s .4s;
 }
 .mt-acc.open .mt-acc-body {
   max-height: 5000px;
-  transition: max-height .6s ease;
+  overflow: visible;
+  transition: max-height .6s ease, overflow 0s 0s;
 }
 .mt-acc-inner {
   padding: 8px 4px 32px 46px;
@@ -2790,12 +2791,13 @@ body::before {
 .pd-body {
   max-height: 0;
   overflow: hidden;
-  transition: max-height .4s ease;
+  transition: max-height .4s ease, overflow 0s .4s;
 }
 .pd-section.open .pd-body,
 .pd-section.open-default .pd-body {
   max-height: 5000px;
-  transition: max-height .6s ease;
+  overflow: visible;
+  transition: max-height .6s ease, overflow 0s 0s;
 }
 .pd-inner {
   padding: 0 4px 28px;
