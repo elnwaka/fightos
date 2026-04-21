@@ -5419,6 +5419,7 @@ function editBlock(day, idx) {
   if (block.title && block.title.indexOf('Maximalkraft') !== -1) matched = 'tpl_maxkraft';
   else if (block.title && (block.title.indexOf('Power') !== -1 || block.title.indexOf('Schnellkraft') !== -1)) matched = 'tpl_power';
   else if (block.title && block.title.indexOf('HIIT') !== -1) matched = 'tpl_hiit';
+  else if (block.title && block.title.indexOf('SIT') !== -1) matched = 'tpl_sit';
   else if (block.title && block.title.indexOf('Zone 2') !== -1) matched = 'tpl_zone2';
   else if (block.title && block.title.indexOf('Sparring') !== -1) matched = 'sparring';
   else if (block.type === 'boxing') matched = 'boxing';
@@ -5496,6 +5497,17 @@ var SESSION_TEMPLATES = {
       hint: 'Härteste Cardio der Woche. Nicht Tag vor/nach Sparring.',
       exercises: [
         { id: 'hiit-4x4', sets: '4 × 4 Min. @ >90% HFmax', rest: '3 Min. aktiv', note: '4 Runden Vollgas + aktive Erholung' }
+      ]
+    };
+  },
+  tpl_sit: function() {
+    return {
+      type: 'cardio', title: 'SIT — Sprint-Intervalle', rpe: 10, duration: 25,
+      warmup: '5 Min. einlaufen + 3 Steigerungsläufe über 60m',
+      cooldown: '5 Min. locker auslaufen + Dehnung Beine',
+      hint: 'Trainiert das PCr-System — explosive Wiederholungsfähigkeit wie im Ring. Max 1×/Woche, nie Tag vor Sparring.',
+      exercises: [
+        { id: 'sit-sprints', sets: '8-10 × 30 Sek. ALL-OUT', rest: '3-4 Min. aktiv', note: '30 Sek. maximaler Sprint, dann 3-4 Min. lockeres Gehen. 8-10 Runden.' }
       ]
     };
   },
