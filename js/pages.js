@@ -973,10 +973,10 @@ function renderUebungenPage() {
   </div>
 
   ${renderProductCards([
-    { name:'IronMind Twist Yo\' Wrist', cat:'WRIST ROLLER · GRIP', price:'30 €', url:'https://www.amazon.de/s?k=IronMind+Twist+Yo+Wrist', desc:'Unterarm- und Griffkraft. Für härtere Fäuste und Handgelenk-Stabilität.' },
-    { name:'Starpro Boxbandagen 4.5m', cat:'HANDSCHUTZ', price:'9 €', url:'https://www.amazon.de/s?k=Starpro+Hand+Wraps+4.5m', desc:'Elastische Baumwolle. Schützt Knöchel und Handgelenke beim Schlagen.' },
-    { name:'Rounds Pro Timer App', cat:'APP · TRAINING', price:'5 €', url:'https://www.amazon.de/s?k=Rounds+Pro+Boxing+Timer', desc:'Runden-Timer mit konfigurierbaren Intervallen. Für Solo-Training am Sack.' },
-    { name:'MyFitnessPal App', cat:'APP · ERNÄHRUNG', price:'Kostenlos', url:'https://www.myfitnesspal.com', desc:'Makro- und Kalorien-Tracking. Riesige deutsche Lebensmittel-Datenbank.' }
+    { name:'IronMind Twist Yo\' Wrist', cat:'WRIST ROLLER · GRIP', price:'30 €', img:'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=IronMind+Twist+Yo+Wrist', desc:'Unterarm- und Griffkraft. Härtere Fäuste.' },
+    { name:'Starpro Boxbandagen 4.5m', cat:'HANDSCHUTZ', price:'9 €', img:'https://images.unsplash.com/photo-1517438476312-10d79c077509?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=Starpro+Hand+Wraps+4.5m', desc:'Elastische Baumwolle. Schützt Knöchel und Handgelenke.' },
+    { name:'Rounds Pro Timer App', cat:'APP · TRAINING', price:'5 €', img:'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=Rounds+Pro+Boxing+Timer', desc:'Runden-Timer für Solo-Training am Sack.' },
+    { name:'MyFitnessPal App', cat:'APP · ERNÄHRUNG', price:'Kostenlos', img:'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=150&h=150&fit=crop', url:'https://www.myfitnesspal.com', desc:'Makro- und Kalorien-Tracking mit deutscher Datenbank.' }
   ])}`;
 }
 
@@ -2345,12 +2345,12 @@ function renderRegenerationPage() {
   </div>
 
   ${renderProductCards([
-    { name:'BLACKROLL Standard Faszienrolle', cat:'FOAM ROLLER', price:'30 €', url:'https://www.amazon.de/s?k=BLACKROLL+Standard+Faszienrolle', desc:'Deutsche Qualität. Standard für Myofascial Release. Hält ewig.' },
-    { name:'POWERbreathe Plus Medium', cat:'ATEMTRAINING · IMT', price:'55 €', url:'https://www.amazon.de/s?k=POWERbreathe+Plus+Medium+Resistance', desc:'Inspiratorisches Muskeltraining. Verbessert Ausdauer über die Runden.' },
-    { name:'Elite HRV App', cat:'APP · HRV-TRACKING', price:'Kostenlos', url:'https://elitehrv.com', desc:'HRV morgens messen mit Brustgurt. Erkennt Übertraining bevor du es spürst.' },
-    { name:'DMoose Neck Harness', cat:'NACKENTRAINING', price:'20 €', url:'https://www.amazon.de/s?k=DMoose+Neck+Harness', desc:'Für Nacken-Curls mit Gewichtsscheibe. Ergänzung zu isometrischem Training.' },
-    { name:'Fit Simplify Resistance Bands Set', cat:'BÄNDER · WARM-UP', price:'13 €', url:'https://www.amazon.de/s?k=Fit+Simplify+Resistance+Bands+Set', desc:'5 Stärken für Schulter-Warmup, Rotatorenmanschette, Hip Activation.' },
-    { name:'Buddy Lee Aero Speed Rope', cat:'SPRINGSEIL', price:'40 €', url:'https://www.amazon.de/s?k=Buddy+Lee+Aero+Speed+Jump+Rope', desc:'Das Boxing-Springseil. Leicht, schnelle Rotation, Goldstandard.' }
+    { name:'BLACKROLL Standard Faszienrolle', cat:'FOAM ROLLER', price:'30 €', img:'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=BLACKROLL+Standard+Faszienrolle', desc:'Deutsche Qualität. Standard für Myofascial Release.' },
+    { name:'POWERbreathe Plus Medium', cat:'ATEMTRAINING · IMT', price:'55 €', img:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=POWERbreathe+Plus+Medium+Resistance', desc:'Inspiratorisches Muskeltraining. Mehr Ausdauer über die Runden.' },
+    { name:'Elite HRV App', cat:'APP · HRV-TRACKING', price:'Kostenlos', img:'https://images.unsplash.com/photo-1510017803434-a899b8644e5d?w=150&h=150&fit=crop', url:'https://elitehrv.com', desc:'HRV morgens messen. Erkennt Übertraining bevor du es spürst.' },
+    { name:'DMoose Neck Harness', cat:'NACKENTRAINING', price:'20 €', img:'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=DMoose+Neck+Harness', desc:'Nacken-Curls mit Gewichtsscheibe. KO-Schutz aufbauen.' },
+    { name:'Fit Simplify Resistance Bands', cat:'BÄNDER · WARM-UP', price:'13 €', img:'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=Fit+Simplify+Resistance+Bands+Set', desc:'5 Stärken für Schulter-Warmup und Rotatorenmanschette.' },
+    { name:'Buddy Lee Aero Speed Rope', cat:'SPRINGSEIL', price:'40 €', img:'https://images.unsplash.com/photo-1515775538093-d2d95c5ae190?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=Buddy+Lee+Aero+Speed+Jump+Rope', desc:'DAS Boxing-Springseil. Leicht, schnelle Rotation.' }
   ])}`;
 }
 
@@ -2719,12 +2719,12 @@ function renderSupplementsPage() {
   <div class="info-box info-tip"><span>*</span><div><strong>Kreatin + Wettkampf:</strong> 1–2 kg Wassereinlagerung. 4–6 Wochen vor Wiegen pausieren. Kraftgewinn bleibt mehrere Wochen erhalten.</div></div>
 
   ${renderProductCards([
-    { name:'ESN Ultrapure Creatine Monohydrate', cat:'KREATIN · PFLICHT', price:'20 €/500g', url:'https://www.amazon.de/s?k=ESN+Ultrapure+Creatine+Monohydrate', desc:'Creapure-Qualität, laborgetestet. Deutsche Marke. Das Standard-Kreatin.' },
-    { name:'ESN Designer Whey Protein', cat:'PROTEIN · PFLICHT', price:'25 €/1kg', url:'https://www.amazon.de/s?k=ESN+Designer+Whey+Protein', desc:'Bestes Preis-Leistung-Verhältnis in DE. 30g Protein pro Shake.' },
-    { name:'Natural Elements Omega-3', cat:'OMEGA-3 · EMPFOHLEN', price:'20 €/120 Kaps.', url:'https://www.amazon.de/s?k=natural+elements+Omega+3', desc:'Hochdosiert EPA/DHA. Anti-entzündlich — wichtig für Gelenke und Erholung.' },
-    { name:'Natural Elements Magnesium Komplex', cat:'MAGNESIUM · EMPFOHLEN', price:'15 €/240 Kaps.', url:'https://www.amazon.de/s?k=natural+elements+Magnesium+Komplex', desc:'Gegen Krämpfe, besserer Schlaf. Magnesiumcitrat + -oxid Kombination.' },
-    { name:'ESN Caffeine Caps 200mg', cat:'KOFFEIN · OPTIONAL', price:'10 €/120 Kaps.', url:'https://www.amazon.de/s?k=ESN+Caffeine+Caps+200mg', desc:'Saubere Pre-Training-Energie ohne Zucker-Crash. 30 Min. vor dem Training.' },
-    { name:'Brandl Nutrition Elektrolyte', cat:'ELEKTROLYTE · WETTKAMPF', price:'15 €', url:'https://www.amazon.de/s?k=Brandl+Nutrition+Elektrolyte', desc:'Für Rehydration bei Gewicht machen. Deutsche Marke.' }
+    { name:'ESN Ultrapure Creatine Monohydrate', cat:'KREATIN · PFLICHT', price:'20 €/500g', img:'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=ESN+Ultrapure+Creatine+Monohydrate', desc:'Creapure-Qualität, laborgetestet. Deutsche Marke.' },
+    { name:'ESN Designer Whey Protein', cat:'PROTEIN · PFLICHT', price:'25 €/1kg', img:'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=ESN+Designer+Whey+Protein', desc:'Bestes Preis-Leistung in DE. 30g Protein pro Shake.' },
+    { name:'Natural Elements Omega-3', cat:'OMEGA-3 · EMPFOHLEN', price:'20 €/120 Kaps.', img:'https://images.unsplash.com/photo-1577401239170-897c525f8547?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=natural+elements+Omega+3', desc:'Hochdosiert EPA/DHA. Anti-entzündlich für Gelenke.' },
+    { name:'Natural Elements Magnesium', cat:'MAGNESIUM · EMPFOHLEN', price:'15 €/240 Kaps.', img:'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=natural+elements+Magnesium+Komplex', desc:'Gegen Krämpfe, besserer Schlaf.' },
+    { name:'ESN Caffeine Caps 200mg', cat:'KOFFEIN · OPTIONAL', price:'10 €/120 Kaps.', img:'https://images.unsplash.com/photo-1514432324607-a09d9b4aefda?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=ESN+Caffeine+Caps+200mg', desc:'Pre-Training-Energie ohne Zucker-Crash.' },
+    { name:'Brandl Nutrition Elektrolyte', cat:'ELEKTROLYTE · WETTKAMPF', price:'15 €', img:'https://images.unsplash.com/photo-1523362628745-0c100150b504?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=Brandl+Nutrition+Elektrolyte', desc:'Rehydration bei Gewicht machen.' }
   ])}`;
 }
 
@@ -2797,17 +2797,16 @@ function openSupplementDetail(id) {
 function renderProductCards(products) {
   return '<div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--surface-2);">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white);margin-bottom:16px;">EMPFOHLENE PRODUKTE</div>' +
-    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">' +
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">' +
     products.map(function(p) {
-      return '<a href="' + p.url + '" target="_blank" rel="noopener" style="display:block;background:var(--surface-0);border:1px solid var(--surface-1);border-radius:var(--radius-md);padding:16px;text-decoration:none;transition:border-color .2s;">' +
-        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
-          '<div>' +
-            '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);font-weight:600;">' + p.name + '</div>' +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-top:2px;">' + p.cat + '</div>' +
-          '</div>' +
-          '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--gold);white-space:nowrap;">~' + p.price + '</div>' +
+      var imgHTML = p.img ? '<div style="width:72px;height:72px;border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;background:var(--surface-1);"><img src="' + p.img + '" alt="" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></div>' : '';
+      return '<a href="' + p.url + '" target="_blank" rel="noopener" style="display:flex;gap:14px;background:var(--surface-0);border:1px solid var(--surface-1);border-radius:var(--radius-md);padding:14px;text-decoration:none;transition:border-color .2s;align-items:center;">' +
+        imgHTML +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);font-weight:600;">' + p.name + '</div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-top:2px;">' + p.cat + ' · <span style="color:var(--gold);">~' + p.price + '</span></div>' +
+          '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#666;margin-top:4px;line-height:1.4;">' + p.desc + '</div>' +
         '</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#666;margin-top:8px;line-height:1.4;">' + p.desc + '</div>' +
       '</a>';
     }).join('') +
     '</div>' +
@@ -3013,12 +3012,12 @@ function renderMentalPage() {
   </div>
 
   ${renderProductCards([
-    { name:'The Fighter\'s Mind – Sam Sheridan', cat:'BUCH · MENTAL', price:'15 €', url:'https://www.amazon.de/s?k=The+Fighters+Mind+Sam+Sheridan', desc:'Interviews mit Elite-Kämpfern über mentale Stärke, Angst und Flow im Ring.' },
-    { name:'Iron Ambition – Mike Tyson', cat:'BUCH · MENTAL', price:'14 €', url:'https://www.amazon.de/s?k=Iron+Ambition+Mike+Tyson', desc:'Tysons Weg unter Cus D\'Amato — Visualisierung, Alter Ego, mentale Dominanz.' },
-    { name:'The Inner Game of Tennis – Timothy Gallwey', cat:'BUCH · MENTAL', price:'12 €', url:'https://www.amazon.de/s?k=The+Inner+Game+of+Tennis+Gallwey', desc:'Das Original-Framework für mentale Performance im Sport. Übertragbar auf jede Kampfsportart.' },
-    { name:'With Winning in Mind – Lanny Bassham', cat:'BUCH · MENTAL', price:'18 €', url:'https://www.amazon.de/s?k=With+Winning+in+Mind+Lanny+Bassham', desc:'Mental Management System eines Olympiasiegers. Perfekt für Kampfnacht-Nervosität.' },
-    { name:'Headspace App', cat:'APP · MEDITATION', price:'13 €/Monat', url:'https://www.headspace.com', desc:'Geführte Visualisierung und Fokus-Sessions. Wird von Profi-Athleten weltweit genutzt.' },
-    { name:'Championship Fighting – Jack Dempsey', cat:'BUCH · TECHNIK', price:'16 €', url:'https://www.amazon.de/s?k=Championship+Fighting+Jack+Dempsey', desc:'Zeitlose Schlagtechnik und Power-Mechanik vom Schwergewichts-Champion.' }
+    { name:'The Fighter\'s Mind – Sam Sheridan', cat:'BUCH · MENTAL', price:'15 €', img:'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=The+Fighters+Mind+Sam+Sheridan', desc:'Interviews mit Elite-Kämpfern über mentale Stärke, Angst und Flow im Ring.' },
+    { name:'Iron Ambition – Mike Tyson', cat:'BUCH · MENTAL', price:'14 €', img:'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=Iron+Ambition+Mike+Tyson', desc:'Tysons Weg unter Cus D\'Amato — Visualisierung, Alter Ego, mentale Dominanz.' },
+    { name:'The Inner Game of Tennis – Timothy Gallwey', cat:'BUCH · MENTAL', price:'12 €', img:'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=The+Inner+Game+of+Tennis+Gallwey', desc:'Das Original-Framework für mentale Performance im Sport.' },
+    { name:'With Winning in Mind – Lanny Bassham', cat:'BUCH · MENTAL', price:'18 €', img:'https://images.unsplash.com/photo-1476275466078-4007374efbbe?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=With+Winning+in+Mind+Lanny+Bassham', desc:'Mental Management System eines Olympiasiegers. Gegen Kampfnacht-Nervosität.' },
+    { name:'Headspace App', cat:'APP · MEDITATION', price:'13 €/Monat', img:'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=150&h=150&fit=crop', url:'https://www.headspace.com', desc:'Geführte Visualisierung und Fokus-Sessions. Von Profi-Athleten genutzt.' },
+    { name:'Championship Fighting – Jack Dempsey', cat:'BUCH · TECHNIK', price:'16 €', img:'https://images.unsplash.com/photo-1549924231-f129b911e442?w=150&h=150&fit=crop', url:'https://www.amazon.de/s?k=Championship+Fighting+Jack+Dempsey', desc:'Zeitlose Schlagtechnik und Power-Mechanik vom Schwergewichts-Champion.' }
   ])}`;
 }
 
