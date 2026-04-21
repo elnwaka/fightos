@@ -4762,13 +4762,32 @@ function generateSmartWeekPlan() {
         totalSessions++;
 
       } else if (isCardioDay) {
-        // Cardio evening — morning can have S&C
-        blocks.push({ type: 'cardio', title: 'Ausdauertraining', time: eveningTime, hint: 'Ausdauer-Session. Voller Einsatz.', rpe: 6, duration: 45,
-          warmup: '5 Min. locker einlaufen + dynamisches Stretching',
-          cooldown: '5 Min. auslaufen + Dehnung Waden, Oberschenkel',
-          exercises: [
-            { id: 'zone2', sets: '40-45 Min.', rest: '', note: 'Laufen, Seilspringen oder Radfahren. Puls 140-160' }
-          ] });
+        // Cardio evening — alternate HIIT (VO2max) and Zone 2 (aerobe Basis)
+        // HIIT max 1×/Woche, nie Tag vor/nach Sparring (Helgerud 2007)
+        var nextIsSparring = allowedSparring.indexOf((di + 1) % 7) !== -1;
+        var prevIsSparring = allowedSparring.indexOf((di + 6) % 7) !== -1;
+        var canDoHIIT = !nextIsSparring && !prevIsSparring;
+        // Check if another cardio day this week already has HIIT
+        var hiitAlreadyPlanned = false;
+        DAY_NAMES.forEach(function(d2, d2i) {
+          if (d2i < di && (ws[d2] || {}).type === 'cardio' && !allowedSparring.includes((d2i+1)%7) && !allowedSparring.includes((d2i+6)%7)) hiitAlreadyPlanned = true;
+        });
+
+        if (canDoHIIT && !hiitAlreadyPlanned) {
+          blocks.push({ type: 'cardio', title: 'HIIT — VO2max', time: eveningTime, hint: 'VO2max-Training: härteste Cardio-Session der Woche. +5-8% VO2max in 8 Wochen (Helgerud 2007).', rpe: 9, duration: 35,
+            warmup: '5 Min. locker einlaufen + dynamisches Stretching',
+            cooldown: '5 Min. locker auslaufen + Dehnung',
+            exercises: [
+              { id: 'hiit-4x4', sets: '4 × 4 Min. @ >90% HFmax', rest: '3 Min. aktiv', note: '4 Min. Vollgas, 3 Min. lockeres Joggen. 4 Runden. Laufen oder Radergometer' }
+            ] });
+        } else {
+          blocks.push({ type: 'cardio', title: 'Zone 2 — Aerobe Basis', time: eveningTime, hint: 'Aerobe Basis: Mitochondrien, Fettverbrennung, Recovery zwischen Runden. Du solltest dich unterhalten können.', rpe: 4, duration: 40,
+            warmup: '5 Min. locker einlaufen',
+            cooldown: 'Dehnung Waden, Oberschenkel 5 Min.',
+            exercises: [
+              { id: 'zone2', sets: '35-40 Min.', rest: '', note: 'Laufen oder Radfahren. Puls 120-140. Kannst du reden → richtige Zone' }
+            ] });
+        }
         totalSessions++;
 
       } else if (isFreeDay) {
