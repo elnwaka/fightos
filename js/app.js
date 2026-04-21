@@ -2072,7 +2072,7 @@ function getBenchmarks() {
   const s = getUserSchedule();
   const bw = s.weight || 75;
   const age = getUserAge() || 25;
-  const bfTarget = age < 25 ? 7 : age <= 35 ? 9 : 11;
+  const bfTarget = age < 25 ? 10 : age <= 35 ? 12 : 14;
   return [
     // LEISTUNGSTESTS – fließen ins Radar
     { id:'deadlift', name:'Deadlift 1RM', unit:'kg', target:Math.round(bw * 2.5), color:'var(--red)', cluster:'Kraft',
@@ -2103,13 +2103,13 @@ function getBenchmarks() {
         {t:'Tipp', d:'3-5 Min. dynamisches Aufwärmen + 2-3 Probesprünge bei 80%. Dann 3 maximale Versuche mit je 2 Min. Pause. Bester Wert zählt.'}
       ], interval:8 },
     { id:'punch_freq', name:'Schlagfrequenz 10s', unit:'Schläge', target:scaleByWeight(bw, PUNCH_TIERS), color:'var(--red)', cluster:'Kraft',
-      how:'Gerade Führhand am Sandsack · 10 Sekunden maximal',
+      how:'Gerade Führhand am Sandsack · 10 Sekunden maximal · Video-Auswertung',
       howSteps:[
-        {t:'Aufbau', d:'Schwerer Sandsack (min. 30 kg). Partner mit Stoppuhr steht seitlich und zählt. Bandagen + Boxhandschuhe (14-16 oz) tragen.'},
+        {t:'Aufbau', d:'Schwerer Sandsack (min. 30 kg). Handy auf Stativ seitlich aufstellen und VIDEO aufnehmen (240fps Slow-Motion wenn möglich). Bandagen + Boxhandschuhe (14-16 oz).'},
         {t:'Aufwärmen', d:'3 Runden Schattenboxen + 2 Min. lockeres Sandsackschlagen. Dann 2 Min. Pause.'},
-        {t:'Ausführung', d:'Boxstellung einnehmen. Auf "LOS" schlägst du NUR gerade Führhand (Jab) so schnell wie möglich auf den Sandsack. Volle Streckung bei jedem Schlag.'},
-        {t:'Zählung', d:'Partner zählt JEDEN Kontakt mit dem Sandsack. Nach exakt 10 Sekunden → "STOPP". Nur Schläge mit voller Armstreckung zählen.'},
-        {t:'Protokoll', d:'3 Versuche mit je 3 Min. Pause. Bester Wert zählt. Alternativ: Beide Hände abwechselnd (dann im Profil vermerken).'}
+        {t:'Ausführung', d:'Boxstellung, Video starten. Timer auf 10 Sek. stellen oder Partner ruft "STOPP". NUR gerade Führhand (Jab) so schnell wie möglich. Volle Streckung bei jedem Schlag.'},
+        {t:'Auswertung per Video', d:'Video in Slow-Motion abspielen und Schläge zählen. Nur Treffer mit voller Armstreckung zählen. Video-Zählung ist 10-15% genauer als Live-Zählung per Hand — bei hoher Frequenz verpasst man Schläge.'},
+        {t:'Protokoll', d:'3 Versuche mit je 3 Min. Pause. Bester Wert zählt. Apps wie PunchLab (Apple Watch) können die Frequenz auch automatisch tracken.'}
       ], interval:6 },
     { id:'cooper', name:'Cooper-Test 12 Min.', unit:'m', target:scaleByWeight(bw, COOPER_TIERS), color:'var(--blue)', cluster:'Ausdauer',
       how:'400m-Bahn · 12 Minuten maximale Distanz',
@@ -2223,9 +2223,9 @@ function getBenchTooltip(b) {
     deadlift: `1RM Trap Bar oder Langhantel. Korreliert mit Schlagkraft (r=0.72–0.80). Nationalkader: 2.5× KG (${bw}kg = ${Math.round(bw*2.5)}kg). Alle 10 Wo. testen.`,
     pullups: `Saubere Klimmzüge bis Versagen. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, PULLUP_TIERS)} Wdh. Wichtiger als Bankdrücken für Clinch + Schlagkraft.`,
     cmj: `Counter Movement Jump – MyJump App oder Kreidemarkierung. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, CMJ_TIERS)}cm. Korreliert direkt mit Schlagkraft.`,
-    punch_freq: `Gerade Führhand am Sandsack, 10 Sek. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, PUNCH_TIERS)} Schläge. Video zur Kontrolle.`,
+    punch_freq: `Gerade Führhand am Sandsack, 10 Sek. — per VIDEO zählen (Slow-Motion), nicht per Hand. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, PUNCH_TIERS)} Schläge. PunchLab App als Alternative.`,
     cooper: `400m-Bahn, 12 Min. max. Für ${bw}kg Nationalkader: ${scaleByWeight(bw, COOPER_TIERS)}m. VO₂max ≈ (Meter − 504) / 44.7 → Ziel: 60+ ml/kg/min.`,
-    bodyfat: `Caliper (7 Falten), Navy-Methode oder DEXA. Für Alter ${age} Nationalkader: ${age < 25 ? 7 : age <= 35 ? 9 : 11}%. Wettkampf: 6–8%.`
+    bodyfat: `Caliper (7 Falten), Navy-Methode oder DEXA. Für Alter ${age}: Ziel ${age < 25 ? '10-12' : age <= 35 ? '10-14' : '12-16'}%. Unter 8% ist ungesund und leistungsmindernd — Hormone, Immunsystem und Erholung leiden.`
   };
   return tips[b.id] || '';
 }
