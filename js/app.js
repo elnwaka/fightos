@@ -4434,7 +4434,13 @@ function generateSmartWeekPlan() {
   // ===== CONSTANTS =====
   const MAX_SPARRING_PER_WEEK = 2;
   // Boxing Science + Daru: 2 S&C bei 3-4x Boxing, max 8-10 total, min 2 Ruhetage
-  const MAX_SC_PER_WEEK = 2;
+  // Deload (Woche 4): nur 1 S&C, Power statt Max Strength (Plisk & Stone 2003)
+  var _weekNum = 1;
+  if (data && data.weekPlanGenerated) {
+    _weekNum = (Math.floor((Date.now() - new Date(data.weekPlanGenerated).getTime()) / (7*86400000)) % 4) + 1;
+  }
+  var isDeload = (_weekNum === 4);
+  const MAX_SC_PER_WEEK = isDeload ? 1 : 2;
   const MAX_TOTAL_SESSIONS = 8;
   const MIN_REST_DAYS = 2;
   const MAX_CONSECUTIVE_TRAINING = 3;
@@ -4451,33 +4457,35 @@ function generateSmartWeekPlan() {
   var scTemplates = [
     {
       key: 'A', title: 'Maximalkraft', rpe: 9,
-      warmup: 'Foam Rolling 2 Min. + Shoulder Dislocates + Aufwärmsätze: Leerstange → 50% → 70% → 80%',
-      cooldown: 'Statisches Stretching: Hüftbeuger, Schultern, Brust — je 30 Sek.',
+      warmup: 'Foam Rolling 2 Min. + Band Pull-Aparts 2×15 + Shoulder Dislocates + Aufwärmsätze: Leerstange → 50% → 70% → 80%',
+      cooldown: 'Foam Rolling Beine + Rücken 3 Min. + Stretching: Hüftbeuger, Schultern, Brust — je 30 Sek.',
       exercises: [
-        // --- HAUPTÜBUNGEN (Squat + Hinge + Press) ---
-        { id: 'trap-bar-deadlift', sets: '4 × 3 @ 88-93%', rest: '3-5 Min.', note: 'HINGE — Hauptübung. Triples, 1-2 Reps im Tank. Jede Woche +2.5 kg' },
+        // --- HAUPTÜBUNGEN (Hinge + Press + Pull) ---
+        { id: 'trap-bar-deadlift', sets: '4 × 3 @ 88-93%', rest: '3-5 Min.', note: 'HINGE — Hauptübung. Triples, 1-2 Reps im Tank. +2.5 kg/Woche' },
         { id: 'bench-press', sets: '4 × 3 @ 85-90%', rest: '3 Min.', note: 'PRESS — kontrolliert runter (2s), explosiv hoch. Barspeed > Gewicht' },
         { id: 'pull-ups', sets: '4 × 3-5 gewichtet', rest: '2 Min.', note: 'PULL — +10-25 kg. Gegengewicht zum Schlagen = Schulterschutz' },
-        // --- ERGÄNZUNG (Single-Leg + Core + Prehab) ---
+        // --- ERGÄNZUNG (Single-Leg + Core + Prehab + Grip) ---
         { id: 'single-leg-rdl', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'SINGLE-LEG — deckt Links-Rechts-Defizite auf' },
         { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'CORE — Anti-Rotation, überträgt Beinkraft auf Faust' },
-        { id: 'face-pulls', sets: '3 × 15', rest: '45 Sek.', note: 'PREHAB — bei jedem Training. Nicht optional' }
+        { id: 'face-pulls', sets: '3 × 15', rest: '45 Sek.', note: 'PREHAB — bei jedem Training. Nicht optional' },
+        { id: 'wrist-roller', sets: '2 × hoch + runter', rest: '30 Sek.', note: 'GRIP — Faust- und Handgelenk-Kraft für Impact' }
       ],
       hint: 'Schwer aber nie bis zum Versagen (RPE 8-9). Alternativ: 5×5 @ 80% mit +2.5 kg/Woche. Echte 1RM nur alle 8-12 Wochen zum Testen.',
       hasHeavyLegs: true, duration: 50
     },
     {
       key: 'B', title: 'Power + Schnellkraft', rpe: 8,
-      warmup: 'Pogo Jumps 3×15 + Lateral Bounds 2×4 + Hip CARs — Plyometrisches Aufwärmen (Boxing Science)',
-      cooldown: 'Lockeres Ausschütteln + Dehnung Hüftbeuger und Schultern',
+      warmup: 'Pogo Jumps 3×15 + Lateral Bounds 2×4 + Hip CARs + Band External Rotation 2×10 — Plyometrisches Aufwärmen',
+      cooldown: 'Foam Rolling + Dehnung Hüftbeuger und Schultern',
       exercises: [
-        // --- HAUPTÜBUNGEN (Explosive Hinge + Rotation + Press) ---
+        // --- HAUPTÜBUNGEN (Explosive Squat + Rotation + Press) ---
         { id: 'jump-squat', sets: '4 × 4 @ 40-60%', rest: '2-3 Min.', note: 'SQUAT-POWER — Optimaler Power-Load (Loturco). So hoch wie möglich!' },
         { id: 'med-ball-rotation', sets: '4 × 5 pro Seite', rest: '90 Sek.', note: 'ROTATION — exakt wie ein Haken. 4-5 kg Ball, Kraft aus der Hüfte' },
         { id: 'landmine-press', sets: '3 × 5 pro Arm', rest: '90 Sek.', note: 'PRESS-POWER — explosiv wie einen Cross drücken' },
-        // --- ERGÄNZUNG (Plyo + Core + Prehab) ---
+        // --- ERGÄNZUNG (Plyo + Hinge + Schulter-Ausdauer + Prehab) ---
         { id: 'explosive-pushup', sets: '4 × 5', rest: '90 Sek.', note: 'PLYO — Hände müssen abheben. Langsam → Set beenden' },
         { id: 'hip-thrust', sets: '3 × 6 explosiv', rest: '60 Sek.', note: 'HINGE-POWER — Hüfte explosiv oben, 1 Sek. halten' },
+        { id: 'battle-ropes', sets: '4 × 20 Sek. / 40 Sek. Pause', rest: '', note: 'SCHULTER-AUSDAUER — Guard bleibt oben in Runde 3' },
         { id: 'face-pulls', sets: '2 × 20', rest: '30 Sek.', note: 'PREHAB — Schulter-Schutz' }
       ],
       hint: 'Geschwindigkeit zählt, nicht Gewicht. Wenn Bewegung langsam wird → Set beenden. Min. 48h nach Maximalkraft.',
@@ -4569,8 +4577,8 @@ function generateSmartWeekPlan() {
   scDays.sort(function(a, b) { return a - b; }); // chronological order
 
   // Assign S&C templates: 1× Maximalkraft (A) + 1× Power (B) bei 2 Sessions/Woche
-  // Boxing Science Standard-Split für 3-4x Boxing
-  var scPattern = [0, 1]; // Maximalkraft, Power
+  // Deload: nur 1× Power (leichtere CNS-Belastung)
+  var scPattern = isDeload ? [1] : [0, 1]; // Deload: nur Power | Normal: Kraft + Power
   var scAssignments = {}; // di -> template index
   scDays.forEach(function(di, slotIdx) {
     var nextDi = (di + 1) % 7;
@@ -4903,7 +4911,7 @@ function _renderWeekPlanInner() {
       <div class="page-title">WOCHEN<span>PLAN</span></div>
       <div class="page-sub">Dein Plan passt sich an dein Level, Equipment und Kampfdatum an.</div>
       <div style="margin-top:8px;"><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${weekNum===4?'var(--green)':weekNum===3?'var(--red)':'var(--blue)'};letter-spacing:1px;">WOCHE ${weekNum}: ${weekLabel}</span>
-      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;margin-left:8px;">${weekNum===1?'Grundlagen aufbauen':weekNum===2?'Volumen steigern':weekNum===3?'Intensitaet hoch, Volumen runter':weekNum===4?'Erholung – halbes Volumen':''}${volumeMult<1?' · Volumen x'+volumeMult:''}</span></div>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;margin-left:8px;">${weekNum===1?'Grundlagen aufbauen':weekNum===2?'Volumen steigern':weekNum===3?'Intensität hoch, Volumen runter':weekNum===4?'Erholung – halbes Volumen':''}${volumeMult<1?' · Volumen x'+volumeMult:''}</span></div>
     </div>
     ${(function() {
       var hints = [];
