@@ -5100,12 +5100,54 @@ function _renderWeekPlanInner() {
 }
 
 function regenerateWeekPlan() {
-  if (!confirm('Plan neu generieren? Manuelle Änderungen werden überschrieben.')) return;
   const data = getData();
   if (!data) return;
+
+  // Collect pinned blocks before regenerating
+  var pinnedBlocks = {};
+  if (data.weekPlan) {
+    ['mo','di','mi','do','fr','sa','so'].forEach(function(day) {
+      (data.weekPlan[day] || []).forEach(function(b) {
+        if (b.pinned) {
+          if (!pinnedBlocks[day]) pinnedBlocks[day] = [];
+          pinnedBlocks[day].push(b);
+        }
+      });
+    });
+  }
+
+  var hasPinned = Object.keys(pinnedBlocks).length > 0;
+  if (!hasPinned) {
+    if (!confirm('Plan neu generieren?')) return;
+  } else {
+    if (!confirm('Plan neu generieren? Deine manuellen Blöcke (' + Object.keys(pinnedBlocks).length + ' Tage) bleiben erhalten.')) return;
+  }
+
   data.weekPlan = generateSmartWeekPlan();
   data.weekPlanGenerated = new Date().toISOString();
   data._weekPlanKey = null;
+
+  // Re-insert pinned blocks
+  if (hasPinned) {
+    ['mo','di','mi','do','fr','sa','so'].forEach(function(day) {
+      if (!pinnedBlocks[day]) return;
+      pinnedBlocks[day].forEach(function(pb) {
+        // Remove auto-generated block at same time slot (±30 min)
+        var pbMin = parseInt((pb.time || '00:00').split(':')[0]) * 60 + parseInt((pb.time || '00:00').split(':')[1] || 0);
+        data.weekPlan[day] = (data.weekPlan[day] || []).filter(function(b) {
+          if (b.pinned) return true;
+          var bMin = parseInt((b.time || '00:00').split(':')[0]) * 60 + parseInt((b.time || '00:00').split(':')[1] || 0);
+          return Math.abs(bMin - pbMin) > 30;
+        });
+        data.weekPlan[day].push(pb);
+      });
+      // Sort by time
+      data.weekPlan[day].sort(function(a, b) { return (a.time || '').localeCompare(b.time || ''); });
+    });
+    // Re-run constraints
+    autoAdjustWeekPlan(data, 'mo', 0);
+  }
+
   saveData(data);
   renderWeekPlan();
 }
@@ -5359,15 +5401,95 @@ function saveBlock() {
   const data = getData();
   if (!data) return;
   const existing = data.weekPlan[editingBlock.day][editingBlock.idx];
+  var newType = document.getElementById('block-edit-type').value;
+  var newTime = document.getElementById('block-edit-time').value;
+  var newTitle = document.getElementById('block-edit-title').value;
+
+  // Mark as manually edited (pinned)
   data.weekPlan[editingBlock.day][editingBlock.idx] = {
-    title: document.getElementById('block-edit-title').value,
-    time: document.getElementById('block-edit-time').value,
-    type: document.getElementById('block-edit-type').value,
-    exercises: existing ? existing.exercises : undefined
+    title: newTitle,
+    time: newTime,
+    type: newType,
+    exercises: existing ? existing.exercises : undefined,
+    warmup: existing ? existing.warmup : undefined,
+    cooldown: existing ? existing.cooldown : undefined,
+    hint: existing ? existing.hint : undefined,
+    rpe: existing ? existing.rpe : undefined,
+    duration: existing ? existing.duration : undefined,
+    pinned: true
   };
+
+  // Auto-adjust rest of the week based on this change
+  autoAdjustWeekPlan(data, editingBlock.day, editingBlock.idx);
+
   saveData(data);
   closeBlockModal();
   renderWeekPlan();
+}
+
+function autoAdjustWeekPlan(data, changedDay, changedIdx) {
+  var wp = data.weekPlan;
+  if (!wp) return;
+  var changedBlock = wp[changedDay][changedIdx];
+
+  // Count S&C, HIIT, and cardio across the week
+  var scCount = 0, hiitCount = 0;
+  var DAY_KEYS = ['mo','di','mi','do','fr','sa','so'];
+
+  DAY_KEYS.forEach(function(day) {
+    (wp[day] || []).forEach(function(b) {
+      if (b.type === 'strength') scCount++;
+      if (b.title && b.title.indexOf('HIIT') !== -1) hiitCount++;
+    });
+  });
+
+  // Rule 1: If user added a strength block, check if we exceed max 2 S&C
+  if (changedBlock.type === 'strength' && scCount > 2) {
+    // Remove the oldest non-pinned strength block
+    DAY_KEYS.forEach(function(day) {
+      (wp[day] || []).forEach(function(b, bi) {
+        if (b.type === 'strength' && !b.pinned && scCount > 2 && !(day === changedDay && bi === changedIdx)) {
+          wp[day].splice(bi, 1);
+          scCount--;
+          showToast('Kraft-Block an ' + day.toUpperCase() + ' entfernt (max 2/Woche)', 'info', 3000);
+        }
+      });
+    });
+  }
+
+  // Rule 2: If user added HIIT, remove duplicate HIIT on other days
+  if (changedBlock.title && changedBlock.title.indexOf('HIIT') !== -1 && hiitCount > 1) {
+    DAY_KEYS.forEach(function(day) {
+      if (day === changedDay) return;
+      wp[day] = (wp[day] || []).filter(function(b, bi) {
+        if (b.title && b.title.indexOf('HIIT') !== -1 && !b.pinned) {
+          showToast('HIIT an ' + day.toUpperCase() + ' entfernt (max 1/Woche)', 'info', 3000);
+          return false;
+        }
+        return true;
+      });
+    });
+  }
+
+  // Rule 3: No S&C on same day as sparring
+  DAY_KEYS.forEach(function(day) {
+    var blocks = wp[day] || [];
+    var hasSparring = blocks.some(function(b) { return b.type === 'boxing' && b.title && b.title.toLowerCase().indexOf('sparring') !== -1; });
+    if (hasSparring) {
+      wp[day] = blocks.filter(function(b) {
+        if (b.type === 'strength' && !b.pinned) {
+          showToast('Kraft an ' + day.toUpperCase() + ' entfernt (Sparring-Tag)', 'info', 3000);
+          return false;
+        }
+        return true;
+      });
+    }
+  });
+
+  // Rule 4: Sort blocks by time on the changed day
+  wp[changedDay].sort(function(a, b) {
+    return (a.time || '').localeCompare(b.time || '');
+  });
 }
 
 function deleteBlock() {
