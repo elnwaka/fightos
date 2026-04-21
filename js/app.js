@@ -5413,7 +5413,20 @@ function editBlock(day, idx) {
   editingBlock = { day, idx };
   document.getElementById('block-edit-title').value = block.title;
   document.getElementById('block-edit-time').value = block.time;
-  document.getElementById('block-edit-type').value = block.type;
+  // Match block to template by title
+  var sel = document.getElementById('block-edit-type');
+  var matched = 'custom';
+  if (block.title && block.title.indexOf('Maximalkraft') !== -1) matched = 'tpl_maxkraft';
+  else if (block.title && (block.title.indexOf('Power') !== -1 || block.title.indexOf('Schnellkraft') !== -1)) matched = 'tpl_power';
+  else if (block.title && block.title.indexOf('HIIT') !== -1) matched = 'tpl_hiit';
+  else if (block.title && block.title.indexOf('Zone 2') !== -1) matched = 'tpl_zone2';
+  else if (block.title && block.title.indexOf('Sparring') !== -1) matched = 'sparring';
+  else if (block.type === 'boxing') matched = 'boxing';
+  else if (block.type === 'recovery') matched = 'recovery';
+  else if (block.title && (block.title.indexOf('Dehnung') !== -1 || block.title.indexOf('Atemtraining') !== -1)) matched = 'tpl_mobility';
+  else if (block.type === 'off') matched = 'off';
+  else if (block.type === 'meta') matched = 'meta';
+  sel.value = matched;
   var modal = document.getElementById('block-modal');
   modal.classList.add('active');
   modal.setAttribute('role', 'dialog');
@@ -5439,30 +5452,118 @@ function addBlock(day) {
   openModalFocus(modal);
 }
 
+// Session templates for edit modal — full workout presets
+var SESSION_TEMPLATES = {
+  tpl_maxkraft: function() {
+    return {
+      type: 'strength', title: 'Krafttraining: Maximalkraft', rpe: 9, duration: 50,
+      warmup: 'Foam Rolling 2 Min. + Band Pull-Aparts 2×15 + Shoulder Dislocates + Aufwärmsätze',
+      cooldown: 'Foam Rolling + Stretching: Hüftbeuger, Schultern, Brust',
+      hint: 'Schwer aber nie bis zum Versagen (RPE 8-9). 3-5 Min. Pause.',
+      exercises: [
+        { id: 'trap-bar-deadlift', sets: '4 × 3 @ 88-93%', rest: '3-5 Min.', note: 'HINGE' },
+        { id: 'bench-press', sets: '4 × 3 @ 85-90%', rest: '3 Min.', note: 'PRESS' },
+        { id: 'pull-ups', sets: '4 × 3-5 gewichtet', rest: '2 Min.', note: 'PULL' },
+        { id: 'single-leg-rdl', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'SINGLE-LEG' },
+        { id: 'pallof-press', sets: '3 × 8 pro Seite', rest: '60 Sek.', note: 'CORE' },
+        { id: 'face-pulls', sets: '3 × 15', rest: '45 Sek.', note: 'PREHAB' },
+        { id: 'wrist-roller', sets: '2 × hoch + runter', rest: '30 Sek.', note: 'GRIP' }
+      ]
+    };
+  },
+  tpl_power: function() {
+    return {
+      type: 'strength', title: 'Krafttraining: Power + Schnellkraft', rpe: 8, duration: 45,
+      warmup: 'Pogo Jumps 3×15 + Lateral Bounds 2×4 + Hip CARs + Band External Rotation',
+      cooldown: 'Foam Rolling + Dehnung Hüftbeuger und Schultern',
+      hint: 'Geschwindigkeit zählt, nicht Gewicht. Langsam → Set beenden.',
+      exercises: [
+        { id: 'jump-squat', sets: '4 × 4 @ 40-60%', rest: '2-3 Min.', note: 'SQUAT-POWER' },
+        { id: 'med-ball-rotation', sets: '4 × 5 pro Seite', rest: '90 Sek.', note: 'ROTATION' },
+        { id: 'landmine-press', sets: '3 × 5 pro Arm', rest: '90 Sek.', note: 'PRESS-POWER' },
+        { id: 'explosive-pushup', sets: '4 × 5', rest: '90 Sek.', note: 'PLYO' },
+        { id: 'hip-thrust', sets: '3 × 6 explosiv', rest: '60 Sek.', note: 'HINGE-POWER' },
+        { id: 'battle-ropes', sets: '4 × 20/40 Sek.', rest: '', note: 'SCHULTER-AUSDAUER' },
+        { id: 'face-pulls', sets: '2 × 20', rest: '30 Sek.', note: 'PREHAB' }
+      ]
+    };
+  },
+  tpl_hiit: function() {
+    return {
+      type: 'cardio', title: 'HIIT — VO2max', rpe: 9, duration: 35,
+      warmup: '5 Min. einlaufen + dynamisches Stretching',
+      cooldown: '5 Min. auslaufen + Dehnung',
+      hint: 'Härteste Cardio der Woche. Nicht Tag vor/nach Sparring.',
+      exercises: [
+        { id: 'hiit-4x4', sets: '4 × 4 Min. @ >90% HFmax', rest: '3 Min. aktiv', note: '4 Runden Vollgas + aktive Erholung' }
+      ]
+    };
+  },
+  tpl_zone2: function() {
+    return {
+      type: 'cardio', title: 'Zone 2 — Aerobe Basis', rpe: 4, duration: 40,
+      warmup: '5 Min. locker einlaufen',
+      cooldown: 'Dehnung Waden, Oberschenkel',
+      hint: 'Du solltest dich unterhalten können. Puls 120-140.',
+      exercises: [
+        { id: 'zone2', sets: '35-40 Min.', rest: '', note: 'Laufen oder Radfahren. Puls 120-140.' }
+      ]
+    };
+  },
+  tpl_mobility: function() {
+    return {
+      type: 'recovery', title: 'Dehnung + Atemtraining', rpe: 2, duration: 20,
+      warmup: '', cooldown: 'Dehnung 10 Min.',
+      hint: 'Erholung hat Priorität.',
+      exercises: [
+        { id: 'imt', sets: '30 Atemzüge', rest: '', note: 'Atemtraining' },
+        { id: 'hip-cars', sets: '5 Kreise pro Richtung', rest: '', note: 'Hüfte mobilisieren' },
+        { id: 'thoracic-rotation', sets: '3 × 8 pro Seite', rest: '', note: 'BWS öffnen' }
+      ]
+    };
+  }
+};
+
+function onBlockTemplateChange(val) {
+  var tpl = SESSION_TEMPLATES[val];
+  if (tpl) {
+    document.getElementById('block-edit-title').value = tpl().title;
+  }
+}
+
 function saveBlock() {
   if (!editingBlock) return;
   const data = getData();
   if (!data) return;
-  const existing = data.weekPlan[editingBlock.day][editingBlock.idx];
-  var newType = document.getElementById('block-edit-type').value;
+  var selectVal = document.getElementById('block-edit-type').value;
   var newTime = document.getElementById('block-edit-time').value;
   var newTitle = document.getElementById('block-edit-title').value;
 
-  // Mark as manually edited (pinned)
-  data.weekPlan[editingBlock.day][editingBlock.idx] = {
-    title: newTitle,
-    time: newTime,
-    type: newType,
-    exercises: existing ? existing.exercises : undefined,
-    warmup: existing ? existing.warmup : undefined,
-    cooldown: existing ? existing.cooldown : undefined,
-    hint: existing ? existing.hint : undefined,
-    rpe: existing ? existing.rpe : undefined,
-    duration: existing ? existing.duration : undefined,
-    pinned: true
-  };
+  var tplFn = SESSION_TEMPLATES[selectVal];
+  var block;
+  if (tplFn) {
+    // Template selected — fill everything from preset
+    block = tplFn();
+    block.time = newTime;
+    if (newTitle && newTitle !== block.title) block.title = newTitle;
+    block.pinned = true;
+  } else {
+    // Simple type (boxing, sparring, recovery, etc.)
+    var existing = data.weekPlan[editingBlock.day][editingBlock.idx];
+    var actualType = selectVal === 'sparring' ? 'boxing' : selectVal === 'custom' ? 'meta' : selectVal;
+    block = {
+      title: selectVal === 'sparring' ? 'Sparring im Verein' : selectVal === 'boxing' ? 'Boxtraining im Verein' : (newTitle || 'Block'),
+      time: newTime, type: actualType,
+      hint: selectVal === 'sparring' ? 'Sparring — Dauer und RPE danach eintragen.' : (existing ? existing.hint : ''),
+      rpe: selectVal === 'sparring' || selectVal === 'boxing' ? 0 : (existing ? existing.rpe : 5),
+      duration: selectVal === 'sparring' || selectVal === 'boxing' ? 0 : (existing ? existing.duration : 30),
+      pinned: true
+    };
+  }
 
-  // Auto-adjust rest of the week based on this change
+  data.weekPlan[editingBlock.day][editingBlock.idx] = block;
+
+  // Auto-adjust rest of the week
   autoAdjustWeekPlan(data, editingBlock.day, editingBlock.idx);
 
   saveData(data);

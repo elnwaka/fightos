@@ -506,15 +506,29 @@ if (localStorage.getItem('fos_current')) {
         <input type="time" id="block-edit-time" class="form-input">
       </div>
       <div class="form-group-inline">
-        <label>Typ</label>
-        <select id="block-edit-type" class="form-select">
-          <option value="strength">Kraft</option>
-          <option value="boxing">Boxen</option>
-          <option value="cardio">Cardio</option>
-          <option value="recovery">Recovery</option>
-          <option value="meta">Meta / BET</option>
-          <option value="fight">Kampf</option>
-          <option value="off">Ruhe</option>
+        <label>Einheit</label>
+        <select id="block-edit-type" class="form-select" onchange="onBlockTemplateChange(this.value)">
+          <optgroup label="Kraft & Power">
+            <option value="tpl_maxkraft">Maximalkraft (RPE 9)</option>
+            <option value="tpl_power">Power + Schnellkraft (RPE 8)</option>
+          </optgroup>
+          <optgroup label="Ausdauer">
+            <option value="tpl_hiit">HIIT — VO2max (RPE 9)</option>
+            <option value="tpl_zone2">Zone 2 — Aerobe Basis (RPE 4)</option>
+          </optgroup>
+          <optgroup label="Boxen">
+            <option value="boxing">Boxtraining im Verein</option>
+            <option value="sparring">Sparring im Verein</option>
+          </optgroup>
+          <optgroup label="Erholung">
+            <option value="recovery">Aktive Erholung</option>
+            <option value="tpl_mobility">Dehnung + Atemtraining</option>
+          </optgroup>
+          <optgroup label="Sonstiges">
+            <option value="meta">Mental / BET</option>
+            <option value="off">Ruhetag</option>
+            <option value="custom">Eigener Block</option>
+          </optgroup>
         </select>
       </div>
     </div>
