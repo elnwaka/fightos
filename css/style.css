@@ -1552,10 +1552,9 @@ body::before {
   font-size: var(--fs-sm);
   color: #999;
   line-height: 1.85;
-  overflow: hidden;
 }
 .faq-item.open .faq-a { grid-template-rows: 1fr; }
-.faq-a > * { overflow: hidden; min-height: 0; }
+.faq-a > * { overflow: hidden; }
 .faq-a-inner { padding: 0 0 18px; }
 .faq-a strong { color: var(--white); }
 
@@ -2657,14 +2656,12 @@ body::before {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows .35s ease;
-  overflow: hidden;
 }
 .mt-acc.open .mt-acc-body {
   grid-template-rows: 1fr;
 }
 .mt-acc-body > * {
   overflow: hidden;
-  min-height: 0;
 }
 .mt-acc-inner {
   padding: 8px 4px 32px 46px;
@@ -2797,7 +2794,6 @@ body::before {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows .35s ease;
-  overflow: hidden;
 }
 .pd-section.open .pd-body,
 .pd-section.open-default .pd-body {
@@ -2805,7 +2801,6 @@ body::before {
 }
 .pd-body > * {
   overflow: hidden;
-  min-height: 0;
 }
 .pd-inner {
   padding: 0 4px 28px;
