@@ -4877,10 +4877,11 @@ function renderWeekPlan() {
 function _renderWeekPlanInner() {
   const data = getData();
   if (!data) return;
+  const s = getUserSchedule();
   // Only generate if NO plan exists at all — never overwrite manual edits
   if (!data.weekPlan || Object.keys(data.weekPlan).length === 0) {
     data.weekPlan = generateSmartWeekPlan();
-    data._weekPlanKey = (data.fightDate || '') + '|' + JSON.stringify(getUserSchedule().weekSchedule);
+    data._weekPlanKey = (data.fightDate || '') + '|' + JSON.stringify(s.weekSchedule);
     saveData(data);
   }
   const plan = data.weekPlan;
