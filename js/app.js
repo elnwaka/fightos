@@ -1443,7 +1443,7 @@ function calcProfileScores(data) {
   const hrv = data.hrv || [];
 
   function pct(val, target) {
-    return val ? Math.min(100, (val / target) * 100) : null;
+    return val ? Math.round(Math.min(100, (val / target) * 100)) : null;
   }
   function avg(tests) {
     const filled = tests.filter(t => t !== null);
