@@ -5066,7 +5066,6 @@ function _renderWeekPlanInner() {
               <span style="display:flex;gap:2px;margin-left:auto;">${daySäulenDots}</span>
             </div>
           </div>
-          ${(s.weekSchedule[day] && s.weekSchedule[day].type === 'sparring' && blocks.some(b => b.type === 'strength')) ? '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--orange);padding:4px 8px;">\u26A0 S&C + Sparring = Verletzungsrisiko</div>' : ''}
           <div class="day-blocks">
             ${blocks.map((b, bi) => {
               const logKey = day + '_' + bi + '_' + getWeekId();
