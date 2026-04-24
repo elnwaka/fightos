@@ -1427,47 +1427,30 @@ function buildUpcomingFightsHTML(data) {
 
 // ===== DASHBOARD STATS – MEASURABLE PERFORMANCE PROFILE =====
 
-// 3 radar axes – only real, testable performance dimensions
-// 8 SÄULEN = 8 RADAR-ACHSEN (das Fundament der App)
+// 3 Radar-Achsen — nur echte, messbare Leistungsdimensionen
+// Kognition, Mental, Ring IQ, Mobilität entfernt (nicht objektiv messbar)
+// Ernährung entfernt (KFA misst Disziplin, nicht Leistung)
 const RADAR_AXES = [
   { key:'kraft',    label:'KRAFT',        color:'var(--red)',    hex:'#e8000d', saeulenIdx:0 },
   { key:'metabol',  label:'AUSDAUER',     color:'var(--blue)',   hex:'#2979ff', saeulenIdx:1 },
-  { key:'kognitiv', label:'KOGNITION',    color:'var(--purple)', hex:'#ab47bc', saeulenIdx:2 },
-  { key:'ernaehr',  label:'ERNÄHRUNG',    color:'var(--green)',  hex:'#4caf50', saeulenIdx:3 },
-  { key:'recovery', label:'REGENERATION', color:'var(--orange)', hex:'#ff6d00', saeulenIdx:4 },
-  { key:'ringiQ',   label:'RING IQ',      color:'var(--gold)',   hex:'#f5c518', saeulenIdx:5 },
-  { key:'psyche',   label:'MENTAL',       color:'#00bcd4',       hex:'#00bcd4', saeulenIdx:6 },
-  { key:'mobil',    label:'MOBILITÄT',    color:'#8bc34a',       hex:'#8bc34a', saeulenIdx:7 }
+  { key:'recovery', label:'REGENERATION', color:'var(--orange)', hex:'#ff6d00', saeulenIdx:4 }
 ];
 
 function calcProfileScores(data) {
   const b = data.benchmarks || {};
   const s = getUserSchedule();
   const bw = parseFloat(s.weight) || 75;
-  const age = getUserAge() || 25;
-  const bfTarget = age < 25 ? 8 : age <= 35 ? 10 : 12;
-  const log = data.log || [];
-  const fights = data.fights || [];
   const hrv = data.hrv || [];
-  const sr = data.saeulenRatings || {};
 
   function pct(val, target) {
     return val ? Math.min(100, (val / target) * 100) : null;
-  }
-  function inversePct(val, target) {
-    if (!val) return null;
-    const upper = 25;
-    return Math.min(100, Math.max(0, ((upper - val) / (upper - target)) * 100));
   }
   function avg(tests) {
     const filled = tests.filter(t => t !== null);
     return filled.length ? Math.round(filled.reduce((a, v) => a + v, 0) / filled.length) : null;
   }
-  function ratingPct(key) {
-    return sr[key] ? Math.round(sr[key] * 20) : null; // 1-5 → 20-100%
-  }
 
-  // S1: KRAFT – Benchmarks (Deadlift, Klimmzüge, CMJ, Schlagfrequenz)
+  // KRAFT — 4 messbare Benchmarks
   const kraft = avg([
     pct(b.deadlift, bw * 2.5),
     pct(b.pullups, scaleByWeight(bw, PULLUP_TIERS)),
@@ -1475,57 +1458,20 @@ function calcProfileScores(data) {
     pct(b.punch_freq, scaleByWeight(bw, PUNCH_TIERS))
   ]);
 
-  // S2: METABOLISCH – Cooper-Test + Selbsteinschätzung
-  const metabol = avg([
-    pct(b.cooper, scaleByWeight(bw, COOPER_TIERS)),
-    ratingPct('metabol')
-  ]);
+  // AUSDAUER — nur Cooper-Test (objektiv)
+  const metabol = pct(b.cooper, scaleByWeight(bw, COOPER_TIERS));
 
-  // S3: KOGNITION – Selbsteinschätzung (Reaktion, Antizipation, Entscheidung)
-  const kognitiv = ratingPct('kognitiv');
-
-  // S4: ERNÄHRUNG – Bodyfat + Selbsteinschätzung
-  const ernaehr = avg([
-    inversePct(b.bodyfat, bfTarget),
-    ratingPct('ernaehr')
-  ]);
-
-  // S5: REGENERATION – HRV-Daten + Selbsteinschätzung
-  var recoveryScore = null;
+  // REGENERATION — HRV-Daten (letzte 7 Tage, nicht erste 7)
+  var recovery = null;
   if (hrv.length >= 7) {
-    var recent = hrv.slice(0, 7);
-    var avg7 = recent.reduce(function(s, h) { return s + h.value; }, 0) / recent.length;
-    var greenDays = 0;
-    recent.forEach(function(h) { if (h.value >= avg7 * 0.95) greenDays++; });
-    recoveryScore = Math.round(greenDays / 7 * 100);
+    var recent7 = hrv.slice(-7); // Bug fix: war slice(0,7)
+    var hrvValues = recent7.map(function(h) { return h.value || h; });
+    var avg7 = hrvValues.reduce(function(a, v) { return a + v; }, 0) / hrvValues.length;
+    var greenDays = hrvValues.filter(function(v) { return v >= avg7 * 0.95; }).length;
+    recovery = Math.round(greenDays / 7 * 100);
   }
-  const recovery = avg([recoveryScore, ratingPct('recovery')]);
 
-  // S6: RING IQ – Kampferfahrung + Selbsteinschätzung
-  var fightIQ = null;
-  if (fights.length >= 3) {
-    var wins = fights.filter(function(f) { return f.result === 'S'; }).length;
-    fightIQ = Math.round(wins / fights.length * 100);
-  }
-  const ringiQ = avg([fightIQ, ratingPct('ringiQ')]);
-
-  // S7: PSYCHE – Selbsteinschätzung
-  const psyche = ratingPct('psyche');
-
-  // S8: MOBILITÄT – Selbsteinschätzung + Mobility-Training-Häufigkeit
-  var mobilLog = null;
-  var last30 = log.filter(function(e) {
-    var d = new Date(e.date);
-    return (Date.now() - d.getTime()) < 30 * 86400000;
-  });
-  if (last30.length >= 4) {
-    var mobilCount = last30.filter(function(e) { return e.type === 'mobility'; }).length;
-    // 8+ Mobility-Sessions im Monat = 100% (ca. 2x/Woche)
-    mobilLog = Math.min(100, Math.round(mobilCount / 8 * 100));
-  }
-  const mobil = avg([mobilLog, ratingPct('mobil')]);
-
-  return { kraft, metabol, kognitiv, ernaehr, recovery, ringiQ, psyche, mobil };
+  return { kraft: kraft, metabol: metabol, recovery: recovery };
 }
 
 function renderDashStats() {
@@ -6846,7 +6792,7 @@ function renderDashboard() {
 
     // ══ FOOTER ══
     '<div id="bench-summary" style="padding:8px 0;font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
-    '<div class="dash-hide-mobile"><div id="saeulen-self-rating"></div></div>' +
+    '' +
 
     '</div>'; // close db-content
 
@@ -6983,7 +6929,7 @@ function renderBenchSummary() {
   const BENCH = getBenchmarks();
   const filled = BENCH.filter(x => b[x.id] && b[x.id] > 0).length;
   const scores = calcProfileScores(data);
-  const vals = [scores.kraft, scores.metabol, scores.ernaehr].filter(v => v !== null);
+  const vals = [scores.kraft, scores.metabol, scores.recovery].filter(v => v !== null);
   const avg = vals.length ? Math.round(vals.reduce((a,v) => a+v, 0) / vals.length) : null;
 
   // Mini Sparklines für Top-3 Benchmarks (meiste History)
