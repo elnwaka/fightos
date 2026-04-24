@@ -5328,7 +5328,7 @@ function openBlockDetail(day, idx) {
   }
 
   // Day select options
-  var daySelectHTML = '<select id="bd-move-day" onchange="moveBlockToDay(\'' + day + '\',' + idx + ',this.value)" style="font-family:\'Space Mono\',monospace;font-size:11px;background:var(--surface-0);color:var(--white);border:1px solid var(--surface-2);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;">';
+  var daySelectHTML = '<select id="bd-move-day" onchange="moveBlockToDay(\'' + day + '\',' + idx + ',this.value)" style="font-family:\'Space Mono\',monospace;font-size:14px;background:var(--surface-0);color:var(--white);border:1px solid var(--surface-2);border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer;min-height:40px;">';
   ['mo','di','mi','do','fr','sa','so'].forEach(function(d) {
     daySelectHTML += '<option value="' + d + '"' + (d === day ? ' selected' : '') + '>' + (DAY_LABEL_MAP[d] || d) + '</option>';
   });
@@ -5351,7 +5351,7 @@ function openBlockDetail(day, idx) {
     '<div class="bd-hero-content">' +
       '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
         daySelectHTML +
-        '<input type="time" value="' + (block.time || '08:00') + '" onchange="changeBlockTime(\'' + day + '\',' + idx + ',this.value)" style="font-family:\'Space Mono\',monospace;font-size:12px;background:var(--surface-0);color:var(--white);border:1px solid var(--surface-2);border-radius:var(--radius-sm);padding:4px 8px;">' +
+        '<input type="time" value="' + (block.time || '08:00') + '" onchange="changeBlockTime(\'' + day + '\',' + idx + ',this.value)" style="font-family:\'Space Mono\',monospace;font-size:14px;background:var(--surface-0);color:var(--white);border:1px solid var(--surface-2);border-radius:var(--radius-sm);padding:8px 12px;min-height:40px;">' +
         (block.pinned ? '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--gold);border:1px solid var(--gold);padding:2px 6px;border-radius:var(--radius-sm);">MANUELL</span>' : '') +
       '</div>' +
       '<div class="bd-title">' + (block.title || '').replace(/</g,'&lt;') + '</div>' +
@@ -6694,8 +6694,8 @@ function renderDashboard() {
             (nextBlock.duration > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-top:4px;">' + nextBlock.duration + ' Min.' + (nextBlock.rpe > 0 ? ' \u00b7 RPE ' + nextBlock.rpe : '') + '</div>' : '') +
             hrvWarn +
             '<div style="display:flex;gap:8px;margin-top:12px;">' +
-              '<button onclick="event.stopPropagation();toggleBlockDone(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ',\'' + nextBlock.type + '\',\'' + (nextBlock.title||'').replace(/'/g,'') + '\')" style="padding:10px 20px;font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1px;border:none;border-radius:var(--radius-sm);cursor:pointer;background:var(--red);color:#fff;">ERLEDIGT \u2713</button>' +
-              '<button onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" style="padding:10px 16px;font-family:\'Space Mono\',monospace;font-size:11px;border:1px solid var(--surface-3);background:none;border-radius:var(--radius-sm);cursor:pointer;color:#555;">DETAILS</button>' +
+              '<button onclick="event.stopPropagation();toggleBlockDone(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ',\'' + nextBlock.type + '\',\'' + (nextBlock.title||'').replace(/'/g,'') + '\')" style="padding:12px 20px;font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1px;border:none;border-radius:var(--radius-sm);cursor:pointer;background:var(--red);color:#fff;min-height:44px;">ERLEDIGT \u2713</button>' +
+              '<button onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" style="padding:12px 16px;font-family:\'Space Mono\',monospace;font-size:12px;border:1px solid var(--surface-3);background:none;border-radius:var(--radius-sm);cursor:pointer;color:#555;min-height:44px;">DETAILS</button>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -6713,7 +6713,7 @@ function renderDashboard() {
         var done = data.completedBlocks && data.completedBlocks[lk];
         if (done) todayDone++;
         return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-1);">' +
-          '<button onclick="toggleBlockDone(\'' + DAY_NAMES[todayDow] + '\',' + bi + ',\'' + b.type + '\',\'' + (b.title||'').replace(/'/g,'') + '\')" style="width:28px;height:28px;border-radius:50%;border:2px solid ' + (done ? 'var(--green)' : 'var(--surface-3)') + ';background:' + (done ? 'var(--green)' : 'none') + ';color:' + (done ? '#000' : '#333') + ';font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (done ? '\u2713' : '') + '</button>' +
+          '<button onclick="toggleBlockDone(\'' + DAY_NAMES[todayDow] + '\',' + bi + ',\'' + b.type + '\',\'' + (b.title||'').replace(/'/g,'') + '\')" style="width:36px;height:36px;border-radius:50%;border:2px solid ' + (done ? 'var(--green)' : 'var(--surface-3)') + ';background:' + (done ? 'var(--green)' : 'none') + ';color:' + (done ? '#000' : '#333') + ';font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (done ? '\u2713' : '') + '</button>' +
           '<div onclick="openBlockDetail(\'' + DAY_NAMES[todayDow] + '\',' + bi + ')" style="flex:1;cursor:pointer;min-width:0;">' +
             '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:' + (done ? '#555' : 'var(--white)') + ';' + (done ? 'text-decoration:line-through;' : '') + '">' + escapeHTML(b.title) + '</div>' +
             '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;">' + (b.time||'') + (b.duration > 0 ? ' · ' + b.duration + ' Min.' : '') + '</div>' +
