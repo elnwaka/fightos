@@ -247,7 +247,7 @@ function openSaeuleDetail(idx) {
       <div class="detail-section-title">WEITERFÜHREND</div>
       <button class="link-card" onclick="showPage('${mapping.linkedPage}')">
         <span>→ ${mapping.linkedLabel}</span>
-        <span style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">Komplette Informationen</span>
+        <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">Komplette Informationen</span>
       </button>
     </div>` : ''}
   </div>`;
@@ -969,7 +969,7 @@ function renderUebungenPage() {
   </div>` : ''}
 
   <div style="margin-top:20px;padding:16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);">
-    <div style="font-size:12px;color:#444;line-height:1.6;">QUELLEN: Boxing Science (Danny Wilson BSc MSc ASCC) · Phil Daru (Daru Strong) · Ross Enamait · Collins et al. 2014 (Neck/Concussion) · Loturco et al. 2016 (Punch Force) · PMC 2024 (VRT) · ExpertBoxing</div>
+    <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">QUELLEN: Boxing Science (Danny Wilson BSc MSc ASCC) · Phil Daru (Daru Strong) · Ross Enamait · Collins et al. 2014 (Neck/Concussion) · Loturco et al. 2016 (Punch Force) · PMC 2024 (VRT) · ExpertBoxing</div>
   </div>
 
   ${renderProductCards([
@@ -990,7 +990,7 @@ function exCard(e, num, color) {
       <div class="ex-muscle">${e.muscle}</div>
     </div>
     <div class="ex-bot">${e.sets.map(s => '<span class="ex-s">'+s+'</span>').join('')}</div>
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;margin-top:8px;letter-spacing:1px;">▸ DETAILS & MUSKELGRUPPEN</div>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:8px;letter-spacing:1px;">▸ DETAILS & MUSKELGRUPPEN</div>
   </div>`;
 }
 
@@ -1416,7 +1416,7 @@ function renderExProgression(exId, color) {
 
   var data = (typeof getData === 'function') ? getData() : null;
   if (!data || !data.liftLog || !data.liftLog[exId] || data.liftLog[exId].length < 2) {
-    wrap.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;text-align:center;padding:16px;">Noch keine Gewichtsdaten. Trage dein Gewicht im Wochenplan ein.</div>';
+    wrap.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-subtle);text-align:center;padding:16px;">Noch keine Gewichtsdaten. Trage dein Gewicht im Wochenplan ein.</div>';
     return;
   }
 
@@ -1431,7 +1431,7 @@ function renderExProgression(exId, color) {
   var diff = maxW - weights[0];
 
   wrap.innerHTML =
-    '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:2px;margin-bottom:8px;">PROGRESSION</div>' +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:8px;">PROGRESSION</div>' +
     (diff !== 0 ? '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:' + (diff > 0 ? 'var(--green)' : 'var(--red)') + ';margin-bottom:8px;">' + (diff > 0 ? '+' : '') + diff.toFixed(1) + ' kg</div>' : '') +
     '<canvas id="ex-prog-canvas" height="140"></canvas>';
 
@@ -1509,7 +1509,7 @@ function renderErnaehrungPage() {
         </tbody>
       </table>
       </div>
-      <div style="font-size:11px;color:#666;">Das sind Richtwerte. Nutze den Makro-Rechner unten für deine persönlichen Werte. Dein Beruf (sitzend vs. körperlich) macht 300–600 kcal Unterschied pro Tag.</div>
+      <div style="font-size:11px;color:var(--text-subtle);">Das sind Richtwerte. Nutze den Makro-Rechner unten für deine persönlichen Werte. Dein Beruf (sitzend vs. körperlich) macht 300–600 kcal Unterschied pro Tag.</div>
     </div>
   </div>
 
@@ -1743,7 +1743,7 @@ function renderErnaehrungPage() {
     <div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">DEIN TAGES-TIMING</div>
       <div id="ern-timeline" class="timeline"></div>
-      <div style="font-family:'Space Mono',monospace;font-size:12px;color:#333;margin-top:8px;">Zeiten basieren auf deinem Profil. Ändern unter Einstellungen.</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-subtle);margin-top:8px;">Zeiten basieren auf deinem Profil. Ändern unter Einstellungen.</div>
     </div>
     <div>
       <div class="card card-top" style="--ca:var(--red);margin-bottom:12px;">
@@ -1886,7 +1886,7 @@ function renderErnaehrungPage() {
         • Koffein 3–6mg/kg (Pre-Training)<br><br>
         <strong>Geldverschwendung:</strong><br>
         BCAAs (Whey enthält sie), Testosteron-Booster, "Fat Burner", Glutamin (genug in normaler Ernährung), überteuerte Pre-Workouts (nimm Koffein-Tabletten + Kreatin).<br><br>
-        <span style="color:#666;font-size:11px;">Mehr Details auf der Supplements-Seite.</span>
+        <span style="color:var(--text-subtle);font-size:11px;">Mehr Details auf der Supplements-Seite.</span>
       </div>
     </div>
   </div>
@@ -2002,11 +2002,11 @@ function renderErnaehrungPage() {
   </div>
 
   <div style="margin-top:30px;padding:16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);">
-    <div style="font-size:12px;color:#444;line-height:1.6;">QUELLEN: ISSN Position Stand – Protein and Exercise (2017) · ACSM Nutrition and Athletic Performance (2016) · Boxing Science Nutrition Guide (Danny Wilson) · Phil Daru Fight Nutrition · Helms et al. 2014 (Protein during weight loss) · Thomas et al. 2016 (ACSM/AND/DC) · Maughan et al. 2018 (IOC Consensus) · Burke et al. 2019 (Carbohydrate for athletes) · Schoenfeld & Aragon 2018 (Protein timing meta-analysis)</div>
+    <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">QUELLEN: ISSN Position Stand – Protein and Exercise (2017) · ACSM Nutrition and Athletic Performance (2016) · Boxing Science Nutrition Guide (Danny Wilson) · Phil Daru Fight Nutrition · Helms et al. 2014 (Protein during weight loss) · Thomas et al. 2016 (ACSM/AND/DC) · Maughan et al. 2018 (IOC Consensus) · Burke et al. 2019 (Carbohydrate for athletes) · Schoenfeld & Aragon 2018 (Protein timing meta-analysis)</div>
   </div>
 
   <div class="related-links" style="margin-top:32px;padding-top:24px;border-top:1px solid var(--surface-2);display:flex;flex-wrap:wrap;gap:10px;">
-    <span style="font-family:'Space Mono',monospace;font-size:11px;color:#444;align-self:center;">SIEHE AUCH:</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);align-self:center;">SIEHE AUCH:</span>
     <button onclick="showPage('cutten')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Gewicht machen</button>
     <button onclick="showPage('supplements')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);background:none;border:1px solid rgba(0,200,83,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Supplements</button>
     <button onclick="showPage('regeneration')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Recovery</button>
@@ -2053,7 +2053,7 @@ function renderErnTimeline() {
   const typeLabels = { boxen:'Boxtraining', pa:'Partnerarbeit', pratzen:'Pratzen', sparring:'Sparring', technik:'Technik', frei:'Frei', cardio:'Cardio' };
   const dayLabel = typeLabels[today.type] || today.type;
 
-  el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;margin-bottom:12px;">Heute: ' + dayLabel + (today.time ? ' um ' + today.time : '') + '</div>' +
+  el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);margin-bottom:12px;">Heute: ' + dayLabel + (today.time ? ' um ' + today.time : '') + '</div>' +
     meals.map(m =>
       '<div class="tl-item"><div class="tl-dot" style="border-color:'+m.dot+'"></div><div class="tl-time">'+m.time+'</div><div class="tl-title">'+m.title+'</div><div class="tl-body">'+m.body+'</div></div>'
     ).join('');
@@ -2639,50 +2639,9 @@ const supplementsData = [
       '• <strong>NADA/WADA:</strong> Steht nicht auf der Verbotsliste, aber es gibt ein reales Kontaminationsrisiko bei minderwertigen Produkten (Schwermetalle, nicht deklarierte Substanzen). <strong>Nur Produkte mit NSF Certified for Sport oder Informed Sport-Zertifizierung verwenden.</strong> Es gab dokumentierte Fälle von kontaminierten Ashwagandha-Produkten.<br>' +
       '• Nicht in der Schwangerschaft.',
     studies: 'Chandrasekhar et al. 2012 (Cortisol −27,9%), Wankhede et al. 2015 (Kraft), Choudhary et al. 2015 (VO2max), Salve et al. 2019 (Schlaf)'
-  },
-  {
-    id: 'altitude-mask', name: 'Altitude Mask', category: 'SKIP',
-    dose: '–', stars: 1, color: 'var(--red)',
-    short: 'KEIN Höhenreiz. Verschlechtert Training. IMT ist besser.',
-    img: "https://images.pexels.com/photos/20523354/pexels-photo-20523354.jpeg?auto=compress&cs=tinysrgb&w=600",
-    what: 'Altitude Masks (Höhenmasken) versprechen einen Höhentrainingseffekt durch Einschränkung des Luftstroms. Die Realität: Sie simulieren KEINE Höhe. Höhentraining funktioniert über reduzierten Sauerstoff-Partialdruck (weniger O₂-Moleküle). Eine Maske reduziert nur den Luftstrom – der O₂-Gehalt der eingeatmeten Luft bleibt identisch.',
-    boxing: '<strong>Warum du sie NICHT tragen solltest:</strong><br><br>' +
-      '• <strong>Kein Höheneffekt:</strong> Kein Anstieg von EPO, keine vermehrte Bildung roter Blutkörperchen, kein echtes Höhentraining.<br>' +
-      '• <strong>Trainingsqualität sinkt:</strong> Du trainierst mit weniger Intensität, weil du durch die Maske schlechter Luft bekommst. Weniger Intensität = weniger Anpassung. Du wirst SCHLECHTER, nicht besser.<br>' +
-      '• <strong>Atemmuskel-Training ineffizient:</strong> Die Maske bietet einen unspezifischen inspiratorischen UND exspiratorischen Widerstand. IMT (PowerBreathe) trainiert gezielt die Einatmungsmuskulatur mit kontrolliertem Widerstand – nachweislich effektiver.<br>' +
-      '• <strong>CO₂-Rückatmung:</strong> Die Maske erhöht CO₂-Rückatmung → Kopfschmerzen, Schwindel, in seltenen Fällen Ohnmacht.',
-    timing: '<strong>Was stattdessen:</strong><br><br>' +
-      '• <strong>IMT (PowerBreathe):</strong> 2×30 Atemzüge pro Tag, 30 Watt aufwärts. Evidenzbasiert, boxspezifisch, dauert 5 Minuten.<br>' +
-      '• <strong>Echtes Höhentraining:</strong> Nur im Höhenlager (>2000m) oder mit Hypoxie-Zelt. Für die meisten Amateur-Boxer nicht praktikabel – und nicht nötig.',
-    warn: '<strong>Fazit:</strong><br><br>' +
-      '• Altitude Mask = Marketingprodukt ohne wissenschaftliche Basis.<br>' +
-      '• Geld sparen und in ein PowerBreathe K5 oder ähnliches IMT-Gerät investieren.<br>' +
-      '• Das Tragen einer Maske beim Training mag „hardcore" aussehen – bringt aber nichts.',
-    studies: 'Porcari et al. 2016 (keine Höhenanpassung), Granados et al. 2016, HajGhanbari et al. 2013 (IMT > Maske)'
-  },
-  {
-    id: 'jaw-trainer', name: 'Jaw Trainer / Kiefer-Trainer', category: 'SKIP',
-    dose: '–', stars: 1, color: 'var(--red)',
-    short: 'Null Evidenz für KO-Schutz. TMJ-Risiko.',
-    img: "",
-    what: 'Jaw Trainer (Jawline-Exerciser, Jawzrsize etc.) sind Silikonbälle oder Federn, auf denen man kaut, um die Kiefermuskulatur zu trainieren. Im Boxer-Kontext werden sie oft als „KO-Schutz" vermarktet – die Behauptung: ein stärkerer Kiefer = weniger KOs.',
-    boxing: '<strong>Warum das kompletter Unsinn ist:</strong><br><br>' +
-      '• <strong>KO-Mechanismus ist NICHT der Kiefer:</strong> Ein KO entsteht durch Rotation des Gehirns im Schädel. Der Kiefer ist nur der Hebel, über den die Kraft übertragen wird. Kiefermuskeln können diese Rotationskraft nicht absorbieren.<br>' +
-      '• <strong>Was wirklich vor KO schützt:</strong> NACKENMUSKULATUR. Ein starker Nacken reduziert die Kopf-Beschleunigung nach einem Treffer. Deshalb trainiert der Wochenplan gezielt Nacken-Isometrie.<br>' +
-      '• <strong>TMJ-Risiko (Kiefergelenk-Dysfunktion):</strong> Exzessives Kiefertraining kann das Kiefergelenk überlasten → chronische Schmerzen, Knacken, Bewegungseinschränkung. TMJ ist schwer behandelbar.<br>' +
-      '• <strong>Masseter-Hypertrophie:</strong> Der Kaumuskel wird größer → breiteres Gesicht. Rein kosmetisch, null funktioneller Vorteil für Boxing.<br>' +
-      '• <strong>Null Studien:</strong> Es existiert keine einzige Studie, die einen KO-schützenden Effekt von Kiefertraining zeigt.',
-    timing: '<strong>Was stattdessen:</strong><br><br>' +
-      '• <strong>Nackentraining:</strong> Isometrie 3×8 Sek. je Richtung (vorne, hinten, links, rechts). Neck Curls, Neck Extensions mit Gewicht. 4× pro Woche. Nackenumfang 42–46 cm anstreben.<br>' +
-      '• <strong>Mundschutz:</strong> Ein guter, angepasster Mundschutz (beim Zahnarzt anfertigen lassen) schützt Kiefer und Zähne 100× besser als jedes Kiefertraining.<br>' +
-      '• <strong>Defensive Technik:</strong> Kinn runter, Schulter hoch, Hände oben. Das schützt vor KO – nicht Kaumuskeln.',
-    warn: '<strong>Fazit:</strong><br><br>' +
-      '• Jaw Trainer = Instagram-Marketing, keine Wissenschaft.<br>' +
-      '• Kann dem Kiefergelenk aktiv schaden.<br>' +
-      '• Investiere die Zeit in Nackentraining – das hat echte Evidenz.',
-    studies: 'Eckner et al. 2014 (Nacken vs. Kopfbeschleunigung), Viano et al. 2005 (KO-Biomechanik), keine Studien pro Jaw Trainer'
   }
 ];
+
 
 function renderSupplementsPage() {
   const el = document.getElementById('page-supplements');
@@ -2742,7 +2701,7 @@ function openSupplementDetail(id) {
         <img src="${s.img}" alt="${s.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'height:100%;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:28px;color:#222;letter-spacing:3px;\\'>${s.name.split(' ')[0].toUpperCase()}</div>'">
       </div>
       <div class="supp-sidebar-meta">
-        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;letter-spacing:2px;margin-bottom:8px;">STECKBRIEF</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);letter-spacing:2px;margin-bottom:8px;">STECKBRIEF</div>
         <div class="supp-sidebar-row"><span>Kategorie</span><span style="color:${headerColor};">${s.category}</span></div>
         <div class="supp-sidebar-row"><span>Evidenz</span><span style="color:var(--gold);">${'★'.repeat(s.stars)}${'☆'.repeat(5 - s.stars)}</span></div>
         ${!isSkip ? `<div class="supp-sidebar-row"><span>Dosis</span><span>${s.dose}</span></div>` : ''}
@@ -2761,7 +2720,7 @@ function openSupplementDetail(id) {
           <span style="color:var(--gold);font-size:12px;letter-spacing:1px;">${'★'.repeat(s.stars)}${'☆'.repeat(5 - s.stars)}</span>
         </div>
         <h1 style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--white);line-height:1.1;">${s.name}</h1>
-        ${!isSkip ? `<div style="font-family:'Space Mono',monospace;font-size:12px;color:#555;margin-top:8px;">${s.dose}</div>` : ''}
+        ${!isSkip ? `<div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);margin-top:8px;">${s.dose}</div>` : ''}
       </header>
 
       <div class="supp-article-layout">
@@ -2780,8 +2739,8 @@ function openSupplementDetail(id) {
           </div>
 
           <div style="padding-top:24px;border-top:1px solid #151515;">
-            <div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;letter-spacing:2px;margin-bottom:8px;">QUELLEN</div>
-            <div style="font-size:11px;color:#444;line-height:1.7;">${s.studies}</div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);letter-spacing:2px;margin-bottom:8px;">QUELLEN</div>
+            <div style="font-size:11px;color:var(--text-muted);line-height:1.7;">${s.studies}</div>
           </div>
         </div>
 
@@ -2804,8 +2763,8 @@ function renderProductCards(products) {
         imgHTML +
         '<div style="flex:1;min-width:0;">' +
           '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);font-weight:600;">' + p.name + '</div>' +
-          '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-top:2px;">' + p.cat + ' · <span style="color:var(--gold);">~' + p.price + '</span></div>' +
-          '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#666;margin-top:4px;line-height:1.4;">' + p.desc + '</div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);margin-top:2px;">' + p.cat + ' · <span style="color:var(--gold);">~' + p.price + '</span></div>' +
+          '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:var(--text-subtle);margin-top:4px;line-height:1.4;">' + p.desc + '</div>' +
         '</div>' +
       '</a>';
     }).join('') +

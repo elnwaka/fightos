@@ -496,7 +496,7 @@ const OB_STEPS = [
       <div class="form-group" style="margin-top:4px;">
         <label class="form-label">BOXTRAINING (UHRZEIT)</label>
         <input class="form-input" id="ob-training" type="time" value="${obData.trainingTime||'18:00'}">
-        <div style="font-size:12px;color:#444;margin-top:4px;">Tagesgenau anpassbar unter Mein Account.</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Tagesgenau anpassbar unter Mein Account.</div>
       </div>`;
     },
     validate() {
@@ -538,7 +538,7 @@ const OB_STEPS = [
       return `<div class="form-group">
         <label class="form-label">KAMPFDATUM (OPTIONAL)</label>
         <input class="form-input" id="ob-fightdate" type="date" value="${obData.fightDate||''}">
-        <div style="font-size:12px;color:#444;margin-top:4px;">Wenn gesetzt, passt sich dein Wochenplan automatisch an die Kampfvorbereitung an.</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Wenn gesetzt, passt sich dein Wochenplan automatisch an die Kampfvorbereitung an.</div>
       </div>`;
     },
     validate() {
@@ -1357,14 +1357,14 @@ function renderFightCountdown() {
 
   const upcomingListHTML = buildUpcomingFightsHTML(data);
   const addBtnHTML = (data.upcomingFights.length < 5)
-    ? '<div style="margin-top:10px;"><button onclick="addUpcomingFight()" style="background:none;border:1px dashed #888;color:#888;padding:4px 12px;border-radius:var(--radius-md);cursor:pointer;font-size:11px;font-family:\'Space Mono\',monospace;">+ Weiteren Kampf hinzuf\u00fcgen</button></div>'
+    ? '<div style="margin-top:10px;"><button onclick="addUpcomingFight()" style="background:none;border:1px dashed #888;color:var(--grey);padding:4px 12px;border-radius:var(--radius-md);cursor:pointer;font-size:11px;font-family:\'Space Mono\',monospace;">+ Weiteren Kampf hinzuf\u00fcgen</button></div>'
     : '';
 
   if (!data.fightDate) {
     display.innerHTML = `
-      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;letter-spacing:2px;">KEIN KAMPF GEPLANT</div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;">KEIN KAMPF GEPLANT</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">NORMALES TRAINING</div>
-      <div style="font-size:12px;color:#666;margin-top:12px;">Kein Kampf geplant \u2014 trage ein Datum ein und dein kompletter Plan passt sich automatisch an.</div>` + addBtnHTML;
+      <div style="font-size:12px;color:var(--text-subtle);margin-top:12px;">Kein Kampf geplant \u2014 trage ein Datum ein und dein kompletter Plan passt sich automatisch an.</div>` + addBtnHTML;
     return;
   }
 
@@ -1376,14 +1376,14 @@ function renderFightCountdown() {
   let mainHTML = '';
   if (diff < -2) {
     mainHTML = `
-      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">Letzter Kampf: ${formatDate(data.fightDate)}</div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">Letzter Kampf: ${formatDate(data.fightDate)}</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">NORMALES TRAINING</div>
-      <div style="font-size:12px;color:#666;margin-top:12px;">Trage den nächsten Kampf ein wenn er feststeht.</div>`;
+      <div style="font-size:12px;color:var(--text-subtle);margin-top:12px;">Trage den nächsten Kampf ein wenn er feststeht.</div>`;
   } else if (diff < 0) {
     mainHTML = `
-      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">Kampf war am ${formatDate(data.fightDate)}</div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">Kampf war am ${formatDate(data.fightDate)}</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">RECOVERY</div>
-      <div style="font-size:12px;color:#666;margin-top:12px;">24–48h leichte Regeneration, dann zurück ins Training.</div>`;
+      <div style="font-size:12px;color:var(--text-subtle);margin-top:12px;">24–48h leichte Regeneration, dann zurück ins Training.</div>`;
   } else if (diff === 0) {
     mainHTML = `
       <div class="fight-countdown-num" style="color:var(--red);">HEUTE</div>
@@ -1399,7 +1399,7 @@ function renderFightCountdown() {
       <div class="fight-countdown-num ${diff <= 1 ? 'countdown-critical' : diff <= 7 ? 'countdown-urgent' : ''}">${diff}</div>
       <div class="fight-countdown-label">TAGE BIS ZUM KAMPF · ${formatDate(data.fightDate)}</div>
       <div class="phase-badge ${phase.cls}" style="margin-top:12px;">${phase.name}</div>
-      ${diff <= 4 ? '<div style="font-size:12px;color:#888;margin-top:8px;">Schärfungsphase: Training leicht anpassen, kein neues hartes Sparring mehr.</div>' : '<div style="font-size:12px;color:#666;margin-top:8px;">Normales Training. Erst 3–4 Tage vor Kampf leicht anpassen.</div>'}`;
+      ${diff <= 4 ? '<div style="font-size:12px;color:var(--grey);margin-top:8px;">Schärfungsphase: Training leicht anpassen, kein neues hartes Sparring mehr.</div>' : '<div style="font-size:12px;color:var(--text-subtle);margin-top:8px;">Normales Training. Erst 3–4 Tage vor Kampf leicht anpassen.</div>'}`;
   }
 
   display.innerHTML = mainHTML + upcomingListHTML + addBtnHTML;
@@ -1415,12 +1415,12 @@ function buildUpcomingFightsHTML(data) {
     const daysLabel = d === 0 ? 'HEUTE' : d === 1 ? 'MORGEN' : d > 0 ? d + ' Tage' : 'vorbei';
     const labelStr = f.label ? (' \u00b7 ' + f.label) : '';
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
-      '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#aaa;">' + formatDate(f.date) + labelStr + ' <span style="color:#888;">(' + daysLabel + ')</span></span>' +
-      '<button onclick="removeUpcomingFight(\'' + f.date + '\')" style="background:none;border:none;color:#888;cursor:pointer;font-size:13px;padding:2px 6px;" title="Kampf entfernen">&times;</button>' +
+      '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#aaa;">' + formatDate(f.date) + labelStr + ' <span style="color:var(--grey);">(' + daysLabel + ')</span></span>' +
+      '<button onclick="removeUpcomingFight(\'' + f.date + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:2px 6px;" title="Kampf entfernen">&times;</button>' +
     '</div>';
   }).join('');
   return '<div style="margin-top:14px;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">' +
-    '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#666;letter-spacing:1.5px;margin-bottom:6px;">WEITERE K\u00c4MPFE</div>' +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-subtle);letter-spacing:1.5px;margin-bottom:6px;">WEITERE K\u00c4MPFE</div>' +
     rows +
   '</div>';
 }
@@ -1525,7 +1525,7 @@ function renderDashStats() {
         <div class="rpg-stat-info">
           <div class="rpg-stat-top">
             <span class="rpg-stat-label">GESAMT</span>
-            <span class="rpg-stat-value" style="color:var(--gold);font-size:24px;">${overall !== null ? overall : '–'}<span style="font-size:12px;color:#444;"> / 100</span></span>
+            <span class="rpg-stat-value" style="color:var(--gold);font-size:24px;">${overall !== null ? overall : '–'}<span style="font-size:12px;color:var(--text-muted);"> / 100</span></span>
           </div>
           <div class="rpg-stat-bar">
             <div class="rpg-stat-fill" style="width:${overall || 0}%;background:linear-gradient(90deg,var(--red),var(--gold));"></div>
@@ -1723,7 +1723,7 @@ function renderHRV() {
   if (!container) return;
   const data = getData();
   if (!data || !data.hrv || !data.hrv.length) {
-    container.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine Daten. RMSSD findest du in deiner Pulsuhr-App (Garmin, Whoop, Polar). Hoher Wert = erholt, niedriger Wert = muede. Trage ihn morgens ein.</div>';
+    container.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);padding:8px 0;">Noch keine Daten. RMSSD findest du in deiner Pulsuhr-App (Garmin, Whoop, Polar). Hoher Wert = erholt, niedriger Wert = muede. Trage ihn morgens ein.</div>';
     return;
   }
   const recent = data.hrv.slice(0, 7);
@@ -1747,7 +1747,7 @@ function renderHRV() {
           <div><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);">7-TAGE Ø</span><br><span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);">${avg7}</span></div>
           <div><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);">DIFFERENZ</span><br><span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${color};">${pctDiff > 0 ? '+' : ''}${pctDiff}%</span></div>
         </div>
-        <div style="font-size:12px;color:#888;">${advice}</div>
+        <div style="font-size:12px;color:var(--grey);">${advice}</div>
       </div>
     </div>`;
 
@@ -2122,7 +2122,7 @@ function renderSäulenProgress() {
               const unit = b.unit;
               trendHTML = `<div style="font-family:'Space Mono',monospace;font-size:11px;color:${color};margin-top:4px;">${arrow} ${b.inverse && diff < 0 ? '-' : '+'}${absDiff % 1 === 0 ? absDiff : absDiff.toFixed(1)} ${unit} seit ${formatDate(hist[0].date)} (${hist.length} Tests)</div>`;
             } else if (hist.length === 1) {
-              trendHTML = `<div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;margin-top:4px;">Erster Test: ${formatDate(hist[0].date)}</div>`;
+              trendHTML = `<div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);margin-top:4px;">Erster Test: ${formatDate(hist[0].date)}</div>`;
             }
             // Mini sparkline SVG
             let sparkHTML = '';
@@ -2143,14 +2143,14 @@ function renderSäulenProgress() {
             }
             return `<div class="bench-card" style="--bc:${b.color}">
               <div class="bench-name"><span class="tt">${b.name}<span class="tt-text">${getBenchTooltip(b)}</span></span></div>
-              <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;margin:-4px 0 8px 0;">${b.how}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin:-4px 0 8px 0;">${b.how}</div>
               <div style="display:flex;align-items:baseline;gap:8px;">
                 <div class="bench-current">${val || '–'}</div>
-                <div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">${b.unit}</div>
+                <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">${b.unit}</div>
                 <div style="margin-left:auto;font-size:11px;font-family:'Space Mono',monospace;color:${getBenchLevel(pct).color};font-weight:700;">${getBenchLevel(pct).label} · ${Math.round(pct)}%</div>
               </div>
               <div class="bench-bar"><div class="bench-fill" style="width:${pct}%;background:${b.color};"></div></div>
-              <div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;margin-top:2px;">Elite-Ziel: ${b.target} ${b.unit}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);margin-top:2px;">Elite-Ziel: ${b.target} ${b.unit}</div>
               ${sparkHTML}
               ${trendHTML}
               <input class="bench-input" type="number" step="any" placeholder="${b.target}" value="${val||''}"
@@ -2450,7 +2450,7 @@ function renderFightLog() {
   const el = document.getElementById('fight-log-list');
   if (!el) return;
   if (!data.fights || !data.fights.length) {
-    el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine Kämpfe. <span style="color:var(--red);cursor:pointer;" onclick="openFightModal()">Ersten Kampf eintragen →</span></div>';
+    el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);padding:8px 0;">Noch keine Kämpfe. <span style="color:var(--red);cursor:pointer;" onclick="openFightModal()">Ersten Kampf eintragen →</span></div>';
     return;
   }
   // Show last 5 fights as compact clickable list
@@ -2460,9 +2460,9 @@ function renderFightLog() {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${color};width:28px;text-align:center;">${f.result}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;color:var(--white);">vs. ${escapeHTML(f.opponent) || 'Unbekannt'}</div>
-        <div style="font-family:'Space Mono',monospace;font-size:12px;color:#444;">${formatDate(f.date)} · ${f.method || ''}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);">${formatDate(f.date)} · ${f.method || ''}</div>
       </div>
-      <div style="font-size:12px;color:#333;">→</div>
+      <div style="font-size:12px;color:var(--text-subtle);">→</div>
     </div>`;
   }).join('') + (data.fights.length > 5 ? `<div onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--red);padding:10px 0;cursor:pointer;text-align:center;">Alle ${data.fights.length} Kämpfe anzeigen →</div>` : '');
 }
@@ -2589,8 +2589,8 @@ function renderFightsTab1(contentEl, data) {
     const wrColor = wr > 60 ? 'var(--green)' : wr >= 40 ? 'var(--gold)' : 'var(--red)';
     return `<tr>
       <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--white);padding:8px 12px 8px 0;">${t}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:11px;color:#888;padding:8px 12px;text-align:center;">${s.total}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:11px;color:#888;padding:8px 12px;text-align:center;">${s.wins}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);padding:8px 12px;text-align:center;">${s.total}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);padding:8px 12px;text-align:center;">${s.wins}</td>
       <td style="font-family:'Space Mono',monospace;font-size:11px;color:${wrColor};padding:8px 12px;text-align:center;font-weight:bold;">${wr}%</td>
     </tr>`;
   }).join('');
@@ -2599,16 +2599,16 @@ function renderFightsTab1(contentEl, data) {
   const visibleFights = fights.slice(0, fightsListLimit);
   const timelineRows = visibleFights.map((f, i) => {
     const dotColor = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
-    const methodTag = f.method ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#888;background:var(--surface-1);padding:2px 6px;border-radius:var(--radius-sm);margin-left:8px;">${f.method}</span>` : '';
-    const typeTag = f.type ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:#666;background:var(--surface-0);border:1px solid var(--surface-2);padding:2px 6px;border-radius:var(--radius-sm);margin-left:4px;">${f.type}</span>` : '';
+    const methodTag = f.method ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);background:var(--surface-1);padding:2px 6px;border-radius:var(--radius-sm);margin-left:8px;">${f.method}</span>` : '';
+    const typeTag = f.type ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);background:var(--surface-0);border:1px solid var(--surface-2);padding:2px 6px;border-radius:var(--radius-sm);margin-left:4px;">${f.type}</span>` : '';
     return `<div onclick="openFightDetail(${i})" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--surface-1);cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
-      <div style="font-family:'Space Mono',monospace;font-size:12px;color:#555;min-width:70px;">${formatDate(f.date)}</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);min-width:70px;">${formatDate(f.date)}</div>
       <div style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
       <div style="flex:1;min-width:0;display:flex;align-items:center;flex-wrap:wrap;">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">vs. ${escapeHTML(f.opponent || 'Unbekannt').toUpperCase()}</span>
         ${methodTag}${typeTag}
       </div>
-      <div style="font-size:14px;color:#333;">&#8250;</div>
+      <div style="font-size:14px;color:var(--text-subtle);">&#8250;</div>
     </div>`;
   }).join('');
 
@@ -2618,12 +2618,12 @@ function renderFightsTab1(contentEl, data) {
     <div style="flex:1;min-width:${isMobile() ? '100%' : '220px'};">
       <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--white);line-height:1;">${wins}</span>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#333;">–</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text-subtle);">–</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${losses > 0 ? 'var(--red)' : '#333'};line-height:1;">${losses}</span>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#333;">–</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text-subtle);">–</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--gold);line-height:1;">${draws}</span>
       </div>
-      <div style="font-family:'Space Mono',monospace;font-size:12px;color:#444;letter-spacing:2px;margin-bottom:12px;">SIEGE – NIEDERLAGEN – UNENTSCHIEDEN</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);letter-spacing:2px;margin-bottom:12px;">SIEGE – NIEDERLAGEN – UNENTSCHIEDEN</div>
       <div style="height:6px;background:var(--surface-1);border-radius:var(--radius-sm);overflow:hidden;max-width:300px;">
         <div style="display:flex;height:100%;">
           <div style="width:${wPct}%;background:var(--green);"></div>
@@ -2635,11 +2635,11 @@ function renderFightsTab1(contentEl, data) {
     <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
       <div style="text-align:center;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--red);">${koRate}%</div>
-        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;">KO-RATE</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;">KO-RATE</div>
       </div>
       <div style="text-align:center;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--green);">${bestStreak}</div>
-        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;">BEST STREAK</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;">BEST STREAK</div>
       </div>
     </div>
   </div>
@@ -2651,10 +2651,10 @@ function renderFightsTab1(contentEl, data) {
     <table style="width:100%;border-collapse:collapse;">
       <thead>
         <tr style="border-bottom:1px solid var(--surface-2);">
-          <th style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;text-align:left;padding:6px 12px 6px 0;text-transform:uppercase;">Gegner-Typ</th>
-          <th style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Kämpfe</th>
-          <th style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Siege</th>
-          <th style="font-family:'Space Mono',monospace;font-size:11px;color:#444;letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Winrate</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:left;padding:6px 12px 6px 0;text-transform:uppercase;">Gegner-Typ</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Kämpfe</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Siege</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Winrate</th>
         </tr>
       </thead>
       <tbody>${matrixRows}</tbody>
@@ -2668,10 +2668,10 @@ function renderFightsTab1(contentEl, data) {
   </div>
   <div id="fights-timeline-list">
     ${fights.length === 0
-      ? '<div style="text-align:center;padding:40px 0;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#1a1a1a;">0 K\u00c4MPFE</div><div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#444;margin:8px 0 16px;">Trage deinen ersten Kampf ein und baue dein Kampfarchiv auf.</div><button class="submit-btn" style="padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ ERSTEN KAMPF EINTRAGEN</button></div>'
+      ? '<div style="text-align:center;padding:40px 0;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#1a1a1a;">0 K\u00c4MPFE</div><div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-muted);margin:8px 0 16px;">Trage deinen ersten Kampf ein und baue dein Kampfarchiv auf.</div><button class="submit-btn" style="padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ ERSTEN KAMPF EINTRAGEN</button></div>'
       : timelineRows}
   </div>
-  ${fights.length > fightsListLimit ? `<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:'Space Mono',monospace;font-size:12px;color:#555;background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:var(--radius-md);cursor:pointer;">Weitere Kämpfe laden (${fights.length - fightsListLimit} übrig)</button></div>` : ''}`;
+  ${fights.length > fightsListLimit ? `<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:var(--radius-md);cursor:pointer;">Weitere Kämpfe laden (${fights.length - fightsListLimit} übrig)</button></div>` : ''}`;
 }
 
 function renderFightsTab2(contentEl, data) {
@@ -2685,8 +2685,8 @@ function renderFightsTab3(contentEl, data) {
   if (fights.length < 3) {
     contentEl.innerHTML = '<div style="padding:60px 20px;text-align:center;">' +
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:36px;color:#1a1a1a;margin-bottom:8px;">ANALYSE</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#444;margin-bottom:20px;">Ab 3 K\u00e4mpfen erkennt FightOS Muster in deinen St\u00e4rken und Schw\u00e4chen.</div>' +
-      '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + fights.length + '/3 K\u00e4mpfe eingetragen</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--text-muted);margin-bottom:20px;">Ab 3 K\u00e4mpfen erkennt FightOS Muster in deinen St\u00e4rken und Schw\u00e4chen.</div>' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);">' + fights.length + '/3 K\u00e4mpfe eingetragen</div>' +
       '<div style="width:120px;height:4px;background:var(--surface-1);border-radius:var(--radius-sm);margin:12px auto;overflow:hidden;"><div style="width:' + Math.round(fights.length / 3 * 100) + '%;height:100%;background:var(--red);border-radius:var(--radius-sm);"></div></div>' +
       '<button class="submit-btn" style="margin-top:16px;padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ KAMPF EINTRAGEN</button>' +
     '</div>';
@@ -2699,8 +2699,8 @@ function renderFightsTab3(contentEl, data) {
     if (!f.improve) return '';
     return '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--surface-1);gap:8px 16px;">' +
       '<div style="flex-shrink:0;min-width:' + (isMobile() ? '100%' : '120px') + ';">' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + formatDate(f.date) + '</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#888;">vs. ' + escapeHTML(f.opponent || 'Unbekannt') + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);">' + formatDate(f.date) + '</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:var(--grey);">vs. ' + escapeHTML(f.opponent || 'Unbekannt') + '</div>' +
       '</div>' +
       '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:13px;color:#aaa;line-height:1.5;">' + escapeHTML(f.improve) + '</div>' +
     '</div>';
@@ -2709,7 +2709,7 @@ function renderFightsTab3(contentEl, data) {
   var sectionA = '<div style="margin-bottom:36px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:2px;margin-bottom:14px;">WIEDERKEHRENDE SCHW\u00c4CHEN</div>' +
     schwHTML +
-    '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;font-style:italic;margin-top:14px;">Lies deine letzten Eintr\u00e4ge \u2014 siehst du ein Thema das sich wiederholt?</div>' +
+    '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);font-style:italic;margin-top:14px;">Lies deine letzten Eintr\u00e4ge \u2014 siehst du ein Thema das sich wiederholt?</div>' +
   '</div>';
 
   // ---- SECTION B: MATCHUP-ANALYSE ----
@@ -2741,14 +2741,14 @@ function renderFightsTab3(contentEl, data) {
     if (goodBullets.length) {
       bulletsHTML += '<div style="margin-top:8px;"><div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--green);letter-spacing:2px;margin-bottom:4px;">ST\u00c4RKEN</div>';
       goodBullets.forEach(function(b) {
-        bulletsHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#888;padding:2px 0 2px 12px;position:relative;"><span style="position:absolute;left:0;color:var(--green);">\u2022</span>' + b + '</div>';
+        bulletsHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:var(--grey);padding:2px 0 2px 12px;position:relative;"><span style="position:absolute;left:0;color:var(--green);">\u2022</span>' + b + '</div>';
       });
       bulletsHTML += '</div>';
     }
     if (improveBullets.length) {
       bulletsHTML += '<div style="margin-top:8px;"><div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:4px;">VERBESSERUNG</div>';
       improveBullets.forEach(function(b) {
-        bulletsHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#888;padding:2px 0 2px 12px;position:relative;"><span style="position:absolute;left:0;color:var(--gold);">\u2022</span>' + b + '</div>';
+        bulletsHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:var(--grey);padding:2px 0 2px 12px;position:relative;"><span style="position:absolute;left:0;color:var(--gold);">\u2022</span>' + b + '</div>';
       });
       bulletsHTML += '</div>';
     }
@@ -2756,12 +2756,12 @@ function renderFightsTab3(contentEl, data) {
     matchupHTML += '<div style="padding:14px 0;border-bottom:1px solid var(--surface-1);">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">' +
         '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);font-weight:600;">' + t + '</div>' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">' + s.wins + 'S - ' + s.losses + 'N' + (s.draws > 0 ? ' - ' + s.draws + 'U' : '') + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);">' + s.wins + 'S - ' + s.losses + 'N' + (s.draws > 0 ? ' - ' + s.draws + 'U' : '') + '</div>' +
       '</div>' +
       '<div style="height:6px;background:var(--surface-1);border-radius:var(--radius-sm);overflow:hidden;">' +
         '<div style="height:100%;width:' + winrate + '%;background:var(--green);border-radius:var(--radius-sm);transition:width .3s;"></div>' +
       '</div>' +
-      '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#444;margin-top:4px;">' + winrate + '% Winrate</div>' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);margin-top:4px;">' + winrate + '% Winrate</div>' +
       bulletsHTML +
     '</div>';
   });
@@ -2787,15 +2787,15 @@ function renderFightsTab3(contentEl, data) {
       var d2 = new Date(chronFights[i + 1].date + 'T00:00:00');
       var diffDays = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
       if (diffDays > 0) {
-        gapHTML = '<div style="position:absolute;left:18px;top:' + (topPx + 28) + 'px;font-family:\'Space Mono\',monospace;font-size:11px;color:#333;">' + diffDays + ' Tage Pause</div>';
+        gapHTML = '<div style="position:absolute;left:18px;top:' + (topPx + 28) + 'px;font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-subtle);">' + diffDays + ' Tage Pause</div>';
       }
     }
 
     timelineHTML += '<div style="position:absolute;left:0;top:' + topPx + 'px;display:flex;align-items:flex-start;gap:14px;">' +
       '<div style="width:12px;height:12px;border-radius:50%;background:' + dotColor + ';flex-shrink:0;margin-top:2px;z-index:1;"></div>' +
       '<div>' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;">' + formatDate(f.date) + ' <span style="color:#888;">vs. ' + escapeHTML(f.opponent || 'Unbekannt') + '</span></div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;">' + (f.method || '') + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);">' + formatDate(f.date) + ' <span style="color:var(--grey);">vs. ' + escapeHTML(f.opponent || 'Unbekannt') + '</span></div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-subtle);">' + (f.method || '') + '</div>' +
       '</div>' +
     '</div>' + gapHTML;
   });
@@ -2804,7 +2804,7 @@ function renderFightsTab3(contentEl, data) {
   var loadMoreTimelineBtn = '';
   if (chronFightsAll.length > fightsListLimit) {
     var remaining = chronFightsAll.length - fightsListLimit;
-    loadMoreTimelineBtn = '<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:var(--radius-md);cursor:pointer;">Weitere Kämpfe laden (' + remaining + ' übrig)</button></div>';
+    loadMoreTimelineBtn = '<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:var(--radius-md);cursor:pointer;">Weitere Kämpfe laden (' + remaining + ' übrig)</button></div>';
   }
   var sectionC = '<div style="margin-bottom:36px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:2px;margin-bottom:14px;">FORTSCHRITTS-TIMELINE</div>' +
@@ -2878,7 +2878,7 @@ function renderFightsTab3(contentEl, data) {
 
   function statRow(label, value, color) {
     return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--surface-1);">' +
-      '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">' + label + '</div>' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);">' + label + '</div>' +
       '<div style="font-family:\'Space Mono\',monospace;font-size:13px;color:' + (color || 'var(--white)') + ';font-weight:700;">' + value + '</div>' +
     '</div>';
   }
@@ -2968,7 +2968,7 @@ function openFightDetail(idx) {
   var timestampsHTML = '<div style="display:flex;flex-direction:column;height:100%;">' +
     '<button onclick="markNow(' + idx + ')" style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:2px;padding:14px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;width:100%;margin-bottom:12px;transition:opacity .15s;" onmousedown="this.style.opacity=\'0.7\'" onmouseup="this.style.opacity=\'1\'">+ SZENE</button>' +
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
-      '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;letter-spacing:1px;">' + markers.length + ' MARKIERUNG' + (markers.length !== 1 ? 'EN' : '') + '</span>' +
+      '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-subtle);letter-spacing:1px;">' + markers.length + ' MARKIERUNG' + (markers.length !== 1 ? 'EN' : '') + '</span>' +
     '</div>' +
     '<div id="ts-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;">';
 
@@ -2998,7 +2998,7 @@ function openFightDetail(idx) {
       `<span onclick="setFightRating(${idx},'${c.key}',${n})" style="display:inline-block;width:16px;height:16px;border-radius:50%;margin-right:4px;cursor:pointer;transition:all .15s;${n <= val ? 'background:var(--red);' : 'background:var(--surface-2);border:1px solid var(--surface-3);'}" onmouseenter="this.style.transform='scale(1.2)'" onmouseleave="this.style.transform='scale(1)'"></span>`
     ).join('');
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
-      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;letter-spacing:1px;min-width:80px;">${c.label}</span>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px;min-width:80px;">${c.label}</span>
       <div>${dots}</div>
     </div>`;
   }).join('');
@@ -3011,24 +3011,24 @@ function openFightDetail(idx) {
   const roundWinnerHTML = [1,2,3].map(r => {
     const w = f.rounds[r-1] ? (f.rounds[r-1].winner || '') : '';
     return `<div style="display:flex;align-items:center;gap:6px;">
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#333;">R${r}</span>
-      ${['ich','gegner','unklar'].map(v => `<span onclick="setRoundWinner(${idx},${r-1},'${v}')" style="font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;${w === v ? (v==='ich'?'background:var(--green);color:#000;':'background:var(--red);color:#fff;') : 'background:var(--surface-1);color:#333;'}">${v === 'ich' ? 'ICH' : v === 'gegner' ? 'ER' : '?'}</span>`).join('')}
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--text-subtle);">R${r}</span>
+      ${['ich','gegner','unklar'].map(v => `<span onclick="setRoundWinner(${idx},${r-1},'${v}')" style="font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;${w === v ? (v==='ich'?'background:var(--green);color:#000;':'background:var(--red);color:#fff;') : 'background:var(--surface-1);color:var(--text-subtle);'}">${v === 'ich' ? 'ICH' : v === 'gegner' ? 'ER' : '?'}</span>`).join('')}
     </div>`;
   }).join('');
 
   el.innerHTML = `
   <!-- BACK -->
   <div style="padding-bottom:16px;">
-    <button onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:11px;color:#444;background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">← Alle Kämpfe</button>
+    <button onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">← Alle Kämpfe</button>
   </div>
 
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
     <span style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,36px);color:${color};letter-spacing:2px;">${label}</span>
-    <span style="font-family:'Space Mono',monospace;font-size:11px;color:#444;">${f.method || ''}</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">${f.method || ''}</span>
   </div>
   <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--white);letter-spacing:3px;line-height:.9;margin-bottom:10px;">vs. ${escapeHTML(f.opponent || 'Unbekannt').toUpperCase()}</div>
-  <div style="font-family:'Space Mono',monospace;font-size:11px;color:#333;margin-bottom:28px;">${formatDate(f.date)}${f.style ? ' · ' + f.style : ''}${f.type ? ' · ' + f.type : ''}</div>
+  <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);margin-bottom:28px;">${formatDate(f.date)}${f.style ? ' · ' + f.style : ''}${f.type ? ' · ' + f.type : ''}</div>
 
   <!-- MAIN: VIDEO LEFT + TIMESTAMPS RIGHT -->
   <div style="display:grid;grid-template-columns:${isMobile() ? '1fr' : '1fr 320px'};gap:24px;margin-bottom:24px;" class="fight-detail-grid">
@@ -3044,7 +3044,7 @@ function openFightDetail(idx) {
     <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SELBSTBEWERTUNG</span>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${avgRating !== '–' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:#333;">/5</span></span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${avgRating !== '–' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:var(--text-subtle);">/5</span></span>
       </div>
       ${ratingsHTML}
     </div>
@@ -3059,9 +3059,9 @@ function openFightDetail(idx) {
   <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:24px;margin-bottom:36px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);letter-spacing:1.5px;">VIDEO-ANALYSE</div>
-      <span style="font-family:'Space Mono',monospace;font-size:10px;color:#333;letter-spacing:1px;">${f.videoAnalysis ? Object.keys(f.videoAnalysis).filter(k => f.videoAnalysis[k]).length + '/15 BEANTWORTET' : '0/15 BEANTWORTET'}</span>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-subtle);letter-spacing:1px;">${f.videoAnalysis ? Object.keys(f.videoAnalysis).filter(k => f.videoAnalysis[k]).length + '/15 BEANTWORTET' : '0/15 BEANTWORTET'}</span>
     </div>
-    <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:#444;margin-bottom:20px;">Schau dir den Kampf an und beantworte die Fragen Runde fürRunde. Nimm dir Zeit – ehrliche Analyse macht dich besser.</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-muted);margin-bottom:20px;">Schau dir den Kampf an und beantworte die Fragen Runde fürRunde. Nimm dir Zeit – ehrliche Analyse macht dich besser.</div>
 
     ${[1,2,3].map(r => {
       const va = (f.videoAnalysis && f.videoAnalysis['r'+r]) || {};
@@ -3093,7 +3093,7 @@ function openFightDetail(idx) {
         '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">' +
           '<div style="width:32px;height:32px;border-radius:50%;background:' + (isComplete ? 'var(--green)' : roundColor) + ';display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:' + (isComplete ? '#000' : '#fff') + ';">' + (isComplete ? '\\u2713' : r) + '</div>' +
           '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">RUNDE ' + r + '</div>' +
-          '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;">' + answeredCount + '/5</div></div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-subtle);">' + answeredCount + '/5</div></div>' +
         '</div>' +
         '<div style="display:flex;flex-direction:column;gap:12px;">' +
           questions.map(function(q) {
@@ -3116,7 +3116,7 @@ function openFightDetail(idx) {
           for (var k = 0; k < keys.length; k++) { if (rd[keys[k]]) total++; }
         }
         if (total === 0) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#222;text-align:center;">Beantworte die Fragen oben um deine Analyse zu starten.</div>';
-        if (total < 10) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;text-align:center;">' + total + '/15 – Mach weiter, je ehrlicher desto besser.</div>';
+        if (total < 10) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);text-align:center;">' + total + '/15 – Mach weiter, je ehrlicher desto besser.</div>';
         if (total < 15) return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--gold);text-align:center;">' + total + '/15 – Fast fertig. Füll die letzten Fragen aus.</div>';
         return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--green);text-align:center;">\\u2713 ANALYSE KOMPLETT – Gute Arbeit. Nutze die Erkenntnisse im Training.</div>';
       })()}
@@ -3127,27 +3127,27 @@ function openFightDetail(idx) {
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
     <div style="padding:16px 0;border-bottom:1px solid var(--surface-1);">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--green);letter-spacing:1px;margin-bottom:8px;">WAS LIEF GUT</div>
-      <div id="fd-good" class="editable-field" onclick="makeFightFieldEditable(${idx},'good',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.good) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
+      <div id="fd-good" class="editable-field" onclick="makeFightFieldEditable(${idx},'good',this)" style="font-size:14px;color:var(--grey);line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.good) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
     <div style="padding:16px 0;border-bottom:1px solid var(--surface-1);">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red);letter-spacing:1px;margin-bottom:8px;">WAS MUSS BESSER WERDEN</div>
-      <div id="fd-improve" class="editable-field" onclick="makeFightFieldEditable(${idx},'improve',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.improve) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
+      <div id="fd-improve" class="editable-field" onclick="makeFightFieldEditable(${idx},'improve',this)" style="font-size:14px;color:var(--grey);line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.improve) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
     <div style="padding:16px 0;border-bottom:1px solid var(--surface-1);">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">GEGNER-SCHWÄCHEN</div>
-      <div id="fd-opponentWeaknesses" class="editable-field" onclick="makeFightFieldEditable(${idx},'opponentWeaknesses',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.opponentWeaknesses) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
+      <div id="fd-opponentWeaknesses" class="editable-field" onclick="makeFightFieldEditable(${idx},'opponentWeaknesses',this)" style="font-size:14px;color:var(--grey);line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.opponentWeaknesses) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
   </div>
 
   <!-- NÄCHSTE SCHRITTE -->
   <div style="margin-bottom:36px;padding:20px 0;border-top:1px solid var(--surface-1);">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1.5px;margin-bottom:10px;">WAS ICH NÄCHSTES MAL ANDERS MACHE</div>
-    <div id="fd-nextSteps" class="editable-field" onclick="makeFightFieldEditable(${idx},'nextSteps',this)" style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.nextSteps) || '<span style="color:#222;">Konkrete Maßnahmen für das nächste Training / den nächsten Kampf...</span>'}</div>
+    <div id="fd-nextSteps" class="editable-field" onclick="makeFightFieldEditable(${idx},'nextSteps',this)" style="font-size:14px;color:var(--grey);line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.nextSteps) || '<span style="color:#222;">Konkrete Maßnahmen für das nächste Training / den nächsten Kampf...</span>'}</div>
   </div>
 
   <!-- ACTIONS -->
   <div style="display:flex;flex-wrap:wrap;gap:12px;padding-top:16px;border-top:1px solid var(--surface-1);">
-    <button onclick="if(confirm('Diesen Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:11px;color:#333;background:none;border:1px solid var(--surface-2);padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;min-height:44px;">KAMPF LÖSCHEN</button>
+    <button onclick="if(confirm('Diesen Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);background:none;border:1px solid var(--surface-2);padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;min-height:44px;">KAMPF LÖSCHEN</button>
   </div>`;
 
   showPage('fight-detail');
@@ -3358,7 +3358,7 @@ function renderTimestampList(idx) {
         'onblur="updateTimestampById(' + idx + ',\'' + mid + '\',this.value)" ' +
         'onkeydown="if(event.key===\'Enter\')this.blur()" ' +
         'style="flex:1;padding:4px 6px;background:transparent;border:none;border-bottom:1px solid var(--surface-1);color:#aaa;font-family:\'DM Sans\',sans-serif;font-size:12px;outline:none;min-width:0;">' +
-      '<span onclick="deleteTimestamp(' + idx + ',\'' + mid + '\')" style="font-size:14px;color:#333;cursor:pointer;padding:0 4px;line-height:1;" title="Entfernen">\u00d7</span>' +
+      '<span onclick="deleteTimestamp(' + idx + ',\'' + mid + '\')" style="font-size:14px;color:var(--text-subtle);cursor:pointer;padding:0 4px;line-height:1;" title="Entfernen">\u00d7</span>' +
     '</div>';
   }).join('');
 }
@@ -3580,7 +3580,7 @@ function makeFightFieldEditable(idx, field, container) {
     else { d.fights[idx][field] = newVal; }
     saveData(d);
     // Replace textarea with display text
-    container.innerHTML = '<div style="font-size:14px;color:#888;line-height:1.7;cursor:text;min-height:24px;padding:4px 0;">' + (escapeHTML(newVal) || '<span style="color:#222;">Klicke hier um Notizen hinzuzufügen...</span>') + '</div>';
+    container.innerHTML = '<div style="font-size:14px;color:var(--grey);line-height:1.7;cursor:text;min-height:24px;padding:4px 0;">' + (escapeHTML(newVal) || '<span style="color:#222;">Klicke hier um Notizen hinzuzufügen...</span>') + '</div>';
   };
 }
 
@@ -3773,7 +3773,7 @@ function renderPrepTabContent() {
   html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">' +
     '<div>' +
       '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">VORBEREITUNGEN</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;">Alle Kampfvorbereitungen auf einen Blick.</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-muted);">Alle Kampfvorbereitungen auf einen Blick.</div>' +
     '</div>' +
     '<button style="' + btnPrimary + '" onclick="createNewPrep()">+ NEUE VORBEREITUNG</button>' +
   '</div>';
@@ -3781,7 +3781,7 @@ function renderPrepTabContent() {
   if (preps.length === 0) {
     html += '<div style="' + cardStyle + 'text-align:center;padding:60px 20px;">' +
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:48px;color:#1a1a1a;margin-bottom:12px;">0</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:#444;margin-bottom:24px;">Noch keine Vorbereitungen erstellt.</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--text-muted);margin-bottom:24px;">Noch keine Vorbereitungen erstellt.</div>' +
       '<button style="' + btnPrimary + '" onclick="createNewPrep()">ERSTE VORBEREITUNG STARTEN</button>' +
     '</div>';
     return html;
@@ -3792,14 +3792,14 @@ function renderPrepTabContent() {
   var completed = preps.filter(function(p) { return p.completed; });
 
   if (active.length > 0) {
-    html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:2px;margin-bottom:12px;">AKTIV (' + active.length + ')</div>';
+    html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:12px;">AKTIV (' + active.length + ')</div>';
     active.forEach(function(p) {
       html += renderPrepCard(p, data);
     });
   }
 
   if (completed.length > 0) {
-    html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:2px;margin-bottom:12px;margin-top:24px;">ABGESCHLOSSEN (' + completed.length + ')</div>';
+    html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:12px;margin-top:24px;">ABGESCHLOSSEN (' + completed.length + ')</div>';
     completed.forEach(function(p) {
       html += renderPrepCard(p, data);
     });
@@ -3837,7 +3837,7 @@ function renderPrepCard(prep, data) {
   }
   html += '</div>';
   if (subtitle) {
-    html += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#666;margin-bottom:10px;">' + subtitle.replace(/</g, '&lt;') + '</div>';
+    html += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-subtle);margin-bottom:10px;">' + subtitle.replace(/</g, '&lt;') + '</div>';
   }
 
   // Mini readiness bar
@@ -3864,13 +3864,13 @@ function renderPrepCard(prep, data) {
 
   // Right side: date + actions
   html += '<div style="text-align:right;flex-shrink:0;margin-left:16px;">';
-  html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;margin-bottom:8px;">' + dateStr + '</div>';
+  html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-subtle);margin-bottom:8px;">' + dateStr + '</div>';
   html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:' + statusColor + ';letter-spacing:1px;margin-bottom:12px;">' + statusLabel + '</div>';
 
   if (prep.completed) {
-    html += '<button onclick="event.stopPropagation();reopenPrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;margin-bottom:4px;display:block;width:100%;">BEARBEITEN</button>';
+    html += '<button onclick="event.stopPropagation();reopenPrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;margin-bottom:4px;display:block;width:100%;">BEARBEITEN</button>';
   }
-  html += '<button onclick="event.stopPropagation();deletePrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;background:none;border:none;cursor:pointer;letter-spacing:1px;">LOESCHEN</button>';
+  html += '<button onclick="event.stopPropagation();deletePrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-subtle);background:none;border:none;cursor:pointer;letter-spacing:1px;">LOESCHEN</button>';
   html += '</div>';
 
   html += '</div>'; // close flex row
@@ -3888,11 +3888,11 @@ function renderPrepWizard(data) {
 
   var inputStyle = 'width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--surface-3);color:#fff;font-family:"DM Sans",sans-serif;font-size:13px;border-radius:var(--radius-sm);outline:none;box-sizing:border-box;';
   var textareaStyle = inputStyle + 'resize:vertical;min-height:80px;';
-  var labelStyle = 'font-family:"Space Mono",monospace;font-size:10px;color:#555;letter-spacing:2px;margin-bottom:6px;display:block;';
+  var labelStyle = 'font-family:"Space Mono",monospace;font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:6px;display:block;';
   var headingStyle = 'font-family:"Bebas Neue",sans-serif;color:var(--white);letter-spacing:1px;';
   var cardStyle = 'background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:20px;margin-bottom:16px;';
   var btnPrimary = 'font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;';
-  var btnSecondary = 'font-family:"Space Mono",monospace;font-size:11px;letter-spacing:1px;padding:10px 20px;background:transparent;color:#555;border:1px solid var(--surface-3);border-radius:var(--radius-sm);cursor:pointer;';
+  var btnSecondary = 'font-family:"Space Mono",monospace;font-size:11px;letter-spacing:1px;padding:10px 20px;background:transparent;color:var(--text-muted);border:1px solid var(--surface-3);border-radius:var(--radius-sm);cursor:pointer;';
 
   // Back to overview
   var oppName = (prep.opponent && prep.opponent.name) ? escapeHTML(prep.opponent.name) : 'Neue Vorbereitung';
@@ -3924,7 +3924,7 @@ function renderPrepWizard(data) {
     progressHTML += '</div>';
   }
   progressHTML += '</div>';
-  progressHTML += '<div style="text-align:center;font-family:\'Space Mono\',monospace;font-size:10px;color:#444;letter-spacing:2px;">SCHRITT ' + step + ' VON 5 \u2014 ' + stepLabels[step - 1] + '</div>';
+  progressHTML += '<div style="text-align:center;font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);letter-spacing:2px;">SCHRITT ' + step + ' VON 5 \u2014 ' + stepLabels[step - 1] + '</div>';
   progressHTML += '</div>';
 
   function navButtons(currentStep) {
@@ -3961,12 +3961,12 @@ function renderPrepWizard(data) {
       if (typeRecord.total > 0) {
         typeHint = '<div style="' + cardStyle + 'background:#0c0c00;border-color:#332d00;margin-bottom:20px;">' +
           '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--gold);letter-spacing:1px;">ERFAHRUNG VS. ' + opp.type.toUpperCase() + '</div>' +
-          '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;margin-top:6px;">' + typeRecord.wins + ' Siege, ' + typeRecord.losses + ' Niederlagen aus ' + typeRecord.total + ' K\u00e4mpfen gegen diesen Gegnertyp.</div>' +
+          '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--grey);margin-top:6px;">' + typeRecord.wins + ' Siege, ' + typeRecord.losses + ' Niederlagen aus ' + typeRecord.total + ' K\u00e4mpfen gegen diesen Gegnertyp.</div>' +
           '</div>';
       }
     }
     contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">GEGNER-PROFIL</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:20px;">Trage alle bekannten Infos \u00fcber deinen n\u00e4chsten Gegner ein.</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-muted);margin-bottom:20px;">Trage alle bekannten Infos \u00fcber deinen n\u00e4chsten Gegner ein.</div>' +
       typeHint +
       '<div style="' + cardStyle + '">' +
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
@@ -3989,7 +3989,7 @@ function renderPrepWizard(data) {
   else if (step === 2) {
     var gp = prep.gameplan || {};
     contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">GAMEPLAN</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:20px;">Plane deine Strategie f\u00fcr jede Runde.</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-muted);margin-bottom:20px;">Plane deine Strategie f\u00fcr jede Runde.</div>' +
       '<div style="' + cardStyle + '">' +
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">RUNDEN-STRATEGIE</div>' +
         '<div style="margin-bottom:16px;"><label style="' + labelStyle + '">RUNDE 1 \u2014 ABTASTEN & DOMINIEREN</label><textarea style="' + textareaStyle + '" oninput="savePrepField(\'gameplan.r1\', this.value)" placeholder="Jab aufbauen, Rhythmus finden, Distanz kontrollieren...">' + (gp.r1 || '') + '</textarea></div>' +
@@ -4024,7 +4024,7 @@ function renderPrepWizard(data) {
     };
 
     contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">MENTALE VORBEREITUNG</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:20px;">Mentale Checkliste \u2014 bereite deinen Kopf vor.</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-muted);margin-bottom:20px;">Mentale Checkliste \u2014 bereite deinen Kopf vor.</div>' +
       '<div style="' + cardStyle + '">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
           '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">CHECKLISTE</div>' +
@@ -4040,7 +4040,7 @@ function renderPrepWizard(data) {
       '</div>' +
       '<div style="' + cardStyle + '">' +
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">TRIGGER-W\u00d6RTER</div>' +
-        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#555;margin-bottom:16px;">Kurze W\u00f6rter, die dich im Ring triggern \u2014 Technik, Motivation, Krisenmodus.</div>' +
+        '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:var(--text-muted);margin-bottom:16px;">Kurze W\u00f6rter, die dich im Ring triggern \u2014 Technik, Motivation, Krisenmodus.</div>' +
         '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">' +
           '<div><label style="' + labelStyle + '">TECHNIK</label><input style="' + inputStyle + '" value="' + (tw.technik || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'triggerWords.technik\', this.value)" placeholder="z.B. JAB!"></div>' +
           '<div><label style="' + labelStyle + '">MOTIVATION</label><input style="' + inputStyle + '" value="' + (tw.motivation || '').replace(/"/g, '&quot;') + '" oninput="savePrepField(\'triggerWords.motivation\', this.value)" placeholder="z.B. KRIEG!"></div>' +
@@ -4068,7 +4068,7 @@ function renderPrepWizard(data) {
     var packedCount = packItems.filter(function(p) { return pl[p[0]]; }).length;
 
     contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">EQUIPMENT</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:20px;">Packliste \u2014 vergiss nichts am Kampftag.</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-muted);margin-bottom:20px;">Packliste \u2014 vergiss nichts am Kampftag.</div>' +
       '<div style="' + cardStyle + '">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
           '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">PACKLISTE</div>' +
@@ -4103,7 +4103,7 @@ function renderPrepWizard(data) {
     ];
 
     contentHTML = '<div style="' + headingStyle + 'font-size:24px;margin-bottom:4px;">FIGHT DAY TIMELINE</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;margin-bottom:24px;">Dein Fahrplan f\u00fcr den Kampftag. X = deine Kampfzeit.</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-muted);margin-bottom:24px;">Dein Fahrplan f\u00fcr den Kampftag. X = deine Kampfzeit.</div>' +
       '<div style="' + cardStyle + 'padding:24px 20px;">';
 
     timeline.forEach(function(t, i) {
@@ -4120,7 +4120,7 @@ function renderPrepWizard(data) {
       contentHTML += '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:' + (isLast ? 'var(--red)' : 'var(--gold)') + ';letter-spacing:1px;white-space:nowrap;">' + t.offset + '</span>';
       contentHTML += '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">' + t.label + '</span>';
       contentHTML += '</div>';
-      contentHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#555;line-height:1.5;">' + t.desc + '</div>';
+      contentHTML += '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-muted);line-height:1.5;">' + t.desc + '</div>';
       contentHTML += '</div></div>';
     });
 
@@ -4154,7 +4154,7 @@ function renderPrepWizard(data) {
   }
 
   var deleteHTML = '<div style="text-align:center;margin-top:20px;">' +
-    '<button onclick="deletePrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;background:none;border:none;cursor:pointer;letter-spacing:1px;">VORBEREITUNG L\u00d6SCHEN</button>' +
+    '<button onclick="deletePrep(\'' + prep.id + '\')" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-subtle);background:none;border:none;cursor:pointer;letter-spacing:1px;">VORBEREITUNG L\u00d6SCHEN</button>' +
   '</div>';
 
   return backHTML + progressHTML + contentHTML + deleteHTML;
@@ -4355,13 +4355,13 @@ function renderRecentLog() {
   if (!data) return;
   const el = document.getElementById('recent-log');
   if (!el) return;
-  if (!data.log || !data.log.length) { el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#444;padding:8px 0;">Noch keine Trainingseinheiten. <span style="color:var(--red);cursor:pointer;" onclick="showPage(\'log\')">Erste Session loggen \u2192</span></div>'; return; }
+  if (!data.log || !data.log.length) { el.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);padding:8px 0;">Noch keine Trainingseinheiten. <span style="color:var(--red);cursor:pointer;" onclick="showPage(\'log\')">Erste Session loggen \u2192</span></div>'; return; }
   el.innerHTML = data.log.slice(0, 5).map(e => {
     const color = TYPE_COLORS[e.type] || 'var(--grey)';
     return `<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #151515;">
       <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></div>
       <div style="flex:1;font-size:13px;color:var(--light);">${TYPE_LABELS[e.type] || e.type} · ${e.duration} Min.</div>
-      <div style="font-family:'Space Mono',monospace;font-size:12px;color:#444;">${formatDate(e.date)}</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);">${formatDate(e.date)}</div>
     </div>`;
   }).join('');
 }
@@ -4817,7 +4817,7 @@ function renderWeekPlan() {
   var _wpEl = document.getElementById('page-wochenplan');
   try { return _renderWeekPlanInner(); } catch(e) {
     console.error('renderWeekPlan error:', e);
-    if (_wpEl) _wpEl.innerHTML = '<div style="padding:40px;color:var(--red);font-family:Space Mono,monospace;"><div style="font-size:18px;margin-bottom:12px;">FEHLER IM WOCHENPLAN</div><pre style="color:#888;font-size:11px;white-space:pre-wrap;">' + e.message + '\n\n' + (e.stack || '').split('\n').slice(0,5).join('\n') + '</pre><button onclick="location.reload()" style="margin-top:16px;padding:8px 16px;background:var(--red);color:#fff;border:none;cursor:pointer;">SEITE NEU LADEN</button></div>';
+    if (_wpEl) _wpEl.innerHTML = '<div style="padding:40px;color:var(--red);font-family:Space Mono,monospace;"><div style="font-size:18px;margin-bottom:12px;">FEHLER IM WOCHENPLAN</div><pre style="color:var(--grey);font-size:11px;white-space:pre-wrap;">' + e.message + '\n\n' + (e.stack || '').split('\n').slice(0,5).join('\n') + '</pre><button onclick="location.reload()" style="margin-top:16px;padding:8px 16px;background:var(--red);color:#fff;border:none;cursor:pointer;">SEITE NEU LADEN</button></div>';
   }
 }
 function _renderWeekPlanInner() {
@@ -4875,7 +4875,7 @@ function _renderWeekPlanInner() {
     const diff = Math.ceil((new Date(data.fightDate + 'T00:00:00') - today) / 86400000);
     const phase = getFightPhase(diff);
     phaseHTML = `<div style="margin-bottom:20px;"><span class="phase-badge ${phase.cls}" style="font-size:16px;padding:6px 14px;">${phase.name}</span>
-      <span style="font-family:'Space Mono',monospace;font-size:12px;color:#555;margin-left:12px;">${diff > 0 ? diff + ' Tage bis Kampf · ' + formatDate(data.fightDate) : 'Kampf vorbei'}</span></div>`;
+      <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);margin-left:12px;">${diff > 0 ? diff + ' Tage bis Kampf · ' + formatDate(data.fightDate) : 'Kampf vorbei'}</span></div>`;
   }
 
   el.innerHTML = `
@@ -4885,10 +4885,10 @@ function _renderWeekPlanInner() {
       <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${weekLabelColor};letter-spacing:1px;">${weekLabel}</span>
         ${isDeloadActive
-          ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--green);">Reduziertes Volumen — nur 1× Power, kein Max Strength</span><button onclick="deactivateDeload()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:32px;">BEENDEN</button>'
-          : '<button onclick="activateDeload()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:32px;">DELOAD</button>'}
+          ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--green);">Reduziertes Volumen — nur 1× Power, kein Max Strength</span><button onclick="deactivateDeload()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:32px;">BEENDEN</button>'
+          : '<button onclick="activateDeload()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:32px;">DELOAD</button>'}
       </div>
-      ${_deloadWarnings.length && !isDeloadActive ? '<div style="margin-top:8px;padding:10px 14px;background:#1a1208;border:1px solid var(--orange);border-radius:var(--radius-md);font-size:12px;color:var(--orange);">⚠ Dein Körper zeigt Zeichen von Überbelastung: ' + _deloadWarnings.join(', ') + '. Brauchst du einen Deload?</div>' : ''}
+      ${_deloadWarnings.length && !isDeloadActive ? '<div style="margin-top:8px;padding:10px 14px;background:var(--surface-0);border:1px solid var(--orange);border-radius:var(--radius-md);font-size:12px;color:var(--orange);">⚠ Dein Körper zeigt Zeichen von Überbelastung: ' + _deloadWarnings.join(', ') + '. Brauchst du einen Deload?</div>' : ''}
     </div>
     ${(function() {
       var hints = [];
@@ -4901,7 +4901,7 @@ function _renderWeekPlanInner() {
       var wh = parseInt((s.workStart || '08:00').split(':')[0]);
       if (wh >= 12 || wh < 5) hints.push('\u26A0 Ungewöhnliche Arbeitszeiten – prüfe ob Trainingszeiten passen');
       return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">' +
-        hints.map(function(h) { return '<span style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:var(--surface-1);border:1px solid var(--surface-2);border-radius:var(--radius-sm);color:#555;">' + h + '</span>'; }).join('') +
+        hints.map(function(h) { return '<span style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:var(--surface-1);border:1px solid var(--surface-2);border-radius:var(--radius-sm);color:var(--text-muted);">' + h + '</span>'; }).join('') +
         '<span onclick="showPage(\'account\')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:transparent;border:1px solid var(--surface-3);border-radius:var(--radius-sm);color:var(--red);cursor:pointer;">AENDERN \u2192</span>' +
       '</div>';
     })()}
@@ -4921,12 +4921,12 @@ function _renderWeekPlanInner() {
       if (fb.rpeLow) lines.push('\u2192 ' + fb.rpeLow);
       if (fb.missedSäulen && fb.missedSäulen.length) lines.push('\u2192 VERSAEUMT: ' + fb.missedSäulen.map(function(si){return saeulenLabels[si];}).join(', ') + ' (extra Fokus)');
       if (lines.length === 0 && pct >= 80) lines.push('\u2713 Gute Woche! Weiter so.');
-      return '<div style="background:#0d0d0d;border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
+      return '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-left:3px solid var(--blue);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
           '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--blue);letter-spacing:2px;">LETZTE WOCHE</span>' +
           '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:' + rateColor + ';">' + pct + '%</span>' +
         '</div>' +
-        lines.map(function(l) { return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:#888;margin-bottom:4px;">' + l + '</div>'; }).join('') +
+        lines.map(function(l) { return '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--grey);margin-bottom:4px;">' + l + '</div>'; }).join('') +
       '</div>';
     })()}
     ${phaseHTML}
@@ -4952,14 +4952,14 @@ function _renderWeekPlanInner() {
         return '<span style="font-family:\'Space Mono\',monospace;font-size:11px;padding:4px 10px;border-radius:var(--radius-sm);background:' + PILLAR_COLORS[key] + '22;color:' + PILLAR_COLORS[key] + ';border:1px solid ' + PILLAR_COLORS[key] + '44;">' + PILLAR_LABELS[key] + ' ' + Math.round(score) + '%' + (isCritical ? ' !!!' : '') + '</span>';
       }).join('');
       var actions = wi.map(function(e) {
-        return '<div style="font-size:11px;color:#888;line-height:1.5;">→ <span style="color:' + PILLAR_COLORS[e[0]] + ';">' + PILLAR_LABELS[e[0]] + '</span>: ' + PILLAR_ACTIONS[e[0]] + '</div>';
+        return '<div style="font-size:11px;color:var(--grey);line-height:1.5;">→ <span style="color:' + PILLAR_COLORS[e[0]] + ';">' + PILLAR_LABELS[e[0]] + '</span>: ' + PILLAR_ACTIONS[e[0]] + '</div>';
       }).join('');
-      return '<div style="margin-bottom:16px;padding:14px 16px;background:#0d0d0d;border:1px solid var(--surface-2);border-radius:var(--radius-md);border-left:3px solid var(--red);">' +
+      return '<div style="margin-bottom:16px;padding:14px 16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);border-left:3px solid var(--red);">' +
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
           '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:2px;color:var(--red);">FASS-PRINZIP AKTIV</span>' +
           pills +
         '</div>' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-bottom:8px;">Dein Plan wurde automatisch angepasst um deine schwachen Säulen zu stärken:</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);margin-bottom:8px;">Dein Plan wurde automatisch angepasst um deine schwachen Säulen zu stärken:</div>' +
         actions +
       '</div>';
     })()}
@@ -4976,11 +4976,11 @@ function _renderWeekPlanInner() {
       var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNÄHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITÄT'];
       var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
       return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px;padding:12px 16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);">' +
-        '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:1px;margin-right:4px;">SÄULEN ' + covered + '/8</span>' +
+        '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-right:4px;">SÄULEN ' + covered + '/8</span>' +
         saeulenLabels.map(function(l, i) {
           var active = coveredSet[i];
           return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);letter-spacing:0.5px;' +
-            (active ? 'background:' + saeulenColors[i] + '22;color:' + saeulenColors[i] + ';border:1px solid ' + saeulenColors[i] + '44;' : 'background:var(--surface-1);color:#333;border:1px solid var(--surface-2);') +
+            (active ? 'background:' + saeulenColors[i] + '22;color:' + saeulenColors[i] + ';border:1px solid ' + saeulenColors[i] + '44;' : 'background:var(--surface-1);color:var(--text-subtle);border:1px solid var(--surface-2);') +
           '">' + l + '</span>';
         }).join('') +
       '</div>';
@@ -5005,7 +5005,7 @@ function _renderWeekPlanInner() {
           <div class="day-header" onclick="toggleDayCol(this)">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--gold);">HEUTE</span>' : ''}</div>
-              <span style="font-family:'Space Mono',monospace;font-size:10px;color:#333;">${blocks.length}</span>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-subtle);">${blocks.length}</span>
             </div>
             <div style="display:flex;align-items:center;gap:4px;margin-top:4px;">
               ${dp ? `<span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:${dp.color};">${dp.label}</span>` : ''}
@@ -5029,7 +5029,7 @@ function _renderWeekPlanInner() {
                 ${isToday || done ? `<button class="block-check-btn${done ? ' checked' : ''}" onclick="event.stopPropagation();toggleBlockDone('${day}',${bi},'${b.type}','${b.title.replace(/'/g,'\\&#39;')}')" title="${done ? 'Erledigt' : 'Als erledigt markieren'}">${done ? '✓' : '○'}</button>` : ''}
               </div>
               <div style="font-size:13px;color:var(--white);line-height:1.3;">${b.title}</div>
-              ${b.duration > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;margin-top:2px;">' + b.duration + ' Min.' + (b.rpe > 0 ? ' · RPE ' + b.rpe : '') + '</div>' : ''}
+              ${b.duration > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);margin-top:2px;">' + b.duration + ' Min.' + (b.rpe > 0 ? ' · RPE ' + b.rpe : '') + '</div>' : ''}
             </div>`}).join('')}
           </div>
           <button class="add-block-btn" onclick="addBlock('${day}')">+ Block</button>
@@ -5038,7 +5038,7 @@ function _renderWeekPlanInner() {
     </div>
     <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;">
       <button class="submit-btn" style="padding:8px 16px;font-size:12px;" onclick="regenerateWeekPlan()">NEU GENERIEREN</button>
-      <span style="font-family:'Space Mono',monospace;font-size:12px;color:#555;">Erstellt den Plan basierend auf Trainingszeiten + Kampfdatum</span>
+      <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);">Erstellt den Plan basierend auf Trainingszeiten + Kampfdatum</span>
     </div>
     <div class="info-box info-tip"><span>💡</span><div>Klicke auf einen <strong>Block</strong> um die vollständige Trainingsanleitung zu sehen. Der Plan wird automatisch neu generiert wenn du ein Kampfdatum einträgst oder änderst.</div></div>`;
 }
@@ -5282,10 +5282,10 @@ function openBlockDetail(day, idx) {
   // ── Top bar: back + done toggle ──
   '<div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;">' +
     '<button onclick="showPage(\'wochenplan\')" class="bd-back">' +
-      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> <span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">ZURÜCK</span>' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> <span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);">ZURÜCK</span>' +
     '</button>' +
     '<div style="display:flex;gap:8px;align-items:center;">' +
-      '<button onclick="editBlockFromDetail(\'' + day + '\',' + idx + ')" style="background:none;border:1px solid var(--surface-2);border-radius:var(--radius-sm);padding:6px 12px;cursor:pointer;font-family:\'Space Mono\',monospace;font-size:10px;color:#555;min-height:36px;">BEARBEITEN</button>' +
+      '<button onclick="editBlockFromDetail(\'' + day + '\',' + idx + ')" style="background:none;border:1px solid var(--surface-2);border-radius:var(--radius-sm);padding:6px 12px;cursor:pointer;font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);min-height:36px;">BEARBEITEN</button>' +
       '<button onclick="toggleBlockDone(\'' + day + '\',' + idx + ',\'' + block.type + '\',\'' + (block.title || '').replace(/'/g,'') + '\')" style="background:' + (isDone ? 'var(--green)' : 'var(--red)') + ';border:none;border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;font-family:\'Space Mono\',monospace;font-size:11px;color:' + (isDone ? '#000' : '#fff') + ';min-height:36px;font-weight:700;">' + (isDone ? '\u2713 ERLEDIGT' : 'ERLEDIGT?') + '</button>' +
     '</div>' +
   '</div>' +
@@ -5732,19 +5732,19 @@ function showBlockDoneModal(day, idx, type, title, needsDuration, needsRpe) {
   modal.innerHTML =
     '<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:24px;width:min(340px,90vw);">' +
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);letter-spacing:1px;margin-bottom:16px;">SESSION ERLEDIGT</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#888;margin-bottom:16px;">' + (title || '').replace(/</g,'&lt;') + '</div>' +
-      (needsDuration ? '<label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;display:block;margin-bottom:4px;">DAUER (MINUTEN)</label>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--grey);margin-bottom:16px;">' + (title || '').replace(/</g,'&lt;') + '</div>' +
+      (needsDuration ? '<label style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;">DAUER (MINUTEN)</label>' +
         '<input type="number" id="bd-duration" class="form-input" placeholder="z.B. 60" min="1" max="300" style="margin-bottom:12px;width:100%;">' : '') +
-      (needsRpe ? '<label style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;display:block;margin-bottom:4px;">WIE HART WAR ES? (1-10)</label>' +
+      (needsRpe ? '<label style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;">WIE HART WAR ES? (1-10)</label>' +
         '<div id="bd-rpe-row" style="display:flex;gap:6px;margin-bottom:16px;">' +
           [1,2,3,4,5,6,7,8,9,10].map(function(n) {
             var col = n <= 3 ? 'var(--green)' : n <= 6 ? 'var(--gold)' : n <= 8 ? 'var(--orange)' : 'var(--red)';
             return '<button class="bd-rpe-btn" data-rpe="' + n + '" onclick="this.parentNode.querySelectorAll(\'.bd-rpe-btn\').forEach(function(b){b.style.background=\'var(--surface-1)\';b.style.color=\'#555\';});this.style.background=\'' + col + '\';this.style.color=\'#000\';this.dataset.selected=\'1\'" ' +
-              'style="flex:1;min-width:0;padding:8px 0;border:none;border-radius:var(--radius-sm);background:var(--surface-1);color:#555;font-family:\'Space Mono\',monospace;font-size:12px;font-weight:700;cursor:pointer;">' + n + '</button>';
+              'style="flex:1;min-width:0;padding:8px 0;border:none;border-radius:var(--radius-sm);background:var(--surface-1);color:var(--text-muted);font-family:\'Space Mono\',monospace;font-size:12px;font-weight:700;cursor:pointer;">' + n + '</button>';
           }).join('') +
         '</div>' : '') +
       '<div style="display:flex;gap:8px;">' +
-        '<button onclick="document.getElementById(\'block-done-modal\').remove()" style="flex:1;padding:10px;border:1px solid var(--surface-3);background:none;color:#888;border-radius:var(--radius-sm);font-family:\'Space Mono\',monospace;font-size:11px;cursor:pointer;">ABBRECHEN</button>' +
+        '<button onclick="document.getElementById(\'block-done-modal\').remove()" style="flex:1;padding:10px;border:1px solid var(--surface-3);background:none;color:var(--grey);border-radius:var(--radius-sm);font-family:\'Space Mono\',monospace;font-size:11px;cursor:pointer;">ABBRECHEN</button>' +
         '<button onclick="submitBlockDone(\'' + day + '\',' + idx + ',\'' + type + '\',\'' + (title || '').replace(/'/g,'') + '\')" class="submit-btn" style="flex:1;padding:10px;font-size:13px;">FERTIG ✓</button>' +
       '</div>' +
     '</div>';
@@ -6173,22 +6173,22 @@ function buildDailyRoutineHTML() {
   const tomorrowTypeLabel = TYPE_LABEL_MAP[tomorrow.type] || tomorrow.type;
   let tomorrowNote = '';
   if (tomorrowIsSparring) {
-    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:#1a1208;border:1px solid var(--orange);border-radius:var(--radius-md);font-size:12px;color:var(--orange);">Morgen: Sparring \u2014 heute fr\u00fch schlafen!</div>`;
+    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:var(--surface-0);border:1px solid var(--orange);border-radius:var(--radius-md);font-size:12px;color:var(--orange);">Morgen: Sparring \u2014 heute fr\u00fch schlafen!</div>`;
   } else if (tomorrowIsBoxing) {
-    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:#0d1a0d;border:1px solid var(--green);border-radius:var(--radius-md);font-size:12px;color:var(--green);">Morgen: ${tomorrowTypeLabel} (${tomorrowLabel}) um ${tomorrow.time || '?'}</div>`;
+    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:var(--surface-0);border:1px solid var(--green);border-radius:var(--radius-md);font-size:12px;color:var(--green);">Morgen: ${tomorrowTypeLabel} (${tomorrowLabel}) um ${tomorrow.time || '?'}</div>`;
   } else if (tomorrow.type === 'frei') {
-    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:var(--surface-1);border:1px solid #333;border-radius:var(--radius-md);font-size:12px;color:#666;">Morgen: Freier Tag (${tomorrowLabel})</div>`;
+    tomorrowNote = `<div style="margin-top:14px;padding:10px 14px;background:var(--surface-1);border:1px solid #333;border-radius:var(--radius-md);font-size:12px;color:var(--text-subtle);">Morgen: Freier Tag (${tomorrowLabel})</div>`;
   }
 
   // Header with today's type
   const headerHTML = `<div style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
-    <span style="font-family:'Space Mono',monospace;font-size:11px;color:#555;">${dayLabel}</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">${dayLabel}</span>
     <span style="background:${isBoxingDay || isSparringDay ? 'var(--red)' : isFreeDay ? 'var(--green)' : 'var(--gold)'};color:#000;font-size:12px;font-weight:700;padding:3px 10px;border-radius:var(--radius-sm);text-transform:uppercase;">${typeLabel}${today.time ? ' \u00b7 ' + today.time : ''}</span>
   </div>`;
 
   // Warnings HTML
   const warningsHTML = warnings.length ? warnings.map(w =>
-    `<div style="margin-bottom:6px;padding:8px 12px;background:#1a1208;border:1px solid var(--orange);border-radius:var(--radius-md);font-size:11px;color:var(--orange);">⚠ ${w}</div>`
+    `<div style="margin-bottom:6px;padding:8px 12px;background:var(--surface-0);border:1px solid var(--orange);border-radius:var(--radius-md);font-size:11px;color:var(--orange);">⚠ ${w}</div>`
   ).join('') : '';
 
   // Filter out noise blocks
@@ -6204,7 +6204,7 @@ function buildDailyRoutineHTML() {
       <div class="routine-label">${isNow ? '<strong>' : ''}<span style="color:${r.color};margin-right:6px;">\u25cf</span> ${r.label}${isNow ? ' \u2190 JETZT</strong>' : ''}</div>
     </div>`;
   }).join('') + tomorrowNote +
-  `<div style="margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;color:#333;">Basierend auf deinem Tagesplan (${today.workStart}\u2013${today.workEnd})${today.time ? ' \u00b7 Training: ' + today.time : ''}</div>`;
+  `<div style="margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text-subtle);">Basierend auf deinem Tagesplan (${today.workStart}\u2013${today.workEnd})${today.time ? ' \u00b7 Training: ' + today.time : ''}</div>`;
 }
 
 // ===== SEARCH =====
@@ -6221,7 +6221,7 @@ function handleSearch(query) {
   }).slice(0, 8);
 
   if (!results.length) {
-    el.innerHTML = '<div class="search-item"><div class="search-item-title" style="color:#555;">Keine Ergebnisse</div></div>';
+    el.innerHTML = '<div class="search-item"><div class="search-item-title" style="color:var(--text-muted);">Keine Ergebnisse</div></div>';
     return;
   }
 
@@ -6484,7 +6484,7 @@ function renderDashboard() {
     var val = scores[a.key];
     return '<div style="flex-shrink:0;text-align:center;padding:6px 10px;border-radius:var(--radius-full);background:' + a.hex + '18;border:1px solid ' + a.hex + '30;min-width:50px;">' +
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:' + a.hex + ';">' + (val !== null ? val : '\u2014') + '</div>' +
-      '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:#555;letter-spacing:1px;">' + a.label + '</div>' +
+      '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:var(--text-muted);letter-spacing:1px;">' + a.label + '</div>' +
     '</div>';
   }).join('');
 
@@ -6508,7 +6508,7 @@ function renderDashboard() {
       var val = scores[a.key];
       return '<div style="text-align:center;padding:6px 8px;border-radius:12px;background:' + a.hex + '18;border:1px solid ' + a.hex + '30;">' +
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:' + a.hex + ';">' + (val !== null ? val : '\u2014') + '</div>' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:#555;letter-spacing:1px;">' + a.label + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:7px;color:var(--text-muted);letter-spacing:1px;">' + a.label + '</div>' +
       '</div>';
     }).join('') +
   '</div>';
@@ -6643,7 +6643,7 @@ function renderDashboard() {
             hrvWarn +
             '<div style="display:flex;gap:8px;margin-top:12px;">' +
               '<button onclick="event.stopPropagation();toggleBlockDone(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ',\'' + nextBlock.type + '\',\'' + (nextBlock.title||'').replace(/'/g,'') + '\')" style="padding:12px 20px;font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1px;border:none;border-radius:var(--radius-sm);cursor:pointer;background:var(--red);color:#fff;min-height:44px;">ERLEDIGT \u2713</button>' +
-              '<button onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" style="padding:12px 16px;font-family:\'Space Mono\',monospace;font-size:12px;border:1px solid var(--surface-3);background:none;border-radius:var(--radius-sm);cursor:pointer;color:#555;min-height:44px;">DETAILS</button>' +
+              '<button onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" style="padding:12px 16px;font-family:\'Space Mono\',monospace;font-size:12px;border:1px solid var(--surface-3);background:none;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-muted);min-height:44px;">DETAILS</button>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -6664,7 +6664,7 @@ function renderDashboard() {
           '<button onclick="toggleBlockDone(\'' + DAY_NAMES[todayDow] + '\',' + bi + ',\'' + b.type + '\',\'' + (b.title||'').replace(/'/g,'') + '\')" style="width:36px;height:36px;border-radius:50%;border:2px solid ' + (done ? 'var(--green)' : 'var(--surface-3)') + ';background:' + (done ? 'var(--green)' : 'none') + ';color:' + (done ? '#000' : '#333') + ';font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (done ? '\u2713' : '') + '</button>' +
           '<div onclick="openBlockDetail(\'' + DAY_NAMES[todayDow] + '\',' + bi + ')" style="flex:1;cursor:pointer;min-width:0;">' +
             '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:' + (done ? '#555' : 'var(--white)') + ';' + (done ? 'text-decoration:line-through;' : '') + '">' + escapeHTML(b.title) + '</div>' +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;">' + (b.time||'') + (b.duration > 0 ? ' · ' + b.duration + ' Min.' : '') + '</div>' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);">' + (b.time||'') + (b.duration > 0 ? ' · ' + b.duration + ' Min.' : '') + '</div>' +
           '</div>' +
         '</div>';
       }).join('');
@@ -6719,7 +6719,7 @@ function renderDashboard() {
         return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--surface-1);">' +
           '<div style="min-width:0;">' +
             '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHTML(name) + '</div>' +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#444;">' + entries.length + ' Einträge · zuletzt ' + last + ' kg</div>' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);">' + entries.length + ' Einträge · zuletzt ' + last + ' kg</div>' +
           '</div>' +
           '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:' + (diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : '#555') + ';">' + (diff > 0 ? '+' : '') + diff.toFixed(1) + '</div>' +
         '</div>';
@@ -6881,16 +6881,16 @@ function renderSäulenSelfRating() {
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SÄULEN-CHECK' +
       (needsUpdate ? ' <span style="font-size:11px;color:var(--red);">AKTUALISIEREN</span>' : '') +
     '</div>' +
-    '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;">' +
+    '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-subtle);">' +
       (lastUpdated ? 'Vor ' + daysAgo + ' Tagen' : 'Noch nie bewertet') +
       ' ▾</span>' +
   '</div>' +
   '<div id="sr-form" style="display:' + (needsUpdate ? 'block' : 'none') + ';">' +
-    '<div style="font-family:\'DM Sans\',sans-serif;font-size:11px;color:#444;margin-bottom:12px;">Bewerte dich ehrlich 1-5. Kraft + Ausdauer + Ernährung fliessen auch aus Benchmarks/HRV ein.</div>' +
+    '<div style="font-family:\'DM Sans\',sans-serif;font-size:11px;color:var(--text-muted);margin-bottom:12px;">Bewerte dich ehrlich 1-5. Kraft + Ausdauer + Ernährung fliessen auch aus Benchmarks/HRV ein.</div>' +
     ratingAxes.map(function(a) {
       var val = sr[a.key] || 0;
       return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--surface-1);">' +
-        '<div style="min-width:80px;"><div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;letter-spacing:1px;">' + a.label.toUpperCase() + '</div></div>' +
+        '<div style="min-width:80px;"><div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px;">' + a.label.toUpperCase() + '</div></div>' +
         '<div style="display:flex;gap:3px;">' +
           [1,2,3,4,5].map(function(n) {
             var filled = n <= val;
@@ -6901,7 +6901,7 @@ function renderSäulenSelfRating() {
             '" title="' + n + '/5"></span>';
           }).join('') +
         '</div>' +
-        '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:10px;color:#333;margin-left:4px;">' + a.hint + '</div>' +
+        '<div style="flex:1;font-family:\'DM Sans\',sans-serif;font-size:10px;color:var(--text-subtle);margin-left:4px;">' + a.hint + '</div>' +
       '</div>';
     }).join('') +
   '</div>';
@@ -6955,7 +6955,7 @@ function renderBenchSummary() {
       item.style.cssText = 'cursor:pointer;';
       item.onclick = function() { showPage('tests'); };
       item.innerHTML = '<canvas id="dash-spark-' + bench.id + '" width="80" height="30" style="display:block;"></canvas>' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;margin-top:2px;">' + val + ' ' + bench.unit +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);margin-top:2px;">' + val + ' ' + bench.unit +
         ' <span style="color:' + trend.color + ';">' + trend.arrow + '</span>' +
         (daysAgo > 30 ? ' <span style="color:var(--gold);">!</span>' : '') +
         '</div>';
@@ -7272,7 +7272,7 @@ function renderTestsPage() {
         <div class="tests-overall-score">${overall !== null ? overall + '%' : '–'}</div>
         <div>
           <div class="tests-overall-label">${overallLevel ? overallLevel.label.toUpperCase() : 'KEINE DATEN'}</div>
-          <div style="font-family:'Space Mono',monospace;font-size:11px;color:#444;margin-top:2px;">Gesamt · ${filled.length}/${RADAR_AXES.length} Achsen</div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:2px;">Gesamt · ${filled.length}/${RADAR_AXES.length} Achsen</div>
         </div>
       </div>
       ${RADAR_AXES.map(a => {
@@ -7289,7 +7289,7 @@ function renderTestsPage() {
           </div>
         </div>`;
       }).join('')}
-      ${vo2max ? `<div style="font-family:'Space Mono',monospace;font-size:11px;color:#555;margin-top:6px;padding-top:8px;border-top:1px solid var(--surface-2);">VO₂max (geschätzt): <strong style="color:var(--blue);">${vo2max} ml/kg/min</strong></div>` : ''}
+      ${vo2max ? `<div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:6px;padding-top:8px;border-top:1px solid var(--surface-2);">VO₂max (geschätzt): <strong style="color:var(--blue);">${vo2max} ml/kg/min</strong></div>` : ''}
       ${weakest ? `<div class="tests-weakest">Schwächstes Glied: <strong>${weakest.label} (${weakest.val}%)</strong> – das Fass-Prinzip: Dein Gesamtniveau wird von der schwächsten Säule begrenzt.</div>` : ''}
     </div>
   </div>`;
@@ -7359,7 +7359,7 @@ function renderTestsPage() {
       progressHTML = '<div class="tests-cluster" style="margin-bottom:20px;">'
         + '<div class="tests-cluster-header">'
         + '<span class="tests-cluster-title" style="color:var(--gold);">DEIN FORTSCHRITT</span>'
-        + '<span class="tests-cluster-avg" style="color:#888;">Vergleich mit vor 8 Wochen</span>'
+        + '<span class="tests-cluster-avg" style="color:var(--grey);">Vergleich mit vor 8 Wochen</span>'
         + '</div>'
         + '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#aaa;padding:10px 14px 6px;border-bottom:1px solid var(--surface-2);">'
         + summaryText
@@ -7368,9 +7368,9 @@ function renderTestsPage() {
           '<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--surface-1);font-family:\'Space Mono\',monospace;font-size:12px;gap:4px;">'
           + '<div style="flex:1;min-width:0;">'
           + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:1px;color:#ccc;">' + p.name + '</div>'
-          + '<div style="color:#666;font-size:11px;margin-top:2px;">' + p.refVal + ' \u2192 ' + p.curVal + ' ' + p.unit + '</div>'
+          + '<div style="color:var(--text-subtle);font-size:11px;margin-top:2px;">' + p.refVal + ' \u2192 ' + p.curVal + ' ' + p.unit + '</div>'
           + '</div>'
-          + '<div style="text-align:center;padding:0 12px;font-size:11px;color:#555;letter-spacing:1px;" title="Verlauf">' + p.sparkline + '</div>'
+          + '<div style="text-align:center;padding:0 12px;font-size:11px;color:var(--text-muted);letter-spacing:1px;" title="Verlauf">' + p.sparkline + '</div>'
           + '<div style="text-align:right;min-width:90px;">'
           + '<span style="color:' + p.color + ';font-weight:bold;font-size:14px;">' + p.arrow + ' ' + (p.absDiff % 1 === 0 ? p.absDiff : p.absDiff.toFixed(1)) + ' ' + p.unit + '</span>'
           + '<div style="color:' + p.color + ';font-size:11px;">' + p.pctChange + '%</div>'
@@ -7383,7 +7383,7 @@ function renderTestsPage() {
         + '<div class="tests-cluster-header">'
         + '<span class="tests-cluster-title" style="color:var(--gold);">DEIN FORTSCHRITT</span>'
         + '</div>'
-        + '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:#555;padding:14px;text-align:center;">'
+        + '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);padding:14px;text-align:center;">'
         + 'Trage regelm\u00e4\u00dfig Werte ein um deinen Fortschritt zu sehen'
         + '</div>'
         + '</div>';
@@ -7413,7 +7413,7 @@ function renderTestsPage() {
     return `<div class="tests-cluster">
       <div class="tests-cluster-header">
         <span class="tests-cluster-title" style="color:${clusterColors[c]};">${c.toUpperCase()}</span>
-        ${clusterLevel ? `<span class="tests-cluster-avg" style="color:${clusterLevel.color};">${clusterLevel.label} · ${clusterAvg}%</span>` : '<span class="tests-cluster-avg" style="color:#333;">– Noch keine Tests</span>'}
+        ${clusterLevel ? `<span class="tests-cluster-avg" style="color:${clusterLevel.color};">${clusterLevel.label} · ${clusterAvg}%</span>` : '<span class="tests-cluster-avg" style="color:var(--text-subtle);">– Noch keine Tests</span>'}
       </div>
       ${items.map(b => {
         const val = data.benchmarks[b.id] || 0;
@@ -7447,7 +7447,7 @@ function renderTestsPage() {
         if (hist.length >= 2) {
           sparkHTML = '<canvas id="' + sparkId + '" width="120" height="40" style="cursor:pointer;vertical-align:middle;" onclick="showBenchDetail(\'' + b.id + '\')"></canvas>';
         } else if (val > 0) {
-          sparkHTML = '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#333;">Teste erneut fürFortschritt</span>';
+          sparkHTML = '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-subtle);">Teste erneut fürFortschritt</span>';
         }
 
         // Due for retest?
@@ -7516,10 +7516,10 @@ function renderTestsPage() {
         ${BENCHMARKS.map(b => {
           const curVal = data.benchmarks[b.id] || '';
           return `<div style="display:flex;flex-direction:column;gap:4px;">
-            <label style="font-family:'Space Mono',monospace;font-size:10px;color:#555;letter-spacing:1px;">${b.name.toUpperCase()}</label>
+            <label style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px;">${b.name.toUpperCase()}</label>
             <div style="display:flex;align-items:center;gap:6px;">
               <input type="number" id="batch-${b.id}" class="form-input" style="flex:1;padding:8px 10px;font-size:13px;" placeholder="${curVal || b.target}" value="${curVal}" step="any">
-              <span style="font-family:'Space Mono',monospace;font-size:10px;color:#444;">${b.unit}</span>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted);">${b.unit}</span>
             </div>
           </div>`;
         }).join('')}
@@ -7543,7 +7543,7 @@ function renderTestsPage() {
       ${benchHTML}
     </div>
     <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;">
-      <span style="font-family:'Space Mono',monospace;font-size:11px;color:#444;align-self:center;">SIEHE AUCH:</span>
+      <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);align-self:center;">SIEHE AUCH:</span>
       <button onclick="showPage('periodisierung')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Periodisierung</button>
       <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
     </div>`;
@@ -7592,24 +7592,24 @@ function showBenchDetail(benchId) {
 
   modal.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
     '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--white);letter-spacing:1px;">' + b.name + '</div>' +
-    '<span onclick="document.getElementById(\'bench-detail-overlay\').remove()" style="font-size:24px;color:#333;cursor:pointer;">\u00d7</span>' +
+    '<span onclick="document.getElementById(\'bench-detail-overlay\').remove()" style="font-size:24px;color:var(--text-subtle);cursor:pointer;">\u00d7</span>' +
   '</div>' +
   '<div style="display:flex;align-items:baseline;gap:16px;margin-bottom:16px;">' +
-    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:40px;color:var(--white);">' + val + '<span style="font-size:16px;color:#555;"> ' + b.unit + '</span></div>' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:40px;color:var(--white);">' + val + '<span style="font-size:16px;color:var(--text-muted);"> ' + b.unit + '</span></div>' +
     '<div style="font-family:\'Space Mono\',monospace;font-size:14px;color:' + trend.color + ';">' + trend.arrow + ' ' + (b.inverse ? (pctChange < 0 ? '' : '+') : (pctChange > 0 ? '+' : '')) + pctChange + '% seit Start</div>' +
   '</div>' +
   '<canvas id="bench-detail-chart" width="560" height="200" style="width:100%;height:200px;margin-bottom:16px;"></canvas>' +
   '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px;background:var(--surface-1);border-radius:var(--radius-md);">' +
-    '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">BESTLEISTUNG</span><br><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--gold);">' + bestVal + ' ' + b.unit + '</span></div>' +
-    '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">AM</span><br><span style="font-family:\'Space Mono\',monospace;font-size:12px;color:#888;">' + (bestEntry ? bestEntry.date : '') + '</span></div>' +
-    '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:#555;">EINTRAEGE</span><br><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);">' + hist.length + '</span></div>' +
+    '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);">BESTLEISTUNG</span><br><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--gold);">' + bestVal + ' ' + b.unit + '</span></div>' +
+    '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);">AM</span><br><span style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--grey);">' + (bestEntry ? bestEntry.date : '') + '</span></div>' +
+    '<div><span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);">EINTRAEGE</span><br><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--white);">' + hist.length + '</span></div>' +
   '</div>' +
-  '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:#555;letter-spacing:1px;margin-bottom:8px;">VERLAUF</div>' +
+  '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">VERLAUF</div>' +
   '<div style="display:flex;flex-direction:column;gap:4px;">' +
     hist.slice().reverse().map(function(h, i) {
       var isBest = h.value === bestVal;
       return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surface-1);border-radius:var(--radius-sm);' + (isBest ? 'border-left:2px solid var(--gold);' : '') + '">' +
-        '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:#555;">' + h.date + '</span>' +
+        '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);">' + h.date + '</span>' +
         '<span style="font-family:\'Space Mono\',monospace;font-size:13px;color:' + (isBest ? 'var(--gold)' : 'var(--white)') + ';">' + h.value + ' ' + b.unit + (isBest ? ' \u2605' : '') + '</span>' +
         '<span onclick="deleteBenchEntry(\'' + benchId + '\',\'' + h.date + '\')" style="font-size:12px;color:#222;cursor:pointer;padding:0 4px;" title="Löschen">\u00d7</span>' +
       '</div>';
@@ -7723,7 +7723,7 @@ function renderChecklist() {
         <span style="font-size:13px;color:${checked ? '#555' : 'var(--light)'};">${item.label}</span>
       </div>`;
     }).join('')}
-    <div style="margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;color:#333;">Checklist resettet sich jeden Tag automatisch</div>`;
+    <div style="margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text-subtle);">Checklist resettet sich jeden Tag automatisch</div>`;
 }
 
 // ===== COLLAPSIBLE SECTIONS =====
