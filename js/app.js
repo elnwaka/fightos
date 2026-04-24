@@ -4877,12 +4877,10 @@ function renderWeekPlan() {
 function _renderWeekPlanInner() {
   const data = getData();
   if (!data) return;
-  // Only regenerate if no saved plan exists or if fight date / schedule changed
-  const s = getUserSchedule();
-  const planKey = (data.fightDate || '') + '|' + JSON.stringify(s.weekSchedule);
-  if (!data.weekPlan || data._weekPlanKey !== planKey) {
+  // Only generate if NO plan exists at all — never overwrite manual edits
+  if (!data.weekPlan || Object.keys(data.weekPlan).length === 0) {
     data.weekPlan = generateSmartWeekPlan();
-    data._weekPlanKey = planKey;
+    data._weekPlanKey = (data.fightDate || '') + '|' + JSON.stringify(getUserSchedule().weekSchedule);
     saveData(data);
   }
   const plan = data.weekPlan;
@@ -5580,7 +5578,9 @@ function saveBlock() {
 
   saveData(data);
   closeBlockModal();
+  showPage('wochenplan');
   renderWeekPlan();
+  showToast('Block gespeichert', 'success', 1500);
 }
 
 function autoAdjustWeekPlan(data, changedDay, changedIdx) {
@@ -5656,7 +5656,9 @@ function deleteBlock() {
   data.weekPlan[editingBlock.day].splice(editingBlock.idx, 1);
   saveData(data);
   closeBlockModal();
+  showPage('wochenplan');
   renderWeekPlan();
+  showToast('Block gelöscht', 'info', 1500);
 }
 
 function closeBlockModal() { closeModal(document.getElementById('block-modal')); editingBlock = null; }
