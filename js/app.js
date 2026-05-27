@@ -5027,7 +5027,7 @@ function _renderWeekPlanInner() {
       if (!s.gymAccess || s.gymAccess === 'none') hints.push('Equipment: Körpergewicht');
       else if (s.gymAccess === 'basic') hints.push('Equipment: Basis');
       else hints.push('Equipment: Volles Gym');
-      hints.push('Level: ' + (s.experienceLevel === 'anfaenger' ? 'Anfaenger' : s.experienceLevel === 'wettkampf' ? 'Wetkaempfer' : 'Fortgeschritten'));
+      hints.push('Level: ' + (s.experienceLevel === 'anfaenger' ? 'Anfänger' : s.experienceLevel === 'wettkampf' ? 'Wettkämpfer' : 'Fortgeschritten'));
       hints.push('S&C: max ' + (s.experienceLevel === 'anfaenger' ? '2' : '3') + 'x/Woche');
       // Shift-Work Warnung
       var wh = parseInt((s.workStart || '08:00').split(':')[0]);
@@ -5096,7 +5096,7 @@ function _renderWeekPlanInner() {
         actions +
       '</div>';
     })()}
-    ${!data.fightDate ? '<div class="info-box info-tip" style="margin-bottom:20px;"><span>💡</span><div>Trage auf dem Dashboard ein <strong>Kampfdatum</strong> ein – der Wochenplan passt sich automatisch an (Schärfen, Kampf-Modus, Recovery).</div></div>' : ''}
+    ${!data.fightDate ? '<div class="info-box info-tip" style="margin-bottom:20px;"><span>💡</span><div>Trage unter <strong>Profil → Account → Kampf</strong> ein Kampfdatum ein – der Plan passt sich automatisch an.</div></div>' : ''}
     ${(function() {
       var coveredSet = {};
       DAY_NAMES.forEach(function(day) {
@@ -5345,9 +5345,9 @@ function openBlockDetail(day, idx) {
         (ex.sets ? '<div class="bd-ex-sets">' + escapeHTML(ex.sets) + '</div>' : '') +
         (ex.rest ? '<div class="bd-ex-rest">' + escapeHTML(ex.rest) + '</div>' : '') +
       '</div>' +
-      '<div class="bd-ex-weight">' +
+      (block.type === 'strength' ? '<div class="bd-ex-weight">' +
         '<input type="number" class="bd-weight-input" data-exid="' + (ex.id || '') + '" placeholder="kg" value="' + prev + '" title="Gewicht' + escapeHTML(prevHint) + '" step="0.5" min="0">' +
-      '</div>' +
+      '</div>' : '') +
     '</div>';
   }
 
@@ -6715,17 +6715,21 @@ function renderDashboard() {
       '<div class="db-hero-fade"></div>' +
       '<div class="db-hero-inner">' +
         '<div class="db-hero-name">' + escapeHTML(getDisplayName()) + '</div>' +
-        '<div style="display:flex;align-items:baseline;gap:12px;margin-top:8px;flex-wrap:wrap;">' +
-          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(24px,4vw,36px);color:var(--white);">' + wins + 'S<span style="color:var(--text-subtle);"> – </span>' + losses + 'N<span style="color:var(--text-subtle);"> – </span>' + draws + 'U</div>' +
-          (koRate > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);">' + koRate + '% KO</div>' : '') +
-          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:rgba(255,255,255,.3);">' + weightClass + '</div>' +
-        '</div>' +
+        (totalFights > 0 ?
+          '<div style="display:flex;align-items:baseline;gap:12px;margin-top:8px;flex-wrap:wrap;">' +
+            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(24px,4vw,36px);color:var(--white);">' + wins + 'S<span style="color:var(--text-subtle);"> – </span>' + losses + 'N<span style="color:var(--text-subtle);"> – </span>' + draws + 'U</div>' +
+            (koRate > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);">' + koRate + '% KO</div>' : '') +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:rgba(255,255,255,.3);">' + weightClass + '</div>' +
+          '</div>'
+        :
+          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:rgba(255,255,255,.3);margin-top:8px;">' + weightClass + '</div>'
+        ) +
       '</div>' +
     '</div>' +
 
     // ══ STATS BAR ══
     '<div class="db-stats-row">' +
-      '<div class="db-stat-cell"><div class="db-stat-num" style="color:var(--gold);">' + (overall !== null ? overall : '\u2014') + '</div><div class="db-stat-lbl">SCORE</div></div>' +
+      '<div class="db-stat-cell"><div class="db-stat-num" style="color:var(--gold);">' + (overall !== null ? overall : '?') + '</div><div class="db-stat-lbl">' + (overall !== null ? 'SCORE' : 'TESTE DICH') + '</div></div>' +
       '<div class="db-stat-cell"><div class="db-stat-num">' + totalFights + '</div><div class="db-stat-lbl">K\u00c4MPFE</div></div>' +
       '<div class="db-stat-cell"><div class="db-stat-num">' + totalSessions + '</div><div class="db-stat-lbl">SESSIONS</div></div>' +
       '<div class="db-stat-cell"><div class="db-stat-num">' + totalDone + '/' + totalPlanned + '</div><div class="db-stat-lbl">WOCHE</div></div>' +
