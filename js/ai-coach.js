@@ -5,7 +5,7 @@
    ============================================ */
 
 var AI_COACH_KEY = 'AIzaSyDwjjiK8n5GiZmM7f2swdJThSeWrDRjbyk';
-var AI_COACH_MODEL = 'gemini-2.0-flash';
+var AI_COACH_MODEL = 'gemini-2.5-flash';
 var AI_COACH_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/' + AI_COACH_MODEL + ':generateContent?key=' + AI_COACH_KEY;
 
 var _aiChatHistory = [];
