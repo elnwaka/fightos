@@ -94,6 +94,53 @@ DEINE REGELN ALS COACH:
 6. Halte Antworten unter 300 Wörter — ein Trainer redet nicht ewig
 7. Nutze die TLAC-Methodik als Grundlage, aber nenne sie nie beim Namen — es ist FightOS-Wissen
 8. Wenn nach Gameplan gefragt: Distanz-Strategie, Schlüssel-Kombis, Runden-Taktik, Sparring-Drills
+
+=== AKTIONEN — DU KANNST DIE APP STEUERN ===
+Du kannst AKTIONEN ausführen indem du spezielle Tags in deine Antwort einbaust. Der User sieht diese Tags NICHT — sie werden automatisch als Buttons/Links gerendert.
+
+Verfügbare Aktionen (schreibe diese EXAKT so in deine Antwort):
+
+[ACTION:NAVIGATE:wochenplan] → Öffnet den Wochenplan
+[ACTION:NAVIGATE:training] → Öffnet die Training-Seite
+[ACTION:NAVIGATE:fights] → Öffnet die Kämpfe-Seite
+[ACTION:NAVIGATE:profil] → Öffnet das Profil
+[ACTION:NAVIGATE:wissen] → Öffnet die Video-Bibliothek
+
+[ACTION:VIDEO:VIDEO_ID:TITEL] → Öffnet ein Video aus der Bibliothek
+Verfügbare Videos:
+- [ACTION:VIDEO:hq7evFpmVek:Mayweathers Taktiken] — Defense & Ring IQ
+- [ACTION:VIDEO:HKU49EclMX8:Lomachenkos Stil] — Winkel & Fußarbeit
+- [ACTION:VIDEO:TwHkGZvGZoM:Usyks System] — System & Taktik
+- [ACTION:VIDEO:Yc6RaEjDwl8:Inoues Killer-Stil] — Power & Timing
+- [ACTION:VIDEO:Ihe9nXXyo1w:Andre Wards Taktiken] — Taktik & Clinch
+- [ACTION:VIDEO:y1UZRV266B0:Caleb Plants Techniken] — Jab-Varianten & Kreativität
+- [ACTION:VIDEO:Po3Dwu1Bb30:Ring abschneiden] — Ring Cut & Druck
+- [ACTION:VIDEO:ONap_xV3ViE:Whitakers Defense] — Defensive Meisterschaft
+- [ACTION:VIDEO:sHIaIDnxXbU:Perfekter Boxer] — Technische Perfektion
+- [ACTION:VIDEO:Jg2CgIK8nFk:Boring Fundamentals] — Grundlagen
+- [ACTION:VIDEO:rwAGGeOk4_Q:Pro Shadow Boxing] — Schattenboxen wie Profis
+- [ACTION:VIDEO:r7MUFC7xA0w:10 Min Verbesserung] — Schnelle Amateur-Tipps
+- [ACTION:VIDEO:hmFQTjxlE5M:Conditioning Ranking] — Beste Methoden
+- [ACTION:VIDEO:22zeL5FuCv0:S&C Guide] — Individualisierung
+- [ACTION:VIDEO:fWSdk2qeRlY:Fight IQ Blueprint] — Fußarbeit, Defense, IQ
+
+[ACTION:REGENERATE_PLAN] → Generiert den Wochenplan neu
+[ACTION:ACTIVATE_DELOAD] → Aktiviert eine Deload-Woche
+[ACTION:SET_PROGRAM:10w] → Wechselt zum 10-Wochen-Programm
+[ACTION:SET_PROGRAM:standard] → Wechselt zum Standard-Programm
+
+WANN AKTIONEN NUTZEN:
+- Wenn du ein Video empfiehlst, füge IMMER die passende [ACTION:VIDEO:...] ein
+- Wenn du sagst "schau dir deinen Plan an", füge [ACTION:NAVIGATE:wochenplan] ein
+- Wenn du sagst "du brauchst einen Deload", füge [ACTION:ACTIVATE_DELOAD] ein
+- Wenn du über Technik redest, verlinke passende Videos
+- Nutze MEHRERE Aktionen pro Antwort wenn sinnvoll
+
+BEISPIEL-ANTWORT:
+"Dein Jab ist das wichtigste Werkzeug. Es gibt verschiedene Varianten — Caleb Plant nutzt z.B. den Shovel Jab sehr kreativ. Schau dir das an:
+[ACTION:VIDEO:y1UZRV266B0:Caleb Plants Techniken]
+Und für die Grundlagen:
+[ACTION:VIDEO:Jg2CgIK8nFk:Boring Fundamentals]"
 `;
 
 // ===== BUILD USER CONTEXT =====
@@ -262,12 +309,45 @@ function renderCoachMessages() {
 }
 
 function formatCoachText(text) {
-  // Simple markdown-like formatting
+  // Process ACTION tags into buttons BEFORE other formatting
+  // [ACTION:VIDEO:ID:TITLE]
+  text = text.replace(/\[ACTION:VIDEO:([a-zA-Z0-9_-]+):(.*?)\]/g, function(match, id, title) {
+    return '<button onclick="closeAICoachAndDo(function(){openVideoPlayer(\'' + id + '\',\'' + title.replace(/'/g,'') + '\')})" class="ai-action-btn ai-action-video">▶ ' + title + '</button>';
+  });
+  // [ACTION:NAVIGATE:PAGE]
+  text = text.replace(/\[ACTION:NAVIGATE:(\w+)\]/g, function(match, page) {
+    var labels = { wochenplan:'Wochenplan öffnen', training:'Training öffnen', fights:'Kämpfe öffnen', profil:'Profil öffnen', wissen:'Video-Bibliothek öffnen' };
+    var label = labels[page] || page;
+    // For wissen: navigate to training then switch tab
+    var action = page === 'wissen' ? "showPage('training');setTimeout(function(){switchTrainingTab('wissen')},300)" : "showPage('" + page + "')";
+    return '<button onclick="closeAICoachAndDo(function(){' + action + '})" class="ai-action-btn ai-action-nav">→ ' + label + '</button>';
+  });
+  // [ACTION:REGENERATE_PLAN]
+  text = text.replace(/\[ACTION:REGENERATE_PLAN\]/g,
+    '<button onclick="closeAICoachAndDo(function(){var d=getData();d.weekPlan=generateCurrentWeekPlan();saveData(d);showPage(\'wochenplan\');showToast(\'Plan neu generiert\')})" class="ai-action-btn ai-action-do">⟳ Plan neu generieren</button>');
+  // [ACTION:ACTIVATE_DELOAD]
+  text = text.replace(/\[ACTION:ACTIVATE_DELOAD\]/g,
+    '<button onclick="closeAICoachAndDo(function(){if(typeof activateDeload===\'function\')activateDeload();showToast(\'Deload aktiviert\')})" class="ai-action-btn ai-action-do">↓ Deload aktivieren</button>');
+  // [ACTION:SET_PROGRAM:TYPE]
+  text = text.replace(/\[ACTION:SET_PROGRAM:(\w+)\]/g, function(match, prog) {
+    var label = prog === '10w' ? '10-Wochen-Programm aktivieren' : 'Standard-Programm aktivieren';
+    return '<button onclick="closeAICoachAndDo(function(){var u=safeParse(\'fos_users\',{});if(u[currentUser]){u[currentUser].trainingProgram=\'' + prog + '\';localStorage.setItem(\'fos_users\',JSON.stringify(u));var d=getData();if(\'' + prog + '\'===\'10w\'&&!d.program10wStart)d.program10wStart=new Date().toISOString().split(\'T\')[0];d.weekPlan=generateCurrentWeekPlan();saveData(d);showPage(\'wochenplan\');showToast(\'' + label + '\')}})" class="ai-action-btn ai-action-do">★ ' + label + '</button>';
+  });
+
+  // Standard markdown formatting
   return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n/g, '<br>')
     .replace(/• /g, '&bull; ')
     .replace(/(\d+)\. /g, '<strong>$1.</strong> ');
+}
+
+// Helper: close coach panel then execute action
+function closeAICoachAndDo(fn) {
+  _aiCoachOpen = false;
+  var panel = document.getElementById('ai-coach-panel');
+  if (panel) panel.classList.remove('open');
+  setTimeout(fn, 200);
 }
 
 async function sendCoachMessage() {
@@ -322,10 +402,11 @@ function initAICoach() {
     '</div>' +
     '<div id="ai-coach-messages" class="ai-coach-messages"></div>' +
     '<div class="ai-coach-quick">' +
-      '<button onclick="coachQuickPrompt(\'Was soll ich heute trainieren?\')" class="ai-quick-btn">Heute trainieren?</button>' +
-      '<button onclick="coachQuickPrompt(\'Erstelle mir einen Gameplan gegen einen Southpaw-Infighter\')" class="ai-quick-btn">Gameplan</button>' +
-      '<button onclick="coachQuickPrompt(\'Wie sollte ich mich diese Woche ernähren?\')" class="ai-quick-btn">Ernährung</button>' +
-      '<button onclick="coachQuickPrompt(\'Analysiere meinen Trainingsplan — was fehlt?\')" class="ai-quick-btn">Plan Check</button>' +
+      '<button onclick="coachQuickPrompt(\'Was soll ich heute trainieren? Zeig mir auch passende Videos.\')" class="ai-quick-btn">Heute?</button>' +
+      '<button onclick="coachQuickPrompt(\'Gameplan gegen einen großen Southpaw-Distanzkämpfer. Zeig mir Videos zu den Techniken.\')" class="ai-quick-btn">Gameplan</button>' +
+      '<button onclick="coachQuickPrompt(\'Analysiere meinen Plan — was fehlt? Ändere es wenn nötig.\')" class="ai-quick-btn">Plan Check</button>' +
+      '<button onclick="coachQuickPrompt(\'Zeig mir Videos um meinen Jab zu verbessern — verschiedene Varianten.\')" class="ai-quick-btn">Jab lernen</button>' +
+      '<button onclick="coachQuickPrompt(\'Ich will mein Ring IQ verbessern. Was muss ich tun und was anschauen?\')" class="ai-quick-btn">Ring IQ</button>' +
     '</div>' +
     '<div class="ai-coach-input-row">' +
       '<input type="text" id="ai-coach-input" placeholder="Frag deinen Coach..." onkeydown="if(event.key===\'Enter\')sendCoachMessage()">' +
