@@ -4,9 +4,9 @@
    Fed with TLAC methodology + user context
    ============================================ */
 
-var AI_COACH_KEY = 'AIzaSyDwjjiK8n5GiZmM7f2swdJThSeWrDRjbyk';
+// API Key is now hidden server-side in Netlify Function
 var AI_COACH_MODEL = 'gemini-2.5-flash';
-var AI_COACH_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/' + AI_COACH_MODEL + ':generateContent?key=' + AI_COACH_KEY;
+var AI_COACH_ENDPOINT = '/.netlify/functions/ai-proxy';
 
 var _aiChatHistory = [];
 var _aiCoachOpen = false;
@@ -388,6 +388,7 @@ async function sendToCoach(userMessage) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        model: AI_COACH_MODEL,
         contents: contents,
         generationConfig: {
           temperature: 0.7,
