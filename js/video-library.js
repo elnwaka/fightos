@@ -13,9 +13,15 @@ var VIDEO_LIBRARY = [
     videos: [
       { id: 'hq7evFpmVek', title: 'Mayweathers unterschätzte Taktiken', desc: 'Nicht der Defensive Mayweather den alle kennen — die offensiven Tricks die niemand sieht.', duration: '15:00', tags: ['Defense','Ring IQ','Konter'] },
       { id: 'pqroVNFSlcs', title: 'Wie Ali "Fehler" zu Meisterwerken machte', desc: 'Die Regeln die Ali brach — und warum sie trotzdem funktionieren.', duration: '16:00', tags: ['Unkonventionell','Kopfbewegung','Reichweite'] },
-      { id: '73yNFaIG0Sc', title: 'Roberto Durans böser Stil', desc: 'Inside Fighting, Aggression und Druck auf höchstem Niveau.', duration: '14:00', tags: ['Infighter','Druck','Körper'] },
+      { id: '73yNFaIG0Sc', title: 'Roberto Durans böser Stil', desc: 'Inside Fighting, Aggression und Druck auf höchstem Niveau. "Hands of Stone".', duration: '14:00', tags: ['Infighter','Druck','Körper'] },
+      { id: 'z1c06v9JAQo', title: 'Sugar Ray Leonards schnelle Hände & Füße', desc: 'Wie Leonard mit Speed und Fußarbeit jeden outboxte. Konterpunching auf Weltklasse-Niveau.', duration: '15:00', tags: ['Speed','Fußarbeit','Konter'] },
       { id: 'nQ75ROGzG2o', title: 'Finito Lopez — Gewalt als Eleganz', desc: 'Wie der kleine Meister rohe Kraft in Kunstform verwandelte.', duration: '15:00', tags: ['Technik','Effizienz','Klein'] },
-      { id: 'ONap_xV3ViE', title: 'Der größte Defensiv-Boxer aller Zeiten', desc: 'Pernell Whitakers seidige Fußarbeit und unerreichte Defense.', duration: '14:00', tags: ['Defense','Fußarbeit','Slips'] }
+      { id: 'ONap_xV3ViE', title: 'Pernell Whitaker — Defensive Meisterschaft', desc: 'Seidige Fußarbeit und unerreichte Defense. Der Mann den niemand treffen konnte.', duration: '14:00', tags: ['Defense','Fußarbeit','Slips'] },
+      { id: 'or3HlkudTEg', title: 'Salvador Sanchez — Konterpunching', desc: 'Lee Wylies legendärer Breakdown des mexikanischen Genies. Timing und Antizipation.', duration: '10:00', tags: ['Konter','Timing','Mexikanisch'] },
+      { id: 'bJCibcYHn-w', title: 'Marvin Haglers Switch-Hitter-Stil', desc: 'Wie Hagler zwischen Orthodox und Southpaw wechselte um Gegner zu verwirren.', duration: '14:00', tags: ['Switch','Southpaw','Druck'] },
+      { id: 'W9gZc20bte8', title: 'Wie Pacquiao jüngere Konkurrenz besiegte', desc: 'Die Anpassungen die den "Manila Ice" auch im Alter gefährlich machten.', duration: '16:00', tags: ['Speed','Anpassung','Winkel'] },
+      { id: 'TpndpNJXFDk', title: 'Elite-Angriffsmethoden im Boxen', desc: 'Lee Wylies Analyse der 5 Angriffsmethoden — universelle Prinzipien jedes Stils.', duration: '12:00', tags: ['Angriff','Methoden','Universell'] },
+      { id: 'EEDq_2KiN44', title: 'Die Kunst des Seitenschritts (Winkel)', desc: 'Lee Wylies Studie über Seitenschritte und Winkel — die Geheimwaffe der Besten.', duration: '8:00', tags: ['Winkel','Seitenschritt','Fußarbeit'] }
     ]
   },
 
@@ -28,11 +34,15 @@ var VIDEO_LIBRARY = [
       { id: 'HKU49EclMX8', title: 'Lomachenkos High-Tech-Stil', desc: 'Winkel kreieren, Guard-Manipulation, Fußarbeit die keiner kopieren kann — bis jetzt.', duration: '18:00', tags: ['Winkel','Fußarbeit','Guard'] },
       { id: 'TwHkGZvGZoM', title: 'Usyks System verstehen', desc: 'Das komplette System — vom Cruiser zum Schwergewicht. Wie er trainiert und warum es funktioniert.', duration: '20:00', tags: ['System','Allrounder','Taktik'] },
       { id: 'Yc6RaEjDwl8', title: 'Naoya Inoues Killer-Stil', desc: 'Der gefährlichste Bantamgewichtler der Geschichte — Timing, Power, Finishing.', duration: '14:00', tags: ['Power','Timing','KO'] },
+      { id: 'fdwifcLaiR8', title: 'Canelos Stil verstehen (Teil 1)', desc: 'Was Canelo großartig macht — Kopfbewegung, Counter, Körperschläge.', duration: '17:00', tags: ['Counter','Kopfbewegung','Körper'] },
+      { id: 'd278zOcMD5A', title: 'Wie Canelo Riesen besiegt (Teil 2)', desc: 'Die Taktiken gegen größere Gegner — Distance Closing, Body Attack, Timing.', duration: '15:00', tags: ['Größenvorteil','Taktik','Body'] },
+      { id: 'L5R5UNJPhCU', title: 'Wie Crawford Canelo neutralisierte', desc: 'Taktische Analyse des größten Kampfes 2025. Crawfords Anpassungen Runde für Runde.', duration: '18:00', tags: ['Taktik','Anpassung','Elite'] },
       { id: 'sYmTdwP40Yc', title: 'Ryan Garcias Stil — mehr als Speed?', desc: 'Was steckt wirklich hinter dem schnellen Stil? Passive Skills und Führhand-Arbeit.', duration: '13:00', tags: ['Speed','Führhand','Counter'] },
       { id: 'lly-AuwD-zc', title: 'Subriel Matias — Unkonventionell aber effektiv', desc: 'Warum sein "falscher" Stil funktioniert. Druck, Körperschläge, Willenskraft.', duration: '12:00', tags: ['Druck','Körper','Wille'] },
       { id: 'y1UZRV266B0', title: 'Caleb Plants kreative Techniken', desc: 'Shovel Jab, Shovel Hook, geschmeidige Fußarbeit. Kreativität im Ring.', duration: '13:00', tags: ['Jab-Varianten','Kreativität','Führhand'] },
       { id: 'Ihe9nXXyo1w', title: 'Andre Wards smarte Taktiken', desc: 'Der IQ-Champion. Clinch-Meister, Distanz-Kontrolle, Inside Fighting.', duration: '16:00', tags: ['Clinch','IQ','Inside'] },
-      { id: 'dvMVNbOsU9k', title: 'Beste Skills der besten P4P-Boxer (Teil 1)', desc: 'Ein Skill von jedem Top-Boxer — zusammengefasst in einem Video.', duration: '20:00', tags: ['P4P','Skills','Kompilation'] }
+      { id: 'dvMVNbOsU9k', title: 'Beste Skills der P4P-Boxer (Teil 1)', desc: 'Ein Skill von jedem Top-Boxer — zusammengefasst in einem Video.', duration: '20:00', tags: ['P4P','Skills','Kompilation'] },
+      { id: 'Wlag12lY0U0', title: 'Dmitry Pirog — Schach im Ring', desc: 'Wie ein Großmeister Fußarbeit benutzt um den Ring zu kontrollieren.', duration: '15:00', tags: ['Fußarbeit','Ring Control','IQ'] }
     ]
   },
 
