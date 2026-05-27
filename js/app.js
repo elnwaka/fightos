@@ -1086,7 +1086,20 @@ function applyRevealToPage() {
 var _skipHashUpdate = false;
 
 function showPage(pageId) {
-  // Clean up all pages first
+  // Map old page IDs to new merged pages for backward compatibility
+  var pageMap = {
+    'account': 'profil',
+    'uebungen': 'training', 'tests': 'training', 'log': 'training',
+    'ernaehrung': 'training', 'periodisierung': 'training', 'regeneration': 'training',
+    'cutten': 'training', 'supplements': 'training',
+    'saeulen': 'profil', 'mental': 'profil', 'rechner': 'profil', 'faq': 'profil'
+  };
+  // Determine which sub-tab to show for merged pages
+  var subTab = null;
+  if (pageMap[pageId] === 'training') { subTab = pageId; pageId = 'training'; }
+  else if (pageMap[pageId] === 'profil' && pageId !== 'profil') { subTab = pageId; pageId = 'profil'; }
+
+  // Clean up all pages
   document.querySelectorAll('.page').forEach(function(p) {
     if (p.id !== 'page-' + pageId && p.classList.contains('active')) {
       p.classList.remove('active');
@@ -1097,56 +1110,47 @@ function showPage(pageId) {
       p.classList.remove('page-exit');
     }
   });
+
+  // Highlight nav
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.nav-hub').forEach(h => h.classList.remove('active'));
-  document.querySelectorAll('.nav-drop-item').forEach(d => d.classList.remove('active'));
   const page = document.getElementById('page-' + pageId);
-  if (page) page.classList.add('active');
-  let navPage = pageId;
-  if (pageId === 'saeulen-detail') navPage = 'saeulen';
-  if (pageId === 'uebung-detail') navPage = 'uebungen';
-  if (pageId === 'supplement-detail') navPage = 'supplements';
+  if (page) {
+    page.classList.add('active');
+    // Page enter animation
+    page.classList.remove('entering');
+    void page.offsetWidth; // force reflow
+    page.classList.add('entering');
+  }
+
+  var navPage = pageId;
+  if (pageId === 'saeulen-detail') navPage = 'profil';
+  if (pageId === 'uebung-detail') navPage = 'training';
+  if (pageId === 'supplement-detail') navPage = 'training';
   if (pageId === 'fight-detail') navPage = 'fights';
   if (pageId === 'block-detail') navPage = 'wochenplan';
-  // Highlight direct nav button
-  const btn = document.querySelector(`.nav-btn[data-page="${navPage}"]`);
+
+  const btn = document.querySelector('.nav-btn[data-page="' + navPage + '"]');
   if (btn) btn.classList.add('active');
-  // Highlight dropdown item + parent hub
-  const dropItem = document.querySelector(`.nav-drop-item[data-page="${navPage}"]`);
-  if (dropItem) {
-    dropItem.classList.add('active');
-    const hub = dropItem.closest('.nav-hub');
-    if (hub) hub.classList.add('active');
-  }
-  // Highlight topbar icon buttons
-  document.querySelectorAll('.topbar-icon-btn').forEach(b => b.classList.remove('active'));
-  if (navPage === 'log') {
-    const logBtn = document.querySelector('.topbar-icon-btn[title="Trainingslog"]');
-    if (logBtn) logBtn.classList.add('active');
-  }
-  // Special render for certain pages
-  var heavyPages = ['dashboard', 'tests', 'fights', 'account'];
+
+  // Render heavy pages
+  var heavyPages = ['dashboard', 'fights', 'profil'];
   if (heavyPages.indexOf(pageId) !== -1) {
     var target = document.getElementById('page-' + pageId);
     var inner = pageId === 'dashboard' ? document.getElementById('dash-app') : target;
     if (inner && !inner.querySelector('.skeleton')) {
-      var skel = '<div style="padding:20px;">' +
-        '<div class="skeleton skeleton-title"></div>' +
-        '<div class="skeleton-row"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>' +
-        '<div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text" style="width:60%;"></div>' +
-        '</div>';
-      inner.innerHTML = skel;
+      inner.innerHTML = '<div style="padding:20px;"><div class="skeleton skeleton-title"></div><div class="skeleton-row"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div><div class="skeleton skeleton-text"></div></div>';
     }
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
         if (pageId === 'dashboard') renderDashboard();
-        else if (pageId === 'tests') renderTestsPage();
-        else if (pageId === 'account') renderAccountPage();
+        else if (pageId === 'profil') renderProfilPage(subTab);
         else if (pageId === 'fights') renderFightsPage();
       });
     });
   }
   if (pageId === 'wochenplan') renderWeekPlan();
+  if (pageId === 'training') renderTrainingPage(subTab);
+
   // Stop YouTube player when leaving fight-detail
   if (pageId !== 'fight-detail' && window._fightPlayer) {
     try { window._fightPlayer.pauseVideo(); } catch(e) {}
@@ -1154,33 +1158,109 @@ function showPage(pageId) {
     window._fightPlayer = null;
   }
   window.scrollTo({ top: 0, behavior: window.scrollY > 200 ? 'smooth' : 'instant' });
-  // Remove focus from any input to prevent blinking caret
   if (document.activeElement && document.activeElement.tagName !== 'BODY') {
     document.activeElement.blur();
   }
-  // Bottom tab bar highlight
+
+  // Bottom tab bar highlight — 5 tabs
   document.querySelectorAll('.btab').forEach(function(b) { b.classList.remove('active'); });
   var btabPage = pageId;
-  if (['wochenplan','uebungen','log','periodisierung','uebung-detail','block-detail'].indexOf(btabPage) !== -1) btabPage = 'wochenplan';
+  if (['wochenplan','block-detail'].indexOf(btabPage) !== -1) btabPage = 'wochenplan';
   else if (['fights','fight-detail'].indexOf(btabPage) !== -1) btabPage = 'fights';
-  else if (btabPage === 'tests') btabPage = 'tests';
-  else if (btabPage !== 'dashboard') btabPage = ''; // Keine der 4 Haupt-Tabs → keiner aktiv
-  if (btabPage) {
-    var activeTab = document.querySelector('.btab[data-page="' + btabPage + '"]');
-    if (activeTab) activeTab.classList.add('active');
-  }
-  // Scroll reveal on new page
+  else if (['training','uebung-detail','supplement-detail'].indexOf(btabPage) !== -1) btabPage = 'training';
+  else if (['profil','saeulen-detail'].indexOf(btabPage) !== -1) btabPage = 'profil';
+  else if (btabPage !== 'dashboard') btabPage = 'dashboard';
+  var activeTab = document.querySelector('.btab[data-page="' + btabPage + '"]');
+  if (activeTab) activeTab.classList.add('active');
+
   setTimeout(applyRevealToPage, 100);
-  // Update URL hash
   if (!_skipHashUpdate) {
     location.hash = pageId === 'dashboard' ? '' : pageId;
   }
 }
 
+// ===== TRAINING PAGE — merged hub with sub-tabs =====
+var _trainingSubTab = 'uebungen';
+function renderTrainingPage(subTab) {
+  subTab = subTab || _trainingSubTab || 'uebungen';
+  _trainingSubTab = subTab;
+  var el = document.getElementById('page-training');
+  if (!el) return;
+
+  var tabs = [
+    { id: 'uebungen', label: 'Übungen' },
+    { id: 'tests', label: 'Tests' },
+    { id: 'log', label: 'Log' },
+    { id: 'ernaehrung', label: 'Ernährung' },
+    { id: 'periodisierung', label: 'Periodisierung' },
+    { id: 'regeneration', label: 'Recovery' }
+  ];
+
+  var tabsHTML = '<div class="sub-tabs">' + tabs.map(function(t) {
+    return '<button class="sub-tab' + (t.id === subTab ? ' active' : '') + '" onclick="switchTrainingTab(\'' + t.id + '\')">' + t.label + '</button>';
+  }).join('') + '</div>';
+
+  var contentId = 'training-content';
+  el.innerHTML = '<div class="page-header"><div class="page-title">TRAIN<span>ING</span></div><div class="page-sub">Übungen, Tests, Log, Ernährung und Recovery — alles an einem Ort.</div></div>' + tabsHTML + '<div id="' + contentId + '"></div>';
+
+  var contentEl = document.getElementById(contentId);
+  if (!contentEl) return;
+
+  // Render the right sub-page into the content area
+  if (subTab === 'uebungen') { renderUebungenPage(); contentEl.innerHTML = document.getElementById('page-uebungen').innerHTML; }
+  else if (subTab === 'tests') { renderTestsPage(); contentEl.innerHTML = document.getElementById('page-tests').innerHTML; }
+  else if (subTab === 'log') { contentEl.innerHTML = document.getElementById('page-log').innerHTML; }
+  else if (subTab === 'ernaehrung') { renderErnaehrungPage(); contentEl.innerHTML = document.getElementById('page-ernaehrung').innerHTML; }
+  else if (subTab === 'periodisierung') { renderPeriodisierungPage(); contentEl.innerHTML = document.getElementById('page-periodisierung').innerHTML; }
+  else if (subTab === 'regeneration') { renderRegenerationPage(); contentEl.innerHTML = document.getElementById('page-regeneration').innerHTML; }
+}
+
+function switchTrainingTab(tab) {
+  _trainingSubTab = tab;
+  renderTrainingPage(tab);
+}
+
+// ===== PROFIL PAGE — merged hub =====
+var _profilSubTab = 'account';
+function renderProfilPage(subTab) {
+  subTab = subTab || _profilSubTab || 'account';
+  _profilSubTab = subTab;
+  var el = document.getElementById('page-profil');
+  if (!el) return;
+
+  var tabs = [
+    { id: 'account', label: 'Account' },
+    { id: 'saeulen', label: '8 Säulen' },
+    { id: 'rechner', label: 'Rechner' },
+    { id: 'faq', label: 'FAQ' }
+  ];
+
+  var tabsHTML = '<div class="sub-tabs">' + tabs.map(function(t) {
+    return '<button class="sub-tab' + (t.id === subTab ? ' active' : '') + '" onclick="switchProfilTab(\'' + t.id + '\')">' + t.label + '</button>';
+  }).join('') + '</div>';
+
+  var contentId = 'profil-content';
+  el.innerHTML = '<div class="page-header"><div class="page-title">PRO<span>FIL</span></div><div class="page-sub">Dein Account, 8 Säulen, Rechner und FAQ.</div></div>' + tabsHTML + '<div id="' + contentId + '"></div>';
+
+  var contentEl = document.getElementById(contentId);
+  if (!contentEl) return;
+
+  if (subTab === 'account') { renderAccountPage(); contentEl.innerHTML = document.getElementById('page-account').innerHTML; }
+  else if (subTab === 'saeulen') { renderSaeulenPage(); contentEl.innerHTML = document.getElementById('page-saeulen').innerHTML; }
+  else if (subTab === 'rechner') { renderRechnerPage(); contentEl.innerHTML = document.getElementById('page-rechner').innerHTML; }
+  else if (subTab === 'faq') { renderFAQPage(); contentEl.innerHTML = document.getElementById('page-faq').innerHTML; }
+}
+
+function switchProfilTab(tab) {
+  _profilSubTab = tab;
+  renderProfilPage(tab);
+}
+
 function getPageFromHash() {
   var hash = location.hash.replace('#', '').replace(/^\//, '');
   if (!hash) return 'dashboard';
-  var valid = ['dashboard','fights','fight-detail','wochenplan','block-detail','uebungen','uebung-detail','tests','log','periodisierung',
+  var valid = ['dashboard','fights','fight-detail','wochenplan','block-detail','training','profil',
+    'uebungen','uebung-detail','tests','log','periodisierung',
     'ernaehrung','cutten','supplements','supplement-detail','regeneration','saeulen','saeulen-detail','mental','rechner','faq','account'];
   return valid.indexOf(hash) !== -1 ? hash : 'dashboard';
 }
