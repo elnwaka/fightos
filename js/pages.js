@@ -247,7 +247,7 @@ function openSaeuleDetail(idx) {
       <div class="detail-section-title">WEITERFÜHREND</div>
       <button class="link-card" onclick="showPage('${mapping.linkedPage}')">
         <span>→ ${mapping.linkedLabel}</span>
-        <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">Komplette Informationen</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">Komplette Informationen</span>
       </button>
     </div>` : ''}
   </div>`;
@@ -990,7 +990,7 @@ function exCard(e, num, color) {
       <div class="ex-muscle">${e.muscle}</div>
     </div>
     <div class="ex-bot">${e.sets.map(s => '<span class="ex-s">'+s+'</span>').join('')}</div>
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:8px;letter-spacing:1px;">▸ DETAILS & MUSKELGRUPPEN</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:8px;letter-spacing:1px;">▸ DETAILS & MUSKELGRUPPEN</div>
   </div>`;
 }
 
@@ -1534,7 +1534,7 @@ function renderErnaehrungPage() {
   <div class="info-box info-sci" style="margin-bottom:30px;"><span>i</span><div><strong>Warum Ernährung über Sieg entscheidet:</strong> Training zerstört Muskelgewebe – Ernährung baut es wieder auf. Ohne ausreichend Protein, Kohlenhydrate und Mikronährstoffe ist jede Trainingseinheit verschwendet. Ein gut ernährter Boxer regeneriert 30–40% schneller, schlägt in Runde 3 noch mit voller Kraft und wird seltener krank.</div></div>
 
   <!-- ============ GRUNDLAGEN ============ -->
-  <div id="ern-s1" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:0 0 20px;border-bottom:2px solid var(--red);padding-bottom:8px;">1. GRUNDLAGEN <span style="color:var(--red);">– WAS DU WISSEN MUSST</span></div>
+  <div id="ern-s1" style="font-family:'Oswald',sans-serif;font-size:34px;color:var(--white);margin:0 0 20px;border-bottom:2px solid var(--red);padding-bottom:8px;">1. GRUNDLAGEN <span style="color:var(--red);">– WAS DU WISSEN MUSST</span></div>
 
   <div class="card card-top" style="--ca:var(--red);margin-bottom:20px;">
     <div class="card-title">DIE 3 GRUNDREGELN</div>
@@ -1568,7 +1568,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ MAKRONÄHRSTOFFE ============ -->
-  <div id="ern-s2" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:0 0 20px;border-bottom:2px solid var(--blue);padding-bottom:8px;">2. MAKRONÄHRSTOFFE <span style="color:var(--blue);">IM DETAIL</span></div>
+  <div id="ern-s2" style="font-family:'Oswald',sans-serif;font-size:34px;color:var(--white);margin:0 0 20px;border-bottom:2px solid var(--blue);padding-bottom:8px;">2. MAKRONÄHRSTOFFE <span style="color:var(--blue);">IM DETAIL</span></div>
 
   <div class="card card-top" style="--ca:var(--blue);margin-bottom:16px;">
     <div class="card-title">PROTEIN – DER BAUSTOFF</div>
@@ -1654,7 +1654,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ MIKRONÄHRSTOFFE ============ -->
-  <div id="ern-s3" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--gold);padding-bottom:8px;">3. MIKRONÄHRSTOFFE <span style="color:var(--gold);">& HYDRATION</span></div>
+  <div id="ern-s3" style="font-family:'Oswald',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--gold);padding-bottom:8px;">3. MIKRONÄHRSTOFFE <span style="color:var(--gold);">& HYDRATION</span></div>
 
   <div class="info-box info-warn" style="margin-bottom:20px;"><span>!</span><div><strong>70% aller Sportler haben mindestens einen Mikronährstoff-Mangel</strong> – meist Vitamin D, Magnesium oder Eisen. Ein Mangel in einem einzigen Mikronährstoff kann Recovery um 20–30% verlangsamen, ohne dass du den Grund erkennst. Blutbild 1–2× pro Jahr machen lassen!</div></div>
 
@@ -1714,7 +1714,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ EINKAUFSLISTE ============ -->
-  <div id="ern-s4" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--green);padding-bottom:8px;">4. EINKAUFSLISTE <span style="color:var(--green);">– WAS IM KÜHLSCHRANK SEIN MUSS</span></div>
+  <div id="ern-s4" style="font-family:'Oswald',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--green);padding-bottom:8px;">4. EINKAUFSLISTE <span style="color:var(--green);">– WAS IM KÜHLSCHRANK SEIN MUSS</span></div>
 
   <div class="info-box info-tip" style="margin-bottom:20px;"><span>*</span><div><strong>Grundregel:</strong> Kaufe zu 80% unverarbeitete Lebensmittel. Wenn es keine Zutatenliste hat (Reis, Fleisch, Gemüse, Obst) oder maximal 5 Zutaten – kauf es. 20% darf Convenience sein (Whey, Reiswaffeln, Tiefkühl-Gemüse).</div></div>
 
@@ -1791,13 +1791,13 @@ function renderErnaehrungPage() {
   <div class="info-box info-warn" style="margin-bottom:30px;"><span>!</span><div><strong>Was NICHT im Einkaufswagen landen sollte:</strong> Softdrinks, Fruchtsäfte (purer Zucker ohne Ballaststoffe), Tiefkühlpizza, Fertiggerichte mit >10 Zutaten, Energy-Drinks (Koffein ja, aber als Kaffee oder Tablette – nicht mit 30g Zucker). Alkohol: schon 2 Bier nach dem Training reduzieren die Muskelproteinsynthese um 24%.</div></div>
 
   <!-- ============ TIMING ============ -->
-  <div id="ern-s5" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid #ab47bc;padding-bottom:8px;">5. TIMING <span style="color:#ab47bc;">– WANN WAS ESSEN</span></div>
+  <div id="ern-s5" style="font-family:'Oswald',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid #ab47bc;padding-bottom:8px;">5. TIMING <span style="color:#ab47bc;">– WANN WAS ESSEN</span></div>
 
   <div class="grid-2" style="margin-bottom:16px;">
     <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">DEIN TAGES-TIMING</div>
+      <div style="font-family:'Oswald',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">DEIN TAGES-TIMING</div>
       <div id="ern-timeline" class="timeline"></div>
-      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-subtle);margin-top:8px;">Zeiten basieren auf deinem Profil. Ändern unter Einstellungen.</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-subtle);margin-top:8px;">Zeiten basieren auf deinem Profil. Ändern unter Einstellungen.</div>
     </div>
     <div>
       <div class="card card-top" style="--ca:var(--red);margin-bottom:12px;">
@@ -1849,7 +1849,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ MAKRO RECHNER ============ -->
-  <div id="ern-s6" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--red);padding-bottom:8px;">6. MAKRO <span style="color:var(--red);">RECHNER</span></div>
+  <div id="ern-s6" style="font-family:'Oswald',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--red);padding-bottom:8px;">6. MAKRO <span style="color:var(--red);">RECHNER</span></div>
 
   <div class="calc-box" style="margin-bottom:40px;">
     <div class="calc-inputs">
@@ -1864,7 +1864,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ HÄUFIGE FEHLER ============ -->
-  <div id="ern-s7" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid #ff7043;padding-bottom:8px;">7. HÄUFIGE FEHLER <span style="color:#ff7043;">– WAS BOXER FALSCH MACHEN</span></div>
+  <div id="ern-s7" style="font-family:'Oswald',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid #ff7043;padding-bottom:8px;">7. HÄUFIGE FEHLER <span style="color:#ff7043;">– WAS BOXER FALSCH MACHEN</span></div>
 
   <div class="grid-2" style="margin-bottom:16px;">
     <div class="card card-top" style="--ca:var(--red);margin-bottom:12px;">
@@ -1946,7 +1946,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ KAMPFTAG ============ -->
-  <div id="ern-s8" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--red);padding-bottom:8px;">8. KAMPFTAG <span style="color:var(--red);">ERNÄHRUNG</span></div>
+  <div id="ern-s8" style="font-family:'Oswald',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--red);padding-bottom:8px;">8. KAMPFTAG <span style="color:var(--red);">ERNÄHRUNG</span></div>
 
   <div class="info-box info-warn" style="margin-bottom:20px;"><span>!</span><div><strong>Amateur-Wiegen = am Kampftag!</strong> Du musst VOR dem Wiegen leicht sein und NACH dem Wiegen schnell Energie tanken. Timing ist alles. KEINE EXPERIMENTE am Kampftag – nur Lebensmittel die du kennst und verträgst.</div></div>
 
@@ -2031,7 +2031,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ GEWICHT & KLASSEN ============ -->
-  <div id="ern-s9" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--gold);padding-bottom:8px;">9. GEWICHTSKLASSE <span style="color:var(--gold);">RICHTIG WÄHLEN</span></div>
+  <div id="ern-s9" style="font-family:'Oswald',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--gold);padding-bottom:8px;">9. GEWICHTSKLASSE <span style="color:var(--gold);">RICHTIG WÄHLEN</span></div>
 
   <div class="card card-top" style="--ca:var(--gold);margin-bottom:16px;">
     <div class="card-title">IN WELCHER KLASSE SOLLTEST DU BOXEN?</div>
@@ -2060,11 +2060,11 @@ function renderErnaehrungPage() {
   </div>
 
   <div class="related-links" style="margin-top:32px;padding-top:24px;border-top:1px solid var(--surface-2);display:flex;flex-wrap:wrap;gap:10px;">
-    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);align-self:center;">SIEHE AUCH:</span>
-    <button onclick="showPage('cutten')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Gewicht machen</button>
-    <button onclick="showPage('supplements')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);background:none;border:1px solid rgba(0,200,83,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Supplements</button>
-    <button onclick="showPage('regeneration')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Recovery</button>
-    <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);align-self:center;">SIEHE AUCH:</span>
+    <button onclick="showPage('cutten')" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Gewicht machen</button>
+    <button onclick="showPage('supplements')" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green);background:none;border:1px solid rgba(0,200,83,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Supplements</button>
+    <button onclick="showPage('regeneration')" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Recovery</button>
+    <button onclick="showPage('rechner')" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
   </div>`;
   renderErnTimeline();
 }
@@ -2162,7 +2162,7 @@ function renderCuttenPage() {
   </table>
   </div>
 
-  <div class="section-header"><div class="section-label">Tool</div><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--white);">WETTKAMPF-PREP <span style="color:var(--gold);">RECHNER</span></div></div>
+  <div class="section-header"><div class="section-label">Tool</div><div style="font-family:'Oswald',sans-serif;font-size:30px;color:var(--white);">WETTKAMPF-PREP <span style="color:var(--gold);">RECHNER</span></div></div>
   <div class="calc-box" style="margin-bottom:24px;">
     <div class="calc-inputs">
       <div class="calc-group"><label>Aktuelles Gewicht (kg)</label><input type="number" id="cut-current" placeholder="82" min="40" max="150" step="0.5"></div>
@@ -2243,7 +2243,7 @@ function renderPeriodisierungPage() {
 
   <div class="info-box info-sci"><span>i</span><div><strong>Amateur vs. Profi:</strong> Profis haben 3-Monats-Camps mit wochenlangem Taper. Im Amateur-Boxen kämpfst du teils jede Woche, alle 2 Wochen, oder 3× am Meisterschafts-Wochenende. Dein System muss <strong>flexibel</strong> sein – kein starrer Zyklus, sondern intelligente Anpassung je nach Kampfabstand.</div></div>
 
-  <div id="peri-s1" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);margin:0 0 16px;border-bottom:2px solid var(--red);padding-bottom:8px;">PHASEN-ZYKLUS</div>
+  <div id="peri-s1" style="font-family:'Oswald',sans-serif;font-size:28px;color:var(--white);margin:0 0 16px;border-bottom:2px solid var(--red);padding-bottom:8px;">PHASEN-ZYKLUS</div>
   <div class="phase-cycle">
     <div class="phase-block ${currentPhase==='training'?'current':''}" style="background:#0f1f0a;">
       <div class="phase-week" style="color:var(--green);">4+ TAGE</div>
@@ -2273,7 +2273,7 @@ function renderPeriodisierungPage() {
 
   <div class="info-box info-tip"><span>*</span><div><strong>Schärfen ≠ Taper:</strong> Profis „tapern" über 1–2 Wochen. Du als Amateur „schärfst" nur 2–3 Tage. Weniger Volumen, gleiche Intensität – kurze explosive Reize halten dein ZNS scharf, ohne dich zu ermüden. Bis 4 Tage vor dem Kampf: normal weiter trainieren!</div></div>
 
-  <div id="peri-s2" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);margin:32px 0 16px;border-bottom:2px solid var(--gold);padding-bottom:8px;">SZENARIEN & WARM-UP</div>
+  <div id="peri-s2" style="font-family:'Oswald',sans-serif;font-size:28px;color:var(--white);margin:32px 0 16px;border-bottom:2px solid var(--gold);padding-bottom:8px;">SZENARIEN & WARM-UP</div>
   <div class="grid-2" style="margin-top:16px;">
     <div class="card card-top" style="--ca:var(--red)">
       <div class="card-title">SZENARIEN – SO PLANST DU</div>
@@ -2303,7 +2303,7 @@ function renderPeriodisierungPage() {
     </div>
   </div>
 
-  <div id="peri-s3" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);margin:32px 0 16px;border-bottom:2px solid var(--red);padding-bottom:8px;">AUFWÄRM-PROTOKOLL</div>
+  <div id="peri-s3" style="font-family:'Oswald',sans-serif;font-size:28px;color:var(--white);margin:32px 0 16px;border-bottom:2px solid var(--red);padding-bottom:8px;">AUFWÄRM-PROTOKOLL</div>
   <div class="card" style="margin-top:16px;">
     <div class="card-title" style="color:var(--red);">KOMPLETTES AUFWÄRM-PROTOKOLL – VOM ANKOMMEN BIS ZUM RING</div>
     <div class="card-body">
@@ -2328,7 +2328,7 @@ function renderPeriodisierungPage() {
     </div>
   </div>
 
-  <div id="peri-s4" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);margin:32px 0 16px;border-bottom:2px solid var(--blue);padding-bottom:8px;">FORTSCHRITT & STRATEGIE</div>
+  <div id="peri-s4" style="font-family:'Oswald',sans-serif;font-size:28px;color:var(--white);margin:32px 0 16px;border-bottom:2px solid var(--blue);padding-bottom:8px;">FORTSCHRITT & STRATEGIE</div>
   <div class="card" style="margin-top:16px;">
     <div class="card-title">FORTSCHRITT TROTZ HÄUFIGER KÄMPFE</div>
     <div class="card-body">
@@ -2421,7 +2421,7 @@ function renderRegenerationPage() {
     </div>
   </div>
 
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">HRV AMPELSYSTEM</div>
+  <div style="font-family:'Oswald',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">HRV AMPELSYSTEM</div>
   <div class="hrv-grid">
     <div class="hrv-box" style="background:rgba(0,200,83,.06);border:1px solid rgba(0,200,83,.2);">
       <div class="hrv-dot" style="background:var(--green);box-shadow:0 0 20px rgba(0,200,83,.4);"></div>
@@ -2800,7 +2800,7 @@ function openSupplementDetail(id) {
         <img src="${s.img}" alt="${s.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'height:100%;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:28px;color:#222;letter-spacing:3px;\\'>${s.name.split(' ')[0].toUpperCase()}</div>'">
       </div>
       <div class="supp-sidebar-meta">
-        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);letter-spacing:2px;margin-bottom:8px;">STECKBRIEF</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-subtle);letter-spacing:2px;margin-bottom:8px;">STECKBRIEF</div>
         <div class="supp-sidebar-row"><span>Kategorie</span><span style="color:${headerColor};">${s.category}</span></div>
         <div class="supp-sidebar-row"><span>Evidenz</span><span style="color:var(--gold);">${'★'.repeat(s.stars)}${'☆'.repeat(5 - s.stars)}</span></div>
         ${!isSkip ? `<div class="supp-sidebar-row"><span>Dosis</span><span>${s.dose}</span></div>` : ''}
@@ -2815,11 +2815,11 @@ function openSupplementDetail(id) {
     <article class="supp-article">
       <header class="supp-article-header">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;flex-wrap:wrap;">
-          <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;color:${headerColor};border:1px solid ${headerColor}40;padding:3px 12px;border-radius:var(--radius-sm);">${s.category}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:${headerColor};border:1px solid ${headerColor}40;padding:3px 12px;border-radius:var(--radius-sm);">${s.category}</span>
           <span style="color:var(--gold);font-size:12px;letter-spacing:1px;">${'★'.repeat(s.stars)}${'☆'.repeat(5 - s.stars)}</span>
         </div>
-        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--white);line-height:1.1;">${s.name}</h1>
-        ${!isSkip ? `<div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);margin-top:8px;">${s.dose}</div>` : ''}
+        <h1 style="font-family:'Oswald',sans-serif;font-size:42px;letter-spacing:2px;color:var(--white);line-height:1.1;">${s.name}</h1>
+        ${!isSkip ? `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);margin-top:8px;">${s.dose}</div>` : ''}
       </header>
 
       <div class="supp-article-layout">
@@ -2838,7 +2838,7 @@ function openSupplementDetail(id) {
           </div>
 
           <div style="padding-top:24px;border-top:1px solid #151515;">
-            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);letter-spacing:2px;margin-bottom:8px;">QUELLEN</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-subtle);letter-spacing:2px;margin-bottom:8px;">QUELLEN</div>
             <div style="font-size:11px;color:var(--text-muted);line-height:1.7;">${s.studies}</div>
           </div>
         </div>
@@ -3048,7 +3048,7 @@ function renderMentalPage() {
 
   <!-- DAILY PROTOCOL -->
   <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--surface-2);">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin-bottom:16px;">TÄGLICHES PROTOKOLL <span style="color:var(--gold);">15 MIN.</span></div>
+    <div style="font-family:'Oswald',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin-bottom:16px;">TÄGLICHES PROTOKOLL <span style="color:var(--gold);">15 MIN.</span></div>
     <div class="mt-daily">
       <div class="mt-slot" style="--mc:var(--blue);">
         <div class="mt-slot-time">MORGENS · 5 MIN.</div>
@@ -3178,7 +3178,7 @@ function renderRechnerPage() {
 
   <div class="grid-2" style="margin-bottom:32px;">
     <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">HERZFREQUENZ <span style="color:var(--blue);">ZONEN</span></div>
+      <div style="font-family:'Oswald',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">HERZFREQUENZ <span style="color:var(--blue);">ZONEN</span></div>
       <div class="calc-box">
         <div class="calc-inputs">
           <div class="calc-group"><label>Alter (Jahre)</label><input type="number" id="hf-age" placeholder="25" min="14" max="60"></div>
@@ -3189,7 +3189,7 @@ function renderRechnerPage() {
       </div>
     </div>
     <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">1RM <span style="color:var(--orange);">RECHNER</span></div>
+      <div style="font-family:'Oswald',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">1RM <span style="color:var(--orange);">RECHNER</span></div>
       <div class="calc-box">
         <div class="calc-inputs">
           <div class="calc-group"><label>Gewicht gehoben (kg)</label><input type="number" id="rm-weight" placeholder="80" min="1" max="500"></div>
