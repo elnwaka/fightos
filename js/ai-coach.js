@@ -1,0 +1,351 @@
+/* ============================================
+   FIGHTOS – AI COACH
+   Google Gemini-powered boxing coach
+   Fed with TLAC methodology + user context
+   ============================================ */
+
+var AI_COACH_KEY = 'AIzaSyDwjjiK8n5GiZmM7f2swdJThSeWrDRjbyk';
+var AI_COACH_MODEL = 'gemini-2.0-flash';
+var AI_COACH_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/' + AI_COACH_MODEL + ':generateContent?key=' + AI_COACH_KEY;
+
+var _aiChatHistory = [];
+var _aiCoachOpen = false;
+
+// ===== TLAC KNOWLEDGE BASE (condensed for system prompt) =====
+var TLAC_KNOWLEDGE = `
+DU BIST DER FIGHTOS AI-COACH — ein Elite-Box-Trainer mit tiefem Wissen über Sportwissenschaft, Kraft- und Konditionstraining, Ernährung und Kampfvorbereitung für Boxer. Du sprichst Deutsch, direkt und motivierend wie ein echter Trainer in der Ecke.
+
+DEIN WISSEN BASIERT AUF FOLGENDEM SYSTEM:
+
+=== KRAFT & POWER ===
+- Ein Schlag wird in unter 200ms geliefert. Kraft wird sequentiell von unten nach oben aktiviert (Boden→Fuß→Hüfte→Core→Schulter→Faust)
+- Jump Higher = Punch Harder: CMJ-Sprunghöhe korreliert stark mit Schlagkraft (r=0.50-0.69). Aus 500+ Boxer-Tests bestätigt
+- Rumpfmasse ist ein starker Prädiktor für Schlagkraft — Core-Training hat höchste Priorität
+- Force-Velocity Curve: Boxer sind typischerweise gut bei leichten/schnellen Bewegungen, schwach bei schweren Lasten. Maximalkraft muss zuerst entwickelt werden
+- 6 Bewegungsmuster pro Session: Squat, Deadlift/Hinge, Single-Leg, Horizontal Press, Vertical Press, Pull
+- Plyometrie in 3 Phasen: Landen→Springen→Beladen. Boxer haben schlechte exzentrische Nutzung
+- Reaktivkraft: Low&Fast Pogos→Band Assisted→Max Effort. Achillessehne als Federmechanismus
+- Schlagspezifisch: MB Punch Throw, Landmine Punch (mit Band), ISO Punch Hold für "Snap"
+- Effective Mass = Ganzkörper-Steifheit beim Aufprall, trainiert durch Core-Steifigkeitsübungen
+
+10-Wochen Kraft-Programm (2x/Woche):
+- Wo. 1-3 GRUNDLAGEN: KB Sumo DL, Goblet Squat, Press-Ups, DB Shoulder Press, Split Squat + Core Circuit
+- Wo. 4-7 KRAFT-SCHNELLIGKEIT: Trap Bar DL, Landmine Squat, DB Floor Press, Landmine Shoulder Press + Plyometric Warm-Up
+- Wo. 8-9 SPITZENLEISTUNG: Banded KB Swing, Landmine Punch Throw, MB Box Jumps, DB CMJ
+- Wo. 10 TAPER: -50% Volumen, Intensität beibehalten
+
+=== CONDITIONING ===
+- Boxen ist zu 77% aerob, Boxer arbeiten bei 85-90% VO2max
+- "Energietank"-Konzept: Größerer aerobes System = höhere Kampf-Intensität
+- Rote Zone: >90% HFmax. Ziel: 6-12 Min pro Session in der roten Zone
+- VERMEIDE "Niemandsland" (RPE 4-7, steady-state) — entweder niedrig oder hoch trainieren
+- 3:1 Loading Pattern: 3 Wochen aufbauen, 1 Woche Deload. Max 10% Steigerung/Woche
+
+3 Conditioning-Säulen (3x/Woche):
+- Wo. 1-3 MUSCLE BUFFERING: 1-2 Min Intervalle, RPE 7-8, Work:Rest 1:2
+- Wo. 4-7 HIIT ZENTRAL: 4 Min @ >90% HFmax, Work:Rest 2:1 (Helgerud-Protokoll)
+- Wo. 8-10 SPEED ENDURANCE: 6x 15-20 Sek pro 3-Min-Set, kampfspezifisch
+
+=== ERNÄHRUNG ===
+- KH sind Haupttreibstoff für Hochintensitäts-Training. Nicht zu früh reduzieren!
+- Protein: 1.6-2.4g/kg, 20-40g alle 3-4h. Tierische Quellen bevorzugen (höhere Bioverfügbarkeit)
+- Fett: ~1g/kg, nie unter 20% Gesamtenergie
+- Hydration: 2% Dehydration = Leistungseinbruch. Schweißrate monitoren
+- Kaloriendefizit: 250-800 kcal/Tag für 0.5-1kg/Woche. Nicht zu aggressiv!
+- Schwere Tage: KH +50%. Leichte Tage: KH reduzieren. Ruhetage: KH stark reduzieren, Protein beibehalten
+
+Supplements: Kreatin 5g/Tag (absetzen 10 Tage vor Wiegen), Koffein 3mg/kg, Beta-Alanin 6g/Tag, Vitamin D3 4000IU, Omega 3 2-3g/Tag
+
+Fight Week: Low-Residue-Diät (<10g Ballaststoffe, 6 Tage), Natrium reduzieren, Water Loading (100ml/kg 3 Tage → 15ml/kg Tag vor Wiegen), KH reduzieren letzte 3 Tage
+Refuelling Amateur: Sofort KH-Elektrolytgetränk, 30min später einfache KH, 3h vor Kampf leichte Mahlzeit
+Refuelling Profi: 8-10g/kg KH über 24h, zuerst rehydrieren, alle 2.5-4h essen
+
+=== MOVEMENT & MOBILITÄT ===
+- Boxer haben typischerweise Schulter-, Hüft- und Knöchel-Mobilitätsprobleme (250+ Boxer getestet)
+- "Train the Movement, Muscles Will Follow"
+- Hüfte: Mobilisieren (Lateral Lunge, Hip Floss) → Stabilisieren (Side Clams) → Stärken (Hip Extensions, Glute Bridges) → Laden (Sumo DL, Hip Thrust)
+- Schulter: Mobilisieren (Thoracic Rotations) → Stabilisieren (Banded Plank, Triple Threat) → Stärken (Landmine Press, Kneeling DB Press)
+- Gluteus ist bei Boxern unterentwickelt — gezielte Aktivierung vor jedem Training
+- RAMP Warm-Up: Raise (5min) → Activate & Mobilise (Mobility-Übungen) → Potentiate (Pogos, Ice Skaters, Banded Shadow Box)
+- Pre-Fight Warm-Up: 5-Schritt-Protokoll mit spezifischen Übungen und Timing
+- DIY Mobility: 10 Min, 1-2x täglich
+
+=== PERIODISIERUNG ===
+- 3:1 Loading Pattern für alle Trainingsbereiche
+- Taper: 7-10 Tage vor Kampf, Volumen -50%, Intensität beibehalten
+- Fitness-Fatigue Modell: Ermüdung abbauen bei gleichzeitigem Fitness-Erhalt
+- Sparring: Max 2-3x/Woche, 48h zwischen Sessions, nie am selben Tag wie HIIT
+- Camp-Phasen: Aufbau→Intensivierung→Taper→Fight Week
+
+=== TESTING ===
+- Overhead Squat (Mobilität, 0-5)
+- CMJ + Squat Jump (Unterkörper-Explosivität)
+- RSI / 10-5 Pogo Test (Reaktivkraft)
+- MB Punch Throw (Schlagkraft)
+- Supine ISO Hold (Core-Ausdauer)
+- 30-15 Intermittent Test (Ausdauer)
+
+DEINE REGELN ALS COACH:
+1. Antworte IMMER auf Deutsch
+2. Sei direkt, motivierend, aber ehrlich — wie ein echter Trainer
+3. Wenn der Boxer Daten hat (Gewicht, Tests, Plan), beziehe dich darauf
+4. Gib konkrete Empfehlungen mit Sets/Reps/Zeiten
+5. Warnung bei Übertraining, zu aggressivem Cutten, oder gefährlichen Praktiken
+6. Halte Antworten unter 300 Wörter — ein Trainer redet nicht ewig
+7. Nutze die TLAC-Methodik als Grundlage, aber nenne sie nie beim Namen — es ist FightOS-Wissen
+8. Wenn nach Gameplan gefragt: Distanz-Strategie, Schlüssel-Kombis, Runden-Taktik, Sparring-Drills
+`;
+
+// ===== BUILD USER CONTEXT =====
+function buildUserContext() {
+  var data = getData();
+  var s = getUserSchedule();
+  if (!data || !s) return 'Keine Benutzerdaten verfügbar.';
+
+  var ctx = 'AKTUELLE DATEN DES BOXERS:\n';
+  ctx += 'Name: ' + getDisplayName() + '\n';
+  ctx += 'Gewicht: ' + (s.weight || '?') + ' kg\n';
+  ctx += 'Größe: ' + (s.height || '?') + ' cm\n';
+  ctx += 'Level: ' + (s.experienceLevel || 'unbekannt') + '\n';
+  ctx += 'Jahre Boxerfahrung: ' + (s.boxingYears || 0) + '\n';
+  ctx += 'Ziel: ' + (s.goal || 'unbekannt') + '\n';
+  ctx += 'Equipment: ' + (s.gymAccess || 'keins') + '\n';
+  ctx += 'Programm: ' + (s.trainingProgram === '10w' ? '10-Wochen-Programm Woche ' + getProgram10WCurrentWeek() : 'Standard') + '\n';
+
+  // Fight info
+  if (data.fightDate) {
+    var diff = Math.ceil((new Date(data.fightDate + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000);
+    ctx += 'Nächster Kampf: ' + data.fightDate + ' (in ' + diff + ' Tagen)\n';
+  }
+
+  // Record
+  var fights = data.fights || [];
+  if (fights.length > 0) {
+    var wins = fights.filter(function(f){return f.result==='S';}).length;
+    var losses = fights.filter(function(f){return f.result==='N';}).length;
+    ctx += 'Record: ' + wins + 'S-' + losses + 'N-' + (fights.length - wins - losses) + 'U (' + fights.length + ' Kämpfe)\n';
+  }
+
+  // Benchmarks
+  if (data.benchmarks) {
+    var benchEntries = Object.entries(data.benchmarks).filter(function(e) { return e[1] > 0; });
+    if (benchEntries.length > 0) {
+      ctx += 'Tests: ' + benchEntries.map(function(e) { return e[0] + '=' + e[1]; }).join(', ') + '\n';
+    }
+  }
+
+  // Today's plan
+  var todayDow = (new Date().getDay() + 6) % 7;
+  var todayKey = ['mo','di','mi','do','fr','sa','so'][todayDow];
+  var todayBlocks = (data.weekPlan && data.weekPlan[todayKey]) || [];
+  if (todayBlocks.length > 0) {
+    ctx += 'Heutiger Plan: ' + todayBlocks.map(function(b) { return b.title + ' (' + b.time + ')'; }).join(', ') + '\n';
+  }
+
+  // Training log summary
+  var log = data.log || [];
+  if (log.length > 0) {
+    ctx += 'Trainings diese Woche: ' + log.filter(function(l) {
+      var d = new Date(l.date);
+      var now = new Date();
+      return (now - d) < 7 * 86400000;
+    }).length + '\n';
+    var lastLog = log[log.length - 1];
+    ctx += 'Letztes Training: ' + (lastLog.type || '') + ' am ' + (lastLog.date || '') + ', RPE ' + (lastLog.rpe || '?') + '\n';
+  }
+
+  // HRV
+  if (data.hrv && data.hrv.length > 0) {
+    var lastHrv = data.hrv[data.hrv.length - 1];
+    ctx += 'HRV: ' + (lastHrv.value || lastHrv) + ' ms\n';
+  }
+
+  return ctx;
+}
+
+// ===== SEND MESSAGE TO GEMINI =====
+async function sendToCoach(userMessage) {
+  var systemPrompt = TLAC_KNOWLEDGE + '\n\n' + buildUserContext();
+
+  // Build conversation history for context
+  var contents = [];
+
+  // System instruction as first user message
+  contents.push({
+    role: 'user',
+    parts: [{ text: 'Du bist mein FightOS AI-Coach. Hier ist dein Wissen und meine Daten:\n\n' + systemPrompt + '\n\nBestätige kurz dass du bereit bist.' }]
+  });
+  contents.push({
+    role: 'model',
+    parts: [{ text: 'Ich bin dein FightOS Coach. Ich kenne deine Daten und das komplette Trainingssystem. Was brauchst du?' }]
+  });
+
+  // Add chat history
+  _aiChatHistory.forEach(function(msg) {
+    contents.push({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.text }]
+    });
+  });
+
+  // Add new message
+  contents.push({
+    role: 'user',
+    parts: [{ text: userMessage }]
+  });
+
+  try {
+    var response = await fetch(AI_COACH_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: contents,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1024,
+          topP: 0.9
+        }
+      })
+    });
+
+    if (!response.ok) {
+      var errText = await response.text();
+      throw new Error('API Error ' + response.status + ': ' + errText.substring(0, 200));
+    }
+
+    var result = await response.json();
+    var reply = result.candidates && result.candidates[0] && result.candidates[0].content &&
+                result.candidates[0].content.parts && result.candidates[0].content.parts[0] &&
+                result.candidates[0].content.parts[0].text;
+
+    if (!reply) throw new Error('Leere Antwort vom AI');
+
+    return reply;
+  } catch (err) {
+    console.error('AI Coach Error:', err);
+    return 'Fehler: ' + err.message;
+  }
+}
+
+// ===== CHAT UI =====
+function toggleAICoach() {
+  _aiCoachOpen = !_aiCoachOpen;
+  var panel = document.getElementById('ai-coach-panel');
+  if (!panel) return;
+  panel.classList.toggle('open', _aiCoachOpen);
+
+  if (_aiCoachOpen && _aiChatHistory.length === 0) {
+    // Show welcome message
+    addCoachMessage('coach', 'Ich bin dein FightOS Coach. Ich kenne deinen Trainingsplan, deine Tests und dein Ziel. Frag mich was du willst — Trainingsplan, Ernährung, Kampfvorbereitung, Technik-Tipps, oder was auch immer dich beschäftigt.');
+  }
+}
+
+function addCoachMessage(role, text) {
+  _aiChatHistory.push({ role: role === 'coach' ? 'model' : 'user', text: text });
+  renderCoachMessages();
+}
+
+function renderCoachMessages() {
+  var container = document.getElementById('ai-coach-messages');
+  if (!container) return;
+
+  container.innerHTML = _aiChatHistory.map(function(msg) {
+    var isUser = msg.role === 'user';
+    return '<div style="display:flex;justify-content:' + (isUser ? 'flex-end' : 'flex-start') + ';margin-bottom:12px;">' +
+      '<div style="max-width:85%;padding:10px 14px;border-radius:' + (isUser ? '12px 12px 2px 12px' : '12px 12px 12px 2px') + ';background:' + (isUser ? 'var(--red)' : 'var(--surface-2)') + ';color:' + (isUser ? '#fff' : 'var(--light)') + ';font-size:14px;line-height:1.6;word-wrap:break-word;">' +
+        formatCoachText(msg.text) +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  container.scrollTop = container.scrollHeight;
+}
+
+function formatCoachText(text) {
+  // Simple markdown-like formatting
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>')
+    .replace(/• /g, '&bull; ')
+    .replace(/(\d+)\. /g, '<strong>$1.</strong> ');
+}
+
+async function sendCoachMessage() {
+  var input = document.getElementById('ai-coach-input');
+  if (!input) return;
+  var msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  addCoachMessage('user', msg);
+
+  // Show typing indicator
+  var container = document.getElementById('ai-coach-messages');
+  var typingId = 'coach-typing-' + Date.now();
+  container.innerHTML += '<div id="' + typingId + '" style="display:flex;justify-content:flex-start;margin-bottom:12px;"><div style="padding:10px 14px;border-radius:12px 12px 12px 2px;background:var(--surface-2);color:var(--text-muted);font-size:14px;"><span class="typing-dots">Denkt nach</span></div></div>';
+  container.scrollTop = container.scrollHeight;
+
+  var reply = await sendToCoach(msg);
+
+  // Remove typing indicator
+  var typingEl = document.getElementById(typingId);
+  if (typingEl) typingEl.remove();
+
+  addCoachMessage('coach', reply);
+}
+
+// ===== QUICK PROMPTS =====
+function coachQuickPrompt(prompt) {
+  var input = document.getElementById('ai-coach-input');
+  if (input) {
+    input.value = prompt;
+    sendCoachMessage();
+  }
+}
+
+// ===== INIT: Inject chat panel into page =====
+function initAICoach() {
+  if (document.getElementById('ai-coach-panel')) return;
+
+  var panel = document.createElement('div');
+  panel.id = 'ai-coach-panel';
+  panel.innerHTML =
+    '<div class="ai-coach-header">' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;">🥊</div>' +
+        '<div>' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">FIGHTOS COACH</div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--text-muted);letter-spacing:1px;">AI-POWERED</div>' +
+        '</div>' +
+      '</div>' +
+      '<button onclick="toggleAICoach()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:8px;min-height:36px;">✕</button>' +
+    '</div>' +
+    '<div id="ai-coach-messages" class="ai-coach-messages"></div>' +
+    '<div class="ai-coach-quick">' +
+      '<button onclick="coachQuickPrompt(\'Was soll ich heute trainieren?\')" class="ai-quick-btn">Heute trainieren?</button>' +
+      '<button onclick="coachQuickPrompt(\'Erstelle mir einen Gameplan gegen einen Southpaw-Infighter\')" class="ai-quick-btn">Gameplan</button>' +
+      '<button onclick="coachQuickPrompt(\'Wie sollte ich mich diese Woche ernähren?\')" class="ai-quick-btn">Ernährung</button>' +
+      '<button onclick="coachQuickPrompt(\'Analysiere meinen Trainingsplan — was fehlt?\')" class="ai-quick-btn">Plan Check</button>' +
+    '</div>' +
+    '<div class="ai-coach-input-row">' +
+      '<input type="text" id="ai-coach-input" placeholder="Frag deinen Coach..." onkeydown="if(event.key===\'Enter\')sendCoachMessage()">' +
+      '<button onclick="sendCoachMessage()" class="ai-send-btn">→</button>' +
+    '</div>';
+
+  document.body.appendChild(panel);
+
+  // Add floating toggle button
+  var fab = document.createElement('button');
+  fab.id = 'ai-coach-fab';
+  fab.innerHTML = '🥊';
+  fab.title = 'AI Coach';
+  fab.onclick = toggleAICoach;
+  document.body.appendChild(fab);
+}
+
+// Auto-init when DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAICoach);
+} else {
+  initAICoach();
+}

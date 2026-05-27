@@ -1,5 +1,5 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-05-27a';
+const BUILD = '2026-05-27b';
 const CACHE_NAME = 'fightos-' + BUILD;
 const PRECACHE = [
   './',
@@ -9,6 +9,7 @@ const PRECACHE = [
   './js/pages.js',
   './js/calculators.js',
   './js/program10w.js',
+  './js/ai-coach.js',
   './manifest.json',
   './js/chart.min.js',
   './js/apexcharts.min.js',
