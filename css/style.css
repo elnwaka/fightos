@@ -349,41 +349,54 @@ button:active, .submit-btn:active, .card:active, .day-block:active { transform: 
 .auth-bg {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 30% 50%, rgba(232,0,13,.12) 0%, transparent 60%),
-              radial-gradient(ellipse at 70% 80%, rgba(245,197,24,.06) 0%, transparent 50%);
+  background:
+    radial-gradient(ellipse at 20% 40%, rgba(232,0,13,.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(59,130,246,.05) 0%, transparent 50%);
+}
+.auth-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+  background-size: 50px 50px;
 }
 .auth-box {
-  background: rgba(19,19,22,.96);
-  border: 1px solid var(--surface-3);
+  background: rgba(10,10,14,.85);
+  border: 1px solid rgba(255,255,255,.06);
   padding: 48px 40px;
   width: 100%;
   max-width: 420px;
   position: relative;
   backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
 }
 .auth-box::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--red), var(--gold));
+  background: linear-gradient(90deg, var(--red), var(--red), transparent);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 .auth-logo {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 42px;
-  letter-spacing: 4px;
+  font-size: 48px;
+  letter-spacing: 5px;
   color: var(--white);
   margin-bottom: 4px;
 }
 .auth-logo span { color: var(--red); }
 .auth-sub {
   font-family: 'Space Mono', monospace;
-  font-size: var(--fs-xs);
+  font-size: 10px;
   letter-spacing: 3px;
-  color: var(--grey);
+  color: var(--subtle);
   text-transform: uppercase;
-  margin-bottom: 36px;
+  margin-bottom: 40px;
 }
 .auth-tabs {
   display: flex;
@@ -3556,7 +3569,7 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .calc-box { padding: 14px; }
   .log-form-card { padding: 14px; }
   .modal { padding: 16px; }
-  .auth-box { padding: 24px 16px; }
+  .auth-box { padding: 32px 20px; margin: 0 12px; border-radius: 16px; }
   .ob-container { padding: 20px 12px 16px; margin: 4px; }
 
   /* --- Tests Mobile: Kompakt --- */
@@ -4847,6 +4860,8 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
 [data-theme="light"] .sub-tab.active { color: var(--white); border-bottom-color: var(--red); }
 
 /* ===== AI COACH PANEL ===== */
+body.hide-coach #ai-coach-fab,
+body.hide-coach #ai-coach-panel { display: none !important; }
 #ai-coach-fab {
   position: fixed;
   bottom: 80px;

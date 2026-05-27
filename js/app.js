@@ -737,6 +737,8 @@ function enterApp() {
   document.getElementById('auth-screen').style.cssText = 'display:none!important';
   document.getElementById('app-screen').classList.add('active');
   document.getElementById('app-screen').style.cssText = 'display:block!important';
+  // Show AI Coach FAB (hidden during auth/onboarding)
+  document.body.classList.remove('hide-coach');
   document.getElementById('user-pill').textContent = getDisplayName();
   // Prevent any input from stealing focus on load
   setTimeout(function() { document.activeElement && document.activeElement.blur(); }, 150);

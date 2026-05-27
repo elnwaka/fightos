@@ -539,6 +539,8 @@ function coachQuickPrompt(prompt) {
 // ===== INIT: Inject chat panel into page =====
 function initAICoach() {
   if (document.getElementById('ai-coach-panel')) return;
+  // Hide coach on auth/onboarding screens
+  document.body.classList.add('hide-coach');
 
   var panel = document.createElement('div');
   panel.id = 'ai-coach-panel';
