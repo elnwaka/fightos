@@ -5928,8 +5928,55 @@ function completeBlock(day, idx, type, title, duration, rpe) {
   saveLiftWeights(data);
 
   saveData(data);
-  showToast('Block erledigt ✓', 'success', 2000);
-  renderWeekPlan();
+
+  // Animate the completed block out before re-rendering
+  var nextBlockEl = document.querySelector('.db-next-block, [style*="border-left: 3px solid var(--red)"]');
+  // Find the today-checklist item too
+  var checklistItems = document.querySelectorAll('#dash-app [onclick*="toggleBlockDone"]');
+  var animated = false;
+
+  // Try to animate the "NÄCHSTE SESSION" card on the dashboard
+  if (nextBlockEl && nextBlockEl.closest('#dash-app')) {
+    var card = nextBlockEl.closest('[style*="border-bottom"]') || nextBlockEl.parentElement;
+    if (card) {
+      card.style.transition = 'transform .4s ease, opacity .4s ease';
+      card.style.transform = 'translateX(60px) scale(.95)';
+      card.style.opacity = '0';
+      animated = true;
+      setTimeout(function() {
+        showToast('Erledigt ✓', 'success', 2000);
+        renderDashboard();
+      }, 400);
+    }
+  }
+
+  // Also try to animate day-block in the wochenplan
+  var dayBlock = document.querySelector('.day-block[onclick*="' + day + ',' + idx + '"]');
+  if (!dayBlock) {
+    // Try finding by checking the block check button
+    var checkBtns = document.querySelectorAll('.block-check-btn');
+    checkBtns.forEach(function(btn) {
+      var parent = btn.closest('.day-block');
+      if (parent && btn.onclick && btn.onclick.toString().indexOf(day) !== -1) dayBlock = parent;
+    });
+  }
+  if (dayBlock) {
+    dayBlock.style.transition = 'transform .35s ease, opacity .35s ease, background .35s ease';
+    dayBlock.style.transform = 'scale(.92)';
+    dayBlock.style.opacity = '.4';
+    dayBlock.style.background = 'rgba(34,197,94,.15)';
+    dayBlock.classList.add('block-done');
+    animated = true;
+  }
+
+  if (!animated) {
+    showToast('Erledigt ✓', 'success', 2000);
+  }
+
+  // Re-render after animation
+  setTimeout(function() {
+    renderWeekPlan();
+  }, animated ? 500 : 0);
 }
 
 function saveLiftWeights(data) {
