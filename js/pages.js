@@ -632,46 +632,108 @@ Die Ecke ist dein taktisches Gehirn zwischen den Runden. Effektive Corner-Kommun
 
   // === SÄULE 08: MOBILITÄT & VERLETZUNGSPRÄVENTION ===
   { name:'MOBILITÄT & VERLETZUNGSPRÄVENTION', category:'Schutz & Bewegung', color:'var(--red)',
-    short:'Nackentraining, Schulter-/Hüftmobilität, Hand-/Handgelenksstabilität. Jedes Pfund Nackenmuskel senkt das KO-Risiko um 5%.',
-    desc:`<strong style="font-size:15px;">WARUM DAS FÜR BOXER ENTSCHEIDEND IST</strong><br>
-Boxer belasten ihren Körper extrem einseitig: Tausende Schläge pro Woche, immer in derselben Kampfstellung, repetitive Kopfbewegungen, harte Treffer auf Kopf und Körper. Mao et al. (2023) analysierten die Verletzungsepidemiologie im Boxen: <strong>Hand/Handgelenk (28%), Gesicht/Kopf (23%), Schulter (12%)</strong> sind die häufigsten Verletzungsorte. Ohne gezielte Prävention sind diese Verletzungen nur eine Frage der Zeit.<br><br>
+    short:'Hüfte, Schulter, Rotation, Glute-Stärke, Achillessehne, Pre-Running, Warm-Up. Mobilität ist der erste Schritt – vor jedem Gewicht.',
+    desc:`<strong style="font-size:15px;">WARUM MOBILITÄT DER ERSTE SCHRITT IST</strong><br>
+Durch die intensive, repetitive Natur des Boxens werden Athleten in bestimmten Muskelgruppen "eng" und in anderen "unteraktiv" – das erzeugt muskuläre Imbalancen die Leistung beeinträchtigen und das Verletzungsrisiko erhöhen.<br><br>
 
-<strong style="font-size:15px;">NACKENTRAINING – KO-PRÄVENTION</strong><br>
-Ein KO entsteht durch die <strong>Rotationsbeschleunigung</strong> des Gehirns im Schädel. Dein Nacken ist die einzige Struktur, die diese Rotation bremsen kann. Die Collins-Studie (2014, <strong>n=6704, an Jugendlichen</strong>) fand einen signifikanten Zusammenhang zwischen Nackenmuskulatur und reduziertem Gehirnerschütterungsrisiko. <strong>Bei erwachsenen Boxern ist der genaue Effekt kleiner, aber die Richtung ist klar belegt</strong> (Eckner et al. 2014): Stärkerer Nacken = weniger Kopfbeschleunigung bei Treffern. Ein angespannter Nacken verbindet den Kopf mit dem Oberkörper (15–30kg ${tt('Effektive Masse','Die Masse, die dem Schlag entgegenwirkt. Mehr effektive Masse = weniger Beschleunigung = weniger KO-Risiko.')}) – 3–6× mehr Masse gegen den Schlag.<br><br>
+Für jeden Athleten bei FightOS ist Mobilitäts- und Bewegungstraining der <strong>allererste Schritt</strong>. Bevor wir auch nur ein Gewicht anfassen, müssen die grundlegenden Bewegungsfähigkeiten stimmen. Das ermöglicht bessere Ergebnisse und vermeidet Verletzungen.<br><br>
 
-<strong>Erweitertes Nackenprotokoll (3×/Woche, 10–15 Min.):</strong><br>
-• <strong>Isometrie:</strong> 4 Richtungen gegen Hand oder Band, 3×8 Sek. – die Basis<br>
-• <strong>Konzentrisch:</strong> Nacken-Curls liegend (Flexion + Extension), 3×12 mit leichtem Gewicht<br>
-• <strong>Neck Harness:</strong> Kontrollierte Flexion/Extension mit progressivem Gewicht (2–5kg Start) – das effektivste Tool für progressive Overload am Nacken<br>
-• <strong>Niemals Nackenbrücken</strong> – das Bandscheibenrisiko überwiegt den Nutzen<br><br>
+<strong>Warum Boxer besonders betroffen sind:</strong><br>
+• Stunden in der geschlossenen Kampfstellung → Engheit in Knöcheln, Hüften und Schultern<br>
+• <strong>500-1000 Schläge pro Session</strong> → alles anteriordominante Bewegungen mit hohen Aufprallkräften<br>
+• Hohe Laufbelastungen → zusätzliche Unterkörper-Mobilitätsprobleme<br>
+• S&C wird selten von klein auf trainiert → Einschränkungen werden nie korrigiert<br><br>
 
-<strong style="font-size:15px;">ROBUSTNESS CIRCUIT – BOXER-SPEZIFISCHE PRÄVENTION</strong><br>
-Ein integrierter Präventions-Circuit, der die häufigsten Boxverletzungen abdeckt (2–3×/Woche, 15 Min.):<br><br>
+Aus Tests mit über <strong>250 Boxern</strong> zeigt sich: Die Mehrheit hat Schulter-, Hüft- und/oder Knöchel-Mobilitätsprobleme. Je länger die Trainingshistorie, desto eingeschränkter.<br><br>
 
-<strong>1. Scapula-Stabilisation (Schulter-Schutz):</strong><br>
-• Band Pull-Aparts: 3×15 · Face Pulls: 3×12 · Prone Y-T-W Raises: 2×8 je Position<br>
-• Warum: Die Scapula-Stabilisatoren ermüden bei repetitivem Schlagen – instabile Schulterblätter = Impingement-Risiko<br><br>
+<strong>FightOS-Philosophie:</strong> "${tt('Train the Movement and the Muscles Will Follow','Wir fokussieren auf Bewegungsmuster statt einzelne Muskeln zu isolieren. Wenn die Bewegung stimmt, folgen die muskulären Anpassungen automatisch.')}" – Wir trainieren die Bewegung, die Muskeln folgen.<br><br>
 
-<strong>2. Hand & Handgelenk:</strong><br>
+<strong style="font-size:15px;">HÜFTMOBILITÄT</strong><br>
+${tt('Hüftbeuger-Verkürzung','Häufig bei Boxern durch langes Sitzen UND Tausende Stunden in der Kampfstellung. Verursacht Rückenschmerzen, limitiert Gluteus-Kraft und einschränkt Hüftrotation.')} ist das häufigste Problem. Boxer verstärken es durch unzählige Stunden in ähnlicher Stellung plus submaximales Dauerlaufen. Eine Studie an Baseball-Pitchern zeigte: Jeder Grad mehr Hüft-Rotation = <strong>0.89× weniger Verletzungsrisiko</strong> an Ellbogen und Schulter.<br><br>
+
+<strong>Mobilisieren:</strong> 1/2 Kneeling Lateral Lunge Rotations, Banded Hip Floss<br>
+<strong>Stabilisieren:</strong> Split Squat Lunge & Rotate, Side Clams (mit Side Bend) → Gluteus Medius für Hüftstabilität im Split Stance<br>
+<strong>Stärken:</strong> Quadruped Hip Extensions, Single Leg Glute Bridge, Banded Glute Bridges<br>
+<strong>Maximal laden:</strong> Lateral Lunge, Banded Sumo Deadlift, Barbell Hip Thrust<br><br>
+
+<strong style="font-size:15px;">GLUTEUS-STÄRKE — DER SCHLÜSSEL ZUR HÜFTE</strong><br>
+Die Glutes sind die primären Hüftstrecker – Hüftextension ist entscheidend für die Kraftübertragung beim Schlag. Aber Glutes sind bei Boxern typischerweise <strong>unterentwickelt und unteraktiv</strong> wegen der anteriordominanten Kampfstellung und Dauerlaufen.<br><br>
+
+<strong>Gluteus Maximus:</strong> Hauptmuskel für kraftvolle Hüftextension (Springen, Sprinten, Schlagen). Schwache Glutes → unterer Rücken kompensiert → Schmerzen und Verletzungen.<br>
+<strong>Gluteus Medius:</strong> Seitlich am Hüftkopf. Verantwortlich für Hüftabduktion und -stabilität. Kann beim Haken die Hüfte schnell rotieren und im Split Stance stabilisieren. Unterentwickelt → Knie-Valgus, instabile Beinarbeit.<br><br>
+
+Bodyweight-Übungen allein reichen nicht – wir müssen auch im Kraftraum gezielt laden: <strong>Goblet Pause Squats mit Mini-Bands, KB Sumo Deadlift, Banded Hip Thrusts</strong>.<br><br>
+
+<strong style="font-size:15px;">SCHULTERMOBILITÄT</strong><br>
+"Hände hoch, Kinn runter" – die defensive Guard erfordert Rundung des oberen Rückens und Hochziehen der Schultern. Hunderte Schläge pro Woche plus Press-Ups und Schulterpresse verschärfen das Problem: <strong>anteriore Dominanz und posteriore Schwäche</strong>.<br><br>
+
+Schlechte Schultermobilität kann zu Impingement, Rotatorenmanschetten-Schwäche, Rückenschmerzen und reduzierter Schulter-Stabilität am Ende des Schlags führen. Das Ergebnis: Karriere-Unterbrechungen, abgesagte Kämpfe, Leistungseinbußen.<br><br>
+
+<strong>Mobilisieren:</strong> Quadruped Thoracic Rotations, Thoracic Extensions, Lunge & Overhead Press<br>
+<strong>Stabilisieren (Rotatorenmanschette):</strong> Banded Plank Clockface, Banded Triple Threat, Med Ball Shoulder Rebounds<br>
+<strong>Stärken (schulterfreundliches Pressen):</strong> Single Arm Landmine Press, 1/2 Kneeling Dumbbell Press, 1/2 Kneeling Bottoms Up Press<br><br>
+
+<strong style="font-size:15px;">ROTATIONSMOBILITÄT</strong><br>
+Die gerundete Haltung im Ring führt zu einer immobilen ${tt('Brustwirbelsäule','Der mittlere Rückenabschnitt der die Schulterblätter und hintere Schulterbewegung reguliert. In gerundeter Haltung werden die umgebenden Muskeln dauerhaft gedehnt → Schwäche und potenzielle Schulterinstabilität.')}. Mangelnde Mobilität hier bedeutet: Rotation wird vom unteren Rücken und oberen Trapez kompensiert.<br><br>
+
+<strong>Leistungsperspektive:</strong> Rotationsmobilität ist essentiell für maximale Reichweite und Kraftübertragung. Jeder Zentimeter mehr Rotation erweitert das Mid-Range-Spiel – die Distanz in der die härtesten Schläge landen.<br><br>
+
+<strong>Wichtig:</strong> Erst Rotationsmobilität, -stabilität und -kraft entwickeln – DANN Geschwindigkeitsübungen (Med Ball Throws). Ohne diese Grundlagen aktivieren Speed-Übungen nicht die richtigen Core-Muskeln und der ${tt('Quadratus Lumborum','Kleiner Muskel im unteren Rücken. Wird überaktiv wenn Obliques und BWS-Rotation schwach sind. Ursache vieler Rückenschmerzen bei Boxern. Foam Rolling hilft nur kurzfristig – die Ursache muss behoben werden.')} kompensiert → Rückenschmerzen.<br><br>
+
+<strong style="font-size:15px;">PRE-RUNNING MOBILITÄT</strong><br>
+Laufen birgt spezifische Risiken für Boxer: Mobilitätseinschränkungen → suboptimale Lauftechnik → Überlastungsverletzungen. Bodenreaktionskraft beim Laufen = <strong>2.5-3× Körpergewicht</strong> bei 13-15 km/h. Drei Schlüsselbereiche vor jedem Lauf:<br><br>
+
+<strong>1. Achillessehne schützen:</strong> Boxer verbringen viel Zeit auf den Fußballen → Zug auf Achillessehne. Mobilisieren (Dorsiflexion), Stabilisieren (einbeinige Low-Impact Plyos), Stärken (High-Amplitude Plyos).<br>
+<strong>2. Hamstrings schützen:</strong> Bei hohen Geschwindigkeiten müssen Hamstrings hohe Kräfte bei maximaler Dehnung produzieren. Hüftmobilität + -stabilität + -kraft als Prävention.<br>
+<strong>3. Sprint-Mechanik:</strong> 3-4 Drills, 2-3 Sets × 10-20m:<br>
+• Skip for Height (vertikale Kraft), A-March (Bodenstriking), Single Leg Drives (Koordination), Wall Drives (horizontale Kraft), Banded Sprint (Überlastung).<br><br>
+
+<strong style="font-size:15px;">MOVEMENT ASSESSMENTS</strong><br>
+<strong>Overhead Squat:</strong> Der primäre Mobilitätstest. Holzstab über dem Kopf, Füße etwas breiter als hüftbreit. Absenken und halten. Bewertet Schulter- UND Hüftmobilität, unilaterale Imbalancen und Core-Stabilität in einer Bewegung. Bewertung 0-5.<br><br>
+<strong>Single Leg Squat:</strong> Für Boxer die den Overhead Squat >3/5 schaffen. Aufdecken von unilateralen Schwächen in Adduktoren, Hamstrings, Abduktoren und QL-Muskel.<br><br>
+
+<strong style="font-size:15px;">WARM-UP — RAMP-METHODE</strong><br>
+Jede Session beginnt mit einem strukturierten Warm-Up nach der ${tt('RAMP-Methode','Raise – Activate & Mobilise – Potentiate. Wissenschaftlich fundiertes Warm-Up-Framework das kurzfristige Kraftverbesserungen durch Post-Activation Potentiation (PAP) erzeugt.')}:<br><br>
+
+<strong>1. RAISE (3-5 Min.):</strong> Seilspringen, leichtes Schattenboxen oder Joggen → Körpertemperatur und Blutfluss erhöhen<br>
+<strong>2. ACTIVATE & MOBILISE:</strong> Dynamische Dehnungen und Stabilisationsübungen → ROM verbessern, Muskeln aktivieren. Hier das tägliche DIY-Mobilitätsprogramm durchführen<br>
+<strong>3. POTENTIATE:</strong> Schnelle oder schwer-geladene Übungen für ${tt('PAP','Post-Activation Potentiation – ein Phänomen das nach nahe-maximaler Anstrengung die Muskelkraft kurzfristig erhöht. Durch Springen und explosive Übungen im Warm-Up den Körper "scharfschalten".')}:<br>
+• Pogos: 2-3 Sets · Ice Skaters: 2-3 Sets · Banded Shadow Box: 2-3 Sets<br>
+• Punch ISO Holds: 3-5 Sek. je Schlag (Jab, Cross, Haken, Uppercuts beidseits)<br><br>
+
+<strong style="font-size:15px;">PRE-FIGHT WARM-UP</strong><br>
+Der letzte Teil der Kampfvorbereitung. 99% der Boxer machen Schattenboxen und Pratzen – aber nur wenige ein strukturiertes physisches Warm-Up. Forschung zeigt: Ein strukturiertes Warm-Up verbessert Fokus, Konzentration, Muskelkraft und reduziert Stress und Angst.<br><br>
+
+<strong>Protokoll:</strong><br>
+1. <strong>Situation einschätzen:</strong> Räumlichkeiten, Fitness des Athleten, verfügbare Zeit<br>
+2. <strong>Raise (5-10 Min.):</strong> Joggen, Seilspringen, Schattenboxen — Zone 2-3 (60-80% HFmax)<br>
+3. <strong>Activate & Mobilise:</strong> Eagles 8 je Seite · Windmills 8 je Seite · Floor Slides 8 · Glute Bridge 8 · Side Clams 8 je Seite · Glute Stretch 8 · Yoga Press-Ups 8 · Spider-Man to Twist 5 je Seite · Squat + Press 8 · Lunge and Rotate 6 je Seite · Lateral Lunge 6 je Seite · Banded Lateral/Monster Walks 8 je Seite<br>
+4. <strong>Potentiate:</strong> Pogos 10×3 · Ice Skaters 6 je Seite ×3 · Banded Shadow Box 20 Sek. ×3 · Punch ISO Holds 5 Sek. je Schlag<br>
+5. <strong>Pads:</strong> 1-2 Min. Runden mit 1-3 Min. Pause — Herzfrequenz in die rote Zone bringen<br><br>
+
+<strong style="font-size:15px;">DAS FIGHTOS DIY-MOBILITÄTSPROGRAMM (10 MIN., 1-2×/TAG)</strong><br>
+Ein Programm das Schulter-, Hüft- und Rotationsmobilität entwickelt und die Glutes aktiviert. Einbauen als: Warm-Up vor S&C/Laufen · Vor dem Box-Warm-Up · Recovery-Session (2-3 Sets statt 1-2) · Morgens oder vor dem Schlaf<br><br>
+
+<strong>Hüfte:</strong> 1/2 Kneeling Lateral Lunge Rotations · Banded Hip Floss<br>
+<strong>Stabilisation:</strong> Split Squat Lunge & Rotate · Side Clams<br>
+<strong>Schulter:</strong> Quadruped Thoracic Rotations · Thoracic Extensions<br>
+<strong>Glutes:</strong> Quadruped Hip Extensions · Single Leg Glute Bridge<br><br>
+
+<strong style="font-size:15px;">NACKENTRAINING — KO-PRÄVENTION</strong><br>
+Ein KO entsteht durch <strong>Rotationsbeschleunigung</strong> des Gehirns im Schädel. Der Nacken ist die einzige Struktur die diese Rotation bremsen kann. Stärkerer Nacken = weniger Kopfbeschleunigung bei Treffern. Ein angespannter Nacken verbindet den Kopf mit dem Oberkörper (15-30kg effektive Masse) – 3-6× mehr Masse gegen den Schlag.<br><br>
+
+<strong>Protokoll (3×/Woche, 10-15 Min.):</strong><br>
+• Isometrie: 4 Richtungen gegen Hand oder Band, 3×8 Sek.<br>
+• Konzentrisch: Nacken-Curls liegend (Flexion + Extension), 3×12<br>
+• Neck Harness: Kontrollierte Flexion/Extension, progressives Gewicht (2-5kg Start)<br>
+• <strong>Niemals Nackenbrücken</strong> – Bandscheibenrisiko überwiegt den Nutzen<br><br>
+
+<strong style="font-size:15px;">HAND & HANDGELENK</strong><br>
+Hand/Handgelenk (28%) sind die häufigsten Verletzungsorte im Boxen. Prävention:<br>
 • Wrist Curls + Reverse Wrist Curls: 3×15 · Radial/Ulnar Deviation: 2×12<br>
-• Rice Bucket Grabs: 2×30 Sek. – stärkt alle intrinsischen Handmuskeln gleichzeitig<br>
-• Richtiges Bandagieren lernen + jedes Training sauber wickeln<br><br>
-
-<strong>3. Nacken:</strong> (s.o.)<br><br>
-
-<strong style="font-size:15px;">MOBILITÄT – SCHLAGWEITE & FUSSARBEIT</strong><br>
-• <strong>Schulter/Thorax:</strong> Thorakale Rotation bestimmt Schlagweite und defensive Kopfbewegung. Eingeschränkte Schulter = kürzere Schläge + compensatorische Überbelastung<br>
-• <strong>Hüfte:</strong> Ständige Rotation für Schläge und Richtungswechsel. Steife Hüften limitieren die Kraftübertragung aus der ${tt('Kinetischen Kette','Boden → Fuß → Knie → Hüfte → Core → Schulter → Faust.')}<br>
-• <strong>Sprunggelenk:</strong> Für Ausfallschritte, Ausweichbewegungen und die tiefe Kampfstellung essentiell<br><br>
-
-<strong style="font-size:15px;">TÄGLICHES MOBILITÄTSPROTOKOLL (10 MIN.)</strong><br>
-<strong>Pre-Training:</strong><br>
-• Thorakale Rotation: 2×8 je Seite · 90/90 Hüft-Stretch: 2×30 Sek. je Seite<br>
-• Schulter-CAR: 5 je Richtung · Wall-Ankle Touches: 2×15<br><br>
-<strong>Post-Training:</strong><br>
-• Handgelenk-Rotation + Flexion/Extension: 2×15<br>
-• Brustwirbelsäule Foam-Rolling: 30 Sek.`,
-    tags:[{text:'Täglich · 15 Min.',cls:'tag-red'},{text:'Nacken 2–3×/Wo.',cls:'tag-orange'}]}
+• Rice Bucket Grabs: 2×30 Sek.<br>
+• Richtiges Bandagieren bei jedem Training`,
+    tags:[{text:'Täglich · 10 Min.',cls:'tag-red'},{text:'DIY + Nacken + Warm-Up',cls:'tag-orange'}]}
 ];
 
 // ===== MUSCLE SVG – FRONT VIEW =====
