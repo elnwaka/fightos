@@ -5929,51 +5929,55 @@ function completeBlock(day, idx, type, title, duration, rpe) {
 
   saveData(data);
 
-  // Animate the completed block out before re-rendering
-  var nextBlockEl = document.querySelector('.db-next-block, [style*="border-left: 3px solid var(--red)"]');
-  // Find the today-checklist item too
-  var checklistItems = document.querySelectorAll('#dash-app [onclick*="toggleBlockDone"]');
+  // Animate completed block then re-render
   var animated = false;
 
-  // Try to animate the "NÄCHSTE SESSION" card on the dashboard
-  if (nextBlockEl && nextBlockEl.closest('#dash-app')) {
-    var card = nextBlockEl.closest('[style*="border-bottom"]') || nextBlockEl.parentElement;
-    if (card) {
-      card.style.transition = 'transform .4s ease, opacity .4s ease';
-      card.style.transform = 'translateX(60px) scale(.95)';
-      card.style.opacity = '0';
-      animated = true;
-      setTimeout(function() {
-        showToast('Erledigt ✓', 'success', 2000);
-        renderDashboard();
-      }, 400);
-    }
+  // 1. Dashboard: animate the fc-next-session card
+  var nextCard = document.querySelector('.fc-next-session');
+  if (nextCard) {
+    nextCard.style.transition = 'transform .45s cubic-bezier(.4,0,.2,1), opacity .45s ease';
+    nextCard.style.transform = 'translateX(80px) scale(.9)';
+    nextCard.style.opacity = '0';
+    animated = true;
+    setTimeout(function() {
+      showToast('Erledigt \u2713', 'success', 2000);
+      renderDashboard();
+    }, 450);
   }
 
-  // Also try to animate day-block in the wochenplan
-  var dayBlock = document.querySelector('.day-block[onclick*="' + day + ',' + idx + '"]');
-  if (!dayBlock) {
-    // Try finding by checking the block check button
-    var checkBtns = document.querySelectorAll('.block-check-btn');
-    checkBtns.forEach(function(btn) {
-      var parent = btn.closest('.day-block');
-      if (parent && btn.onclick && btn.onclick.toString().indexOf(day) !== -1) dayBlock = parent;
-    });
-  }
-  if (dayBlock) {
-    dayBlock.style.transition = 'transform .35s ease, opacity .35s ease, background .35s ease';
-    dayBlock.style.transform = 'scale(.92)';
-    dayBlock.style.opacity = '.4';
-    dayBlock.style.background = 'rgba(34,197,94,.15)';
-    dayBlock.classList.add('block-done');
-    animated = true;
-  }
+  // 2. Today checklist: animate the specific item
+  var todayItems = document.querySelectorAll('.fc-today-item');
+  todayItems.forEach(function(item) {
+    var check = item.querySelector('.fc-check');
+    if (check && item.innerHTML.indexOf(title) !== -1 && !check.classList.contains('done')) {
+      check.classList.add('done');
+      check.textContent = '\u2713';
+      var titleEl = item.querySelector('div[style*="color"]');
+      if (titleEl) {
+        titleEl.style.textDecoration = 'line-through';
+        titleEl.style.color = 'var(--text-muted)';
+      }
+    }
+  });
+
+  // 3. Wochenplan: animate day-block
+  var dayBlocks = document.querySelectorAll('.day-block');
+  dayBlocks.forEach(function(block) {
+    if (block.innerHTML.indexOf(title) !== -1 && !block.classList.contains('block-done')) {
+      block.style.transition = 'transform .35s ease, opacity .35s ease, background .35s ease';
+      block.style.transform = 'scale(.92)';
+      block.style.opacity = '.4';
+      block.style.background = 'rgba(34,197,94,.15)';
+      block.classList.add('block-done');
+      animated = true;
+    }
+  });
 
   if (!animated) {
-    showToast('Erledigt ✓', 'success', 2000);
+    showToast('Erledigt \u2713', 'success', 2000);
   }
 
-  // Re-render after animation
+  // Re-render wochenplan after animation
   setTimeout(function() {
     renderWeekPlan();
   }, animated ? 500 : 0);
@@ -6762,6 +6766,8 @@ function renderDashboard() {
 
     // ══ HERO: Animated Gradient + Grid ══
     '<div class="fc-hero">' +
+      '<div class="db-hero-img" style="background-image:url(\'img/hero/gym-dark.jpg\');"></div>' +
+      '<div class="db-hero-fade"></div>' +
       '<div class="fc-hero-name">' + escapeHTML(getDisplayName()) + '</div>' +
       (totalFights > 0 ?
         '<div class="fc-hero-record">' +

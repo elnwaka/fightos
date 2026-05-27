@@ -4386,11 +4386,25 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   flex-direction: column;
   justify-content: flex-end;
 }
+.fc-hero .db-hero-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: .35;
+  z-index: 0;
+}
+.fc-hero .db-hero-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--black) 0%, rgba(10,10,11,.6) 50%, rgba(10,10,11,.3) 100%);
+  z-index: 0;
+}
 .fc-hero::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #0a0a0b 0%, #1a0508 25%, #0a0a0b 50%, #080a14 75%, #0a0a0b 100%);
+  background: linear-gradient(135deg, rgba(232,0,13,.08) 0%, transparent 40%, rgba(59,130,246,.06) 80%, transparent 100%);
   background-size: 400% 400%;
   animation: fcGradient 20s ease infinite;
   z-index: 0;
