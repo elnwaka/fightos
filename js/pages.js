@@ -407,41 +407,109 @@ BET konfrontiert dein Gehirn mit kognitiven Aufgaben (${tt('Stroop-Test','Farbw�
 
   // === SÄULE 06: ERNÄHRUNG & GEWICHTSMANAGEMENT ===
   { name:'ERNÄHRUNG & GEWICHTSMANAGEMENT', category:'Treibstoff', color:'var(--green)',
-    short:'Makros, Timing, Hydration, Gewicht machen, Rehydration. Der beste Motor bringt nichts mit dem falschen Treibstoff.',
-    desc:`<strong style="font-size:15px;">WARUM DAS FÜR BOXER ENTSCHEIDEND IST</strong><br>
-Dein Körper ist wie ein Rennwagen: Das beste Chassis (Kraft), der beste Motor (Ausdauer) und der beste Fahrer (Technik) bringen nichts mit dem falschen Treibstoff. Als Boxer musst du explosiv und ausdauernd gleichzeitig sein, Muskelmasse aufbauen aber in deiner Gewichtsklasse bleiben, und dich von brutalem Training erholen – oft 2× am Tag. Die ISSN Position Stand (2025) bestätigt: Ernährung entscheidet über Trainingsqualität, Erholung und Kampfleistung in Kampfsportarten.<br><br>
+    short:'Makros, Timing, Hydration, Gewicht machen, Supplements, Refuelling. Ernährung ist mehr als nur Gewicht machen – es ist der Treibstoff für Leistung.',
+    desc:`<strong style="font-size:15px;">MEHR ALS NUR GEWICHT MACHEN</strong><br>
+Boxen ist ein Gewichtsklassen-Sport, deshalb spielt Ernährung eine massive Rolle beim sicheren und effektiven Gewichtmachen. Aber bei FightOS planen wir Ernährungsstrategien um <strong>hochintensive Leistung zu befeuern</strong> und sich von hartem Training zu erholen – es geht nicht nur ums Gewicht.<br><br>
 
-<strong style="font-size:15px;">MAKRONÄHRSTOFFE IM BOXEN</strong><br>
-• <strong>Protein (Empfehlung: 2.2g/kg):</strong> Repariert Muskelfasern nach dem Training. Die ${tt('MPS','Muskelproteinsynthese – der Prozess, durch den dein Körper beschädigte Muskelproteine repariert und neue aufbaut. Wird durch Training + Protein getriggert. Peak: 24–48h nach dem Training.')} braucht mindestens <strong>2.5g ${tt('Leucin','Die wichtigste Aminosäure für Muskelaufbau. Leucin aktiviert den mTOR-Signalweg, der die Muskelproteinsynthese startet. Mindestens 2.5g pro Mahlzeit nötig – das „Leucin-Schwellenwert-Konzept".')}</strong> pro Mahlzeit (Morton et al. 2018). 4–5 Protein-Boli über den Tag verteilt sind optimal.<br><br>
+Zu verstehen wie man richtig tankt kann schwierig sein, wenn Athleten 2× täglich trainieren. Schlechte Erholung führt zu verminderter Leistung und erhöhtem Verletzungs- und Krankheitsrisiko. Kohlenhydrate zu stark zu reduzieren beeinträchtigt die Hochintensitäts-Leistung massiv und erhöht das Krankheitsrisiko, weil die Energieversorgung des Immunsystems sinkt. Außerdem sabotiert es die Fight-Week-Strategie zum Gewichtmachen.<br><br>
 
-• <strong>Kohlenhydrate (4–8g/kg):</strong> Dein Gehirn und deine Muskeln laufen auf ${tt('Glykogen','Die Speicherform von Kohlenhydraten in Muskeln und Leber. Deine Muskeln speichern ~400g, die Leber ~100g. Bei leerem Glykogen sinkt die Leistung drastisch – du schlägst schwächer und reagierst langsamer.')}. Nach hartem Training sind deine Speicher zu 40–60% leer. KH-Timing ist entscheidend: 5–6h vor dem Abendtraining das Mittagessen als Glykogen-Loader nutzen. Post-Training: schnelle KH für Regeneration. Burke et al. (2011) zeigten: optimiertes KH-Timing → <strong>8–12% mehr Leistung</strong>.<br><br>
+<strong style="font-size:15px;">KOHLENHYDRATE — DER HAUPTTREIBSTOFF</strong><br>
+Kohlenhydrate sind die <strong>Hauptenergiequelle für hochintensives Training</strong>. Strategisches KH-Timing über den Tag, die Camp-Phase und vor dem Kampf ist essentiell für hohe Intensität.<br><br>
 
-• <strong>Fett (0.8–1.2g/kg):</strong> Baut Hormone (Testosteron!), schützt Organe, transportiert fettlösliche Vitamine. Unter 0.8g/kg sinkt die Testosteronproduktion messbar.<br><br>
+<strong>Typen:</strong> ${tt('Stärkehaltige KH','Höherer Ballaststoffgehalt, langsame Verdauung, stabiler Blutzucker. Beispiele: Haferflocken, Vollkornreis, Vollkornbrot.')} (langsam, füllen länger) vs. ${tt('Einfache KH','Niedriger Ballaststoffgehalt, schnelle Absorption. Beispiele: Weißbrot, Bananen, Marmelade. Ideal für schnelle Energie nach dem Training.')} (schnell, für sofortige Energie).<br>
+• Beim Gewichtmachen: ballaststoffreiche KH wählen (sättigender)<br>
+• Am Kampfabend: ballaststoffarme, einfache KH wählen (schnelle Energie)<br><br>
 
-<strong>Timing:</strong> Das ${tt('Anabole Fenster','Die Phase erhöhter Muskelproteinsynthese nach dem Training. Entgegen dem Mythos dauert sie nicht 30 Minuten, sondern 24–48 Stunden – aber die erste Mahlzeit nach dem Training hat den stärksten Effekt.')} nach dem Training ist der beste Zeitpunkt für Protein + KH. Vor dem Schlaf: 40g Casein-Protein für eine langsame, 7-stündige Aminosäure-Versorgung → +22% nächtliche MPS (Res et al. 2012).<br><br>
+<strong>Timing:</strong><br>
+• <strong>3-4 Stunden vor hartem Training:</strong> 40-80g stärkehaltige KH (Haferflocken, Reis)<br>
+• <strong>30 Min. bis 2h nach dem Training:</strong> Einfache KH für schnelle Glykogen-Auffüllung<br>
+• <strong>Ruhetage:</strong> KH reduzieren um Körperfett zu kontrollieren<br>
+• <strong>Morgentraining:</strong> Abends zuvor KH-reiche Mahlzeit → Speicher bleiben gefüllt<br><br>
 
-<strong style="font-size:15px;">GEWICHTSMANAGEMENT – DIE BOXSPEZIFISCHE DIMENSION</strong><br>
-In kaum einem Sport ist Gewichtsmanagement so entscheidend wie im Boxen. Die ISSN (2025) gibt klare zeitabhängige Grenzen vor:<br><br>
+<strong>Planung nach Camp-Phase:</strong><br>
+• 4-6 Wochen vor Kampf (hohes Volumen): KH bei <strong>~3g/kg</strong> priorisieren<br>
+• 1-2 Wochen vor Kampf (Taper): KH auf <strong>~2g/kg</strong> reduzieren → letzte Pfunde verlieren<br><br>
 
-<strong>Zeitabhängige Cut-Grenzen:</strong><br>
-• <strong>>4 Wochen vor Kampf:</strong> Max. 0.5–1% KG/Woche durch Kaloriendefizit (gradual weight loss)<br>
-• <strong>Kampfwoche (5–7 Tage):</strong> Max. 3–5% KG durch Wasser-/Natrium-Manipulation<br>
-• <strong>>5% akuter Cut = gefährlich:</strong> Kognitive Einschränkung, Dehydration, erhöhtes Verletzungsrisiko<br><br>
+<strong style="font-size:15px;">PROTEIN — BAUSTOFF FÜR ERHOLUNG</strong><br>
+Protein ist essentiell für die Muskelreparatur. Wenn Boxer Gewicht machen, befinden sie sich oft in negativer Energiebilanz. Wenn KH eingeschränkt werden, baut der Körper Proteine ab (${tt('Glukoneogenese','Synthese von Glukose aus Nicht-Kohlenhydrat-Quellen wie Aminosäuren und Fetten. Passiert verstärkt bei KH-Restriktion.')}). Das bedeutet: <strong>Boxer brauchen mehr Protein als normale Sportler.</strong><br><br>
 
-<strong>Kontrollierter Cut – Protokoll:</strong><br>
-• Wasserloading: Tage 5–3: 8L/Tag → Tag 2: 2L → Tag 1: nur Schlucke<br>
-• Natrium-Reduktion parallel zum Wasserloading<br>
-• Low-Residue-Diät ab 48h vor dem Wiegen<br>
-• <strong>Fight Week: Trainingsvolumen um 40–60% reduzieren</strong> – der häufigste Fehler ist, in der Kampfwoche bei reduzierter Kalorien- und Wasserzufuhr noch voll zu trainieren<br><br>
+<strong>Empfehlung: 1.6-2.4g/kg pro Tag</strong><br>
+• In schweren Krafttraining-Phasen oder starkem Kaloriendefizit: bis <strong>2.4g/kg</strong><br>
+• <strong>20-40g Protein pro Mahlzeit</strong> (0.3-0.5g/kg) — weniger ist suboptimal, mehr bringt kaum Zusatznutzen<br>
+• <strong>Alle 3-4 Stunden</strong> eine Proteinquelle → maximale ${tt('MPS','Muskelproteinsynthese – bleibt bis zu 48h nach dem Training erhöht. Alle 3-4h Protein essen maximiert diesen Prozess.')}<br>
+• Tierische Quellen (Casein, Whey, Eier, Fleisch) haben höhere ${tt('Bioverfügbarkeit','Wie effizient der Körper das Protein aufnehmen und nutzen kann. Tierische Quellen >75 auf dem Index sind optimal.')} als pflanzliche<br><br>
 
-<strong>Rehydration-Protokoll (nach Wiegen):</strong><br>
-• <strong>Erste 2 Stunden:</strong> 1–1.5L Elektrolytlösung (Natrium 40–80mmol/L) + 1–1.5g/kg KH + 0.3g/kg Protein<br>
-• <strong>Stunden 2–6:</strong> Weiter trinken bis 150% des verlorenen Gewichts erreicht. Kleine, häufige Mahlzeiten<br>
-• <strong>Letzte Mahlzeit:</strong> 3–4h vor dem Kampf, vertraut und leicht verdaulich<br><br>
+<strong>Praxis-Tipps:</strong><br>
+• Nach dem Training: 500ml Milch oder Whey-Protein-Shake<br>
+• Frühstück: 3-Eier-Omelette (hochwertig + sättigend)<br>
+• Vor dem Schlaf: 150-250g Magerquark oder griechischer Joghurt → Recovery im Schlaf<br><br>
 
-<strong style="font-size:15px;">MEHR DETAILS</strong><br>
-Klicke auf „Ernährung" und „Cutten" im Menü für den kompletten Guide mit Einkaufsliste, Makro-Rechner, Kampftag-Protokoll und Cut-Strategien.`,
-    tags:[{text:'6 Mahlzeiten',cls:'tag-green'},{text:'Gewicht + Ernährung',cls:'tag-gold'}]},
+<strong style="font-size:15px;">FETT — NICHT DER FEIND</strong><br>
+Hauptrollen: Energiequelle bei niedriger Intensität, Vitamin-Träger (A, D, E, K), Hormonproduktion. <strong>~1g/kg pro Tag</strong>, nie unter 20% der Gesamtenergie. An Ruhetagen und im Taper Fett leicht erhöhen wenn KH sinken.<br><br>
+
+Ungesättigte Fette (Lachs, Makrele, Nüsse, Olivenöl) → gesundheitsfördernd<br>
+Gesättigte Fette (Butter, Kokosnussöl) → in Maßen ok<br>
+Trans-Fette (Fast Food, Frittiertes) → vermeiden<br><br>
+
+<strong style="font-size:15px;">HYDRATION — 2% DEHYDRATION = LEISTUNGSEINBRUCH</strong><br>
+Bereits <strong>2% Dehydration</strong> (1-2kg Wasserverlust) beeinträchtigt physische UND mentale Leistung: erhöhte Herzfrequenz, reduzierte Kraftproduktion, langsamere Reaktionszeit, schlechtere Entscheidungsfindung. Boxer verlieren <strong>3-5% Körpermasse</strong> durch Schweiß in einer 90-Min-Session.<br><br>
+
+<strong>Schweißrate monitoren:</strong><br>
+Gewicht vor Training + Flüssigkeitsaufnahme − Gewicht nach Training = Schweißverlust<br>
+Schweißverlust × 1.5 = Ziel-Trinkmenge nach dem Training<br>
+Beispiel: 85kg + 1L = 86kg, nach Training 83kg → 3L Verlust × 1.5 = <strong>4.5L Ziel</strong><br><br>
+
+<strong>Praxis-Tipps:</strong> Morgens 300-500ml Wasser · Prise Salz zu Hauptmahlzeiten · 500ml Elektrolytgetränk 30-60 Min. vor dem Training · Urinfarbe: hellgelb = gut<br><br>
+
+<strong style="font-size:15px;">SUPPLEMENTS — FOOD FIRST</strong><br>
+FightOS verfolgt einen "Food First"-Ansatz — erst die Ernährung optimieren, dann Supplements. Nur evidenzbasierte, batchgetestete Produkte verwenden.<br><br>
+
+<strong>Gesundheits-Supplements:</strong><br>
+• <strong>Vitamin D3</strong> (4000 IU/Tag): Knochengesundheit, Immunfunktion, Muskelregeneration. Besonders im Winter<br>
+• <strong>Omega 3</strong> (2-3g/Tag, 2000mg EPA + 1000mg DHA): Entzündungshemmend, Muskelproteinsynthese, potenziell hirnschützend nach Kopftreffern<br>
+• <strong>Probiotika</strong> (täglich): Reduziert Krankheitsrisiko in intensiven Trainingsphasen<br>
+• <strong>Eisen</strong> (nur bei Mangel, Ferritin <30 ug/L): 14mg/Tag mit Vitamin C<br>
+• <strong>Calcium</strong> (400mg vor hartem Training): Knochengesundheit bei Energiedefizit<br><br>
+
+<strong>Leistungs-Supplements:</strong><br>
+• <strong>Kreatin</strong> (5g/Tag, >6 Wochen): Verbessert Kurzzeit-Hochintensitätsleistung, erhöht Muskelmasse, potenziell hirnschützend. <strong>10 Tage vor dem Wiegen absetzen</strong> (speichert Wasser). Nach dem Wiegen: 2×5g mit KH für schnelle Aufladung<br>
+• <strong>Koffein</strong> (3mg/kg, 45 Min. vor Training): Verbessert Ausdauer, Reaktionszeit, reduziert wahrgenommene Anstrengung. Gum-Form wirkt in 5 Min.<br>
+• <strong>Beta-Alanin</strong> (6g/Tag in 4×1.5g): Erhöht Pufferkapazität, verbessert Schlagkraft und -frequenz über 3×3 Runden. Mit Essen einnehmen (weniger Kribbeln)<br>
+• <strong>Whey Protein</strong> (20-40g nach Training): Praktische Proteinquelle, hochverfügbar, sättigend<br><br>
+
+<strong style="font-size:15px;">TRAINING BEFEUERN — TAGESTYPEN</strong><br>
+<strong>Schwerer Trainingstag (Sparring, HIIT):</strong> KH +50% vs. normal. Vorab 40-80g stärkehaltige KH, danach schnelle KH + Protein<br>
+<strong>Leichter Trainingstag (Technik, Kraft):</strong> KH reduziert. 30g KH vor der Session reicht<br>
+<strong>Ruhetag:</strong> KH-Reduktion um 600-750 kcal vs. Trainingstag. Protein beibehalten (MPS bleibt 48h erhöht)<br><br>
+
+<strong style="font-size:15px;">GEWICHT MACHEN — FIGHT WEEK</strong><br>
+<strong>Allgemein:</strong> 250-800 kcal Defizit/Tag → 0.5-1kg/Woche Gewichtsverlust. Nicht zu aggressiv – großes Defizit → Ermüdung, Krankheit, Dietabbruch.<br><br>
+
+<strong>Fight Week Methoden:</strong><br>
+• <strong>Low-Residue-Diät</strong> (6 Tage vor Wiegen): <10g Ballaststoffe/Tag. Weißer Reis, Pasta, Brot, Eier, Hähnchen. Durchschnittlich <strong>~1% Körpermasse</strong> Verlust<br>
+• <strong>Natrium reduzieren</strong> (3-5 Tage vorher): Kein Salz hinzufügen, keine Soßen → weniger Wassereinlagerung<br>
+• <strong>KH reduzieren</strong> (letzte 3 Tage): Pro 1g KH weniger = 2.7g weniger Wassergewicht<br>
+• <strong>Water Loading</strong>: 100ml/kg Körpermasse für 3 Tage, dann 15ml/kg am Tag vor dem Wiegen → erhöhte Urinproduktion<br>
+• <strong>Kreatin absetzen</strong>: 10 Tage vor dem Wiegen → ~1% Körpermasse<br><br>
+
+<strong style="font-size:15px;">REFUELLING — NACH DEM WIEGEN</strong><br>
+<strong>Amateur (1-3h Refuel-Fenster):</strong><br>
+• Sofort: 1-1.5L verdünntes KH-Elektrolytgetränk (30-60g KH)<br>
+• 30 Min. später: Ballaststoffarme KH (Milchreis, Weißbrot mit Marmelade, Bananenbrot)<br>
+• 3h vor Kampf: Weißer Reis/Pasta (wenn Zeit reicht)<br>
+• 30 Min. vor Kampf: Reife Banane oder Gummibärchen<br>
+• 10 Min. vor Kampf: KH-Elektrolytgetränk + Energy-Gel<br><br>
+
+<strong>Profi (24-30h Refuel-Fenster):</strong><br>
+• <strong>Zuerst rehydrieren</strong>, dann essen. KH im dehydrierten Zustand → Übelkeit und Blähungen<br>
+• 1-2g/kg KH sofort nach dem Wiegen, dann <strong>8-10g/kg KH über 24h</strong><br>
+• Alle 2.5-4h: 60-80g stärkehaltige KH (Pasta, Reis, Brot, Obst)<br>
+• <strong>Kein Junk Food</strong> — hoher Fett+KH → Magen-Darm-Probleme, Durchfall, Dehydration, schlechter Schlaf<br>
+• 2-3h vor dem Kampf: Leicht verdauliche Snacks (Milchreis, Banane, Marmelade-Toast, Gummibärchen)<br>
+• Im Umkleideraum: KH-Gel mit Elektrolyten<br><br>
+
+<strong>Vorbereitung ist alles:</strong> Detaillierten Zeitplan schreiben · Stoppuhr nach dem Wiegen starten · Kühlbox + Eisblöcke mitnehmen · Eigene Mahlzeiten vorbereiten · Extra KH-Snacks einpacken · Gewicht in verschiedenen Phasen kontrollieren`,
+    tags:[{text:'Individuell',cls:'tag-green'},{text:'Makros + Supplements + Fight Week',cls:'tag-gold'}]},
 
   // === SÄULE 07: REGENERATION & BELASTUNGSSTEUERUNG ===
   { name:'REGENERATION & BELASTUNGSSTEUERUNG', category:'Recovery', color:'var(--green)',
