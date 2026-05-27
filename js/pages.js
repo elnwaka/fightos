@@ -1059,9 +1059,10 @@ function exerciseImgUrl(id, frame) {
 function exerciseIcon(id) {
   const remoteUrl = exerciseImgUrl(id, 0);
   const localUrl = exerciseImgLocal(id);
-  // Versuche zuerst lokales Bild, dann Remote, dann kein Bild
   const src = remoteUrl || localUrl;
-  return '<img src="' + src + '" alt="" class="ex-icon-img" loading="lazy" onerror="this.parentElement.classList.add(\'ex-icon-fallback\');this.remove()"/>';
+  // Generate short fallback label from exercise ID
+  var fallback = id.replace(/-/g,' ').replace(/\b\w/g, function(c){return c.toUpperCase();}).substring(0,12);
+  return '<img src="' + src + '" alt="" class="ex-icon-img" loading="lazy" onerror="this.parentElement.classList.add(\'ex-icon-fallback\');this.parentElement.setAttribute(\'data-fallback\',\'' + fallback + '\');this.remove()"/>';
 }
 
 // ===== ÜBUNGEN =====

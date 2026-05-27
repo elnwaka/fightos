@@ -1204,7 +1204,8 @@ function renderTrainingPage(subTab) {
     { id: 'log', label: 'Log' },
     { id: 'ernaehrung', label: 'Ernährung' },
     { id: 'periodisierung', label: 'Periodisierung' },
-    { id: 'regeneration', label: 'Recovery' }
+    { id: 'regeneration', label: 'Recovery' },
+    { id: 'notizen', label: 'Notizen' }
   ];
 
   var tabsHTML = '<div class="sub-tabs">' + tabs.map(function(t) {
@@ -1227,6 +1228,111 @@ function renderTrainingPage(subTab) {
   else if (subTab === 'ernaehrung') { renderErnaehrungPage(); contentEl.innerHTML = document.getElementById('page-ernaehrung').innerHTML; }
   else if (subTab === 'periodisierung') { renderPeriodisierungPage(); contentEl.innerHTML = document.getElementById('page-periodisierung').innerHTML; }
   else if (subTab === 'regeneration') { renderRegenerationPage(); contentEl.innerHTML = document.getElementById('page-regeneration').innerHTML; }
+  else if (subTab === 'notizen') { renderNotizenTab(contentEl); }
+}
+
+// ===== NOTIZEN-TAB =====
+var NOTIZ_CATEGORIES = [
+  { id: 'training', label: 'Training', color: 'var(--red)', icon: '🥊' },
+  { id: 'taktik', label: 'Taktik & Ring IQ', color: 'var(--blue)', icon: '🧠' },
+  { id: 'gegner', label: 'Gegner & Sparring', color: 'var(--orange)', icon: '👊' },
+  { id: 'ernaehrung', label: 'Ernährung & Gewicht', color: 'var(--green)', icon: '🍎' },
+  { id: 'mental', label: 'Mental & Motivation', color: 'var(--purple)', icon: '💭' },
+  { id: 'allgemein', label: 'Allgemein', color: 'var(--grey)', icon: '📝' }
+];
+
+function renderNotizenTab(el) {
+  var data = getData();
+  if (!data) return;
+  if (!data.notizen) data.notizen = [];
+
+  var activeCategory = window._notizFilter || 'alle';
+  var filtered = activeCategory === 'alle' ? data.notizen : data.notizen.filter(function(n) { return n.category === activeCategory; });
+
+  // Category filter pills
+  var filterHTML = '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;margin-bottom:20px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">' +
+    '<button onclick="window._notizFilter=\'alle\';renderNotizenTab(document.getElementById(\'training-content\'))" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:6px 14px;border-radius:var(--radius-full);border:1px solid ' + (activeCategory === 'alle' ? 'var(--red)' : 'var(--surface-3)') + ';background:' + (activeCategory === 'alle' ? 'rgba(232,0,13,.15)' : 'transparent') + ';color:' + (activeCategory === 'alle' ? 'var(--white)' : 'var(--text-muted)') + ';cursor:pointer;white-space:nowrap;min-height:32px;">ALLE</button>' +
+    NOTIZ_CATEGORIES.map(function(c) {
+      var isActive = activeCategory === c.id;
+      return '<button onclick="window._notizFilter=\'' + c.id + '\';renderNotizenTab(document.getElementById(\'training-content\'))" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:6px 14px;border-radius:var(--radius-full);border:1px solid ' + (isActive ? c.color : 'var(--surface-3)') + ';background:' + (isActive ? c.color + '22' : 'transparent') + ';color:' + (isActive ? 'var(--white)' : 'var(--text-muted)') + ';cursor:pointer;white-space:nowrap;min-height:32px;">' + c.icon + ' ' + c.label.toUpperCase() + '</button>';
+    }).join('') +
+  '</div>';
+
+  // New note form
+  var formHTML = '<div style="background:var(--glass-bg);backdrop-filter:blur(var(--glass-blur));border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:20px;margin-bottom:24px;">' +
+    '<div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;">' +
+      '<select id="notiz-cat" style="flex:1;min-width:140px;background:var(--surface-1);border:1px solid var(--surface-2);color:var(--light);padding:10px 14px;border-radius:var(--radius);font-family:\'DM Sans\',sans-serif;font-size:14px;min-height:44px;">' +
+        NOTIZ_CATEGORIES.map(function(c) { return '<option value="' + c.id + '">' + c.icon + ' ' + c.label + '</option>'; }).join('') +
+      '</select>' +
+      '<input type="text" id="notiz-title" placeholder="Titel (optional)" style="flex:2;min-width:180px;background:var(--surface-1);border:1px solid var(--surface-2);color:var(--light);padding:10px 14px;border-radius:var(--radius);font-size:14px;min-height:44px;">' +
+    '</div>' +
+    '<textarea id="notiz-text" rows="3" placeholder="Was willst du festhalten?" style="width:100%;background:var(--surface-1);border:1px solid var(--surface-2);color:var(--light);padding:12px 14px;border-radius:var(--radius);font-family:\'DM Sans\',sans-serif;font-size:14px;resize:vertical;margin-bottom:12px;"></textarea>' +
+    '<button onclick="addNotiz()" class="fc-btn-done" style="width:100%;">NOTIZ SPEICHERN</button>' +
+  '</div>';
+
+  // Notes list
+  var notesHTML = '';
+  if (filtered.length === 0) {
+    notesHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">' +
+      '<div style="font-size:32px;margin-bottom:12px;">📝</div>' +
+      '<div style="font-size:14px;">Noch keine Notizen' + (activeCategory !== 'alle' ? ' in dieser Kategorie' : '') + '.</div>' +
+      '<div style="font-size:12px;color:var(--text-subtle);margin-top:4px;">Schreib dir auf was dir auffällt — im Training, beim Sparring, über Gegner oder Ernährung.</div>' +
+    '</div>';
+  } else {
+    notesHTML = filtered.map(function(n, i) {
+      var cat = NOTIZ_CATEGORIES.find(function(c) { return c.id === n.category; }) || NOTIZ_CATEGORIES[5];
+      var origIdx = data.notizen.indexOf(n);
+      var dateStr = n.date ? new Date(n.date).toLocaleDateString('de-DE', { day:'2-digit', month:'short', year:'numeric' }) : '';
+      return '<div style="background:var(--surface-1);border:1px solid var(--surface-2);border-left:3px solid ' + cat.color + ';border-radius:var(--radius);padding:16px;margin-bottom:10px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
+              '<span style="font-size:14px;">' + cat.icon + '</span>' +
+              '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:' + cat.color + ';letter-spacing:1px;">' + cat.label.toUpperCase() + '</span>' +
+              '<span style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--text-subtle);">' + dateStr + '</span>' +
+            '</div>' +
+            (n.title ? '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);letter-spacing:0.5px;margin-bottom:4px;">' + escapeHTML(n.title) + '</div>' : '') +
+            '<div style="font-size:13px;color:var(--text-muted);line-height:1.6;white-space:pre-wrap;">' + escapeHTML(n.text) + '</div>' +
+          '</div>' +
+          '<button onclick="deleteNotiz(' + origIdx + ')" style="background:none;border:none;color:var(--text-subtle);font-size:16px;cursor:pointer;padding:4px 8px;min-height:32px;flex-shrink:0;" title="Löschen">&times;</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  el.innerHTML = '<div class="page-header"><div class="page-title">NOTI<span>ZEN</span></div><div class="page-sub">Gedanken, Beobachtungen, Erkenntnisse — alles an einem Ort.</div></div>' +
+    filterHTML + formHTML + notesHTML;
+}
+
+function addNotiz() {
+  var cat = document.getElementById('notiz-cat');
+  var title = document.getElementById('notiz-title');
+  var text = document.getElementById('notiz-text');
+  if (!text || !text.value.trim()) { showToast('Schreib etwas!', 'error'); return; }
+
+  var data = getData();
+  if (!data) return;
+  if (!data.notizen) data.notizen = [];
+
+  data.notizen.unshift({
+    category: cat ? cat.value : 'allgemein',
+    title: title ? title.value.trim() : '',
+    text: text.value.trim(),
+    date: new Date().toISOString()
+  });
+  saveData(data);
+  showToast('Notiz gespeichert', 'success');
+  renderNotizenTab(document.getElementById('training-content'));
+}
+
+function deleteNotiz(idx) {
+  if (!confirm('Notiz löschen?')) return;
+  var data = getData();
+  if (!data || !data.notizen) return;
+  data.notizen.splice(idx, 1);
+  saveData(data);
+  showToast('Gelöscht', 'info', 1500);
+  renderNotizenTab(document.getElementById('training-content'));
 }
 
 function switchTrainingTab(tab) {

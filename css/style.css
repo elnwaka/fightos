@@ -1201,8 +1201,20 @@ button:active, .submit-btn:active, .card:active, .day-block:active { transform: 
   transform: scale(1.05);
 }
 /* Fallback wenn Bild nicht lädt: Bildbereich ausblenden */
-.ex-card-img.ex-icon-fallback,
-.ex-card-img:has(.ex-icon-fallback) { display: none; }
+.ex-card-img.ex-icon-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+  min-height: 120px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: var(--surface-3);
+  letter-spacing: 2px;
+}
+.ex-card-img.ex-icon-fallback::after {
+  content: attr(data-fallback);
+}
 
 /* Exercise detail page photos */
 .ex-detail-photos { margin-bottom: 24px; width: 100%; }
