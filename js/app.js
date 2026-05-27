@@ -324,6 +324,7 @@ async function doRegister() {
     // Auto-login after registration — no redirect to login tab
     currentUser = user;
     localStorage.setItem('fos_current', user);
+    if (typeof _appEntered !== 'undefined') _appEntered = true;
     enterApp();
   } catch(e) {
     msg.className = 'auth-msg error';
@@ -355,6 +356,7 @@ async function doLogin() {
     if (!users[user].created) users[user].created = new Date().toISOString();
     localStorage.setItem('fos_users', JSON.stringify(users));
     // Enter app immediately — sync in background
+    if (typeof _appEntered !== 'undefined') _appEntered = true;
     enterApp();
     syncFromCloud(function() {});
   } catch(e) {

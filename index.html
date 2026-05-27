@@ -572,19 +572,22 @@ if (localStorage.getItem('fos_current')) {
   // Default log date
   var ld = document.getElementById('log-date');
   if (ld) ld.value = new Date().toISOString().split('T')[0];
-  // Auto-login
+  // Auto-login (skip if enterApp was already called by doRegister/doLogin)
+  var _appEntered = false;
   function doAutoLogin() {
+    if (_appEntered) return; // Already entered via register/login
     var saved = localStorage.getItem('fos_current');
     if (!saved) return;
     currentUser = saved;
-    // Ensure user entry exists with all flags
+    // Ensure user entry exists — preserve onboarding flags
     var users = safeParse('fos_users', {});
     if (!users[saved]) users[saved] = {};
     users[saved].pass = 'firebase';
-    if (!users[saved].onboardingDone) users[saved].onboardingDone = true;
-    if (!users[saved].seenIntro) users[saved].seenIntro = true;
+    if (users[saved].onboardingDone === undefined) users[saved].onboardingDone = false;
+    if (users[saved].seenIntro === undefined) users[saved].seenIntro = false;
     if (!users[saved].created) users[saved].created = new Date().toISOString();
     localStorage.setItem('fos_users', JSON.stringify(users));
+    _appEntered = true;
     enterApp();
     // Background sync (don't block)
     if (_fbUser) syncFromCloud(function() {});
