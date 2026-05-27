@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoxSpec — Das komplette Trainingssystem für Boxer</title>
+<meta name="description" content="BoxSpec: Trainingsplan, Ernährung, Kraft & Conditioning, Kampfvorbereitung und AI Coach für Boxer. Wissenschaftlich basiert, kostenlos.">
+<meta name="keywords" content="Boxen, Boxing, Trainingsplan, Boxer App, Kraft und Kondition, Ernährung Boxer, Kampfvorbereitung, Box Training, S&C Boxing">
+<meta name="author" content="BoxSpec">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://elnwaka.github.io/fightos/landing.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="BoxSpec — Das komplette Trainingssystem für Boxer">
+<meta property="og:description" content="Trainingsplan, Ernährung, Kraft & Conditioning, Kampfvorbereitung und AI Coach. Wissenschaftlich basiert.">
+<meta property="og:url" content="https://elnwaka.github.io/fightos/landing.html">
+<meta property="og:image" content="https://elnwaka.github.io/fightos/img/icons/icon-512x512.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BoxSpec — Trainingssystem für Boxer">
+<meta name="twitter:description" content="Trainingsplan, Ernährung, S&C und AI Coach für Boxer. Kostenlos.">
+<link rel="icon" type="image/svg+xml" href="img/icons/icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06060a;--surface:#0d0d14;--surface2:#14141f;--border:rgba(255,255,255,.06);
+  --red:#E8000D;--red-glow:rgba(232,0,13,.4);--gold:#F5C518;
+  --white:#f0f0f5;--muted:#6b6b80;--subtle:#3a3a50;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden}
+
+/* ===== NAV ===== */
+.ln-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,6,10,.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);transition:background .3s}
+.ln-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);letter-spacing:3px;text-decoration:none}
+.ln-logo span{color:var(--red)}
+.ln-cta{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;padding:10px 28px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s;display:inline-block}
+.ln-cta:hover{transform:translateY(-2px);box-shadow:0 6px 24px var(--red-glow)}
+
+/* ===== HERO ===== */
+.ln-hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:120px 32px 80px}
+.ln-hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,0,13,.06) 0%,transparent 40%,rgba(59,130,246,.04) 80%,transparent 100%);background-size:400% 400%;animation:heroGrad 20s ease infinite;z-index:0}
+.ln-hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:60px 60px;z-index:0}
+@keyframes heroGrad{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.ln-hero-content{position:relative;z-index:1;max-width:800px}
+.ln-hero-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--red);border:1px solid rgba(232,0,13,.3);padding:6px 16px;border-radius:20px;margin-bottom:24px;text-transform:uppercase}
+.ln-hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,10vw,100px);line-height:.9;letter-spacing:4px;color:var(--white);margin-bottom:24px;text-shadow:0 0 60px rgba(232,0,13,.15)}
+.ln-hero h1 em{font-style:normal;color:var(--red)}
+.ln-hero p{font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:560px;margin-bottom:40px;line-height:1.7}
+.ln-hero-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.ln-hero-sub{font-family:'Space Mono',monospace;font-size:11px;color:var(--subtle);letter-spacing:1px}
+.ln-hero-visual{position:absolute;right:-5%;top:50%;transform:translateY(-50%);width:45%;max-width:600px;opacity:.15;z-index:0}
+.ln-hero-visual img{width:100%;filter:grayscale(1) contrast(1.2)}
+
+/* Scroll indicator */
+.ln-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:1}
+.ln-scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--red),transparent);animation:scrollPulse 2s ease infinite}
+.ln-scroll-text{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--subtle);text-transform:uppercase}
+@keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ===== SECTION COMMON ===== */
+.ln-section{padding:120px 32px;position:relative}
+.ln-section-inner{max-width:1100px;margin:0 auto}
+.ln-section-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--red);text-transform:uppercase;margin-bottom:12px}
+.ln-section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:3px;color:var(--white);margin-bottom:16px;line-height:1}
+.ln-section-desc{font-size:16px;color:var(--muted);max-width:600px;line-height:1.7;margin-bottom:48px}
+
+/* ===== PILLARS (8 Säulen) ===== */
+.ln-pillars{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.ln-pillar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px 24px;transition:border-color .2s,transform .2s;position:relative;overflow:hidden}
+.ln-pillar:hover{border-color:rgba(255,255,255,.12);transform:translateY(-4px)}
+.ln-pillar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--pillar-color,var(--red));opacity:.6}
+.ln-pillar-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--pillar-color,var(--red));opacity:.15;position:absolute;top:12px;right:16px;line-height:1}
+.ln-pillar-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--white);margin-bottom:8px}
+.ln-pillar-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ===== FEATURES ===== */
+.ln-features{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.ln-feature-text h3{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--white);margin-bottom:12px}
+.ln-feature-text p{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:20px}
+.ln-feature-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.ln-feature-list li{font-size:14px;color:var(--muted);padding-left:20px;position:relative}
+.ln-feature-list li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--red)}
+.ln-feature-visual{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;min-height:300px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.ln-feature-visual::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,0,13,.03),transparent 60%)}
+
+/* ===== AI COACH SECTION ===== */
+.ln-ai{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ln-ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.ln-ai-chat{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:20px;max-width:400px}
+.ln-ai-msg{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;margin-bottom:10px;max-width:85%}
+.ln-ai-msg.user{background:var(--red);color:#fff;margin-left:auto;border-radius:12px 12px 2px 12px}
+.ln-ai-msg.coach{background:var(--surface2);color:var(--muted);border-radius:12px 12px 12px 2px}
+.ln-ai-input{display:flex;gap:8px;margin-top:12px}
+.ln-ai-input input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--muted);font-size:13px}
+.ln-ai-input button{width:40px;height:40px;background:var(--red);border:none;border-radius:8px;color:#fff;font-size:16px;cursor:pointer}
+
+/* ===== STATS ===== */
+.ln-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding:80px 0}
+.ln-stat{text-align:center}
+.ln-stat-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,64px);color:var(--white);line-height:1}
+.ln-stat-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-top:4px;text-transform:uppercase}
+
+/* ===== FINAL CTA ===== */
+.ln-final{text-align:center;padding:120px 32px;position:relative}
+.ln-final::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 80%,rgba(232,0,13,.08),transparent 60%)}
+.ln-final h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,8vw,80px);letter-spacing:4px;color:var(--white);margin-bottom:16px;line-height:.95;position:relative;z-index:1}
+.ln-final p{font-size:16px;color:var(--muted);margin-bottom:32px;position:relative;z-index:1}
+.ln-final .ln-cta{font-size:20px;padding:16px 48px;position:relative;z-index:1}
+
+/* ===== FOOTER ===== */
+.ln-footer{padding:40px 32px;border-top:1px solid var(--border);text-align:center}
+.ln-footer p{font-family:'Space Mono',monospace;font-size:11px;color:var(--subtle);letter-spacing:1px}
+
+/* ===== SCROLL REVEAL ===== */
+.ln-reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.ln-reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .ln-nav{padding:12px 16px}
+  .ln-hero{padding:100px 16px 60px}
+  .ln-hero-visual{display:none}
+  .ln-section{padding:80px 16px}
+  .ln-features{grid-template-columns:1fr;gap:24px}
+  .ln-features.reverse{direction:ltr}
+  .ln-ai-grid{grid-template-columns:1fr;gap:24px}
+  .ln-stats{grid-template-columns:repeat(2,1fr);gap:16px}
+  .ln-pillars{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .ln-pillars{grid-template-columns:1fr}
+  .ln-hero h1{font-size:44px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="ln-nav">
+  <a href="landing.html" class="ln-logo">BOX<span>SPEC</span></a>
+  <a href="index.html" class="ln-cta">KOSTENLOS STARTEN</a>
+</nav>
+
+<!-- HERO -->
+<section class="ln-hero">
+  <div class="ln-hero-content">
+    <div class="ln-hero-badge">Built for Fighters</div>
+    <h1>TRAINIERE<br>WIE EIN <em>CHAMPION.</em></h1>
+    <p>BoxSpec ist das komplette Trainingssystem für Boxer. Trainingsplan, Ernährung, Kraft & Conditioning, Kampfvorbereitung — alles wissenschaftlich basiert, alles in einer App. Kostenlos.</p>
+    <div class="ln-hero-actions">
+      <a href="index.html" class="ln-cta">JETZT STARTEN</a>
+      <span class="ln-hero-sub">Kein Download nötig. Funktioniert im Browser.</span>
+    </div>
+  </div>
+  <div class="ln-scroll">
+    <div class="ln-scroll-line"></div>
+    <div class="ln-scroll-text">Mehr erfahren</div>
+  </div>
+</section>
+
+<!-- 8 SÄULEN -->
+<section class="ln-section" id="saeulen">
+  <div class="ln-section-inner">
+    <div class="ln-section-label">Das System</div>
+    <div class="ln-section-title ln-reveal">EIN BOXER IST NUR SO STARK WIE SEIN SCHWÄCHSTES GLIED.</div>
+    <div class="ln-section-desc ln-reveal">BoxSpec trainiert 8 fundamentale Leistungsbereiche. Nicht nur Technik und Kondition — sondern alles was einen kompletten Boxer ausmacht.</div>
+    <div class="ln-pillars">
+      <div class="ln-pillar ln-reveal" style="--pillar-color:#E8000D"><div class="ln-pillar-num">01</div><div class="ln-pillar-title">KRAFT & POWER</div><div class="ln-pillar-desc">Maximalkraft, Explosivität, Handgeschwindigkeit. Die kinetische Kette vom Boden bis zur Faust.</div></div>
+      <div class="ln-pillar ln-reveal" style="--pillar-color:#3B82F6"><div class="ln-pillar-num">02</div><div class="ln-pillar-title">AUSDAUER</div><div class="ln-pillar-desc">VO₂max, Laktatschwelle, Atemmuskulatur. Dein aerober Motor für Runde 3 und darüber hinaus.</div></div>
+      <div class="ln-pillar ln-reveal" style="--pillar-color:#A855F7"><div class="ln-pillar-num">03</div><div class="ln-pillar-title">KOGNITION</div><div class="ln-pillar-desc">Antizipation, Blickverhalten, Entscheidungsfindung unter Ermüdung.</div></div>
+      <div class="ln-pillar ln-reveal" style="--pillar-color:#22C55E"><div class="ln-pillar-num">04</div><div class="ln-pillar-title">ERNÄHRUNG</div><div class="ln-pillar-desc">Makros, Timing, Hydration, Gewicht machen. Der richtige Treibstoff für den Motor.</div></div>
+      <div class="ln-pillar ln-reveal" style="--pillar-color:#F97316"><div class="ln-pillar-num">05</div><div class="ln-pillar-title">REGENERATION</div><div class="ln-pillar-desc">Schlafoptimierung, HRV-Monitoring, Sparring-Recovery. Du wirst im Schlaf stärker.</div></div>
+      <div class="ln-pillar ln-reveal" style="--pillar-color:#EAB308"><div class="ln-pillar-num">06</div><div class="ln-pillar-title">RING IQ</div><div class="ln-pillar-desc">Distanzkontrolle, Gegner lesen, Taktik. Auf Nationalebene gewinnt der Klügere.</div></div>
+      <div class="ln-pillar ln-reveal" style="--pillar-color:#06B6D4"><div class="ln-pillar-num">07</div><div class="ln-pillar-title">MENTAL</div><div class="ln-pillar-desc">Visualisierung, Arousal-Kontrolle, Box-Breathing. 90% des Kampfes passieren im Kopf.</div></div>
+      <div class="ln-pillar ln-reveal" style="--pillar-color:#84CC16"><div class="ln-pillar-num">08</div><div class="ln-pillar-title">MOBILITÄT</div><div class="ln-pillar-desc">Hüfte, Schulter, Rotation, Nackentraining. Verletzungsprävention ist Pflicht.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRAININGSPLAN -->
+<section class="ln-section">
+  <div class="ln-section-inner">
+    <div class="ln-features ln-reveal">
+      <div class="ln-feature-text">
+        <div class="ln-section-label">Trainingsplan</div>
+        <h3>10-WOCHEN-PROGRAMM. PERIODISIERT. PERSONALISIERT.</h3>
+        <p>Dein Wochenplan wird automatisch generiert — basierend auf deinem Level, Equipment, Zeitplan und Kampfdatum. Kraft, Conditioning und Mobilität in einem System.</p>
+        <ul class="ln-feature-list">
+          <li>Wochen 1-3: Grundlagen aufbauen</li>
+          <li>Wochen 4-7: Kraft-Schnelligkeit entwickeln</li>
+          <li>Wochen 8-9: Spitzenleistung erreichen</li>
+          <li>Woche 10: Taper für den Kampf</li>
+          <li>3:1 Loading Pattern — 3 Wochen aufbauen, 1 Woche Deload</li>
+        </ul>
+      </div>
+      <div class="ln-feature-visual">
+        <div style="text-align:center;color:var(--muted)">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--white);letter-spacing:2px;">MO — SO</div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;margin-top:8px;letter-spacing:1px;">KRAFT · CONDITIONING · BOXING · MOBILITY · RECOVERY</div>
+          <div style="display:flex;gap:6px;justify-content:center;margin-top:20px">
+            <div style="width:40px;height:24px;background:#3B82F633;border:1px solid #3B82F644;border-radius:4px"></div>
+            <div style="width:40px;height:24px;background:#E8000D33;border:1px solid #E8000D44;border-radius:4px"></div>
+            <div style="width:40px;height:24px;background:#22C55E33;border:1px solid #22C55E44;border-radius:4px"></div>
+            <div style="width:40px;height:24px;background:#F9731633;border:1px solid #F9731644;border-radius:4px"></div>
+            <div style="width:40px;height:24px;background:#3B82F633;border:1px solid #3B82F644;border-radius:4px"></div>
+            <div style="width:40px;height:24px;background:#E8000D33;border:1px solid #E8000D44;border-radius:4px"></div>
+            <div style="width:40px;height:12px;background:#33333366;border:1px solid #33333388;border-radius:4px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI COACH -->
+<section class="ln-section ln-ai" id="coach">
+  <div class="ln-section-inner">
+    <div class="ln-ai-grid ln-reveal">
+      <div class="ln-feature-text">
+        <div class="ln-section-label">AI Coach</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--white);margin-bottom:12px">DEIN PERSÖNLICHER TRAINER. 24/7.</h3>
+        <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:20px">Der BoxSpec AI Coach kennt dein Level, deinen Plan, deine Tests und dein Kampfdatum. Frag ihn was du willst — Gameplan gegen einen Southpaw, Ernährung in der Kampfwoche, oder ob du heute trainieren solltest.</p>
+        <ul class="ln-feature-list">
+          <li>Kennt die komplette Trainings-Methodik</li>
+          <li>Sieht deine aktuellen Daten und Plan</li>
+          <li>Erstellt Gameplans für spezifische Gegner</li>
+          <li>Empfiehlt Videos und passt den Plan an</li>
+        </ul>
+      </div>
+      <div class="ln-ai-chat">
+        <div class="ln-ai-msg user">Gameplan gegen einen großen Southpaw-Distanzkämpfer</div>
+        <div class="ln-ai-msg coach"><strong>Distanz-Strategie:</strong> Du bist kleiner — Außendistanz meiden. Einsteppen mit Doppel-Jab, dann sofort in die Mitteldistanz.<br><br><strong>Schlüssel-Kombis:</strong><br>1-1-2 zum Körper<br>Jab → rechter Haken<br>Slip links → linker Uppercut<br><br><strong>Wichtig:</strong> Southpaw-Falle vermeiden — nicht auf seinem Power-Fuß stehen.</div>
+        <div class="ln-ai-input">
+          <input type="text" placeholder="Frag deinen Coach..." disabled>
+          <button>&rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO LIBRARY -->
+<section class="ln-section">
+  <div class="ln-section-inner">
+    <div class="ln-features reverse ln-reveal" style="direction:rtl">
+      <div class="ln-feature-text" style="direction:ltr">
+        <div class="ln-section-label">Video-Bibliothek</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--white);margin-bottom:12px">50+ KURATIERTE VIDEOS. VON DEN BESTEN.</h3>
+        <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:20px">Kampf-Breakdowns, Ring IQ, Technik-Tutorials und S&C — handverlesen von den besten Boxing-Analysten. Kein YouTube-Chaos. Nur was dich besser macht.</p>
+        <ul class="ln-feature-list" style="direction:ltr">
+          <li>Mayweather, Ali, Lomachenko, Usyk, Pacquiao analysiert</li>
+          <li>Defense, Fußarbeit, Jab-Varianten, Ring-Control</li>
+          <li>Kraft & Conditioning Workouts zum Mitmachen</li>
+          <li>Custom Player — kein YouTube-Branding</li>
+        </ul>
+      </div>
+      <div class="ln-feature-visual" style="direction:ltr">
+        <div style="text-align:center;color:var(--muted)">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);letter-spacing:1px;">7 KATEGORIEN</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px">
+            <span style="font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;background:rgba(232,0,13,.15);border:1px solid rgba(232,0,13,.3);border-radius:12px;color:#ff6b6b">LEGENDEN</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:12px;color:#6ba3ff">AKTIVE KÄMPFER</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;background:rgba(234,179,8,.12);border:1px solid rgba(234,179,8,.25);border-radius:12px;color:#eab308">RING IQ</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:12px;color:#22c55e">GRUNDLAGEN</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);border-radius:12px;color:#a855f7">DEFENSE</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);border-radius:12px;color:#f97316">S&C</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--muted)">DRILLS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="ln-section" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface)">
+  <div class="ln-section-inner">
+    <div class="ln-stats ln-reveal">
+      <div class="ln-stat"><div class="ln-stat-num">8</div><div class="ln-stat-label">Leistungssäulen</div></div>
+      <div class="ln-stat"><div class="ln-stat-num">50+</div><div class="ln-stat-label">Kuratierte Videos</div></div>
+      <div class="ln-stat"><div class="ln-stat-num">10</div><div class="ln-stat-label">Wochen Programm</div></div>
+      <div class="ln-stat"><div class="ln-stat-num">24/7</div><div class="ln-stat-label">AI Coach</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCIENCE -->
+<section class="ln-section" id="science">
+  <div class="ln-section-inner">
+    <div class="ln-section-label ln-reveal">Die Wissenschaft</div>
+    <div class="ln-section-title ln-reveal">EVIDENZBASIERT. NICHT BAUCHGEFÜHL.</div>
+    <div class="ln-section-desc ln-reveal">Jede Empfehlung in BoxSpec basiert auf Sportwissenschaft — getestet mit hunderten Boxern, vom Amateur bis zum Weltmeister. Kraft, Conditioning, Ernährung und Regeneration nach dem gleichen System das Profis nutzen.</div>
+    <div class="ln-features ln-reveal">
+      <div>
+        <ul class="ln-feature-list">
+          <li>Force-Velocity Curve für boxspezifisches Krafttraining</li>
+          <li>VO₂max und Red-Zone-Training statt sinnlosem Joggen</li>
+          <li>Periodisiertes 3:1 Loading Pattern</li>
+          <li>Makro-Timing basierend auf Trainingsintensität</li>
+          <li>Fight-Week Protokoll: Water Loading, Low-Residue, Refuelling</li>
+          <li>HRV-basierte Belastungssteuerung</li>
+          <li>RAMP Warm-Up Methode für Pre-Fight Vorbereitung</li>
+        </ul>
+      </div>
+      <div class="ln-feature-visual">
+        <div style="text-align:center">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--white);letter-spacing:1px;margin-bottom:16px">HÖHER SPRINGEN = HÄRTER SCHLAGEN</div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);line-height:1.8">CMJ-Sprunghöhe korreliert mit<br>Schlagkraft bei r=0.50–0.69<br><span style="color:var(--subtle)">(Getestet mit 500+ Boxern)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="ln-final">
+  <h2 class="ln-reveal">BEREIT?</h2>
+  <p class="ln-reveal">Kostenlos. Kein Download. Sofort loslegen.</p>
+  <a href="index.html" class="ln-cta ln-reveal">JETZT STARTEN</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="ln-footer">
+  <p>BOX<span style="color:var(--red)">SPEC</span> &copy; 2026 &mdash; Built for Fighters.</p>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.ln-reveal').forEach(function(el) { observer.observe(el); });
+</script>
+
+</body>
+</html>
