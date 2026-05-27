@@ -195,14 +195,14 @@ function initSaeulenIntroObserver() {
 
 // Mapping: Säule index → exercise IDs + linked page
 const saeulenExercises = {
-  0: { exerciseIds: ['trap-bar-deadlift','jump-squat','hip-thrust','power-clean','bench-press','explosive-pushup','landmine-press','overcoming-iso','single-leg-rdl','med-ball-rotation','bfr'] },
+  0: { exerciseIds: ['trap-bar-deadlift','jump-squat','hip-thrust','power-clean','bench-press','explosive-pushup','landmine-press','overcoming-iso','single-leg-rdl','med-ball-rotation','bfr','kb-sumo-deadlift','goblet-squat','db-floor-press','banded-kb-swing','landmine-punch-throw','db-cmj','mb-punch-throw'] },
   1: { exerciseIds: ['zone2','hiit-4x4','fartlek','sit-sprints','imt'] },
   2: { exerciseIds: ['shadow-boxing'], linkedPage:'saeulen', linkedLabel:'Kognitions-Training Details' },
   3: { exerciseIds: [], linkedPage:'ernaehrung', linkedLabel:'Ernährungs-Seite' },
   4: { exerciseIds: [], linkedPage:'regeneration', linkedLabel:'Recovery-Seite' },
   5: { exerciseIds: [], linkedPage:'fights', linkedLabel:'Kampfanalyse & Taktik' },
   6: { exerciseIds: [], linkedPage:'mental', linkedLabel:'Mentaltraining-Seite' },
-  7: { exerciseIds: ['iso-nacken','nacken-flexion'] }
+  7: { exerciseIds: ['iso-nacken','nacken-flexion','half-kneeling-lateral-lunge','banded-hip-floss','quadruped-thoracic-rotation','thoracic-extensions','side-clams','split-squat-rotate'] }
 };
 
 function openSaeuleDetail(idx) {
@@ -1306,6 +1306,16 @@ exercisesMobility.forEach(e => exerciseColors[e.id] = '#26c6da');
 exercisesPowerEndurance.forEach(e => exerciseColors[e.id] = '#ff7043');
 exercisesSpecial.forEach(e => exerciseColors[e.id] = 'var(--gold)');
 
+// Merge 10-Week Program exercises if available
+if (typeof exercisesProgram10W !== 'undefined' && exercisesProgram10W.length) {
+  exercisesProgram10W.forEach(function(e) {
+    if (!allExercises.find(function(x) { return x.id === e.id; })) {
+      allExercises.push(e);
+      exerciseColors[e.id] = 'var(--gold)';
+    }
+  });
+}
+
 function openExerciseDetail(id) {
   const e = allExercises.find(ex => ex.id === id);
   if (!e) return;
@@ -1469,11 +1479,55 @@ function renderExProgression(exId, color) {
 function renderErnaehrungPage() {
   const el = document.getElementById('page-ernaehrung');
   const userW = typeof getUserSchedule === 'function' ? getUserSchedule().weight : 75;
+  var s10wE = typeof getUserSchedule === 'function' ? getUserSchedule() : {};
+  var is10WE = s10wE.trainingProgram === '10w';
+  var p10wWeekE = is10WE && typeof getProgram10WCurrentWeek === 'function' ? getProgram10WCurrentWeek() : 0;
+  var p10wPhaseE = is10WE && typeof getP10WPhase === 'function' ? getP10WPhase(p10wWeekE) : null;
+
+  // Build 10-week nutrition panel
+  var nut10w = '';
+  if (is10WE && typeof P10W_NUTRITION !== 'undefined') {
+    var n = P10W_NUTRITION;
+    var w = userW;
+    nut10w = '<div style="margin-bottom:32px;padding:20px;background:var(--surface-0);border-radius:var(--radius-md);border-left:3px solid var(--green);">'
+      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--green);letter-spacing:1px;margin-bottom:12px;">ERNÄHRUNG — WOCHE '+p10wWeekE+'/10'+(p10wPhaseE ? ' · '+p10wPhaseE.name.toUpperCase() : '')+'</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">'
+      + '<div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;">'
+      +   '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:#555;letter-spacing:1px;">SCHWERE TAGE</div>'
+      +   '<div style="font-size:13px;color:#ccc;margin-top:4px;">KH: <strong>'+n.heavy.carbs+'</strong> ('+Math.round(w*5)+'g)</div>'
+      +   '<div style="font-size:13px;color:#ccc;">Protein: <strong>'+n.heavy.protein+'</strong> ('+Math.round(w*2)+'g)</div>'
+      +   '<div style="font-size:13px;color:#ccc;">Fett: <strong>'+n.heavy.fat+'</strong> ('+Math.round(w*1)+'g)</div>'
+      + '</div>'
+      + '<div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;">'
+      +   '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:#555;letter-spacing:1px;">LEICHTE / RUHETAGE</div>'
+      +   '<div style="font-size:13px;color:#ccc;margin-top:4px;">KH: <strong>'+n.light.carbs+'</strong> ('+Math.round(w*2.5)+'g)</div>'
+      +   '<div style="font-size:13px;color:#ccc;">Protein: <strong>'+n.light.protein+'</strong> ('+Math.round(w*1.8)+'g)</div>'
+      +   '<div style="font-size:13px;color:#ccc;">Fett: <strong>'+n.light.fat+'</strong> ('+Math.round(w*1)+'g)</div>'
+      + '</div>'
+      + '</div>'
+      + '<div style="font-size:12px;color:#888;line-height:1.6;margin-bottom:12px;">'
+      + '<strong>Timing:</strong> '+n.heavy.timing
+      + '</div>'
+      + '<div style="font-size:12px;color:#888;line-height:1.6;">'
+      + '<strong>Hydration:</strong> '+n.hydration.daily+' · Nach dem Training: '+n.hydration.rehydration
+      + '</div>'
+      + (p10wWeekE >= 9 ? '<div style="margin-top:12px;padding:12px;background:rgba(232,0,13,0.1);border:1px solid rgba(232,0,13,0.3);border-radius:8px;font-size:12px;color:var(--red);line-height:1.6;">'
+        + '<strong>KAMPFWOCHE-PROTOKOLL:</strong><br>'
+        + 'Wasserloading: '+n.fightWeek.waterLoading+'<br>'
+        + 'Natrium: '+n.fightWeek.sodium+'<br>'
+        + 'Nach dem Wiegen: '+n.fightWeek.postWeigh+'<br>'
+        + 'Letzte Mahlzeit: '+n.fightWeek.lastMeal
+        + '</div>' : '')
+      + '</div>';
+  }
+
   el.innerHTML = `
   <div class="page-header">
     <div class="page-title">ERNÄHR<span>UNG</span></div>
     <div class="page-sub">Dein kompletter Ernährungsguide. Ein Boxer braucht keine andere Quelle als diese Seite. Alles von Grundlagen über Einkaufsliste bis Kampftag – wissenschaftlich basiert, praxiserprobt.</div>
   </div>
+
+  ${nut10w}
 
   <!-- Sections below auto-wrapped by applyPD() into collapsible blocks -->
 
@@ -2136,11 +2190,56 @@ function renderPeriodisierungPage() {
   }
 
   const el = document.getElementById('page-periodisierung');
+  var s10w = typeof getUserSchedule === 'function' ? getUserSchedule() : {};
+  var is10W = s10w.trainingProgram === '10w';
+  var p10wWeek = is10W && typeof getProgram10WCurrentWeek === 'function' ? getProgram10WCurrentWeek() : 0;
+
+  // Build 10-week timeline HTML
+  var timeline10w = '';
+  if (is10W && typeof P10W_PHASES !== 'undefined') {
+    var phaseBlocks = P10W_PHASES.map(function(ph) {
+      var weeks = ph.weeks.map(function(w) {
+        var isCurrent = w === p10wWeek;
+        var isDeload = (w === 4 || w === 8);
+        return '<div style="flex:1;text-align:center;padding:8px 2px;border-radius:6px;font-family:\'Space Mono\',monospace;font-size:11px;'
+          + (isCurrent ? 'background:'+ph.color+';color:#000;font-weight:700;' : 'background:rgba(255,255,255,0.03);color:#666;')
+          + '">'
+          + 'W' + w
+          + (isDeload ? '<br><span style="font-size:8px;opacity:0.7;">DELOAD</span>' : '')
+          + '</div>';
+      }).join('');
+      return '<div style="margin-bottom:16px;">'
+        + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:'+ph.color+';letter-spacing:1px;margin-bottom:6px;">'+ph.name.toUpperCase()+'</div>'
+        + '<div style="display:flex;gap:4px;">'+weeks+'</div>'
+        + '</div>';
+    }).join('');
+
+    timeline10w = '<div style="margin-bottom:32px;padding:20px;background:var(--surface-0);border-radius:var(--radius-md);">'
+      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:var(--white);margin-bottom:16px;border-bottom:2px solid var(--gold);padding-bottom:8px;">10-WOCHEN-PROGRAMM</div>'
+      + '<div style="font-size:12px;color:#888;margin-bottom:16px;line-height:1.6;">Periodisiertes Kraft-, Conditioning- und Movement-Programm. 3:1 Loading-Pattern: 3 Wochen aufbauen, 1 Woche Deload. Wochen 4 und 8 sind Erholungswochen mit reduziertem Volumen.</div>'
+      + phaseBlocks
+      + '<div style="margin-top:16px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px;font-size:11px;color:#666;line-height:1.6;">'
+      + '<strong style="color:var(--green);">Grundlagen (Wo. 1-3):</strong> Kraft A/B — KB Sumo DL, Goblet Squat, Press-Ups, Shoulder Press + Core Circuit<br>'
+      + '<strong style="color:var(--blue);">Kraft-Schnelligkeit (Wo. 4-7):</strong> Trap Bar DL, Landmine Squat, DB Floor Press + Extended Plyometric Warm-Up<br>'
+      + '<strong style="color:var(--red);">Spitzenleistung (Wo. 8-9):</strong> Banded KB Swing, Landmine Punch Throw, MB Box Jumps — maximale Explosivität<br>'
+      + '<strong style="color:var(--gold);">Taper (Wo. 10):</strong> Volumen -50%, Intensität beibehalten — Fitness erhalten, Ermüdung abbauen'
+      + '</div>'
+      + '<div style="margin-top:12px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px;font-size:11px;color:#666;line-height:1.6;">'
+      + '<strong>Conditioning:</strong><br>'
+      + '<span style="color:var(--green);">Wo. 1-3:</span> Muscle Buffering (1-2 Min. Intervalle, RPE 7-8)<br>'
+      + '<span style="color:var(--blue);">Wo. 4-7:</span> HIIT — Zentrale Adaptationen (4 Min. @ >90% HFmax)<br>'
+      + '<span style="color:var(--red);">Wo. 8-10:</span> Speed Endurance (15-20 Sek. Sprints, kampfspezifisch)'
+      + '</div>'
+      + '</div>';
+  }
+
   el.innerHTML = `
   <div class="page-header">
     <div class="page-title">PERIODISI<span>ERUNG</span></div>
-    <div class="page-sub">Amateur-Boxen = variable Kampfabstände. Kein starrer 4-Wochen-Plan – dein Training passt sich dem nächsten Kampf an.</div>
+    <div class="page-sub">${is10W ? '10-Wochen-Programm — Woche ' + p10wWeek + '/10' : 'Amateur-Boxen = variable Kampfabstände. Kein starrer 4-Wochen-Plan – dein Training passt sich dem nächsten Kampf an.'}</div>
   </div>
+
+  ${timeline10w}
 
   <div class="info-box info-sci"><span>i</span><div><strong>Amateur vs. Profi:</strong> Profis haben 3-Monats-Camps mit wochenlangem Taper. Im Amateur-Boxen kämpfst du teils jede Woche, alle 2 Wochen, oder 3× am Meisterschafts-Wochenende. Dein System muss <strong>flexibel</strong> sein – kein starrer Zyklus, sondern intelligente Anpassung je nach Kampfabstand.</div></div>
 

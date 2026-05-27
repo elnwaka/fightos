@@ -700,7 +700,7 @@ function obComplete() {
       data.fightDate = obData.fightDate;
       data.upcomingFights = [{ date: obData.fightDate, label: '' }];
     }
-    data.weekPlan = generateSmartWeekPlan();
+    data.weekPlan = generateCurrentWeekPlan();
     saveData(data);
   }
 
@@ -1245,7 +1245,7 @@ function updateFightDate() {
   // Enforce max 5
   if (data.upcomingFights.length > 5) data.upcomingFights = data.upcomingFights.slice(0, 5);
   saveData(data); // Save first so generateSmartWeekPlan reads the new date
-  data.weekPlan = generateSmartWeekPlan();
+  data.weekPlan = generateCurrentWeekPlan();
   saveData(data);
   showToast('Kampfdatum aktualisiert');
   renderFightCountdown();
@@ -1283,7 +1283,7 @@ function addUpcomingFight() {
   // Enforce max 5
   if (data.upcomingFights.length > 5) data.upcomingFights = data.upcomingFights.slice(0, 5);
   saveData(data);
-  data.weekPlan = generateSmartWeekPlan();
+  data.weekPlan = generateCurrentWeekPlan();
   saveData(data);
   renderFightCountdown();
   renderDashStats();
@@ -1304,7 +1304,7 @@ function removeUpcomingFight(dateStr) {
   }
   document.getElementById('fight-date-input').value = data.fightDate || '';
   saveData(data);
-  data.weekPlan = generateSmartWeekPlan();
+  data.weekPlan = generateCurrentWeekPlan();
   saveData(data);
   renderFightCountdown();
   renderDashStats();
@@ -1329,7 +1329,7 @@ function clearFightDate() {
     document.getElementById('fight-date-input').value = '';
   }
   saveData(data);
-  data.weekPlan = generateSmartWeekPlan();
+  data.weekPlan = generateCurrentWeekPlan();
   saveData(data);
   renderFightCountdown();
   renderDashStats();
@@ -4800,6 +4800,16 @@ function generateSmartWeekPlan() {
   return plan;
 }
 
+// ===== WRAPPER: Routes to 10-Week Program or Standard =====
+function generateCurrentWeekPlan() {
+  var s = getUserSchedule();
+  if (s.trainingProgram === '10w' && typeof generateProgram10WPlan === 'function') {
+    var week = getProgram10WCurrentWeek();
+    return generateProgram10WPlan(week);
+  }
+  return generateSmartWeekPlan();
+}
+
 const DAY_NAMES = ['mo', 'di', 'mi', 'do', 'fr', 'sa', 'so'];
 const DAY_LABELS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
 const TYPE_CLASS = { strength: 'strength', boxing: 'boxing', cardio: 'cardio', recovery: 'recovery', meta: 'meta', fight: 'fight', off: 'off' };
@@ -4826,7 +4836,7 @@ function _renderWeekPlanInner() {
   const s = getUserSchedule();
   // Only generate if NO plan exists at all — never overwrite manual edits
   if (!data.weekPlan || Object.keys(data.weekPlan).length === 0) {
-    data.weekPlan = generateSmartWeekPlan();
+    data.weekPlan = generateCurrentWeekPlan();
     data._weekPlanKey = (data.fightDate || '') + '|' + JSON.stringify(s.weekSchedule);
     saveData(data);
   }
@@ -4878,16 +4888,38 @@ function _renderWeekPlanInner() {
       <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);margin-left:12px;">${diff > 0 ? diff + ' Tage bis Kampf · ' + formatDate(data.fightDate) : 'Kampf vorbei'}</span></div>`;
   }
 
+  // 10-Week program banner
+  var is10W = s.trainingProgram === '10w';
+  var p10wWeek = is10W ? getProgram10WCurrentWeek() : 0;
+  var p10wPhase = is10W ? getP10WPhase(p10wWeek) : null;
+  var p10wBanner = '';
+  if (is10W && p10wPhase) {
+    var progressDots = '';
+    for (var pw = 1; pw <= 10; pw++) {
+      var pwPhase = getP10WPhase(pw);
+      var dotStyle = pw === p10wWeek ? 'width:12px;height:12px;border:2px solid #fff;' : 'width:8px;height:8px;opacity:0.5;';
+      progressDots += '<div style="'+dotStyle+'border-radius:50%;background:'+pwPhase.color+';"></div>';
+    }
+    p10wBanner = '<div style="margin-bottom:16px;padding:14px 18px;background:var(--surface-0);border-radius:var(--radius-md);border-left:3px solid '+p10wPhase.color+';">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'
+      + '<div><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:'+p10wPhase.color+';letter-spacing:1px;">WOCHE '+p10wWeek+'/10</span>'
+      + '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);margin-left:12px;">'+p10wPhase.name.toUpperCase()+'</span></div>'
+      + (isP10WDeload(p10wWeek) ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--green);border:1px solid var(--green);padding:2px 8px;border-radius:4px;">DELOAD</span>' : '')
+      + '</div>'
+      + '<div style="display:flex;gap:4px;align-items:center;margin-top:8px;">'+progressDots+'</div>'
+      + '</div>';
+  }
+
   el.innerHTML = `
     <div class="page-header">
       <div class="page-title">WOCHEN<span>PLAN</span></div>
-      <div class="page-sub">Dein Plan passt sich an dein Level, Equipment und Kampfdatum an.</div>
-      <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${weekLabelColor};letter-spacing:1px;">${weekLabel}</span>
-        ${isDeloadActive
+      <div class="page-sub">${is10W ? '10-Wochen-Programm — Phase: ' + (p10wPhase ? p10wPhase.name : '') : 'Dein Plan passt sich an dein Level, Equipment und Kampfdatum an.'}</div>
+      ${is10W ? '' : '<div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'}
+      ${is10W ? '' : '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:'+weekLabelColor+';letter-spacing:1px;">'+weekLabel+'</span>'}
+        ${is10W ? '' : (isDeloadActive
           ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--green);">Reduziertes Volumen — nur 1× Power, kein Max Strength</span><button onclick="deactivateDeload()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:32px;">BEENDEN</button>'
-          : '<button onclick="activateDeload()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:32px;">DELOAD</button>'}
-      </div>
+          : '<button onclick="activateDeload()" style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--surface-3);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:32px;">DELOAD</button>')}
+      ${is10W ? '' : '</div>'}
       ${_deloadWarnings.length && !isDeloadActive ? '<div style="margin-top:8px;padding:10px 14px;background:var(--surface-0);border:1px solid var(--orange);border-radius:var(--radius-md);font-size:12px;color:var(--orange);">⚠ Dein Körper zeigt Zeichen von Überbelastung: ' + _deloadWarnings.join(', ') + '. Brauchst du einen Deload?</div>' : ''}
     </div>
     ${(function() {
@@ -4930,6 +4962,7 @@ function _renderWeekPlanInner() {
       '</div>';
     })()}
     ${phaseHTML}
+    ${p10wBanner}
     ${(function() {
       var wp = data._weakPillars || {};
       var wi = data._weakInfo || [];
@@ -5067,7 +5100,7 @@ function regenerateWeekPlan() {
     if (!confirm('Plan neu generieren? Deine manuellen Blöcke (' + Object.keys(pinnedBlocks).length + ' Tage) bleiben erhalten.')) return;
   }
 
-  data.weekPlan = generateSmartWeekPlan();
+  data.weekPlan = generateCurrentWeekPlan();
   data.weekPlanGenerated = new Date().toISOString();
   data._weekPlanKey = null;
 
@@ -5100,7 +5133,7 @@ function activateDeload() {
   const data = getData();
   if (!data) return;
   data.deloadActive = true;
-  data.weekPlan = generateSmartWeekPlan();
+  data.weekPlan = generateCurrentWeekPlan();
   data._weekPlanKey = null;
   saveData(data);
   showToast('Deload aktiviert — reduziertes Volumen', 'info', 2000);
@@ -5111,7 +5144,7 @@ function deactivateDeload() {
   const data = getData();
   if (!data) return;
   data.deloadActive = false;
-  data.weekPlan = generateSmartWeekPlan();
+  data.weekPlan = generateCurrentWeekPlan();
   data._weekPlanKey = null;
   saveData(data);
   showToast('Deload beendet — normales Training', 'success', 2000);
@@ -5971,7 +6004,7 @@ function applyScheduleToUser(ws) {
   localStorage.setItem('fos_users', JSON.stringify(users));
   var data = getData();
   if (data) {
-    data.weekPlan = generateSmartWeekPlan();
+    data.weekPlan = generateCurrentWeekPlan();
     saveData(data);
   }
 }
@@ -6006,6 +6039,7 @@ function getUserSchedule() {
     goal: u.goal || 'fitness',
     fitnessLevel: u.fitnessLevel || 'mittel',
     gymAccess: u.gymAccess || 'none',
+    trainingProgram: u.trainingProgram || 'standard',
     weekSchedule: ws
   };
 }
@@ -7108,6 +7142,27 @@ function renderAccountPage() {
       </div>
 
       <div class="account-section">
+        <div class="account-section-title">TRAININGSPROGRAMM</div>
+        <div class="account-grid">
+          <div class="form-group">
+            <label class="form-label">Programm</label>
+            <select class="form-select" id="acc-program" onchange="document.getElementById('acc-10w-start-wrap').style.display=this.value==='10w'?'block':'none'">
+              <option value="standard" ${(u.trainingProgram||'standard')==='standard'?'selected':''}>Standard (FightOS)</option>
+              <option value="10w" ${u.trainingProgram==='10w'?'selected':''}>10-Wochen-Programm</option>
+            </select>
+          </div>
+          <div class="form-group" id="acc-10w-start-wrap" style="display:${u.trainingProgram==='10w'?'block':'none'}">
+            <label class="form-label">Startdatum</label>
+            <input class="form-input" id="acc-10w-start" type="date" value="${data.program10wStart||new Date().toISOString().split('T')[0]}">
+          </div>
+        </div>
+        <div id="acc-10w-info" style="display:${u.trainingProgram==='10w'?'block':'none'};margin-top:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border-left:3px solid var(--green);">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--green);letter-spacing:1px;margin-bottom:6px;">10-WOCHEN-PROGRAMM</div>
+          <div style="font-size:12px;color:#888;line-height:1.5;">Strukturiertes Kraft-, Conditioning- und Movement-Programm in 4 Phasen: Grundlagen (Wo. 1-3) → Kraft-Schnelligkeit (Wo. 4-7) → Spitzenleistung (Wo. 8-9) → Taper (Wo. 10). Der Wochenplan wird automatisch an die aktuelle Phase angepasst.</div>
+        </div>
+      </div>
+
+      <div class="account-section">
         <div class="account-section-title">ZEITPLAN</div>
         <div class="account-grid" style="margin-bottom:16px;">
           <div class="form-group">
@@ -7165,6 +7220,7 @@ function saveAccountPage() {
   users[currentUser].goal = document.getElementById('acc-goal').value;
   users[currentUser].fitnessLevel = document.getElementById('acc-fitness').value;
   users[currentUser].gymAccess = document.getElementById('acc-gym').value;
+  users[currentUser].trainingProgram = document.getElementById('acc-program').value;
   users[currentUser].workStart = document.getElementById('acc-work-start').value;
   users[currentUser].workEnd = document.getElementById('acc-work-end').value;
 
@@ -7198,7 +7254,13 @@ function saveAccountPage() {
         data.fightDate = '';
       }
     }
-    data.weekPlan = generateSmartWeekPlan();
+    // Save 10-week program start date
+    var prog = document.getElementById('acc-program').value;
+    if (prog === '10w') {
+      data.program10wStart = document.getElementById('acc-10w-start').value || new Date().toISOString().split('T')[0];
+    }
+
+    data.weekPlan = generateCurrentWeekPlan();
     saveData(data);
   }
 
