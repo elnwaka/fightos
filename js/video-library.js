@@ -5,20 +5,34 @@
    ============================================ */
 
 var VIDEO_LIBRARY = [
-  // === KAMPF-BREAKDOWNS ===
+  // === KAMPF-BREAKDOWNS: LEGENDEN ===
   {
-    category: 'breakdowns',
-    categoryLabel: 'KAMPF-BREAKDOWNS',
-    categoryDesc: 'Profi-Kämpfe analysiert — verstehe WARUM Boxer gewinnen, nicht nur WER.',
+    category: 'legends',
+    categoryLabel: 'LEGENDEN ANALYSIERT',
+    categoryDesc: 'Was die Größten der Geschichte anders gemacht haben — Technik die du klauen kannst.',
     videos: [
-      { id: 'hq7evFpmVek', title: 'Mayweathers unterschätzte Taktiken', desc: 'Ring IQ, Punch Selection und Defense-Strategie des vielleicht smartesten Boxers aller Zeiten.', duration: '15:00', tags: ['Defense','Ring IQ','Taktik'] },
-      { id: 'HKU49EclMX8', title: 'Lomachenkos High-Tech-Stil', desc: 'Wie Lomachenko Winkel kreiert und ausnutzt — Stance, Kopfbewegung, Fußarbeit und Guard-Manipulation.', duration: '18:00', tags: ['Winkel','Fußarbeit','Guard'] },
-      { id: 'TwHkGZvGZoM', title: 'Usyks System verstehen', desc: 'Das System hinter Usyks Stil — und wie er es trainiert. Vom Cruiser- zum Schwergewicht.', duration: '20:00', tags: ['System','Stil','Taktik'] },
-      { id: 'Yc6RaEjDwl8', title: 'Naoya Inoues Killer-Stil', desc: 'Die Skills hinter dem gefährlichsten Bantamgewichtler der Geschichte.', duration: '14:00', tags: ['Power','Timing','Kombis'] },
-      { id: 'Ihe9nXXyo1w', title: 'Andre Wards smarte Taktiken', desc: 'Strategien und Taktiken vom ungeschlagenen Supermittelgewichts-Champion.', duration: '16:00', tags: ['Taktik','Clinch','IQ'] },
-      { id: 'y1UZRV266B0', title: 'Caleb Plants kreative Techniken', desc: 'Shovel Jab, Shovel Hook, geschmeidige Fußarbeit und Führhand-Kontrolle.', duration: '13:00', tags: ['Jab','Kreativität','Führhand'] },
-      { id: 'lly-AuwD-zc', title: 'Subriel Matias — unkonventioneller Stil', desc: 'Warum sein ungewöhnlicher Stil so effektiv funktioniert.', duration: '12:00', tags: ['Druck','Körper','Power'] },
-      { id: 'Wlag12lY0U0', title: 'Dmitry Pirog — Schach im Ring', desc: 'Wie ein Großmeister die Fußarbeit benutzt um den Ring zu kontrollieren.', duration: '15:00', tags: ['Fußarbeit','Ring Control','IQ'] }
+      { id: 'hq7evFpmVek', title: 'Mayweathers unterschätzte Taktiken', desc: 'Nicht der Defensive Mayweather den alle kennen — die offensiven Tricks die niemand sieht.', duration: '15:00', tags: ['Defense','Ring IQ','Konter'] },
+      { id: 'pqroVNFSlcs', title: 'Wie Ali "Fehler" zu Meisterwerken machte', desc: 'Die Regeln die Ali brach — und warum sie trotzdem funktionieren.', duration: '16:00', tags: ['Unkonventionell','Kopfbewegung','Reichweite'] },
+      { id: '73yNFaIG0Sc', title: 'Roberto Durans böser Stil', desc: 'Inside Fighting, Aggression und Druck auf höchstem Niveau.', duration: '14:00', tags: ['Infighter','Druck','Körper'] },
+      { id: 'nQ75ROGzG2o', title: 'Finito Lopez — Gewalt als Eleganz', desc: 'Wie der kleine Meister rohe Kraft in Kunstform verwandelte.', duration: '15:00', tags: ['Technik','Effizienz','Klein'] },
+      { id: 'ONap_xV3ViE', title: 'Der größte Defensiv-Boxer aller Zeiten', desc: 'Pernell Whitakers seidige Fußarbeit und unerreichte Defense.', duration: '14:00', tags: ['Defense','Fußarbeit','Slips'] }
+    ]
+  },
+
+  // === KAMPF-BREAKDOWNS: AKTIVE KÄMPFER ===
+  {
+    category: 'active',
+    categoryLabel: 'AKTIVE KÄMPFER',
+    categoryDesc: 'Die Stile der besten aktiven Boxer verstehen — und für dein eigenes Boxen nutzen.',
+    videos: [
+      { id: 'HKU49EclMX8', title: 'Lomachenkos High-Tech-Stil', desc: 'Winkel kreieren, Guard-Manipulation, Fußarbeit die keiner kopieren kann — bis jetzt.', duration: '18:00', tags: ['Winkel','Fußarbeit','Guard'] },
+      { id: 'TwHkGZvGZoM', title: 'Usyks System verstehen', desc: 'Das komplette System — vom Cruiser zum Schwergewicht. Wie er trainiert und warum es funktioniert.', duration: '20:00', tags: ['System','Allrounder','Taktik'] },
+      { id: 'Yc6RaEjDwl8', title: 'Naoya Inoues Killer-Stil', desc: 'Der gefährlichste Bantamgewichtler der Geschichte — Timing, Power, Finishing.', duration: '14:00', tags: ['Power','Timing','KO'] },
+      { id: 'sYmTdwP40Yc', title: 'Ryan Garcias Stil — mehr als Speed?', desc: 'Was steckt wirklich hinter dem schnellen Stil? Passive Skills und Führhand-Arbeit.', duration: '13:00', tags: ['Speed','Führhand','Counter'] },
+      { id: 'lly-AuwD-zc', title: 'Subriel Matias — Unkonventionell aber effektiv', desc: 'Warum sein "falscher" Stil funktioniert. Druck, Körperschläge, Willenskraft.', duration: '12:00', tags: ['Druck','Körper','Wille'] },
+      { id: 'y1UZRV266B0', title: 'Caleb Plants kreative Techniken', desc: 'Shovel Jab, Shovel Hook, geschmeidige Fußarbeit. Kreativität im Ring.', duration: '13:00', tags: ['Jab-Varianten','Kreativität','Führhand'] },
+      { id: 'Ihe9nXXyo1w', title: 'Andre Wards smarte Taktiken', desc: 'Der IQ-Champion. Clinch-Meister, Distanz-Kontrolle, Inside Fighting.', duration: '16:00', tags: ['Clinch','IQ','Inside'] },
+      { id: 'dvMVNbOsU9k', title: 'Beste Skills der besten P4P-Boxer (Teil 1)', desc: 'Ein Skill von jedem Top-Boxer — zusammengefasst in einem Video.', duration: '20:00', tags: ['P4P','Skills','Kompilation'] }
     ]
   },
 
@@ -26,25 +40,50 @@ var VIDEO_LIBRARY = [
   {
     category: 'ringiQ',
     categoryLabel: 'RING IQ & TAKTIK',
-    categoryDesc: 'Distanzkontrolle, Timing, Winkel schneiden, Ringschneiden — der mentale Kampf.',
+    categoryDesc: 'Distanzkontrolle, Timing, Winkel, Ringschneiden — der mentale Kampf entscheidet.',
     videos: [
-      { id: 'Po3Dwu1Bb30', title: 'Ring abschneiden — Stop den Runner', desc: 'Wie du einen Gegner der wegläuft systematisch einkreist und unter Druck setzt.', duration: '11:00', tags: ['Ring Cut','Druck','Fußarbeit'] },
-      { id: 'ONap_xV3ViE', title: 'Der größte Defensiv-Boxer aller Zeiten', desc: 'Pernell Whitakers seidige Fußarbeit und unerreichte defensive Meisterschaft.', duration: '14:00', tags: ['Defense','Fußarbeit','Ring IQ'] },
-      { id: 'fWSdk2qeRlY', title: 'Fußarbeit, Defense & Fight IQ Blueprint', desc: 'Kompletter Guide zu den drei Grundpfeilern des intelligenten Boxens.', duration: '45:00', tags: ['Fußarbeit','Defense','IQ'] },
-      { id: 'sHIaIDnxXbU', title: 'Den technisch perfekten Boxer bauen', desc: 'Was einen technisch kompletten Boxer ausmacht — und wie du dorthin kommst.', duration: '16:00', tags: ['Technik','Komplett','System'] }
+      { id: 'Po3Dwu1Bb30', title: 'Ring abschneiden — Stop den Runner', desc: 'Systematisch einkreisen und unter Druck setzen. Schritt für Schritt.', duration: '11:00', tags: ['Ring Cut','Druck','Fußarbeit'] },
+      { id: 'Wlag12lY0U0', title: 'Dmitry Pirog — Schach im Ring', desc: 'Wie ein Großmeister Fußarbeit benutzt um den Ring zu kontrollieren.', duration: '15:00', tags: ['Ring Control','Fußarbeit','IQ'] },
+      { id: 'fWSdk2qeRlY', title: 'Fußarbeit, Defense & Fight IQ Blueprint', desc: 'Kompletter Guide zu den drei Grundpfeilern. Lang aber essentiell.', duration: '45:00', tags: ['Fußarbeit','Defense','Komplett'] },
+      { id: 'sHIaIDnxXbU', title: 'Den technisch perfekten Boxer bauen', desc: 'Was einen kompletten Boxer ausmacht und wie du dorthin kommst.', duration: '16:00', tags: ['Komplett','System','Technik'] },
+      { id: 'QErNkgN5two', title: 'Wie die Top 1% der Boxer denken', desc: 'Entscheidungsfindung im Ring — warum manche Boxer immer einen Schritt voraus sind.', duration: '12:00', tags: ['Mindset','Entscheidung','Elite'] }
     ]
   },
 
-  // === TECHNIK-TUTORIALS ===
+  // === GRUNDLAGEN & TECHNIK ===
   {
-    category: 'technik',
-    categoryLabel: 'TECHNIK',
-    categoryDesc: 'Es gibt nicht nur einen Weg einen Jab zu schlagen. Verschiedene Stile, verschiedene Lösungen.',
+    category: 'grundlagen',
+    categoryLabel: 'GRUNDLAGEN',
+    categoryDesc: 'Stance, Guard, Beinarbeit, Schläge — die Basis auf der alles aufbaut. Nicht überspringen.',
     videos: [
-      { id: 'Jg2CgIK8nFk', title: 'Die langweiligen Grundlagen die Boxer stark machen', desc: 'Die Basics die keiner sexy findet aber die den Unterschied machen. Stance, Guard, Gewichtsverlagerung.', duration: '18:00', tags: ['Grundlagen','Stance','Guard'] },
-      { id: 'rwAGGeOk4_Q', title: 'Wie Profis wirklich Schattenboxen', desc: 'Schattenboxen ist nicht nur rumschwingen — so machen es die Profis mit System und Absicht.', duration: '12:00', tags: ['Schattenboxen','Routine','Visualisierung'] },
-      { id: 'r7MUFC7xA0w', title: '10 Minuten die dein Amateurboxen verbessern', desc: 'Schnelle, sofort umsetzbare Technik-Verbesserungen für Amateurboxer.', duration: '10:00', tags: ['Amateur','Schnell','Umsetzbar'] },
-      { id: 'N0U5RPGpjSg', title: '10 Skills die du meistern musst + 3 die du vermeiden sollst', desc: 'Die wichtigsten Boxing-Skills für Anfänger — und welche Gewohnheiten du sofort ablegen musst.', duration: '20:00', tags: ['Anfänger','Skills','Fehler'] }
+      { id: 'Jg2CgIK8nFk', title: 'Die langweiligen Grundlagen die stark machen', desc: 'Die Basics die keiner sexy findet aber die den Unterschied machen.', duration: '18:00', tags: ['Stance','Guard','Basics'] },
+      { id: 'r7MUFC7xA0w', title: '10 Minuten die dein Boxen verbessern', desc: 'Sofort umsetzbare Verbesserungen für Amateurboxer.', duration: '10:00', tags: ['Amateur','Schnell','Umsetzbar'] },
+      { id: 'N0U5RPGpjSg', title: '10 Skills meistern + 3 vermeiden', desc: 'Was du lernen musst und welche Gewohnheiten du sofort ablegen sollst.', duration: '20:00', tags: ['Anfänger','Skills','Fehler'] },
+      { id: 'D8DouKeOkfI', title: 'Boxing 101 — Komplettes Tutorial', desc: 'Von Null auf Box-Grundlagen. Stance, Jab, Cross, Hook, Bewegung.', duration: '25:00', tags: ['Anfänger','Komplett','Schritt-für-Schritt'] }
+    ]
+  },
+
+  // === SCHATTENBOXEN & TRAINING ===
+  {
+    category: 'training',
+    categoryLabel: 'SCHATTENBOXEN & DRILLS',
+    categoryDesc: 'Wie du alleine trainierst — Schattenboxen, Drills, Solo-Übungen mit System.',
+    videos: [
+      { id: 'rwAGGeOk4_Q', title: 'Wie Profis wirklich Schattenboxen', desc: 'Nicht einfach rumschwingen — mit System, Absicht und Visualisierung.', duration: '12:00', tags: ['Schattenboxen','System','Profis'] },
+      { id: 'dMgBWqyUqTM', title: '21 Geheimnisse der Box-Technik', desc: 'Kurze, knackige Technik-Tipps die sofort umsetzbar sind.', duration: '8:00', tags: ['Tipps','Technik','Kurz'] },
+      { id: 'nH-NsajI2tM', title: 'Beginner Boxing 101 — Willkommen', desc: 'Für absolute Anfänger: Erste Schritte im Boxen.', duration: '15:00', tags: ['Anfänger','Start','Einführung'] }
+    ]
+  },
+
+  // === DEFENSE & KOPFBEWEGUNG ===
+  {
+    category: 'defense',
+    categoryLabel: 'DEFENSE & KOPFBEWEGUNG',
+    categoryDesc: 'Nicht getroffen werden ist genauso wichtig wie treffen. Slips, Rolls, Parries, Blocks.',
+    videos: [
+      { id: 'ONap_xV3ViE', title: 'Whitaker — Defensive Meisterschaft', desc: 'Der unerreichte Meister der Ausweichbewegungen.', duration: '14:00', tags: ['Slips','Rolls','Meister'] },
+      { id: 'hq7evFpmVek', title: 'Mayweather — Defense als Waffe', desc: 'Wie Mayweather Defense offensiv nutzt — Shoulder Roll, Pull Counter, Check Hook.', duration: '15:00', tags: ['Shoulder Roll','Counter','Guard'] },
+      { id: 'BV1wtKInZ5g', title: 'Fortgeschrittenes Box-Tutorial', desc: 'Über die Basics hinaus — Defense-Techniken für Fortgeschrittene.', duration: '22:00', tags: ['Fortgeschritten','Defense','Kombis'] }
     ]
   },
 
@@ -54,10 +93,12 @@ var VIDEO_LIBRARY = [
     categoryLabel: 'KRAFT & CONDITIONING',
     categoryDesc: 'Sportwissenschaft für Boxer — die gleiche Methodik die FightOS nutzt.',
     videos: [
-      { id: 'hmFQTjxlE5M', title: 'Die besten Conditioning-Methoden für Boxer (Ranking)', desc: 'Alle Conditioning-Methoden im Vergleich — von Zone 2 bis HIIT bis SIT. Was funktioniert wirklich?', duration: '22:00', tags: ['Conditioning','HIIT','Ranking'] },
-      { id: '22zeL5FuCv0', title: 'S&C individualisieren — Kompletter Guide', desc: 'Wie du Kraft- und Konditionstraining an dein Level, deine Schwächen und deinen Kampfkalender anpasst.', duration: '30:00', tags: ['Periodisierung','Individuell','System'] },
-      { id: 'DajasFD5ExA', title: 'S&C in die Amateur-Boxing-Routine integrieren', desc: 'Praktischer Guide: Wie du Krafttraining mit deinem Vereinstraining kombinierst ohne dich zu überlasten.', duration: '18:00', tags: ['Amateur','Planung','Integration'] },
-      { id: 'QmnpevLGSs4', title: 'Kraft & Power Workout für Boxer', desc: 'Komplettes Workout zum Mitmachen — die Übungen die FightOS im Kraftprogramm nutzt.', duration: '25:00', tags: ['Workout','Kraft','Power'] }
+      { id: 'hmFQTjxlE5M', title: 'Conditioning-Methoden Ranking', desc: 'Zone 2 vs HIIT vs SIT — was funktioniert wirklich für Boxer?', duration: '22:00', tags: ['Conditioning','HIIT','Vergleich'] },
+      { id: '22zeL5FuCv0', title: 'S&C individualisieren — Guide', desc: 'Kraft- und Konditionstraining an Level, Schwächen und Kampfkalender anpassen.', duration: '30:00', tags: ['Periodisierung','Individuell','System'] },
+      { id: 'DajasFD5ExA', title: 'S&C im Amateur-Boxalltag', desc: 'Krafttraining mit Vereinstraining kombinieren ohne Überbelastung.', duration: '18:00', tags: ['Amateur','Planung','Praxis'] },
+      { id: 'QmnpevLGSs4', title: 'Kraft & Power Workout', desc: 'Komplettes Workout — die Übungen aus dem FightOS-Programm.', duration: '25:00', tags: ['Workout','Mitmachen','Power'] },
+      { id: 'cTlUErNBMRU', title: 'Ein Tag bei Boxing Science', desc: 'Wie professionelle Boxer ihren S&C-Tag strukturieren.', duration: '15:00', tags: ['Pro','Tagesablauf','Einblick'] },
+      { id: '5rP3shb1lrE', title: '30-Min S&C Workout für Boxer', desc: 'Kurzes, intensives Workout wenn die Zeit knapp ist.', duration: '30:00', tags: ['Kurz','Intensiv','Mitmachen'] }
     ]
   }
 ];

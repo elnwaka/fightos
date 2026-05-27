@@ -11,6 +11,22 @@ var AI_COACH_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models
 var _aiChatHistory = [];
 var _aiCoachOpen = false;
 
+// ===== PERSISTENT CHAT HISTORY =====
+function saveCoachHistory() {
+  try {
+    var key = 'fos_coach_' + (currentUser || 'anon');
+    var toSave = _aiChatHistory.slice(-50); // Keep last 50 messages
+    localStorage.setItem(key, JSON.stringify(toSave));
+  } catch(e) {}
+}
+function loadCoachHistory() {
+  try {
+    var key = 'fos_coach_' + (currentUser || 'anon');
+    var saved = localStorage.getItem(key);
+    if (saved) _aiChatHistory = JSON.parse(saved);
+  } catch(e) { _aiChatHistory = []; }
+}
+
 // ===== TLAC KNOWLEDGE BASE (condensed for system prompt) =====
 var TLAC_KNOWLEDGE = `
 DU BIST DER FIGHTOS AI-COACH — ein Elite-Box-Trainer mit tiefem Wissen über Sportwissenschaft, Kraft- und Konditionstraining, Ernährung und Kampfvorbereitung für Boxer. Du sprichst Deutsch, direkt und motivierend wie ein echter Trainer in der Ecke.
@@ -107,22 +123,47 @@ Verfügbare Aktionen (schreibe diese EXAKT so in deine Antwort):
 [ACTION:NAVIGATE:wissen] → Öffnet die Video-Bibliothek
 
 [ACTION:VIDEO:VIDEO_ID:TITEL] → Öffnet ein Video aus der Bibliothek
-Verfügbare Videos:
-- [ACTION:VIDEO:hq7evFpmVek:Mayweathers Taktiken] — Defense & Ring IQ
-- [ACTION:VIDEO:HKU49EclMX8:Lomachenkos Stil] — Winkel & Fußarbeit
-- [ACTION:VIDEO:TwHkGZvGZoM:Usyks System] — System & Taktik
-- [ACTION:VIDEO:Yc6RaEjDwl8:Inoues Killer-Stil] — Power & Timing
-- [ACTION:VIDEO:Ihe9nXXyo1w:Andre Wards Taktiken] — Taktik & Clinch
-- [ACTION:VIDEO:y1UZRV266B0:Caleb Plants Techniken] — Jab-Varianten & Kreativität
-- [ACTION:VIDEO:Po3Dwu1Bb30:Ring abschneiden] — Ring Cut & Druck
-- [ACTION:VIDEO:ONap_xV3ViE:Whitakers Defense] — Defensive Meisterschaft
+Verfügbare Videos (nutze diese um passende Empfehlungen zu geben):
+
+LEGENDEN:
+- [ACTION:VIDEO:hq7evFpmVek:Mayweathers Taktiken] — Defense, Ring IQ, Konter
+- [ACTION:VIDEO:pqroVNFSlcs:Alis Meisterwerke] — Unkonventionell, Kopfbewegung
+- [ACTION:VIDEO:73yNFaIG0Sc:Durans böser Stil] — Inside Fighting, Druck, Körper
+- [ACTION:VIDEO:nQ75ROGzG2o:Finito Lopez] — Technik, Effizienz
+- [ACTION:VIDEO:ONap_xV3ViE:Whitakers Defense] — Slips, Rolls, Fußarbeit
+
+AKTIVE KÄMPFER:
+- [ACTION:VIDEO:HKU49EclMX8:Lomachenkos Stil] — Winkel, Guard-Manipulation
+- [ACTION:VIDEO:TwHkGZvGZoM:Usyks System] — Komplettes System
+- [ACTION:VIDEO:Yc6RaEjDwl8:Inoues Killer-Stil] — Power, Timing, KO
+- [ACTION:VIDEO:sYmTdwP40Yc:Ryan Garcias Stil] — Speed, Counter
+- [ACTION:VIDEO:lly-AuwD-zc:Matias unkonventionell] — Druck, Körper
+- [ACTION:VIDEO:y1UZRV266B0:Caleb Plants Techniken] — Jab-Varianten, Kreativität
+- [ACTION:VIDEO:Ihe9nXXyo1w:Andre Wards Taktiken] — Clinch, Inside
+- [ACTION:VIDEO:dvMVNbOsU9k:Beste P4P Skills] — Kompilation
+
+RING IQ:
+- [ACTION:VIDEO:Po3Dwu1Bb30:Ring abschneiden] — Ring Cut, Druck
+- [ACTION:VIDEO:Wlag12lY0U0:Pirog — Schach im Ring] — Ring Control
+- [ACTION:VIDEO:fWSdk2qeRlY:Fight IQ Blueprint] — Fußarbeit, Defense, IQ komplett
 - [ACTION:VIDEO:sHIaIDnxXbU:Perfekter Boxer] — Technische Perfektion
-- [ACTION:VIDEO:Jg2CgIK8nFk:Boring Fundamentals] — Grundlagen
-- [ACTION:VIDEO:rwAGGeOk4_Q:Pro Shadow Boxing] — Schattenboxen wie Profis
-- [ACTION:VIDEO:r7MUFC7xA0w:10 Min Verbesserung] — Schnelle Amateur-Tipps
+- [ACTION:VIDEO:QErNkgN5two:Wie Top 1% denken] — Entscheidungsfindung
+
+GRUNDLAGEN:
+- [ACTION:VIDEO:Jg2CgIK8nFk:Langweilige Grundlagen] — Stance, Guard, Basics
+- [ACTION:VIDEO:r7MUFC7xA0w:10 Min Verbesserung] — Schnelle Tipps
+- [ACTION:VIDEO:N0U5RPGpjSg:10 Skills + 3 Fehler] — Anfänger
+- [ACTION:VIDEO:D8DouKeOkfI:Boxing 101] — Komplett-Tutorial
+
+TRAINING:
+- [ACTION:VIDEO:rwAGGeOk4_Q:Pro Shadow Boxing] — Schattenboxen mit System
+- [ACTION:VIDEO:dMgBWqyUqTM:21 Technik-Geheimnisse] — Kurze Tipps
+
+S&C:
 - [ACTION:VIDEO:hmFQTjxlE5M:Conditioning Ranking] — Beste Methoden
 - [ACTION:VIDEO:22zeL5FuCv0:S&C Guide] — Individualisierung
-- [ACTION:VIDEO:fWSdk2qeRlY:Fight IQ Blueprint] — Fußarbeit, Defense, IQ
+- [ACTION:VIDEO:DajasFD5ExA:S&C im Alltag] — Amateur-Integration
+- [ACTION:VIDEO:5rP3shb1lrE:30-Min Workout] — Mitmachen
 
 [ACTION:REGENERATE_PLAN] → Generiert den Wochenplan neu
 [ACTION:ACTIVATE_DELOAD] → Aktiviert eine Deload-Woche
@@ -281,14 +322,23 @@ function toggleAICoach() {
   if (!panel) return;
   panel.classList.toggle('open', _aiCoachOpen);
 
-  if (_aiCoachOpen && _aiChatHistory.length === 0) {
-    // Show welcome message
-    addCoachMessage('coach', 'Ich bin dein FightOS Coach. Ich kenne deinen Trainingsplan, deine Tests und dein Ziel. Frag mich was du willst — Trainingsplan, Ernährung, Kampfvorbereitung, Technik-Tipps, oder was auch immer dich beschäftigt.');
+  if (_aiCoachOpen) {
+    // Load saved history
+    if (_aiChatHistory.length === 0) {
+      loadCoachHistory();
+    }
+    if (_aiChatHistory.length === 0) {
+      // First time — show welcome
+      addCoachMessage('coach', 'Ich bin dein FightOS Coach. Ich kenne deinen Trainingsplan, deine Tests und dein Ziel. Frag mich was du willst — Trainingsplan, Ernährung, Kampfvorbereitung, Technik-Tipps, oder was auch immer dich beschäftigt.\n\nDein Chatverlauf wird gespeichert — du kannst jederzeit zurückkommen.');
+    } else {
+      renderCoachMessages();
+    }
   }
 }
 
 function addCoachMessage(role, text) {
   _aiChatHistory.push({ role: role === 'coach' ? 'model' : 'user', text: text });
+  saveCoachHistory();
   renderCoachMessages();
 }
 
