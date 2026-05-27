@@ -1199,6 +1199,7 @@ function renderTrainingPage(subTab) {
 
   var tabs = [
     { id: 'uebungen', label: 'Übungen' },
+    { id: 'wissen', label: 'Wissen' },
     { id: 'tests', label: 'Tests' },
     { id: 'log', label: 'Log' },
     { id: 'ernaehrung', label: 'Ernährung' },
@@ -1217,7 +1218,10 @@ function renderTrainingPage(subTab) {
   if (!contentEl) return;
 
   // Render the right sub-page into the content area
-  if (subTab === 'uebungen') { renderUebungenPage(); contentEl.innerHTML = document.getElementById('page-uebungen').innerHTML; }
+  if (subTab === 'wissen') {
+    contentEl.innerHTML = '<div class="page-header"><div class="page-title">BOX<span>WISSEN</span></div><div class="page-sub">Kampf-Breakdowns, Ring IQ, Technik und S&C — von den besten Coaches und Analysten.</div></div>' + (typeof renderVideoLibrary === 'function' ? renderVideoLibrary() : '<div style="color:var(--text-muted);">Video Library wird geladen...</div>');
+  }
+  else if (subTab === 'uebungen') { renderUebungenPage(); contentEl.innerHTML = document.getElementById('page-uebungen').innerHTML; }
   else if (subTab === 'tests') { renderTestsPage(); contentEl.innerHTML = document.getElementById('page-tests').innerHTML; }
   else if (subTab === 'log') { contentEl.innerHTML = document.getElementById('page-log').innerHTML; }
   else if (subTab === 'ernaehrung') { renderErnaehrungPage(); contentEl.innerHTML = document.getElementById('page-ernaehrung').innerHTML; }

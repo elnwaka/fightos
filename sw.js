@@ -10,6 +10,7 @@ const PRECACHE = [
   './js/calculators.js',
   './js/program10w.js',
   './js/ai-coach.js',
+  './js/video-library.js',
   './manifest.json',
   './js/chart.min.js',
   './js/apexcharts.min.js',
