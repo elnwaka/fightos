@@ -2,3 +2,7 @@ tlac_full.txt
 tlac_full.txt
 test-*.png
 node_modules/
+test-screenshots/
+test-*.mjs
+test-report.txt
+FINDINGS.md
