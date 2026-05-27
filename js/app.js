@@ -6764,21 +6764,23 @@ function renderDashboard() {
 
   el.innerHTML =
 
-    // ══ HERO: Animated Gradient + Grid ══
-    '<div class="fc-hero">' +
+    // ══ HERO: Full-width image like before ══
+    '<div class="db-hero">' +
       '<div class="db-hero-img" style="background-image:url(\'img/hero/gym-dark.jpg\');"></div>' +
       '<div class="db-hero-fade"></div>' +
-      '<div class="fc-hero-name">' + escapeHTML(getDisplayName()) + '</div>' +
-      (totalFights > 0 ?
-        '<div class="fc-hero-record">' +
-          '<span class="fc-record-badge wins">' + wins + ' SIEGE</span>' +
-          (losses > 0 ? '<span class="fc-record-badge losses">' + losses + ' NIEDERLAGEN</span>' : '') +
-          (draws > 0 ? '<span class="fc-record-badge draws">' + draws + ' UNENTSCHIEDEN</span>' : '') +
-          (koRate > 0 ? '<span class="fc-record-badge" style="color:var(--red);border-color:rgba(232,0,13,.25);">' + koRate + '% KO</span>' : '') +
-        '</div>'
-      :
-        '<div class="fc-hero-sub">' + weightClass + '</div>'
-      ) +
+      '<div class="db-hero-inner">' +
+        '<div class="db-hero-name">' + escapeHTML(getDisplayName()) + '</div>' +
+        (totalFights > 0 ?
+          '<div class="fc-hero-record">' +
+            '<span class="fc-record-badge wins">' + wins + ' SIEGE</span>' +
+            (losses > 0 ? '<span class="fc-record-badge losses">' + losses + ' NIEDERLAGEN</span>' : '') +
+            (draws > 0 ? '<span class="fc-record-badge draws">' + draws + ' UNENTSCHIEDEN</span>' : '') +
+            (koRate > 0 ? '<span class="fc-record-badge" style="color:var(--red);border-color:rgba(232,0,13,.25);">' + koRate + '% KO</span>' : '') +
+          '</div>'
+        :
+          '<div class="db-hero-sub">' + weightClass + '</div>'
+        ) +
+      '</div>' +
     '</div>' +
 
     // ══ STATS BAR: Glasmorphism cells ══
