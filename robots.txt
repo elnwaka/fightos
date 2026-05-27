@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://elnwaka.github.io/fightos/sitemap.xml
+Sitemap: https://boxspec.app/sitemap.xml
