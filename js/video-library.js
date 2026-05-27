@@ -97,6 +97,25 @@ var VIDEO_LIBRARY = [
     ]
   },
 
+  // === DIRTY BOXING & CLINCH ===
+  {
+    category: 'dirty',
+    categoryLabel: 'DIRTY BOXING & CLINCH',
+    categoryDesc: 'Die Grauzone. Legale Veteranen-Tricks, Inside Fighting, Clinch-Arbeit — was sie dir im Anfängerkurs nicht beibringen.',
+    videos: [
+      { id: 'YlPOTExpxAM', title: 'Alle Dirty Boxing Techniken in 8 Minuten', desc: 'Kompakter Überblick: Jede wichtige Dirty-Boxing-Technik erklärt. Unterarm, Clinch, Kopfposition, Körperarbeit.', duration: '8:00', tags: ['Komplett','Überblick','Tricks'] },
+      { id: '_x9MMvC3Bd0', title: 'Wie der Clinch im Boxen WIRKLICH funktioniert', desc: 'Die 3 Phasen des Clinch — rein kommen, arbeiten, raus kommen. Nicht nur festhalten.', duration: '15:00', tags: ['Clinch','3 Phasen','System'] },
+      { id: '30Zo_JxNa44', title: 'ALLES über Clinch & Inside Fighting', desc: 'Kompletter Guide: Wann clinchen, wie innen arbeiten, wie sich befreien. Profi-Level.', duration: '20:00', tags: ['Inside','Komplett','Profi'] },
+      { id: 'R6R6wSoUuzA', title: 'Die Grauzone meistern — Dirty Boxing Kunst', desc: 'Die feine Linie zwischen legal und illegal. Wie Profis die Grauzone zu ihrem Vorteil nutzen.', duration: '12:00', tags: ['Grauzone','Legal','Taktik'] },
+      { id: 'U1JlCK_gUr8', title: '10 Dirty Boxing Techniken und Tricks', desc: 'Von Unterarm-Blocks bis Gewicht-Verlagern im Clinch — 10 konkrete Techniken zum Üben.', duration: '14:00', tags: ['10 Tricks','Konkret','Training'] },
+      { id: 'vs8Ku79ltJU', title: 'Aus dem Clinch entkommen', desc: '4 Taktiken um einen Clinch-Gegner abzuschütteln: Distanz schaffen, Gewalt, Winkel, Timing.', duration: '10:00', tags: ['Escape','Defense','Taktik'] },
+      { id: 'f0zBN71xctU', title: 'Clinch-Geheimnisse — Inside the Pocket dominieren', desc: 'Auf kürzester Distanz dominieren. Uppercuts, kurze Haken, Körperarbeit aus dem Clinch.', duration: '13:00', tags: ['Pocket','Uppercuts','Dominanz'] },
+      { id: '2AnWJAz_-9k', title: 'Mayweather Shoulder Roll Breakdown', desc: 'Film-Studie: Wie Mayweather die Shoulder Roll als Waffe nutzt — nicht nur Defense, sondern Setup für Counter.', duration: '16:00', tags: ['Shoulder Roll','Mayweather','Counter'] },
+      { id: 'pqL81VdD7Zo', title: 'Philly Shell Tutorial — Shoulder Roll lernen', desc: 'Schritt für Schritt die Philly Shell / Shoulder Roll aufbauen. Stand, Arm-Position, Timing, Counter.', duration: '18:00', tags: ['Philly Shell','Tutorial','Anfänger'] },
+      { id: 'xGrg2G9kSc8', title: 'Inside Fighting & Clinch Drills', desc: 'Konkrete Drills für den Trainingsalltag — Clinch-Arbeit üben ohne einen Partner zu verletzen.', duration: '12:00', tags: ['Drills','Training','Partnerarbeit'] }
+    ]
+  },
+
   // === S&C FÜR BOXER ===
   {
     category: 'sc',

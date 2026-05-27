@@ -250,6 +250,16 @@ TRAINING:
 - [ACTION:VIDEO:rwAGGeOk4_Q:Pro Shadow Boxing] — Schattenboxen mit System
 - [ACTION:VIDEO:dMgBWqyUqTM:21 Technik-Geheimnisse] — Kurze Tipps
 
+DIRTY BOXING & CLINCH:
+- [ACTION:VIDEO:YlPOTExpxAM:Dirty Boxing komplett] — Alle Techniken in 8 Min
+- [ACTION:VIDEO:_x9MMvC3Bd0:Wie der Clinch funktioniert] — 3 Phasen
+- [ACTION:VIDEO:30Zo_JxNa44:Inside Fighting komplett] — Alles über Clinch
+- [ACTION:VIDEO:R6R6wSoUuzA:Dirty Boxing Grauzone] — Legale Tricks
+- [ACTION:VIDEO:U1JlCK_gUr8:10 Dirty Boxing Tricks] — Konkrete Techniken
+- [ACTION:VIDEO:vs8Ku79ltJU:Clinch Escape] — Aus dem Clinch entkommen
+- [ACTION:VIDEO:2AnWJAz_-9k:Mayweather Shoulder Roll] — Film-Studie
+- [ACTION:VIDEO:pqL81VdD7Zo:Philly Shell lernen] — Shoulder Roll Tutorial
+
 S&C:
 - [ACTION:VIDEO:hmFQTjxlE5M:Conditioning Ranking] — Beste Methoden
 - [ACTION:VIDEO:22zeL5FuCv0:S&C Guide] — Individualisierung
