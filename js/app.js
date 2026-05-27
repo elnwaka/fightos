@@ -1442,7 +1442,7 @@ function renderFightCountdown() {
 
   if (!data.fightDate) {
     display.innerHTML = `
-      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;">KEIN KAMPF GEPLANT</div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;">KEIN KAMPF GEPLANT</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">NORMALES TRAINING</div>
       <div style="font-size:12px;color:var(--text-subtle);margin-top:12px;">Kein Kampf geplant \u2014 trage ein Datum ein und dein kompletter Plan passt sich automatisch an.</div>` + addBtnHTML;
     return;
@@ -1456,12 +1456,12 @@ function renderFightCountdown() {
   let mainHTML = '';
   if (diff < -2) {
     mainHTML = `
-      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">Letzter Kampf: ${formatDate(data.fightDate)}</div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">Letzter Kampf: ${formatDate(data.fightDate)}</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">NORMALES TRAINING</div>
       <div style="font-size:12px;color:var(--text-subtle);margin-top:12px;">Trage den nächsten Kampf ein wenn er feststeht.</div>`;
   } else if (diff < 0) {
     mainHTML = `
-      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">Kampf war am ${formatDate(data.fightDate)}</div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">Kampf war am ${formatDate(data.fightDate)}</div>
       <div class="phase-badge phase-aufbau" style="margin-top:12px;">RECOVERY</div>
       <div style="font-size:12px;color:var(--text-subtle);margin-top:12px;">24–48h leichte Regeneration, dann zurück ins Training.</div>`;
   } else if (diff === 0) {
@@ -1819,13 +1819,13 @@ function renderHRV() {
     <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
       <div style="text-align:center;">
         <div style="width:48px;height:48px;border-radius:50%;background:${color};margin:0 auto 8px;box-shadow:0 0 20px ${color}40;"></div>
-        <div style="font-family:'Oswald',sans-serif;font-size:20px;color:${color};">${status}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${color};">${status}</div>
       </div>
       <div style="flex:1;min-width:200px;">
         <div style="display:flex;gap:24px;margin-bottom:8px;">
-          <div><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);">HEUTE</span><br><span style="font-family:'Oswald',sans-serif;font-size:28px;color:var(--white);">${today}</span></div>
-          <div><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);">7-TAGE Ø</span><br><span style="font-family:'Oswald',sans-serif;font-size:28px;color:var(--white);">${avg7}</span></div>
-          <div><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);">DIFFERENZ</span><br><span style="font-family:'Oswald',sans-serif;font-size:28px;color:${color};">${pctDiff > 0 ? '+' : ''}${pctDiff}%</span></div>
+          <div><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);">HEUTE</span><br><span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);">${today}</span></div>
+          <div><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);">7-TAGE Ø</span><br><span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);">${avg7}</span></div>
+          <div><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);">DIFFERENZ</span><br><span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${color};">${pctDiff > 0 ? '+' : ''}${pctDiff}%</span></div>
         </div>
         <div style="font-size:12px;color:var(--grey);">${advice}</div>
       </div>
@@ -2072,8 +2072,8 @@ function renderHinweise() {
     gettingStartedHtml = `
       <div style="margin-bottom:16px;padding:14px 16px;border-radius:var(--radius-md);background:rgba(255,255,255,.03);border:1px solid rgba(245,197,24,.15);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <span style="font-family:'Oswald',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;">DEIN ERSTER SCHRITT</span>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);">${completedSteps}/4 erledigt</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;">DEIN ERSTER SCHRITT</span>
+          <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);">${completedSteps}/4 erledigt</span>
         </div>
         <div style="width:100%;height:4px;background:rgba(255,255,255,.06);border-radius:var(--radius-sm);margin-bottom:12px;">
           <div style="width:${gsPct}%;height:100%;background:var(--gold);border-radius:var(--radius-sm);transition:width .3s;"></div>
@@ -2085,7 +2085,7 @@ function renderHinweise() {
   if (!items.length && !gettingStartedHtml) { el.innerHTML = ''; return; }
 
   el.innerHTML = `
-    <div style="font-family:'Oswald',sans-serif;font-size:20px;color:var(--white);margin-bottom:10px;">HINWEISE</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:10px;">HINWEISE</div>
     ${gettingStartedHtml}
     ${items.slice(0, 5).map(r => `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:6px;padding:7px 12px;border-left:3px solid ${r.color};border-radius:0 4px 4px 0;background:rgba(255,255,255,.015);">
       <span style="font-size:12px;color:${r.color};line-height:1.4;">${r.text}</span>
@@ -2175,7 +2175,7 @@ function renderSäulenProgress() {
     return `
       <div style="margin-bottom:24px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-          <span style="font-family:'Oswald',sans-serif;font-size:20px;letter-spacing:2px;color:${clusterColors[c]};">${c.toUpperCase()}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:${clusterColors[c]};">${c.toUpperCase()}</span>
         </div>
         <div class="bench-grid">
           ${items.map(b => {
@@ -2200,9 +2200,9 @@ function renderSäulenProgress() {
               const color = better ? 'var(--green)' : diff === 0 ? '#555' : 'var(--red)';
               const absDiff = Math.abs(diff);
               const unit = b.unit;
-              trendHTML = `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${color};margin-top:4px;">${arrow} ${b.inverse && diff < 0 ? '-' : '+'}${absDiff % 1 === 0 ? absDiff : absDiff.toFixed(1)} ${unit} seit ${formatDate(hist[0].date)} (${hist.length} Tests)</div>`;
+              trendHTML = `<div style="font-family:'Space Mono',monospace;font-size:11px;color:${color};margin-top:4px;">${arrow} ${b.inverse && diff < 0 ? '-' : '+'}${absDiff % 1 === 0 ? absDiff : absDiff.toFixed(1)} ${unit} seit ${formatDate(hist[0].date)} (${hist.length} Tests)</div>`;
             } else if (hist.length === 1) {
-              trendHTML = `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-subtle);margin-top:4px;">Erster Test: ${formatDate(hist[0].date)}</div>`;
+              trendHTML = `<div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);margin-top:4px;">Erster Test: ${formatDate(hist[0].date)}</div>`;
             }
             // Mini sparkline SVG
             let sparkHTML = '';
@@ -2223,14 +2223,14 @@ function renderSäulenProgress() {
             }
             return `<div class="bench-card" style="--bc:${b.color}">
               <div class="bench-name"><span class="tt">${b.name}<span class="tt-text">${getBenchTooltip(b)}</span></span></div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin:-4px 0 8px 0;">${b.how}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin:-4px 0 8px 0;">${b.how}</div>
               <div style="display:flex;align-items:baseline;gap:8px;">
                 <div class="bench-current">${val || '–'}</div>
-                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">${b.unit}</div>
-                <div style="margin-left:auto;font-size:11px;font-family:'JetBrains Mono',monospace;color:${getBenchLevel(pct).color};font-weight:700;">${getBenchLevel(pct).label} · ${Math.round(pct)}%</div>
+                <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">${b.unit}</div>
+                <div style="margin-left:auto;font-size:11px;font-family:'Space Mono',monospace;color:${getBenchLevel(pct).color};font-weight:700;">${getBenchLevel(pct).label} · ${Math.round(pct)}%</div>
               </div>
               <div class="bench-bar"><div class="bench-fill" style="width:${pct}%;background:${b.color};"></div></div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-subtle);margin-top:2px;">Elite-Ziel: ${b.target} ${b.unit}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);margin-top:2px;">Elite-Ziel: ${b.target} ${b.unit}</div>
               ${sparkHTML}
               ${trendHTML}
               <input class="bench-input" type="number" step="any" placeholder="${b.target}" value="${val||''}"
@@ -2537,14 +2537,14 @@ function renderFightLog() {
   el.innerHTML = data.fights.slice(0, 5).map((f, i) => {
     const color = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
     return `<div onclick="openFightDetail(${i})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--surface-1);cursor:pointer;" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
-      <div style="font-family:'Oswald',sans-serif;font-size:20px;color:${color};width:28px;text-align:center;">${f.result}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${color};width:28px;text-align:center;">${f.result}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;color:var(--white);">vs. ${escapeHTML(f.opponent) || 'Unbekannt'}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);">${formatDate(f.date)} · ${f.method || ''}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);">${formatDate(f.date)} · ${f.method || ''}</div>
       </div>
       <div style="font-size:12px;color:var(--text-subtle);">→</div>
     </div>`;
-  }).join('') + (data.fights.length > 5 ? `<div onclick="showPage('fights')" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red);padding:10px 0;cursor:pointer;text-align:center;">Alle ${data.fights.length} Kämpfe anzeigen →</div>` : '');
+  }).join('') + (data.fights.length > 5 ? `<div onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--red);padding:10px 0;cursor:pointer;text-align:center;">Alle ${data.fights.length} Kämpfe anzeigen →</div>` : '');
 }
 
 function deleteFight(i) {
@@ -2587,7 +2587,7 @@ function renderFightsPage() {
     <div id="fights-tab-bar" style="display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--surface-2);margin-bottom:24px;">
       ${tabs.map(t => {
         const isActive = currentFightsTab === t.key;
-        return `<div class="fights-tab-btn${isActive ? ' active' : ''}" data-tab="${t.key}" onclick="switchFightsTab('${t.key}')" style="padding:12px ${isMobile() ? '12px' : '20px'};cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:${isMobile() ? '11px' : '12px'};text-transform:uppercase;letter-spacing:${isMobile() ? '1px' : '2px'};color:${isActive ? 'var(--white)' : '#555'};border-bottom:${isActive ? '2px solid var(--red)' : '2px solid transparent'};transition:all .2s;margin-bottom:-1px;" onmouseenter="if(!this.classList.contains('active'))this.style.color='#888'" onmouseleave="if(!this.classList.contains('active'))this.style.color='#555'">${t.label}</div>`;
+        return `<div class="fights-tab-btn${isActive ? ' active' : ''}" data-tab="${t.key}" onclick="switchFightsTab('${t.key}')" style="padding:12px ${isMobile() ? '12px' : '20px'};cursor:pointer;font-family:'Space Mono',monospace;font-size:${isMobile() ? '11px' : '12px'};text-transform:uppercase;letter-spacing:${isMobile() ? '1px' : '2px'};color:${isActive ? 'var(--white)' : '#555'};border-bottom:${isActive ? '2px solid var(--red)' : '2px solid transparent'};transition:all .2s;margin-bottom:-1px;" onmouseenter="if(!this.classList.contains('active'))this.style.color='#888'" onmouseleave="if(!this.classList.contains('active'))this.style.color='#555'">${t.label}</div>`;
       }).join('')}
     </div>
     <div id="fights-tab-content"></div>`;
@@ -2668,10 +2668,10 @@ function renderFightsTab1(contentEl, data) {
     const wr = Math.round((s.wins / s.total) * 100);
     const wrColor = wr > 60 ? 'var(--green)' : wr >= 40 ? 'var(--gold)' : 'var(--red)';
     return `<tr>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--white);padding:8px 12px 8px 0;">${t}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);padding:8px 12px;text-align:center;">${s.total}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);padding:8px 12px;text-align:center;">${s.wins}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${wrColor};padding:8px 12px;text-align:center;font-weight:bold;">${wr}%</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--white);padding:8px 12px 8px 0;">${t}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);padding:8px 12px;text-align:center;">${s.total}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);padding:8px 12px;text-align:center;">${s.wins}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:${wrColor};padding:8px 12px;text-align:center;font-weight:bold;">${wr}%</td>
     </tr>`;
   }).join('');
 
@@ -2679,13 +2679,13 @@ function renderFightsTab1(contentEl, data) {
   const visibleFights = fights.slice(0, fightsListLimit);
   const timelineRows = visibleFights.map((f, i) => {
     const dotColor = f.result === 'S' ? 'var(--green)' : f.result === 'N' ? 'var(--red)' : 'var(--gold)';
-    const methodTag = f.method ? `<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);background:var(--surface-1);padding:2px 6px;border-radius:var(--radius-sm);margin-left:8px;">${f.method}</span>` : '';
-    const typeTag = f.type ? `<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-subtle);background:var(--surface-0);border:1px solid var(--surface-2);padding:2px 6px;border-radius:var(--radius-sm);margin-left:4px;">${f.type}</span>` : '';
+    const methodTag = f.method ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);background:var(--surface-1);padding:2px 6px;border-radius:var(--radius-sm);margin-left:8px;">${f.method}</span>` : '';
+    const typeTag = f.type ? `<span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);background:var(--surface-0);border:1px solid var(--surface-2);padding:2px 6px;border-radius:var(--radius-sm);margin-left:4px;">${f.type}</span>` : '';
     return `<div onclick="openFightDetail(${i})" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--surface-1);cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);min-width:70px;">${formatDate(f.date)}</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);min-width:70px;">${formatDate(f.date)}</div>
       <div style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
       <div style="flex:1;min-width:0;display:flex;align-items:center;flex-wrap:wrap;">
-        <span style="font-family:'Oswald',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">vs. ${escapeHTML(f.opponent || 'Unbekannt').toUpperCase()}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">vs. ${escapeHTML(f.opponent || 'Unbekannt').toUpperCase()}</span>
         ${methodTag}${typeTag}
       </div>
       <div style="font-size:14px;color:var(--text-subtle);">&#8250;</div>
@@ -2697,13 +2697,13 @@ function renderFightsTab1(contentEl, data) {
   <div style="display:flex;gap:${isMobile() ? '16px' : '32px'};flex-wrap:wrap;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--surface-2);">
     <div style="flex:1;min-width:${isMobile() ? '100%' : '220px'};">
       <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">
-        <span style="font-family:'Oswald',sans-serif;font-size:48px;color:var(--white);line-height:1;">${wins}</span>
-        <span style="font-family:'Oswald',sans-serif;font-size:20px;color:var(--text-subtle);">–</span>
-        <span style="font-family:'Oswald',sans-serif;font-size:48px;color:${losses > 0 ? 'var(--red)' : '#333'};line-height:1;">${losses}</span>
-        <span style="font-family:'Oswald',sans-serif;font-size:20px;color:var(--text-subtle);">–</span>
-        <span style="font-family:'Oswald',sans-serif;font-size:48px;color:var(--gold);line-height:1;">${draws}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--white);line-height:1;">${wins}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text-subtle);">–</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${losses > 0 ? 'var(--red)' : '#333'};line-height:1;">${losses}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text-subtle);">–</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--gold);line-height:1;">${draws}</span>
       </div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);letter-spacing:2px;margin-bottom:12px;">SIEGE – NIEDERLAGEN – UNENTSCHIEDEN</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);letter-spacing:2px;margin-bottom:12px;">SIEGE – NIEDERLAGEN – UNENTSCHIEDEN</div>
       <div style="height:6px;background:var(--surface-1);border-radius:var(--radius-sm);overflow:hidden;max-width:300px;">
         <div style="display:flex;height:100%;">
           <div style="width:${wPct}%;background:var(--green);"></div>
@@ -2714,12 +2714,12 @@ function renderFightsTab1(contentEl, data) {
     </div>
     <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
       <div style="text-align:center;">
-        <div style="font-family:'Oswald',sans-serif;font-size:36px;color:var(--red);">${koRate}%</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;">KO-RATE</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--red);">${koRate}%</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;">KO-RATE</div>
       </div>
       <div style="text-align:center;">
-        <div style="font-family:'Oswald',sans-serif;font-size:36px;color:var(--green);">${bestStreak}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;">BEST STREAK</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--green);">${bestStreak}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;">BEST STREAK</div>
       </div>
     </div>
   </div>
@@ -2727,14 +2727,14 @@ function renderFightsTab1(contentEl, data) {
   <!-- MATCHUP MATRIX -->
   ${matrixRows ? `
   <div style="margin-bottom:28px;">
-    <div style="font-family:'Oswald',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">MATCHUP MATRIX</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">MATCHUP MATRIX</div>
     <table style="width:100%;border-collapse:collapse;">
       <thead>
         <tr style="border-bottom:1px solid var(--surface-2);">
-          <th style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:left;padding:6px 12px 6px 0;text-transform:uppercase;">Gegner-Typ</th>
-          <th style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Kämpfe</th>
-          <th style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Siege</th>
-          <th style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Winrate</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:left;padding:6px 12px 6px 0;text-transform:uppercase;">Gegner-Typ</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Kämpfe</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Siege</th>
+          <th style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-align:center;padding:6px 12px;text-transform:uppercase;">Winrate</th>
         </tr>
       </thead>
       <tbody>${matrixRows}</tbody>
@@ -2743,7 +2743,7 @@ function renderFightsTab1(contentEl, data) {
 
   <!-- FIGHT TIMELINE -->
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-    <div style="font-family:'Oswald',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">ALLE KÄMPFE</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">ALLE KÄMPFE</div>
     <button class="submit-btn" style="padding:6px 14px;font-size:12px;" onclick="openFightModal()">+ NEUEN KAMPF</button>
   </div>
   <div id="fights-timeline-list">
@@ -2751,7 +2751,7 @@ function renderFightsTab1(contentEl, data) {
       ? '<div style="text-align:center;padding:40px 0;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#1a1a1a;">0 K\u00c4MPFE</div><div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--text-muted);margin:8px 0 16px;">Trage deinen ersten Kampf ein und baue dein Kampfarchiv auf.</div><button class="submit-btn" style="padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ ERSTEN KAMPF EINTRAGEN</button></div>'
       : timelineRows}
   </div>
-  ${fights.length > fightsListLimit ? `<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:var(--radius-md);cursor:pointer;">Weitere Kämpfe laden (${fights.length - fightsListLimit} übrig)</button></div>` : ''}`;
+  ${fights.length > fightsListLimit ? `<div style="text-align:center;padding:16px 0;"><button onclick="fightsListLimit+=20;renderFightsPage();" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);background:none;border:1px solid var(--surface-2);padding:10px 24px;border-radius:var(--radius-md);cursor:pointer;">Weitere Kämpfe laden (${fights.length - fightsListLimit} übrig)</button></div>` : ''}`;
 }
 
 function renderFightsTab2(contentEl, data) {
@@ -3021,7 +3021,7 @@ function openFightDetail(idx) {
         <video id="fight-video-player" src="${escapeHTML(f.videoLink)}" controls playsinline preload="metadata" style="width:100%;display:block;border-radius:var(--radius-md);"></video>
       </div>
       <div style="display:flex;gap:16px;margin-top:8px;">
-        <span onclick="showVideoInput(${idx})" style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);cursor:pointer;">Video ändern</span>
+        <span onclick="showVideoInput(${idx})" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);cursor:pointer;">Video ändern</span>
       </div>
       <div id="video-input-area" style="display:none;margin-top:8px;"></div>`;
   } else if (ytId) {
@@ -3030,15 +3030,15 @@ function openFightDetail(idx) {
         <div id="fight-yt-container" style="width:100%;height:100%;"></div>
       </div>
       <div style="display:flex;gap:16px;margin-top:8px;">
-        <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);text-decoration:none;">Auf YouTube öffnen ↗</a>
-        <span onclick="showVideoInput(${idx})" style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);cursor:pointer;">Video ändern</span>
+        <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);text-decoration:none;">Auf YouTube öffnen ↗</a>
+        <span onclick="showVideoInput(${idx})" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);cursor:pointer;">Video ändern</span>
       </div>
       <div id="video-input-area" style="display:none;margin-top:8px;"></div>`;
   } else {
     videoHTML = `
       <div onclick="showVideoInput(${idx})" style="width:100%;aspect-ratio:16/9;border-radius:var(--radius-md);background:var(--surface-0);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;" onmouseenter="this.style.background='var(--surface-1)'" onmouseleave="this.style.background='var(--surface-0)'">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-subtle)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:1px;">VIDEO HOCHLADEN ODER LINK EINFÜGEN</div>
+        <div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:1px;">VIDEO HOCHLADEN ODER LINK EINFÜGEN</div>
       </div>
       <div id="video-input-area" style="margin-top:10px;"></div>`;
   }
@@ -3078,7 +3078,7 @@ function openFightDetail(idx) {
       `<span onclick="setFightRating(${idx},'${c.key}',${n})" style="display:inline-block;width:16px;height:16px;border-radius:50%;margin-right:4px;cursor:pointer;transition:all .15s;${n <= val ? 'background:var(--red);' : 'background:var(--surface-2);border:1px solid var(--surface-3);'}" onmouseenter="this.style.transform='scale(1.2)'" onmouseleave="this.style.transform='scale(1)'"></span>`
     ).join('');
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px;min-width:80px;">${c.label}</span>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px;min-width:80px;">${c.label}</span>
       <div>${dots}</div>
     </div>`;
   }).join('');
@@ -3091,24 +3091,24 @@ function openFightDetail(idx) {
   const roundWinnerHTML = [1,2,3].map(r => {
     const w = f.rounds[r-1] ? (f.rounds[r-1].winner || '') : '';
     return `<div style="display:flex;align-items:center;gap:6px;">
-      <span style="font-family:'Oswald',sans-serif;font-size:16px;color:var(--text-subtle);">R${r}</span>
-      ${['ich','gegner','unklar'].map(v => `<span onclick="setRoundWinner(${idx},${r-1},'${v}')" style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;${w === v ? (v==='ich'?'background:var(--green);color:#000;':'background:var(--red);color:#fff;') : 'background:var(--surface-1);color:var(--text-subtle);'}">${v === 'ich' ? 'ICH' : v === 'gegner' ? 'ER' : '?'}</span>`).join('')}
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--text-subtle);">R${r}</span>
+      ${['ich','gegner','unklar'].map(v => `<span onclick="setRoundWinner(${idx},${r-1},'${v}')" style="font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;${w === v ? (v==='ich'?'background:var(--green);color:#000;':'background:var(--red);color:#fff;') : 'background:var(--surface-1);color:var(--text-subtle);'}">${v === 'ich' ? 'ICH' : v === 'gegner' ? 'ER' : '?'}</span>`).join('')}
     </div>`;
   }).join('');
 
   el.innerHTML = `
   <!-- BACK -->
   <div style="padding-bottom:16px;">
-    <button onclick="showPage('fights')" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">← Alle Kämpfe</button>
+    <button onclick="showPage('fights')" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:0;min-height:44px;display:inline-flex;align-items:center;letter-spacing:1px;">← Alle Kämpfe</button>
   </div>
 
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
-    <span style="font-family:'Oswald',sans-serif;font-size:clamp(28px,4vw,36px);color:${color};letter-spacing:2px;">${label}</span>
-    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">${f.method || ''}</span>
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,36px);color:${color};letter-spacing:2px;">${label}</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">${f.method || ''}</span>
   </div>
-  <div style="font-family:'Oswald',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--white);letter-spacing:3px;line-height:.9;margin-bottom:10px;">vs. ${escapeHTML(f.opponent || 'Unbekannt').toUpperCase()}</div>
-  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-subtle);margin-bottom:28px;">${formatDate(f.date)}${f.style ? ' · ' + f.style : ''}${f.type ? ' · ' + f.type : ''}</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);color:var(--white);letter-spacing:3px;line-height:.9;margin-bottom:10px;">vs. ${escapeHTML(f.opponent || 'Unbekannt').toUpperCase()}</div>
+  <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);margin-bottom:28px;">${formatDate(f.date)}${f.style ? ' · ' + f.style : ''}${f.type ? ' · ' + f.type : ''}</div>
 
   <!-- MAIN: VIDEO LEFT + TIMESTAMPS RIGHT -->
   <div style="display:grid;grid-template-columns:${isMobile() ? '1fr' : '1fr 320px'};gap:24px;margin-bottom:24px;" class="fight-detail-grid">
@@ -3123,14 +3123,14 @@ function openFightDetail(idx) {
     <!-- Self-Rating -->
     <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-family:'Oswald',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SELBSTBEWERTUNG</span>
-        <span style="font-family:'Oswald',sans-serif;font-size:24px;color:${avgRating !== '–' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:var(--text-subtle);">/5</span></span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;">SELBSTBEWERTUNG</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${avgRating !== '–' ? 'var(--gold)' : '#222'};">${avgRating}<span style="font-size:12px;color:var(--text-subtle);">/5</span></span>
       </div>
       ${ratingsHTML}
     </div>
     <!-- Runden-Scoring (kompakt neben Selbstbewertung) -->
     <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:16px;">
-      <div style="font-family:'Oswald',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:10px;">WER HAT GEWONNEN?</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);letter-spacing:1px;margin-bottom:10px;">WER HAT GEWONNEN?</div>
       <div style="display:flex;flex-direction:column;gap:6px;">${roundWinnerHTML}</div>
     </div>
   </div>
@@ -3138,10 +3138,10 @@ function openFightDetail(idx) {
   <!-- GEFÜHRTE VIDEO-ANALYSE -->
   <div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:24px;margin-bottom:36px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-      <div style="font-family:'Oswald',sans-serif;font-size:20px;color:var(--white);letter-spacing:1.5px;">VIDEO-ANALYSE</div>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-subtle);letter-spacing:1px;">${f.videoAnalysis ? Object.keys(f.videoAnalysis).filter(k => f.videoAnalysis[k]).length + '/15 BEANTWORTET' : '0/15 BEANTWORTET'}</span>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);letter-spacing:1.5px;">VIDEO-ANALYSE</div>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-subtle);letter-spacing:1px;">${f.videoAnalysis ? Object.keys(f.videoAnalysis).filter(k => f.videoAnalysis[k]).length + '/15 BEANTWORTET' : '0/15 BEANTWORTET'}</span>
     </div>
-    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:var(--text-muted);margin-bottom:20px;">Schau dir den Kampf an und beantworte die Fragen Runde fürRunde. Nimm dir Zeit – ehrliche Analyse macht dich besser.</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-muted);margin-bottom:20px;">Schau dir den Kampf an und beantworte die Fragen Runde fürRunde. Nimm dir Zeit – ehrliche Analyse macht dich besser.</div>
 
     ${[1,2,3].map(r => {
       const va = (f.videoAnalysis && f.videoAnalysis['r'+r]) || {};
@@ -3206,28 +3206,28 @@ function openFightDetail(idx) {
   <!-- ANALYSE – full width below -->
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px;">
     <div style="padding:16px 0;border-bottom:1px solid var(--surface-1);">
-      <div style="font-family:'Oswald',sans-serif;font-size:16px;color:var(--green);letter-spacing:1px;margin-bottom:8px;">WAS LIEF GUT</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--green);letter-spacing:1px;margin-bottom:8px;">WAS LIEF GUT</div>
       <div id="fd-good" class="editable-field" onclick="makeFightFieldEditable(${idx},'good',this)" style="font-size:14px;color:var(--grey);line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.good) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
     <div style="padding:16px 0;border-bottom:1px solid var(--surface-1);">
-      <div style="font-family:'Oswald',sans-serif;font-size:16px;color:var(--red);letter-spacing:1px;margin-bottom:8px;">WAS MUSS BESSER WERDEN</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red);letter-spacing:1px;margin-bottom:8px;">WAS MUSS BESSER WERDEN</div>
       <div id="fd-improve" class="editable-field" onclick="makeFightFieldEditable(${idx},'improve',this)" style="font-size:14px;color:var(--grey);line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.improve) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
     <div style="padding:16px 0;border-bottom:1px solid var(--surface-1);">
-      <div style="font-family:'Oswald',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">GEGNER-SCHWÄCHEN</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--blue);letter-spacing:1px;margin-bottom:8px;">GEGNER-SCHWÄCHEN</div>
       <div id="fd-opponentWeaknesses" class="editable-field" onclick="makeFightFieldEditable(${idx},'opponentWeaknesses',this)" style="font-size:14px;color:var(--grey);line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.opponentWeaknesses) || '<span style="color:#222;">Klicke zum Eintragen...</span>'}</div>
     </div>
   </div>
 
   <!-- NÄCHSTE SCHRITTE -->
   <div style="margin-bottom:36px;padding:20px 0;border-top:1px solid var(--surface-1);">
-    <div style="font-family:'Oswald',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1.5px;margin-bottom:10px;">WAS ICH NÄCHSTES MAL ANDERS MACHE</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1.5px;margin-bottom:10px;">WAS ICH NÄCHSTES MAL ANDERS MACHE</div>
     <div id="fd-nextSteps" class="editable-field" onclick="makeFightFieldEditable(${idx},'nextSteps',this)" style="font-size:14px;color:var(--grey);line-height:1.7;cursor:text;min-height:24px;">${escapeHTML(f.nextSteps) || '<span style="color:#222;">Konkrete Maßnahmen für das nächste Training / den nächsten Kampf...</span>'}</div>
   </div>
 
   <!-- ACTIONS -->
   <div style="display:flex;flex-wrap:wrap;gap:12px;padding-top:16px;border-top:1px solid var(--surface-1);">
-    <button onclick="if(confirm('Diesen Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-subtle);background:none;border:1px solid var(--surface-2);padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;min-height:44px;">KAMPF LÖSCHEN</button>
+    <button onclick="if(confirm('Diesen Kampf wirklich löschen?')){deleteFight(${idx});showPage('fights');}" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);background:none;border:1px solid var(--surface-2);padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;min-height:44px;">KAMPF LÖSCHEN</button>
   </div>`;
 
   showPage('fight-detail');
@@ -4407,7 +4407,7 @@ function renderLogEntries() {
       <div><div class="log-entry-date">${day}</div><div class="log-entry-month">${month}</div></div>
       <div class="log-entry-body">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:${color};letter-spacing:1px;">${TYPE_LABELS[e.type] || e.type}</span>
+          <span style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:${color};letter-spacing:1px;">${TYPE_LABELS[e.type] || e.type}</span>
           <span style="font-size:var(--fs-sm);color:var(--white);">${e.duration} Min.</span>
           ${e.rpe ? '<span style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">RPE ' + e.rpe + '</span>' : ''}
           ${e.weight ? '<span style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);">' + e.weight + ' kg</span>' : ''}
@@ -4441,7 +4441,7 @@ function renderRecentLog() {
     return `<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #151515;">
       <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></div>
       <div style="flex:1;font-size:13px;color:var(--light);">${TYPE_LABELS[e.type] || e.type} · ${e.duration} Min.</div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);">${formatDate(e.date)}</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);">${formatDate(e.date)}</div>
     </div>`;
   }).join('');
 }
@@ -4965,7 +4965,7 @@ function _renderWeekPlanInner() {
     const diff = Math.ceil((new Date(data.fightDate + 'T00:00:00') - today) / 86400000);
     const phase = getFightPhase(diff);
     phaseHTML = `<div style="margin-bottom:20px;"><span class="phase-badge ${phase.cls}" style="font-size:16px;padding:6px 14px;">${phase.name}</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);margin-left:12px;">${diff > 0 ? diff + ' Tage bis Kampf · ' + formatDate(data.fightDate) : 'Kampf vorbei'}</span></div>`;
+      <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);margin-left:12px;">${diff > 0 ? diff + ' Tage bis Kampf · ' + formatDate(data.fightDate) : 'Kampf vorbei'}</span></div>`;
   }
 
   // 10-Week program banner
@@ -5118,10 +5118,10 @@ function _renderWeekPlanInner() {
           <div class="day-header" onclick="toggleDayCol(this)">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--gold);">HEUTE</span>' : ''}</div>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-subtle);">${blocks.length}</span>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-subtle);">${blocks.length}</span>
             </div>
             <div style="display:flex;align-items:center;gap:4px;margin-top:4px;">
-              ${dp ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:${dp.color};">${dp.label}</span>` : ''}
+              ${dp ? `<span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:${dp.color};">${dp.label}</span>` : ''}
               <span style="display:flex;gap:2px;margin-left:auto;">${daySäulenDots}</span>
             </div>
           </div>
@@ -5136,7 +5136,7 @@ function _renderWeekPlanInner() {
               return `<div class="day-block ${TYPE_CLASS[b.type] || 'meta'}${done ? ' block-done' : ''}" onclick="openBlockDetail('${day}',${bi})" title="Klicke fürDetails">
               <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div style="display:flex;align-items:center;gap:6px;">
-                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.7;">${b.time}</span>
+                  <span style="font-family:'Space Mono',monospace;font-size:11px;opacity:.7;">${b.time}</span>
                   <span class="block-saeulen-dots" style="display:flex;gap:2px;">${blockDots}</span>
                 </div>
                 ${isToday || done ? `<button class="block-check-btn${done ? ' checked' : ''}" onclick="event.stopPropagation();toggleBlockDone('${day}',${bi},'${b.type}','${b.title.replace(/'/g,'\\&#39;')}')" title="${done ? 'Erledigt' : 'Als erledigt markieren'}">${done ? '✓' : '○'}</button>` : ''}
@@ -5151,7 +5151,7 @@ function _renderWeekPlanInner() {
     </div>
     <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;">
       <button class="submit-btn" style="padding:8px 16px;font-size:12px;" onclick="regenerateWeekPlan()">NEU GENERIEREN</button>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);">Erstellt den Plan basierend auf Trainingszeiten + Kampfdatum</span>
+      <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);">Erstellt den Plan basierend auf Trainingszeiten + Kampfdatum</span>
     </div>
     <div class="info-box info-tip"><span>💡</span><div>Klicke auf einen <strong>Block</strong> um die vollständige Trainingsanleitung zu sehen. Der Plan wird automatisch neu generiert wenn du ein Kampfdatum einträgst oder änderst.</div></div>`;
 }
@@ -6296,7 +6296,7 @@ function buildDailyRoutineHTML() {
 
   // Header with today's type
   const headerHTML = `<div style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
-    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">${dayLabel}</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">${dayLabel}</span>
     <span style="background:${isBoxingDay || isSparringDay ? 'var(--red)' : isFreeDay ? 'var(--green)' : 'var(--gold)'};color:#000;font-size:12px;font-weight:700;padding:3px 10px;border-radius:var(--radius-sm);text-transform:uppercase;">${typeLabel}${today.time ? ' \u00b7 ' + today.time : ''}</span>
   </div>`;
 
@@ -6318,7 +6318,7 @@ function buildDailyRoutineHTML() {
       <div class="routine-label">${isNow ? '<strong>' : ''}<span style="color:${r.color};margin-right:6px;">\u25cf</span> ${r.label}${isNow ? ' \u2190 JETZT</strong>' : ''}</div>
     </div>`;
   }).join('') + tomorrowNote +
-  `<div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-subtle);">Basierend auf deinem Tagesplan (${today.workStart}\u2013${today.workEnd})${today.time ? ' \u00b7 Training: ' + today.time : ''}</div>`;
+  `<div style="margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text-subtle);">Basierend auf deinem Tagesplan (${today.workStart}\u2013${today.workEnd})${today.time ? ' \u00b7 Training: ' + today.time : ''}</div>`;
 }
 
 // ===== SEARCH =====
@@ -6447,7 +6447,7 @@ function renderReminders() {
   }
 
   el.innerHTML = `
-    <div style="font-family:'Oswald',sans-serif;font-size:20px;color:var(--white);margin-bottom:12px;">ERINNERUNGEN</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:12px;">ERINNERUNGEN</div>
     ${reminders.slice(0, 5).map(r => `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,.02);border-left:3px solid ${r.color};border-radius:0 4px 4px 0;">
       <span style="font-size:12px;color:${r.color};line-height:1.4;">${r.text}</span>
     </div>`).join('')}`;
@@ -7048,22 +7048,22 @@ function renderAccountPage() {
     <!-- HERO -->
     <div style="display:flex;align-items:center;gap:24px;padding:32px 0;border-bottom:1px solid var(--surface-2);margin-bottom:28px;flex-wrap:wrap;">
       <div style="width:80px;height:80px;border-radius:50%;background:var(--surface-1);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <span style="font-family:'Oswald',sans-serif;font-size:var(--fs-xl);color:var(--white);letter-spacing:2px;">${escapeHTML(initials)}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-xl);color:var(--white);letter-spacing:2px;">${escapeHTML(initials)}</span>
       </div>
       <div style="flex:1;min-width:200px;">
-        <div style="font-family:'Oswald',sans-serif;font-size:var(--fs-2xl);color:var(--white);letter-spacing:2px;line-height:1;">${escapeHTML(displayName).toUpperCase()}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-top:4px;">Mitglied seit ${memberSince}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-2xl);color:var(--white);letter-spacing:2px;line-height:1;">${escapeHTML(displayName).toUpperCase()}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-top:4px;">Mitglied seit ${memberSince}</div>
       </div>
       <div style="display:flex;gap:20px;">
-        <div style="text-align:center;"><div style="font-family:'Oswald',sans-serif;font-size:var(--fs-xl);color:var(--white);">${totalFights}</div><div style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">KÄMPFE</div></div>
-        <div style="text-align:center;"><div style="font-family:'Oswald',sans-serif;font-size:var(--fs-xl);color:var(--white);">${totalSessions}</div><div style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">SESSIONS</div></div>
-        <div style="text-align:center;"><div style="font-family:'Oswald',sans-serif;font-size:var(--fs-xl);color:var(--white);">${daysActive}</div><div style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">TAGE</div></div>
+        <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-xl);color:var(--white);">${totalFights}</div><div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">KÄMPFE</div></div>
+        <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-xl);color:var(--white);">${totalSessions}</div><div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">SESSIONS</div></div>
+        <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-xl);color:var(--white);">${daysActive}</div><div style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">TAGE</div></div>
       </div>
     </div>
 
     <!-- ACHIEVEMENTS -->
     <div style="margin-bottom:28px;">
-      <div style="font-family:'Oswald',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1.5px;margin-bottom:4px;">MEILENSTEINE <span style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">${doneCount}/${achievements.length}</span></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1.5px;margin-bottom:4px;">MEILENSTEINE <span style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-muted);">${doneCount}/${achievements.length}</span></div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
         ${achievements.map(function(a) {
           return '<div style="padding:10px 14px;border-radius:var(--radius-md);border:1px solid ' + (a.done ? 'rgba(0,200,83,.3)' : 'var(--surface-2)') + ';background:' + (a.done ? 'rgba(0,200,83,.06)' : 'var(--surface-1)') + ';min-width:120px;flex:1;">' +
@@ -7075,7 +7075,7 @@ function renderAccountPage() {
     </div>
 
     <!-- EINSTELLUNGEN -->
-    <div style="font-family:'Oswald',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1.5px;margin-bottom:16px;">EINSTELLUNGEN</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--fs-lg);color:var(--white);letter-spacing:1.5px;margin-bottom:16px;">EINSTELLUNGEN</div>
     <div class="account-wrap">
       <div class="account-section">
         <div class="account-section-title">PERSÖNLICHE DATEN</div>
@@ -7141,7 +7141,7 @@ function renderAccountPage() {
           </div>
         </div>
         <div id="acc-10w-info" style="display:${u.trainingProgram==='10w'?'block':'none'};margin-top:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border-left:3px solid var(--green);">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green);letter-spacing:1px;margin-bottom:6px;">10-WOCHEN-PROGRAMM</div>
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--green);letter-spacing:1px;margin-bottom:6px;">10-WOCHEN-PROGRAMM</div>
           <div style="font-size:12px;color:#888;line-height:1.5;">Strukturiertes Kraft-, Conditioning- und Movement-Programm in 4 Phasen: Grundlagen (Wo. 1-3) → Kraft-Schnelligkeit (Wo. 4-7) → Spitzenleistung (Wo. 8-9) → Taper (Wo. 10). Der Wochenplan wird automatisch an die aktuelle Phase angepasst.</div>
         </div>
       </div>
@@ -7179,15 +7179,15 @@ function renderAccountPage() {
         <div class="account-section-title">CLOUD SYNC</div>
         <div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;line-height:1.6;">Daten manuell mit der Cloud synchronisieren. Nützlich wenn du Daten von einem anderen Gerät übertragen willst.</div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-          <button onclick="forceSyncNow()" style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;">JETZT SYNCHRONISIEREN</button>
-          <div id="sync-status" style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">${(function(){var ls=localStorage.getItem('fos_last_sync');if(!ls)return'Noch nie synchronisiert';var d=new Date(ls);var now=new Date();var diff=Math.round((now-d)/60000);if(diff<1)return'Zuletzt: gerade eben';if(diff<60)return'Zuletzt: vor '+diff+' Min.';if(diff<1440)return'Zuletzt: vor '+Math.round(diff/60)+' Std.';return'Zuletzt: '+d.toLocaleDateString('de-DE')+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})})()}</div>
+          <button onclick="forceSyncNow()" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--blue);background:none;border:1px solid rgba(41,121,255,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;">JETZT SYNCHRONISIEREN</button>
+          <div id="sync-status" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">${(function(){var ls=localStorage.getItem('fos_last_sync');if(!ls)return'Noch nie synchronisiert';var d=new Date(ls);var now=new Date();var diff=Math.round((now-d)/60000);if(diff<1)return'Zuletzt: gerade eben';if(diff<60)return'Zuletzt: vor '+diff+' Min.';if(diff<1440)return'Zuletzt: vor '+Math.round(diff/60)+' Std.';return'Zuletzt: '+d.toLocaleDateString('de-DE')+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})})()}</div>
         </div>
       </div>
 
       <div class="account-section" style="margin-top:32px;padding-top:24px;border-top:2px solid rgba(232,0,13,.2);">
         <div class="account-section-title" style="color:var(--red);">DANGER ZONE</div>
         <div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;line-height:1.6;">Alle Trainingsdaten, Kämpfe, Benchmarks und Einstellungen werden unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.</div>
-        <button onclick="deleteAllData()" style="font-family:'JetBrains Mono',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;">ALLE DATEN LÖSCHEN</button>
+        <button onclick="deleteAllData()" style="font-family:'Space Mono',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:12px 24px;border-radius:var(--radius-md);cursor:pointer;min-height:44px;">ALLE DATEN LÖSCHEN</button>
       </div>
     </div>`;
 }
@@ -7318,7 +7318,7 @@ function renderTestsPage() {
         <div class="tests-overall-score">${overall !== null ? overall + '%' : '–'}</div>
         <div>
           <div class="tests-overall-label">${overallLevel ? overallLevel.label.toUpperCase() : 'KEINE DATEN'}</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:2px;">Gesamt · ${filled.length}/${RADAR_AXES.length} Achsen</div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:2px;">Gesamt · ${filled.length}/${RADAR_AXES.length} Achsen</div>
         </div>
       </div>
       ${RADAR_AXES.map(a => {
@@ -7335,7 +7335,7 @@ function renderTestsPage() {
           </div>
         </div>`;
       }).join('')}
-      ${vo2max ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:6px;padding-top:8px;border-top:1px solid var(--surface-2);">VO₂max (geschätzt): <strong style="color:var(--blue);">${vo2max} ml/kg/min</strong></div>` : ''}
+      ${vo2max ? `<div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:6px;padding-top:8px;border-top:1px solid var(--surface-2);">VO₂max (geschätzt): <strong style="color:var(--blue);">${vo2max} ml/kg/min</strong></div>` : ''}
       ${weakest ? `<div class="tests-weakest">Schwächstes Glied: <strong>${weakest.label} (${weakest.val}%)</strong> – das Fass-Prinzip: Dein Gesamtniveau wird von der schwächsten Säule begrenzt.</div>` : ''}
     </div>
   </div>`;
@@ -7554,25 +7554,25 @@ function renderTestsPage() {
   // Batch input form
   const batchHTML = `<div style="background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);padding:20px;margin-bottom:24px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;cursor:pointer;" onclick="var c=document.getElementById('batch-test-form');c.style.display=c.style.display==='none'?'block':'none';">
-      <div style="font-family:'Oswald',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">ALLE TESTS AUF EINMAL EINTRAGEN</div>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--red);letter-spacing:1px;">AUFKLAPPEN ▾</span>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">ALLE TESTS AUF EINMAL EINTRAGEN</div>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--red);letter-spacing:1px;">AUFKLAPPEN ▾</span>
     </div>
     <div id="batch-test-form" style="display:none;">
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
         ${BENCHMARKS.map(b => {
           const curVal = data.benchmarks[b.id] || '';
           return `<div style="display:flex;flex-direction:column;gap:4px;">
-            <label style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px;">${b.name.toUpperCase()}</label>
+            <label style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px;">${b.name.toUpperCase()}</label>
             <div style="display:flex;align-items:center;gap:6px;">
               <input type="number" id="batch-${b.id}" class="form-input" style="flex:1;padding:8px 10px;font-size:13px;" placeholder="${curVal || b.target}" value="${curVal}" step="any">
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);">${b.unit}</span>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted);">${b.unit}</span>
             </div>
           </div>`;
         }).join('')}
       </div>
       <div style="margin-top:16px;display:flex;gap:12px;align-items:center;">
         <button class="submit-btn" style="padding:10px 24px;font-size:13px;" onclick="saveBatchBenchmarks()">ALLE SPEICHERN</button>
-        <span id="batch-confirm" style="display:none;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green);"></span>
+        <span id="batch-confirm" style="display:none;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);"></span>
       </div>
     </div>
   </div>`;
@@ -7589,9 +7589,9 @@ function renderTestsPage() {
       ${benchHTML}
     </div>
     <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);align-self:center;">SIEHE AUCH:</span>
-      <button onclick="showPage('periodisierung')" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Periodisierung</button>
-      <button onclick="showPage('rechner')" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
+      <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);align-self:center;">SIEHE AUCH:</span>
+      <button onclick="showPage('periodisierung')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Periodisierung</button>
+      <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
     </div>`;
 
   setTimeout(() => {
@@ -7707,7 +7707,7 @@ function renderDailyCombined() {
   // --- Checklist items ---
   const checkHTML = `
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--surface-2);">
-      <div style="font-family:'Oswald',sans-serif;font-size:16px;color:var(--white);margin-bottom:10px;">TAGES-CHECKLIST</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);margin-bottom:10px;">TAGES-CHECKLIST</div>
       <div style="margin-bottom:10px;height:4px;background:var(--surface-2);border-radius:var(--radius-sm);overflow:hidden;">
         <div style="height:100%;width:${pct}%;background:${pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : 'var(--red)'};transition:width .3s;"></div>
       </div>
@@ -7769,7 +7769,7 @@ function renderChecklist() {
         <span style="font-size:13px;color:${checked ? '#555' : 'var(--light)'};">${item.label}</span>
       </div>`;
     }).join('')}
-    <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-subtle);">Checklist resettet sich jeden Tag automatisch</div>`;
+    <div style="margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text-subtle);">Checklist resettet sich jeden Tag automatisch</div>`;
 }
 
 // ===== COLLAPSIBLE SECTIONS =====
