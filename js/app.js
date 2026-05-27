@@ -6756,56 +6756,51 @@ function renderDashboard() {
     }
   }
 
-  // ═══ SIMPLIFIED DASHBOARD — 5 ZONES ═══
+  // ═══ FIGHT COMMAND DASHBOARD ═══
 
   el.innerHTML =
 
-    // ══ HERO WITH IMAGE ══
-    '<div class="db-hero">' +
-      '<div class="db-hero-img" style="background-image:url(\'img/hero/gym-dark.jpg\');"></div>' +
-      '<div class="db-hero-fade"></div>' +
-      '<div class="db-hero-inner">' +
-        '<div class="db-hero-name">' + escapeHTML(getDisplayName()) + '</div>' +
-        (totalFights > 0 ?
-          '<div style="display:flex;align-items:baseline;gap:12px;margin-top:8px;flex-wrap:wrap;">' +
-            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(24px,4vw,36px);color:var(--white);">' + wins + 'S<span style="color:var(--text-subtle);"> – </span>' + losses + 'N<span style="color:var(--text-subtle);"> – </span>' + draws + 'U</div>' +
-            (koRate > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);">' + koRate + '% KO</div>' : '') +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:rgba(255,255,255,.3);">' + weightClass + '</div>' +
-          '</div>'
-        :
-          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:rgba(255,255,255,.3);margin-top:8px;">' + weightClass + '</div>'
-        ) +
-      '</div>' +
+    // ══ HERO: Animated Gradient + Grid ══
+    '<div class="fc-hero">' +
+      '<div class="fc-hero-name">' + escapeHTML(getDisplayName()) + '</div>' +
+      (totalFights > 0 ?
+        '<div class="fc-hero-record">' +
+          '<span class="fc-record-badge wins">' + wins + ' SIEGE</span>' +
+          (losses > 0 ? '<span class="fc-record-badge losses">' + losses + ' NIEDERLAGEN</span>' : '') +
+          (draws > 0 ? '<span class="fc-record-badge draws">' + draws + ' UNENTSCHIEDEN</span>' : '') +
+          (koRate > 0 ? '<span class="fc-record-badge" style="color:var(--red);border-color:rgba(232,0,13,.25);">' + koRate + '% KO</span>' : '') +
+        '</div>'
+      :
+        '<div class="fc-hero-sub">' + weightClass + '</div>'
+      ) +
     '</div>' +
 
-    // ══ STATS BAR ══
-    '<div class="db-stats-row">' +
-      '<div class="db-stat-cell"><div class="db-stat-num" style="color:var(--gold);">' + (overall !== null ? overall : '?') + '</div><div class="db-stat-lbl">' + (overall !== null ? 'SCORE' : 'TESTE DICH') + '</div></div>' +
-      '<div class="db-stat-cell"><div class="db-stat-num">' + totalFights + '</div><div class="db-stat-lbl">K\u00c4MPFE</div></div>' +
-      '<div class="db-stat-cell"><div class="db-stat-num">' + totalSessions + '</div><div class="db-stat-lbl">SESSIONS</div></div>' +
-      '<div class="db-stat-cell"><div class="db-stat-num">' + totalDone + '/' + totalPlanned + '</div><div class="db-stat-lbl">WOCHE</div></div>' +
+    // ══ STATS BAR: Glasmorphism cells ══
+    '<div class="fc-stats-bar">' +
+      '<div class="fc-stat-cell"><div class="fc-stat-num" style="color:var(--gold);">' + (overall !== null ? overall : '?') + '</div><div class="fc-stat-lbl">' + (overall !== null ? 'SCORE' : 'TESTE DICH') + '</div></div>' +
+      '<div class="fc-stat-cell"><div class="fc-stat-num">' + totalFights + '</div><div class="fc-stat-lbl">K\u00c4MPFE</div></div>' +
+      '<div class="fc-stat-cell"><div class="fc-stat-num">' + totalSessions + '</div><div class="fc-stat-lbl">SESSIONS</div></div>' +
+      '<div class="fc-stat-cell"><div class="fc-stat-num">' + totalDone + '/' + totalPlanned + '</div><div class="fc-stat-lbl">WOCHE</div></div>' +
     '</div>' +
 
-    '<div class="db-content">' +
+    '<div class="fc-content">' +
 
     // ══ NEW USER WELCOME BANNER ══
     (isNewUser ?
-      '<div style="padding:24px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid var(--red);margin-bottom:20px;">' +
+      '<div class="fc-welcome">' +
         '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div>' +
-        '<div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:16px;">Dein Trainingsplan wurde basierend auf deinem Level und Zeitplan generiert. So startest du:</div>' +
-        '<div style="display:flex;flex-direction:column;gap:12px;">' +
-          '<div onclick="showPage(\'wochenplan\')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border-radius:var(--radius);cursor:pointer;">' +
-            '<div style="width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:14px;flex-shrink:0;">1</div>' +
-            '<div><div style="font-size:14px;color:var(--white);font-weight:500;">Wochenplan ansehen</div><div style="font-size:12px;color:var(--text-muted);">Dein personalisierter Trainingsplan für diese Woche</div></div>' +
-          '</div>' +
-          '<div onclick="showPage(\'training\')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border-radius:var(--radius);cursor:pointer;">' +
-            '<div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:14px;flex-shrink:0;">2</div>' +
-            '<div><div style="font-size:14px;color:var(--white);font-weight:500;">Übungen entdecken</div><div style="font-size:12px;color:var(--text-muted);">Alle Übungen mit Erklärungen und Boxing-Relevanz</div></div>' +
-          '</div>' +
-          '<div onclick="showPage(\'profil\')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border-radius:var(--radius);cursor:pointer;">' +
-            '<div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:14px;flex-shrink:0;">3</div>' +
-            '<div><div style="font-size:14px;color:var(--white);font-weight:500;">8 Säulen verstehen</div><div style="font-size:12px;color:var(--text-muted);">Die Wissenschaft hinter deinem Training</div></div>' +
-          '</div>' +
+        '<div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:16px;">Dein Trainingsplan wurde generiert. So startest du:</div>' +
+        '<div class="fc-welcome-step" onclick="showPage(\'wochenplan\')">' +
+          '<div class="fc-welcome-num" style="background:var(--red);">1</div>' +
+          '<div><div style="font-size:14px;color:var(--white);font-weight:500;">Wochenplan ansehen</div><div style="font-size:12px;color:var(--text-muted);">Dein personalisierter Plan f\u00fcr diese Woche</div></div>' +
+        '</div>' +
+        '<div class="fc-welcome-step" onclick="showPage(\'training\')">' +
+          '<div class="fc-welcome-num" style="background:var(--blue);">2</div>' +
+          '<div><div style="font-size:14px;color:var(--white);font-weight:500;">\u00dcbungen entdecken</div><div style="font-size:12px;color:var(--text-muted);">Alle \u00dcbungen mit Erkl\u00e4rungen und Boxing-Relevanz</div></div>' +
+        '</div>' +
+        '<div class="fc-welcome-step" onclick="showPage(\'profil\')">' +
+          '<div class="fc-welcome-num" style="background:var(--green);">3</div>' +
+          '<div><div style="font-size:14px;color:var(--white);font-weight:500;">8 S\u00e4ulen verstehen</div><div style="font-size:12px;color:var(--text-muted);">Die Wissenschaft hinter deinem Training</div></div>' +
         '</div>' +
       '</div>'
     : '') +
@@ -6831,24 +6826,28 @@ function renderDashboard() {
           fightLine = '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);margin-top:8px;">\ud83e\udd4a ' + fDiff + ' Tage bis Kampf · ' + formatDate(data.fightDate) + '</div>';
         }
       }
-      return '<div style="padding:24px 0;border-bottom:1px solid var(--surface-2);">' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:2px;margin-bottom:10px;">N\u00c4CHSTE SESSION</div>' +
-        '<div style="position:relative;padding:16px 16px 16px 20px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid var(--red);">' +
-          '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">' +
-            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--white);">' + (nextBlock.time || '') + '</div>' +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">' + nextBlockDay + '</div>' +
-          '</div>' +
-          '<div onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(18px,3.5vw,24px);color:var(--white);margin-top:4px;cursor:pointer;letter-spacing:1px;">' + escapeHTML(nextBlock.title) + '</div>' +
-          (nextBlock.duration > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-top:4px;">' + nextBlock.duration + ' Min.' + (nextBlock.rpe > 0 ? ' \u00b7 RPE ' + nextBlock.rpe : '') + '</div>' : '') +
-          hrvWarn + fightLine +
-          '<div style="display:flex;gap:8px;margin-top:14px;">' +
-            '<button onclick="event.stopPropagation();toggleBlockDone(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ',\'' + nextBlock.type + '\',\'' + (nextBlock.title||'').replace(/'/g,'') + '\')" class="submit-btn" style="padding:10px 20px;font-size:15px;">ERLEDIGT \u2713</button>' +
-            '<button onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" class="btn-ghost back-link" style="padding:10px 16px;font-size:12px;">DETAILS</button>' +
+      var blockColor = nextBlock.type === 'strength' ? 'rgba(59,130,246,.6)' : nextBlock.type === 'cardio' ? 'rgba(34,197,94,.6)' : nextBlock.type === 'boxing' ? 'rgba(232,0,13,.6)' : nextBlock.type === 'recovery' ? 'rgba(255,109,0,.5)' : 'rgba(232,0,13,.6)';
+      return '<div style="padding:24px 0;">' +
+        '<div class="fc-section-label">N\u00c4CHSTE SESSION</div>' +
+        '<div class="fc-next-session" style="--block-color:' + blockColor + ';">' +
+          '<div class="fc-next-glow"></div>' +
+          '<div style="padding-left:16px;">' +
+            '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">' +
+              '<div class="fc-next-time">' + (nextBlock.time || '') + '</div>' +
+              '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">' + nextBlockDay + '</div>' +
+            '</div>' +
+            '<div class="fc-next-title" onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')">' + escapeHTML(nextBlock.title) + '</div>' +
+            (nextBlock.duration > 0 ? '<div class="fc-next-meta">' + nextBlock.duration + ' Min.' + (nextBlock.rpe > 0 ? ' \u00b7 RPE ' + nextBlock.rpe : '') + '</div>' : '') +
+            hrvWarn + fightLine +
+            '<div style="display:flex;gap:8px;margin-top:14px;">' +
+              '<button onclick="event.stopPropagation();toggleBlockDone(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ',\'' + nextBlock.type + '\',\'' + (nextBlock.title||'').replace(/'/g,'') + '\')" class="fc-btn-done">ERLEDIGT \u2713</button>' +
+              '<button onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" class="fc-btn-ghost">DETAILS</button>' +
+            '</div>' +
           '</div>' +
         '</div>' +
       '</div>';
     })()
-    : '<div style="padding:20px 0;text-align:center;border-bottom:1px solid var(--surface-2);"><div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--green);">\u2713 Alle Bl\u00f6cke diese Woche erledigt</div></div>') +
+    : '<div style="padding:20px 0;text-align:center;"><div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--green);">\u2713 Alle Bl\u00f6cke diese Woche erledigt</div></div>') +
 
     // ══ ZONE 3: HEUTE + WEEK STRIP ══
     (function() {
@@ -6860,9 +6859,9 @@ function renderDashboard() {
           var lk = DAY_NAMES[todayDow] + '_' + bi + '_' + wkId;
           var done = data.completedBlocks && data.completedBlocks[lk];
           if (done) todayDone++;
-          return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-1);">' +
-            '<button onclick="toggleBlockDone(\'' + DAY_NAMES[todayDow] + '\',' + bi + ',\'' + b.type + '\',\'' + (b.title||'').replace(/'/g,'') + '\')" style="width:32px;height:32px;border-radius:50%;border:2px solid ' + (done ? 'var(--green)' : 'var(--surface-3)') + ';background:' + (done ? 'var(--green)' : 'none') + ';color:' + (done ? '#000' : 'var(--surface-4)') + ';font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;min-height:32px;">' + (done ? '\u2713' : '') + '</button>' +
-            '<div onclick="openBlockDetail(\'' + DAY_NAMES[todayDow] + '\',' + bi + ')" style="flex:1;cursor:pointer;min-width:0;">' +
+          return '<div class="fc-today-item" onclick="openBlockDetail(\'' + DAY_NAMES[todayDow] + '\',' + bi + ')">' +
+            '<button onclick="event.stopPropagation();toggleBlockDone(\'' + DAY_NAMES[todayDow] + '\',' + bi + ',\'' + b.type + '\',\'' + (b.title||'').replace(/'/g,'') + '\')" class="fc-check' + (done ? ' done' : '') + '">' + (done ? '\u2713' : '') + '</button>' +
+            '<div style="flex:1;min-width:0;">' +
               '<div style="font-size:13px;color:' + (done ? 'var(--text-muted)' : 'var(--white)') + ';' + (done ? 'text-decoration:line-through;' : '') + '">' + escapeHTML(b.title) + '</div>' +
               '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);">' + (b.time||'') + (b.duration > 0 ? ' \u00b7 ' + b.duration + ' Min.' : '') + '</div>' +
             '</div>' +
@@ -6871,15 +6870,16 @@ function renderDashboard() {
       }
       // Progress bar
       var pctToday = todayBlocks.length > 0 ? Math.round(todayDone / todayBlocks.length * 100) : 0;
-      return '<div style="padding:20px 0;border-bottom:1px solid var(--surface-2);">' +
+      var barClass = pctToday >= 100 ? 'complete' : 'in-progress';
+      return '<div style="padding:20px 0;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:2px;">HEUTE</div>' +
+          '<div class="fc-section-label" style="margin-bottom:0;">HEUTE</div>' +
           '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:' + (todayDone === todayBlocks.length && todayBlocks.length > 0 ? 'var(--green)' : 'var(--text-muted)') + ';">' + todayDone + '/' + todayBlocks.length + '</div>' +
         '</div>' +
-        (todayBlocks.length > 0 ? '<div style="height:4px;background:var(--surface-2);border-radius:2px;margin-bottom:12px;overflow:hidden;"><div style="height:100%;width:' + pctToday + '%;background:' + (pctToday >= 100 ? 'var(--green)' : 'var(--gold)') + ';border-radius:2px;transition:width .4s ease;"></div></div>' : '') +
+        (todayBlocks.length > 0 ? '<div class="fc-today-bar"><div class="fc-today-fill ' + barClass + '" style="width:' + pctToday + '%;"></div></div>' : '') +
         todayHTML +
         // Week strip
-        '<div class="db-week-strip" style="margin-top:16px;">' +
+        '<div class="fc-week-strip" style="margin-top:16px;">' +
           DAY_SHORT.map(function(d, i) {
             var dc = dayCompletion[i];
             var pct2 = dc.total > 0 ? dc.done / dc.total : 0;
@@ -6887,28 +6887,30 @@ function renderDashboard() {
             var off = c * (1 - pct2);
             var col = pct2 >= 1 ? 'var(--green)' : pct2 > 0 ? 'var(--gold)' : 'var(--surface-3)';
             var isToday = i === todayDow;
-            return '<div class="db-week-day' + (isToday ? ' today' : '') + '">' +
+            return '<div class="fc-week-day' + (isToday ? ' today' : '') + '">' +
               '<svg width="32" height="32" viewBox="0 0 32 32">' +
                 '<circle cx="16" cy="16" r="14" stroke="var(--surface-2)" stroke-width="2.5" fill="none"/>' +
                 '<circle id="week-ring-' + i + '" data-target="' + off + '" cx="16" cy="16" r="14" stroke="' + col + '" stroke-width="2.5" fill="none" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + c.toFixed(1) + '" stroke-linecap="round" transform="rotate(-90 16 16)" style="transition:stroke-dashoffset .6s ease;"/>' +
               '</svg>' +
-              '<div class="db-week-day-lbl">' + d + '</div>' +
+              '<div class="fc-week-lbl">' + d + '</div>' +
             '</div>';
           }).join('') +
         '</div>' +
       '</div>';
     })() +
 
-    // ══ ZONE 4: PERFORMANCE SNAPSHOT ══
+    // ══ PERFORMANCE: Glasmorphism Card ══
     (hasScores ?
-      '<div style="padding:20px 0;border-bottom:1px solid var(--surface-2);">' +
+      '<div style="padding:20px 0;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
-          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:2px;">PERFORMANCE</div>' +
+          '<div class="fc-section-label" style="margin-bottom:0;">PERFORMANCE</div>' +
           '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'training\')">Alle Tests \u2192</div>' +
         '</div>' +
+        '<div class="fc-performance" onclick="showPage(\'training\')">' +
         '<div id="rpg-radar" style="height:280px;"></div>' +
+        '</div>' +
         (hasHRV ?
-          '<div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 14px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid ' + hrvColor + ';">' +
+          '<div class="fc-hrv-pill" style="border-color:' + hrvColor + '30;">' +
             '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:' + hrvColor + ';">HRV ' + hrvLabel + '</div>' +
             '<div style="flex:1;"></div>' +
             '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);">0<span style="font-size:var(--fs-xs);color:var(--text-subtle);"> ms</span></div>' +
@@ -6917,11 +6919,11 @@ function renderDashboard() {
       '</div>'
     : '') +
 
-    // ══ ZONE 5: QUICK LINKS ══
-    '<div style="padding:20px 0;display:flex;gap:8px;flex-wrap:wrap;">' +
-      '<button onclick="showPage(\'training\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);background:var(--surface-1);border:1px solid var(--surface-2);padding:10px 16px;border-radius:var(--radius-full);cursor:pointer;min-height:36px;transition:border-color var(--duration) var(--ease);">+ Training loggen</button>' +
-      '<button onclick="showPage(\'fights\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);background:var(--surface-1);border:1px solid var(--surface-2);padding:10px 16px;border-radius:var(--radius-full);cursor:pointer;min-height:36px;transition:border-color var(--duration) var(--ease);">Kampf planen</button>' +
-      '<button onclick="showPage(\'training\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);background:var(--surface-1);border:1px solid var(--surface-2);padding:10px 16px;border-radius:var(--radius-full);cursor:pointer;min-height:36px;transition:border-color var(--duration) var(--ease);">Test machen</button>' +
+    // ══ QUICK LINKS: Ghost buttons with glow ══
+    '<div class="fc-quick-links">' +
+      '<button class="fc-quick-btn" onclick="showPage(\'training\')">+ Training loggen</button>' +
+      '<button class="fc-quick-btn" onclick="showPage(\'fights\')">Kampf planen</button>' +
+      '<button class="fc-quick-btn" onclick="showPage(\'training\')">Test machen</button>' +
     '</div>' +
 
     // Hidden containers for sub-renderers
@@ -6933,7 +6935,7 @@ function renderDashboard() {
     '<div id="recent-log" style="display:none;"></div>' +
     '<div id="bench-summary" style="display:none;"></div>' +
 
-    '</div>'; // close db-content
+    '</div>'; // close fc-content
 
   // Render sub-components (keep them functional even if hidden)
   renderFightCountdown();
