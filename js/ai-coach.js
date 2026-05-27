@@ -369,8 +369,9 @@ async function sendToCoach(userMessage) {
     parts: [{ text: 'Ich bin dein BoxSpec Coach. Ich kenne deine Daten und das komplette Trainingssystem. Was brauchst du?' }]
   });
 
-  // Add chat history
-  _aiChatHistory.forEach(function(msg) {
+  // Add chat history (last 10 messages to avoid token overflow)
+  var recentHistory = _aiChatHistory.slice(-10);
+  recentHistory.forEach(function(msg) {
     contents.push({
       role: msg.role === 'user' ? 'user' : 'model',
       parts: [{ text: msg.text }]
@@ -392,7 +393,7 @@ async function sendToCoach(userMessage) {
         contents: contents,
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 2048,
           topP: 0.9
         }
       })
