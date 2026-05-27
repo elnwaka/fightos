@@ -355,10 +355,20 @@ async function doLogin() {
     users[user].firebaseUid = _fbUser.uid;
     if (!users[user].created) users[user].created = new Date().toISOString();
     localStorage.setItem('fos_users', JSON.stringify(users));
-    // Enter app immediately — sync in background
+    // Sync from cloud FIRST, then enter app (prevents onboarding on new browser)
     if (typeof _appEntered !== 'undefined') _appEntered = true;
-    enterApp();
-    syncFromCloud(function() {});
+    var _loginEntered = false;
+    syncFromCloud(function() {
+      if (_loginEntered) return;
+      _loginEntered = true;
+      enterApp();
+    });
+    // Fallback: if cloud sync takes too long, enter anyway after 3s
+    setTimeout(function() {
+      if (_loginEntered) return;
+      _loginEntered = true;
+      enterApp();
+    }, 3000);
   } catch(e) {
     msg.className = 'auth-msg error';
     if (e.code === 'auth/user-not-found') {
