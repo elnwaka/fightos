@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "FightOS — Elite Boxer Platform",
-  "short_name": "FightOS",
-  "description": "8-Saeulen Leveling-System fuer Boxer",
+  "name": "BoxSpec — Built for Fighters",
+  "short_name": "BoxSpec",
+  "description": "Das komplette Trainingssystem fuer Boxer",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

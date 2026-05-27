@@ -1,5 +1,5 @@
 /* ============================================
-   FIGHTOS – 10-Wochen Boxing Science Programm
+   BOXSPEC – 10-Wochen Boxing Science Programm
    Basiert auf dem "Train Like A Champion" System
    ============================================ */
 

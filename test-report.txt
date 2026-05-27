@@ -1,0 +1,95 @@
+[OK] [AUTH] Auth screen is visible
+[OK] [AUTH] Logo text: FIGHTOS
+[INFO] [AUTH] Subtitle: Elite Boxer Platform
+[INFO] [AUTH] Login form labels: Benutzername, Passwort
+[INFO] [AUTH] Username placeholder: Dein Name
+[OK] [AUTH] Empty submit message: Alle Felder ausfüllen!
+[OK] [AUTH] Switched to Register tab
+[OK] [AUTH] Left auth screen after registration
+[OK] [ONBOARDING] Onboarding wizard is showing
+[INFO] [ONBOARDING] Step 1: SCHRITT 1 / 7
+[OK] [ONBOARDING] Filled nickname: TestChamp
+[OK] [ONBOARDING] Selected birth year: 2000
+[INFO] [ONBOARDING] Step 1 title: WER BIST DU?
+[INFO] [ONBOARDING] Step 2 title: DEIN KÖRPER
+[INFO] [ONBOARDING] Step 3 title: DEIN LEVEL
+[INFO] [ONBOARDING] Selected first option card
+[INFO] [ONBOARDING] Step 4 title: DEIN ZEITPLAN
+[INFO] [ONBOARDING] Step 5 title: DEIN ZIEL
+[INFO] [ONBOARDING] Selected first option card
+[INFO] [ONBOARDING] Step 6 title: KAMPFDATUM
+[INFO] [ONBOARDING] Step 7 title: AKTUELLE FITNESS
+[INFO] [ONBOARDING] Selected first option card
+[OK] [INTRO] 8-Säulen intro is showing
+[OK] [INTRO] Closed 8-Säulen intro
+[OK] [DASHBOARD] Welcome banner: present
+[INFO] [DASHBOARD] Hero section: visible
+[INFO] [DASHBOARD] Stats visible: SCORE=true, SESSIONS=true
+[OK] [DASHBOARD] Next session: visible
+[OK] [DASHBOARD] Today section: visible
+[OK] [DASHBOARD] Week strip days: 7/7
+[INFO] [DASHBOARD] Quick links: visible
+[OK] [DASHBOARD] Shows 0/0: false
+[OK] [PLAN] Plan title: visible
+[OK] [PLAN] Auto-generated hint: visible
+[OK] [PLAN] Day columns: 7/7
+[OK] [PLAN] Training blocks: 13
+[INFO] [PLAN] Block types: {"cardio":3,"boxing":4,"strength":2,"recovery":3,"off":1}
+[OK] [PLAN] Day labels: visible
+[OK] [PLAN] Block detail view: opens
+[OK] [TRAINING] Training page title
+[OK] [TRAINING] Sub-tabs: Übungen, Tests, Log, Ernährung, Periodisierung, Recovery
+[OK] [TRAINING] Übungen tab: 7136 chars of content
+[OK] [TRAINING] Tests tab: 5767 chars of content
+[OK] [TRAINING] Tests empty state hint: present
+[OK] [TRAINING] Log tab: 274 chars of content
+[OK] [TRAINING] Log form: present
+[OK] [TRAINING] Ernährung tab: 18767 chars of content
+[OK] [TRAINING] Nutrition content: present
+[OK] [TRAINING] Periodisierung tab: 5553 chars of content
+[OK] [TRAINING] Recovery tab: 1954 chars of content
+[OK] [KÄMPFE] Fights page title
+[OK] [KÄMPFE] Empty state: present with CTA
+[OK] [PROFIL] Profil page title
+[OK] [PROFIL] Profil sub-tabs: Übungen, Tests, Log, Ernährung, Periodisierung, Recovery, Account, 8 Säulen, Rechner, FAQ
+[OK] [PROFIL] Weight setting: visible
+[UX] [PROFIL] Schedule setting: missing
+[OK] [PROFIL] Fight date setting: visible
+[OK] [PROFIL] Program selector: visible
+[OK] [PROFIL] 8 Säulen - Kraft pillar: visible
+[OK] [PROFIL] 8 Säulen - Metabolisch pillar: visible
+[OK] [PROFIL] FAQ content: 7766 chars
+[OK] [MOBILE] Bottom bar: visible
+[OK] [MOBILE] Bottom tabs: 5/5
+[INFO] [MOBILE] Tab labels: Home, Plan, Training, Kämpfe, Profil
+[INFO] [MOBILE] Topbar height: 48px
+[BUG] [QUALITY] Console errors: 21
+[BUG] [QUALITY] Error 1: PAGE ERROR: Assignment to constant variable.
+[BUG] [QUALITY] Error 2: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 3: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 4: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 5: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 6: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 7: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 8: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 9: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 10: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 11: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 12: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 13: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 14: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 15: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 16: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 17: Failed to load resource: the server responded with a status of 404 ()
+[BUG] [QUALITY] Error 18: PAGE ERROR: Assignment to constant variable.
+[BUG] [QUALITY] Error 19: PAGE ERROR: Assignment to constant variable.
+[BUG] [QUALITY] Error 20: PAGE ERROR: Assignment to constant variable.
+[BUG] [QUALITY] Error 21: PAGE ERROR: Assignment to constant variable.
+[BUG] [QUALITY] Broken images: https://images.unsplash.com/photo-1510017803434-a899b8644e5d?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1515775538093-d2d95c5ae190?w=150&h=150&fit=crop, https://elnwaka.github.io/fightos/img/exercises/overcoming-iso.jpg, https://elnwaka.github.io/fightos/img/exercises/pallof-press.jpg, https://elnwaka.github.io/fightos/img/exercises/seilspringen.jpg, https://elnwaka.github.io/fightos/img/exercises/rice-bucket.jpg, https://elnwaka.github.io/fightos/img/exercises/knuckle-pushups.jpg, https://elnwaka.github.io/fightos/img/exercises/bottoms-up-kb.jpg, https://elnwaka.github.io/fightos/img/exercises/wrist-roller.jpg, https://elnwaka.github.io/fightos/img/exercises/pinch-holds.jpg, https://elnwaka.github.io/fightos/img/exercises/hip-cars.jpg, https://elnwaka.github.io/fightos/img/exercises/thoracic-rotation.jpg, https://elnwaka.github.io/fightos/img/exercises/shoulder-dislocates.jpg, https://elnwaka.github.io/fightos/img/exercises/ankle-mobility.jpg, https://elnwaka.github.io/fightos/img/exercises/heavy-bag-intervals.jpg, https://elnwaka.github.io/fightos/img/exercises/barbell-complex.jpg, https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Battling_Ropes/0.jpg, https://elnwaka.github.io/fightos/img/exercises/sled-push.jpg, https://elnwaka.github.io/fightos/img/exercises/bfr.jpg, https://elnwaka.github.io/fightos/img/exercises/imt.jpg, https://elnwaka.github.io/fightos/img/exercises/shadow-boxing.jpg, https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1517438476312-10d79c077509?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1510017803434-a899b8644e5d?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1515775538093-d2d95c5ae190?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1577401239170-897c525f8547?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1514432324607-a09d9b4aefda?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1523362628745-0c100150b504?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1512820790803-83ca734da794?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1476275466078-4007374efbbe?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=150&h=150&fit=crop, https://images.unsplash.com/photo-1549924231-f129b911e442?w=150&h=150&fit=crop
+[UX] [QUALITY] Possible text overflow in: TESTBOXER1779871645944
+0S – 0N – 0U
+75 kg
+—
+SCORE
+
+[OK] [QUALITY] Light mode toggle: light

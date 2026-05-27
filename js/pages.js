@@ -1,5 +1,5 @@
 /* ============================================
-   FIGHTOS – Page Content Renderer
+   BOXSPEC – Page Content Renderer
    All static page content (Säulen, Übungen, etc.)
    ============================================ */
 
@@ -269,20 +269,20 @@ Bei geraden Schlägen (Jab und Cross) treiben sich Boxer nach vorne zum Ziel. Be
 <strong style="font-size:15px;">HÖHER SPRINGEN = HÄRTER SCHLAGEN</strong><br>
 Aus Tests mit über <strong>500 Boxern</strong> haben wir starke Zusammenhänge zwischen Sprunghöhe und Schlagkraft identifiziert. Die ${tt('CMJ','Counter Movement Jump – Sprung aus dem Stand mit Ausholbewegung. Misst explosive Beinkraft.')}-Sprunghöhe korreliert mit <strong>r=0.50–0.69</strong> mit der Medizinball-Schlagwurf-Weite (Wilson et al. 2020). Jeder Zentimeter mehr Sprunghöhe erhöht die Spitzengeschwindigkeit des Landmine Punch um <strong>0.036 m/s</strong> (Omcirk et al. 2021).<br><br>
 
-Boxer haben typischerweise <strong>niedrigere Sprungwerte</strong> als Athleten anderer Sportarten und zeigen nur geringe Unterschiede zwischen CMJ und Squat Jump – das bedeutet eine <strong>ineffektive Nutzung des Dehnungs-Verkürzungs-Zyklus</strong>. Genau hier setzt das FightOS-Krafttraining an.<br><br>
+Boxer haben typischerweise <strong>niedrigere Sprungwerte</strong> als Athleten anderer Sportarten und zeigen nur geringe Unterschiede zwischen CMJ und Squat Jump – das bedeutet eine <strong>ineffektive Nutzung des Dehnungs-Verkürzungs-Zyklus</strong>. Genau hier setzt das BoxSpec-Krafttraining an.<br><br>
 
 <strong style="font-size:15px;">DER KERN DES SCHLAGS – RUMPFMUSKULATUR</strong><br>
 Unsere Forschung zeigt: ${tt('Relative Rumpfmasse','Das Verhältnis von Rumpfmuskulatur zum Gesamtgewicht – ein starker Prädiktor für Schlagkraft.')} ist ein starker Prädiktor für den Medizinball-Schlagwurf. Der Core ist das entscheidende Glied bei der Kraftübertragung vom Unterkörper zur Faust. Ineffektive Rumpfrotation erzeugt "Energielecks" die Schlagkraft und -geschwindigkeit reduzieren.<br><br>
 
-Core-Kraft spielt auch eine zentrale Rolle beim ${tt('Effective Mass','Die "Schärfe" eines Schlags. Erfordert simultane Ganzkörper-Spannung beim Aufprall – besonders Core, Arm und Schulter.')} – der "Snap" des Schlags. Je steifer der Rumpf beim Aufprall, desto mehr Kraft wird ins Ziel übertragen. Deshalb trainiert FightOS den Core in 4 Kategorien: Anti-Rotation (Pallof Press), Anti-Extension (Plank Holds, Deadbugs), Anti-Lateralflexion (Farmer Walks) und Hüftflexion mit neutraler Wirbelsäule (Supine ISO Holds, Leg Lowers).<br><br>
+Core-Kraft spielt auch eine zentrale Rolle beim ${tt('Effective Mass','Die "Schärfe" eines Schlags. Erfordert simultane Ganzkörper-Spannung beim Aufprall – besonders Core, Arm und Schulter.')} – der "Snap" des Schlags. Je steifer der Rumpf beim Aufprall, desto mehr Kraft wird ins Ziel übertragen. Deshalb trainiert BoxSpec den Core in 4 Kategorien: Anti-Rotation (Pallof Press), Anti-Extension (Plank Holds, Deadbugs), Anti-Lateralflexion (Farmer Walks) und Hüftflexion mit neutraler Wirbelsäule (Supine ISO Holds, Leg Lowers).<br><br>
 
 <strong style="font-size:15px;">DIE KRAFT-GESCHWINDIGKEITS-KURVE</strong><br>
 Die ${tt('Force-Velocity Curve','Inverse Beziehung: Je schwerer die Last (Kraft), desto langsamer die Bewegung (Geschwindigkeit). Boxer müssen alle Bereiche der Kurve trainieren.')} zeigt: Je schwerer du hebst, desto langsamer bewegst du dich – und umgekehrt. Die meisten Boxer sind gut bei leichten, schnellen Bewegungen, kämpfen aber mit schweren Lasten. Deshalb muss Krafttraining bei der <strong>Maximalkraft beginnen</strong> und sich über 2-3 Zyklen à 10 Wochen aufbauen – bevor explosive Methoden ihr volles Potenzial entfalten.<br><br>
 
-<strong>Aber zuerst die Grundlagen:</strong> Boxer haben typischerweise Mobilitätsprobleme die schweres Heben ineffektiv oder gefährlich machen. Deshalb beginnt das FightOS-Programm mit <strong>Grundlagen-Übungen</strong> (KB Sumo Deadlift, Goblet Squat, Press-Ups) bevor in späteren Phasen die schweren Übungen (Trap Bar Deadlift, DB Floor Press) kommen.<br><br>
+<strong>Aber zuerst die Grundlagen:</strong> Boxer haben typischerweise Mobilitätsprobleme die schweres Heben ineffektiv oder gefährlich machen. Deshalb beginnt das BoxSpec-Programm mit <strong>Grundlagen-Übungen</strong> (KB Sumo Deadlift, Goblet Squat, Press-Ups) bevor in späteren Phasen die schweren Übungen (Trap Bar Deadlift, DB Floor Press) kommen.<br><br>
 
 <strong style="font-size:15px;">SECHS BEWEGUNGSMUSTER</strong><br>
-Jede FightOS-Session basiert auf 6 fundamentalen Bewegungsmustern:<br>
+Jede BoxSpec-Session basiert auf 6 fundamentalen Bewegungsmustern:<br>
 • <strong>Squat</strong> – Quads, Hamstrings, Glutes laden für Unterkörper-Explosivität<br>
 • <strong>Deadlift/Hinge</strong> – Hüftextension für konzentrische Kraftentwicklung<br>
 • <strong>Single-Leg</strong> – Unilaterale Arbeit gegen Seitenimbalancen (Boxer stehen nie symmetrisch)<br>
@@ -291,7 +291,7 @@ Jede FightOS-Session basiert auf 6 fundamentalen Bewegungsmustern:<br>
 • <strong>Pull (vertikal + horizontal)</strong> – Lat-Entwicklung für schnelles Zurückziehen der Hände und Clinch-Kontrolle<br><br>
 
 <strong style="font-size:15px;">PLYOMETRIE – EXPLOSIVKRAFT ENTWICKELN</strong><br>
-FightOS nutzt zwei Arten von ${tt('Plyometrie','Sprung- und Schnelligkeitsübungen. Echter plyometrischer Effekt nur bei Bodenkontaktzeiten unter 0.25 Sekunden.')}:<br><br>
+BoxSpec nutzt zwei Arten von ${tt('Plyometrie','Sprung- und Schnelligkeitsübungen. Echter plyometrischer Effekt nur bei Bodenkontaktzeiten unter 0.25 Sekunden.')}:<br><br>
 
 <strong>Langer Dehnungs-Verkürzungs-Zyklus (RFD):</strong><br>
 Zielt auf vertikalen Impuls durch Sprungbewegungen. Entwicklung in 3 Phasen:<br>
@@ -311,7 +311,7 @@ Traditionelles Krafttraining entwickelt die RFD – aber Boxer müssen diese Kra
 • <strong>Landmine Punch mit Band:</strong> Akkommodierender Widerstand verbessert den "Snap" am Ende des Schlags<br>
 • <strong>Isometric Punch Hold:</strong> Erhöht Core-, Schulter- und Gluteus-Aktivierung beim Aufprall<br><br>
 
-<strong style="font-size:15px;">DAS FIGHTOS-PROGRAMM (2×/Woche, 10 Wochen)</strong><br>
+<strong style="font-size:15px;">DAS BOXSPEC PROGRAMM (2×/Woche, 10 Wochen)</strong><br>
 <strong>Wochen 1-3 — Grundlagen:</strong> KB Sumo Deadlift, Goblet Squat, Strict Press-Ups, DB Shoulder Press, Goblet Split Squat + Core Circuit (Pallof Press, Plank Hold, Leg Lowers, Supine ISO Hold)<br>
 <strong>Wochen 4-7 — Kraft-Schnelligkeit:</strong> Trap Bar Deadlift, Landmine Squat, DB Floor Press, Landmine Shoulder Press + Extended Plyometric Warm-Up (Altitude Landing to Jump, MB Ice Skaters, Landmine Punch mit Band, CMJ, Band Assisted Pogos)<br>
 <strong>Wochen 8-9 — Spitzenleistung:</strong> Banded KB Swing, Landmine Punch Throw, MB Box Jumps, DB CMJ, Max Effort Pogos<br>
@@ -335,7 +335,7 @@ Um die aerobe Kapazität zu verbessern: (1) Herzpumpleistung steigern, (2) Gefä
 <strong>Energiesystem-Verteilung:</strong> Boxer arbeiten bei <strong>85-90% ihrer maximalen aeroben Kapazität</strong>. <strong>77% der Energie</strong> kommt aus aeroben Wegen, 19% aus sofortigen Energiesystemen, 4% aus intermediären. Der aerobe Motor ist das Fundament.<br><br>
 
 <strong style="font-size:15px;">DIE ROTE ZONE</strong><br>
-Boxen zwingt Athleten in die ${tt('Rote Zone','Über 90% der maximalen Herzfrequenz. Hier wird die Atmung schwer, das Denken langsamer, die Beinarbeit träger. Aber genau hier passieren die Anpassungen.')} (>90% HFmax). Die meiste Zeit im Sparring und Wettkampf wird in dieser Zone verbracht. FightOS macht dich zum <strong>Red Zone Dominant</strong> – du sollst in der roten Zone mit Klarheit, schneller Beinarbeit und kraftvollen Schlägen arbeiten können.<br><br>
+Boxen zwingt Athleten in die ${tt('Rote Zone','Über 90% der maximalen Herzfrequenz. Hier wird die Atmung schwer, das Denken langsamer, die Beinarbeit träger. Aber genau hier passieren die Anpassungen.')} (>90% HFmax). Die meiste Zeit im Sparring und Wettkampf wird in dieser Zone verbracht. BoxSpec macht dich zum <strong>Red Zone Dominant</strong> – du sollst in der roten Zone mit Klarheit, schneller Beinarbeit und kraftvollen Schlägen arbeiten können.<br><br>
 
 <strong>Vermeide das Niemandsland:</strong> Laufen bei RPE 4-7 (mittlere Intensität, 30-40 Min.) ist suboptimal. Forschung zeigt: Der beste Weg zur Fitness ist entweder <strong>viel bei niedriger Intensität</strong> oder <strong>wenig bei hoher Intensität</strong>. Niemandsland-Training belastet Muskeln und Gelenke ohne optimale Anpassungen zu liefern.<br><br>
 
@@ -346,7 +346,7 @@ Aerobe Kapazität setzt die Obergrenze der Boxleistung. Das Ziel: möglichst vie
 
 <strong>Optimale Red-Zone-Zeit:</strong> 6-12 Minuten bei ≥90% HFmax pro Session führen zu kardiovaskulären Anpassungen die die Sauerstoffversorgung verbessern. Ziel: Innerhalb von 60-90 Sek. in die rote Zone kommen.<br><br>
 
-FightOS nutzt drei HIIT-Varianten:<br>
+BoxSpec nutzt drei HIIT-Varianten:<br>
 • <strong>Traditional HIIT:</strong> 4×4 Min. bei >90% HFmax, 2 Min. Erholung<br>
 • <strong>Pyramid HIIT:</strong> Erst längere Intervalle (1-4 Min.), dann kurze Hochgeschwindigkeits-Sprints (15s on/15s off) → >95% VO₂max<br>
 • <strong>Fight-Specific HIIT:</strong> 3-Min.-Runden mit 10-20 Sek. Hochintensitäts-Bursts – simuliert die Kampfanforderungen<br><br>
@@ -357,7 +357,7 @@ Kurzintervall-Training bei hoher Geschwindigkeit entwickelt die Fähigkeit der M
 <strong>SÄULE 3 — SPEED ENDURANCE (Wo. 8-10)</strong><br>
 Kampfspezifische Kurzintervalle: <strong>6× 15-20 Sek.</strong> bei maximaler Geschwindigkeit pro 3-Min.-Set, 3-4 Sets. 10-5 Sek. Pause zwischen Reps, 1 Min. zwischen Sets. Transfer der physiologischen Anpassungen auf kampfspezifische Aktivität.<br><br>
 
-<strong style="font-size:15px;">DAS FIGHTOS-CONDITIONING-PROGRAMM (3×/Woche, 10 Wochen)</strong><br>
+<strong style="font-size:15px;">DAS BOXSPEC CONDITIONING-PROGRAMM (3×/Woche, 10 Wochen)</strong><br>
 <strong>Wochen 1-3:</strong> Muscle Buffering → Laktat-Toleranz aufbauen<br>
 <strong>Wochen 4-7:</strong> HIIT → Zentrale kardiovaskuläre Adaptationen<br>
 <strong>Wochen 8-10:</strong> Speed Endurance → Kampfspezifischer Transfer + Taper<br><br>
@@ -409,7 +409,7 @@ BET konfrontiert dein Gehirn mit kognitiven Aufgaben (${tt('Stroop-Test','Farbw�
   { name:'ERNÄHRUNG & GEWICHTSMANAGEMENT', category:'Treibstoff', color:'var(--green)',
     short:'Makros, Timing, Hydration, Gewicht machen, Supplements, Refuelling. Ernährung ist mehr als nur Gewicht machen – es ist der Treibstoff für Leistung.',
     desc:`<strong style="font-size:15px;">MEHR ALS NUR GEWICHT MACHEN</strong><br>
-Boxen ist ein Gewichtsklassen-Sport, deshalb spielt Ernährung eine massive Rolle beim sicheren und effektiven Gewichtmachen. Aber bei FightOS planen wir Ernährungsstrategien um <strong>hochintensive Leistung zu befeuern</strong> und sich von hartem Training zu erholen – es geht nicht nur ums Gewicht.<br><br>
+Boxen ist ein Gewichtsklassen-Sport, deshalb spielt Ernährung eine massive Rolle beim sicheren und effektiven Gewichtmachen. Aber bei BoxSpec planen wir Ernährungsstrategien um <strong>hochintensive Leistung zu befeuern</strong> und sich von hartem Training zu erholen – es geht nicht nur ums Gewicht.<br><br>
 
 Zu verstehen wie man richtig tankt kann schwierig sein, wenn Athleten 2× täglich trainieren. Schlechte Erholung führt zu verminderter Leistung und erhöhtem Verletzungs- und Krankheitsrisiko. Kohlenhydrate zu stark zu reduzieren beeinträchtigt die Hochintensitäts-Leistung massiv und erhöht das Krankheitsrisiko, weil die Energieversorgung des Immunsystems sinkt. Außerdem sabotiert es die Fight-Week-Strategie zum Gewichtmachen.<br><br>
 
@@ -462,7 +462,7 @@ Beispiel: 85kg + 1L = 86kg, nach Training 83kg → 3L Verlust × 1.5 = <strong>4
 <strong>Praxis-Tipps:</strong> Morgens 300-500ml Wasser · Prise Salz zu Hauptmahlzeiten · 500ml Elektrolytgetränk 30-60 Min. vor dem Training · Urinfarbe: hellgelb = gut<br><br>
 
 <strong style="font-size:15px;">SUPPLEMENTS — FOOD FIRST</strong><br>
-FightOS verfolgt einen "Food First"-Ansatz — erst die Ernährung optimieren, dann Supplements. Nur evidenzbasierte, batchgetestete Produkte verwenden.<br><br>
+BoxSpec verfolgt einen "Food First"-Ansatz — erst die Ernährung optimieren, dann Supplements. Nur evidenzbasierte, batchgetestete Produkte verwenden.<br><br>
 
 <strong>Gesundheits-Supplements:</strong><br>
 • <strong>Vitamin D3</strong> (4000 IU/Tag): Knochengesundheit, Immunfunktion, Muskelregeneration. Besonders im Winter<br>
@@ -636,7 +636,7 @@ Die Ecke ist dein taktisches Gehirn zwischen den Runden. Effektive Corner-Kommun
     desc:`<strong style="font-size:15px;">WARUM MOBILITÄT DER ERSTE SCHRITT IST</strong><br>
 Durch die intensive, repetitive Natur des Boxens werden Athleten in bestimmten Muskelgruppen "eng" und in anderen "unteraktiv" – das erzeugt muskuläre Imbalancen die Leistung beeinträchtigen und das Verletzungsrisiko erhöhen.<br><br>
 
-Für jeden Athleten bei FightOS ist Mobilitäts- und Bewegungstraining der <strong>allererste Schritt</strong>. Bevor wir auch nur ein Gewicht anfassen, müssen die grundlegenden Bewegungsfähigkeiten stimmen. Das ermöglicht bessere Ergebnisse und vermeidet Verletzungen.<br><br>
+Für jeden Athleten bei BoxSpec ist Mobilitäts- und Bewegungstraining der <strong>allererste Schritt</strong>. Bevor wir auch nur ein Gewicht anfassen, müssen die grundlegenden Bewegungsfähigkeiten stimmen. Das ermöglicht bessere Ergebnisse und vermeidet Verletzungen.<br><br>
 
 <strong>Warum Boxer besonders betroffen sind:</strong><br>
 • Stunden in der geschlossenen Kampfstellung → Engheit in Knöcheln, Hüften und Schultern<br>
@@ -646,7 +646,7 @@ Für jeden Athleten bei FightOS ist Mobilitäts- und Bewegungstraining der <stro
 
 Aus Tests mit über <strong>250 Boxern</strong> zeigt sich: Die Mehrheit hat Schulter-, Hüft- und/oder Knöchel-Mobilitätsprobleme. Je länger die Trainingshistorie, desto eingeschränkter.<br><br>
 
-<strong>FightOS-Philosophie:</strong> "${tt('Train the Movement and the Muscles Will Follow','Wir fokussieren auf Bewegungsmuster statt einzelne Muskeln zu isolieren. Wenn die Bewegung stimmt, folgen die muskulären Anpassungen automatisch.')}" – Wir trainieren die Bewegung, die Muskeln folgen.<br><br>
+<strong>BoxSpec-Philosophie:</strong> "${tt('Train the Movement and the Muscles Will Follow','Wir fokussieren auf Bewegungsmuster statt einzelne Muskeln zu isolieren. Wenn die Bewegung stimmt, folgen die muskulären Anpassungen automatisch.')}" – Wir trainieren die Bewegung, die Muskeln folgen.<br><br>
 
 <strong style="font-size:15px;">HÜFTMOBILITÄT</strong><br>
 ${tt('Hüftbeuger-Verkürzung','Häufig bei Boxern durch langes Sitzen UND Tausende Stunden in der Kampfstellung. Verursacht Rückenschmerzen, limitiert Gluteus-Kraft und einschränkt Hüftrotation.')} ist das häufigste Problem. Boxer verstärken es durch unzählige Stunden in ähnlicher Stellung plus submaximales Dauerlaufen. Eine Studie an Baseball-Pitchern zeigte: Jeder Grad mehr Hüft-Rotation = <strong>0.89× weniger Verletzungsrisiko</strong> an Ellbogen und Schulter.<br><br>
@@ -711,7 +711,7 @@ Der letzte Teil der Kampfvorbereitung. 99% der Boxer machen Schattenboxen und Pr
 4. <strong>Potentiate:</strong> Pogos 10×3 · Ice Skaters 6 je Seite ×3 · Banded Shadow Box 20 Sek. ×3 · Punch ISO Holds 5 Sek. je Schlag<br>
 5. <strong>Pads:</strong> 1-2 Min. Runden mit 1-3 Min. Pause — Herzfrequenz in die rote Zone bringen<br><br>
 
-<strong style="font-size:15px;">DAS FIGHTOS DIY-MOBILITÄTSPROGRAMM (10 MIN., 1-2×/TAG)</strong><br>
+<strong style="font-size:15px;">DAS BOXSPEC-MOBILITÄTSPROGRAMM (10 MIN., 1-2×/TAG)</strong><br>
 Ein Programm das Schulter-, Hüft- und Rotationsmobilität entwickelt und die Glutes aktiviert. Einbauen als: Warm-Up vor S&C/Laufen · Vor dem Box-Warm-Up · Recovery-Session (2-3 Sets statt 1-2) · Morgens oder vor dem Schlaf<br><br>
 
 <strong>Hüfte:</strong> 1/2 Kneeling Lateral Lunge Rotations · Banded Hip Floss<br>

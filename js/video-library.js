@@ -1,5 +1,5 @@
 /* ============================================
-   FIGHTOS – Video Library (Wissen)
+   BOXSPEC – Video Library (Wissen)
    Curated boxing knowledge videos
    Custom player UI over YouTube embeds
    ============================================ */
@@ -101,12 +101,12 @@ var VIDEO_LIBRARY = [
   {
     category: 'sc',
     categoryLabel: 'KRAFT & CONDITIONING',
-    categoryDesc: 'Sportwissenschaft für Boxer — die gleiche Methodik die FightOS nutzt.',
+    categoryDesc: 'Sportwissenschaft für Boxer — die gleiche Methodik die BoxSpec nutzt.',
     videos: [
       { id: 'hmFQTjxlE5M', title: 'Conditioning-Methoden Ranking', desc: 'Zone 2 vs HIIT vs SIT — was funktioniert wirklich für Boxer?', duration: '22:00', tags: ['Conditioning','HIIT','Vergleich'] },
       { id: '22zeL5FuCv0', title: 'S&C individualisieren — Guide', desc: 'Kraft- und Konditionstraining an Level, Schwächen und Kampfkalender anpassen.', duration: '30:00', tags: ['Periodisierung','Individuell','System'] },
       { id: 'DajasFD5ExA', title: 'S&C im Amateur-Boxalltag', desc: 'Krafttraining mit Vereinstraining kombinieren ohne Überbelastung.', duration: '18:00', tags: ['Amateur','Planung','Praxis'] },
-      { id: 'QmnpevLGSs4', title: 'Kraft & Power Workout', desc: 'Komplettes Workout — die Übungen aus dem FightOS-Programm.', duration: '25:00', tags: ['Workout','Mitmachen','Power'] },
+      { id: 'QmnpevLGSs4', title: 'Kraft & Power Workout', desc: 'Komplettes Workout — die Übungen aus dem BoxSpec-Programm.', duration: '25:00', tags: ['Workout','Mitmachen','Power'] },
       { id: 'cTlUErNBMRU', title: 'Ein Tag bei Boxing Science', desc: 'Wie professionelle Boxer ihren S&C-Tag strukturieren.', duration: '15:00', tags: ['Pro','Tagesablauf','Einblick'] },
       { id: '5rP3shb1lrE', title: '30-Min S&C Workout für Boxer', desc: 'Kurzes, intensives Workout wenn die Zeit knapp ist.', duration: '30:00', tags: ['Kurz','Intensiv','Mitmachen'] }
     ]

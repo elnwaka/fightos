@@ -1,6 +1,6 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
 const BUILD = '2026-05-27b';
-const CACHE_NAME = 'fightos-' + BUILD;
+const CACHE_NAME = 'boxspec-' + BUILD;
 const PRECACHE = [
   './',
   './index.html',
@@ -118,7 +118,7 @@ self.addEventListener('fetch', function(event) {
         // Network failed — return offline fallback if no cache
         if (event.request.mode === 'navigate') {
           return new Response(
-            '<html><body style="background:#080808;color:#E8000D;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;"><div><h1 style="font-size:48px;letter-spacing:4px;">FIGHTOS</h1><p style="color:#555;font-size:14px;">Offline — diese Seite ist nicht gecacht.</p><p style="color:#333;font-size:12px;">Öffne die App einmal mit Internet.</p></div></body></html>',
+            '<html><body style="background:#080808;color:#E8000D;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;"><div><h1 style="font-size:48px;letter-spacing:4px;">BOXSPEC</h1><p style="color:#555;font-size:14px;">Offline — diese Seite ist nicht gecacht.</p><p style="color:#333;font-size:12px;">Öffne die App einmal mit Internet.</p></div></body></html>',
             { headers: { 'Content-Type': 'text/html' } }
           );
         }
@@ -147,11 +147,11 @@ self.addEventListener('message', function(event) {
   if (event.data && event.data.type === 'SCHEDULE_NOTIFICATION') {
     var delay = event.data.delay || 0;
     setTimeout(function() {
-      self.registration.showNotification(event.data.title || 'FightOS', {
+      self.registration.showNotification(event.data.title || 'BoxSpec', {
         body: event.data.body || '',
         icon: './img/icons/icon-192x192.png',
         badge: './img/icons/icon-192x192.png',
-        tag: event.data.tag || 'fightos-reminder',
+        tag: event.data.tag || 'boxspec-reminder',
         vibrate: [100, 50, 100]
       });
     }, delay);

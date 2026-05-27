@@ -1,5 +1,5 @@
 /* ============================================
-   FIGHTOS – Core Application Logic
+   BOXSPEC – Core Application Logic
    Auth, Navigation, Fight Date, HRV, Logs
    ============================================ */
 
@@ -279,7 +279,7 @@ function getUserAge() {
 }
 
 // ===== AUTH =====
-var APP_SALT = 'FightOS_v1_';
+var APP_SALT = 'BoxSpec_v1_';
 
 async function hashPassword(password, username) {
   var salted = APP_SALT + username.toLowerCase() + ':' + password;
@@ -512,7 +512,7 @@ const OB_STEPS = [
   },
   {
     title: 'DEIN ZIEL',
-    sub: 'Was willst du mit FightOS erreichen?',
+    sub: 'Was willst du mit BoxSpec erreichen?',
     render() {
       const opts = [
         { val:'erster-kampf', icon:'🎯', label:'ERSTER KAMPF', desc:'Ich will meinen ersten Wettkampf bestreiten' },
@@ -787,7 +787,7 @@ function initNotifications() {
       var banner = document.createElement('div');
       banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface-1);border:1px solid var(--surface-3);border-radius:var(--radius-md);padding:16px 20px;z-index:9998;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.5);';
       banner.innerHTML = '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-md);color:var(--white);margin-bottom:6px;">ERINNERUNGEN AKTIVIEREN?</div>' +
-        '<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;line-height:1.5;">FightOS kann dich täglich an Training, HRV und Checklist erinnern.</div>' +
+        '<div style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:12px;line-height:1.5;">BoxSpec kann dich täglich an Training, HRV und Checklist erinnern.</div>' +
         '<div style="display:flex;gap:8px;">' +
           '<button onclick="requestNotifPermission(this.closest(\'div[style]\'))" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);background:none;border:1px solid rgba(232,0,13,.3);padding:8px 16px;border-radius:var(--radius-md);cursor:pointer;">JA, AKTIVIEREN</button>' +
           '<button onclick="this.closest(\'div[style]\').remove();localStorage.setItem(\'fos_notif_dismissed\',\'1\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);background:none;border:1px solid var(--surface-3);padding:8px 16px;border-radius:var(--radius-md);cursor:pointer;">NEIN DANKE</button>' +
@@ -2894,7 +2894,7 @@ function renderFightsTab3(contentEl, data) {
   if (fights.length < 3) {
     contentEl.innerHTML = '<div style="padding:60px 20px;text-align:center;">' +
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:36px;color:#1a1a1a;margin-bottom:8px;">ANALYSE</div>' +
-      '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--text-muted);margin-bottom:20px;">Ab 3 K\u00e4mpfen erkennt FightOS Muster in deinen St\u00e4rken und Schw\u00e4chen.</div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--text-muted);margin-bottom:20px;">Ab 3 K\u00e4mpfen erkennt BoxSpec Muster in deinen St\u00e4rken und Schw\u00e4chen.</div>' +
       '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);">' + fights.length + '/3 K\u00e4mpfe eingetragen</div>' +
       '<div style="width:120px;height:4px;background:var(--surface-1);border-radius:var(--radius-sm);margin:12px auto;overflow:hidden;"><div style="width:' + Math.round(fights.length / 3 * 100) + '%;height:100%;background:var(--red);border-radius:var(--radius-sm);"></div></div>' +
       '<button class="submit-btn" style="margin-top:16px;padding:10px 20px;font-size:12px;" onclick="openFightModal()">+ KAMPF EINTRAGEN</button>' +
@@ -5383,7 +5383,7 @@ var BLOCK_DETAIL_CONTENT = {
   'boxing': {
     warmup: 'VOR dem Vereinstraining: Seilspringen 3 Min. → Schulterkreise → Face Pulls 3x15 mit Band → Hüften mobilisieren',
     cooldown: 'NACH dem Vereinstraining: Statisches Stretching (Schultern, Hüftbeuger, Handgelenke) → Hände auslockern → Finger dehnen',
-    notes: 'Dein Trainer gibt den Inhalt im Verein vor. FightOS kümmert sich um alles drumherum: Aufwärmen, Erholung, Kraft, Ernährung.'
+    notes: 'Dein Trainer gibt den Inhalt im Verein vor. BoxSpec kümmert sich um alles drumherum: Aufwärmen, Erholung, Kraft, Ernährung.'
   },
   'cardio': {
     warmup: '5 Min. locker einlaufen → Dynamisches Stretching: Beinschwingen, Hüftkreise',
@@ -6174,7 +6174,7 @@ function copyShareLink() {
 
 function shareWhatsApp() {
   const link = document.getElementById('share-link').value;
-  window.open('https://wa.me/?text=' + encodeURIComponent('Check meinen FightOS Trainingsplan: ' + link), '_blank');
+  window.open('https://wa.me/?text=' + encodeURIComponent('Check meinen BoxSpec Trainingsplan: ' + link), '_blank');
 }
 
 function closeShareModal() { closeModal(document.getElementById('share-modal')); }
@@ -6902,7 +6902,7 @@ function renderDashboard() {
     // ══ NEW USER WELCOME BANNER ══
     (isNewUser ?
       '<div class="fc-welcome">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div>' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">WILLKOMMEN BEI BOXSPEC</div>' +
         '<div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:16px;">Dein Trainingsplan wurde generiert. So startest du:</div>' +
         '<div class="fc-welcome-step" onclick="showPage(\'wochenplan\')">' +
           '<div class="fc-welcome-num" style="background:var(--red);">1</div>' +
@@ -7344,7 +7344,7 @@ function renderAccountPage() {
           <div class="form-group">
             <label class="form-label">Programm</label>
             <select class="form-select" id="acc-program" onchange="document.getElementById('acc-10w-start-wrap').style.display=this.value==='10w'?'block':'none'">
-              <option value="standard" ${(u.trainingProgram||'standard')==='standard'?'selected':''}>Standard (FightOS)</option>
+              <option value="standard" ${(u.trainingProgram||'standard')==='standard'?'selected':''}>Standard (BoxSpec)</option>
               <option value="10w" ${u.trainingProgram==='10w'?'selected':''}>10-Wochen-Programm</option>
             </select>
           </div>
@@ -8069,7 +8069,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('sw.js')
       .then(function(reg) {
-        console.log('FightOS SW registered, scope:', reg.scope);
+        console.log('BoxSpec SW registered, scope:', reg.scope);
         setInterval(function() { reg.update(); }, 60 * 60 * 1000);
       })
       .catch(function(err) {

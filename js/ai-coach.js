@@ -1,5 +1,5 @@
 /* ============================================
-   FIGHTOS – AI COACH
+   BOXSPEC – AI COACH
    Google Gemini-powered boxing coach
    Fed with TLAC methodology + user context
    ============================================ */
@@ -29,7 +29,7 @@ function loadCoachHistory() {
 
 // ===== TLAC KNOWLEDGE BASE (condensed for system prompt) =====
 var TLAC_KNOWLEDGE = `
-DU BIST DER FIGHTOS AI-COACH — ein Elite-Box-Trainer mit tiefem Wissen über Sportwissenschaft, Kraft- und Konditionstraining, Ernährung und Kampfvorbereitung für Boxer. Du sprichst Deutsch, direkt und motivierend wie ein echter Trainer in der Ecke.
+DU BIST DER BOXSPEC AI-COACH — ein Elite-Box-Trainer mit tiefem Wissen über Sportwissenschaft, Kraft- und Konditionstraining, Ernährung und Kampfvorbereitung für Boxer. Du sprichst Deutsch, direkt und motivierend wie ein echter Trainer in der Ecke.
 
 DEIN WISSEN BASIERT AUF FOLGENDEM SYSTEM:
 
@@ -108,7 +108,7 @@ DEINE REGELN ALS COACH:
 4. Gib konkrete Empfehlungen mit Sets/Reps/Zeiten
 5. Warnung bei Übertraining, zu aggressivem Cutten, oder gefährlichen Praktiken
 6. Halte Antworten unter 300 Wörter — ein Trainer redet nicht ewig
-7. Nutze die TLAC-Methodik als Grundlage, aber nenne sie nie beim Namen — es ist FightOS-Wissen
+7. Nutze die TLAC-Methodik als Grundlage, aber nenne sie nie beim Namen — es ist BoxSpec-Wissen
 8. Wenn nach Gameplan gefragt: Distanz-Strategie, Schlüssel-Kombis, Runden-Taktik, Sparring-Drills
 
 === AKTIONEN — DU KANNST DIE APP STEUERN ===
@@ -261,11 +261,11 @@ async function sendToCoach(userMessage) {
   // System instruction as first user message
   contents.push({
     role: 'user',
-    parts: [{ text: 'Du bist mein FightOS AI-Coach. Hier ist dein Wissen und meine Daten:\n\n' + systemPrompt + '\n\nBestätige kurz dass du bereit bist.' }]
+    parts: [{ text: 'Du bist mein BoxSpec AI-Coach. Hier ist dein Wissen und meine Daten:\n\n' + systemPrompt + '\n\nBestätige kurz dass du bereit bist.' }]
   });
   contents.push({
     role: 'model',
-    parts: [{ text: 'Ich bin dein FightOS Coach. Ich kenne deine Daten und das komplette Trainingssystem. Was brauchst du?' }]
+    parts: [{ text: 'Ich bin dein BoxSpec Coach. Ich kenne deine Daten und das komplette Trainingssystem. Was brauchst du?' }]
   });
 
   // Add chat history
@@ -329,7 +329,7 @@ function toggleAICoach() {
     }
     if (_aiChatHistory.length === 0) {
       // First time — show welcome
-      addCoachMessage('coach', 'Ich bin dein FightOS Coach. Ich kenne deinen Trainingsplan, deine Tests und dein Ziel. Frag mich was du willst — Trainingsplan, Ernährung, Kampfvorbereitung, Technik-Tipps, oder was auch immer dich beschäftigt.\n\nDein Chatverlauf wird gespeichert — du kannst jederzeit zurückkommen.');
+      addCoachMessage('coach', 'Ich bin dein BoxSpec Coach. Ich kenne deinen Trainingsplan, deine Tests und dein Ziel. Frag mich was du willst — Trainingsplan, Ernährung, Kampfvorbereitung, Technik-Tipps, oder was auch immer dich beschäftigt.\n\nDein Chatverlauf wird gespeichert — du kannst jederzeit zurückkommen.');
     } else {
       renderCoachMessages();
     }
@@ -444,7 +444,7 @@ function initAICoach() {
       '<div style="display:flex;align-items:center;gap:10px;">' +
         '<div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;">🥊</div>' +
         '<div>' +
-          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">FIGHTOS COACH</div>' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">BOXSPEC COACH</div>' +
           '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:var(--text-muted);letter-spacing:1px;">AI-POWERED</div>' +
         '</div>' +
       '</div>' +

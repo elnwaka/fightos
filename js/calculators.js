@@ -1,5 +1,5 @@
 /* ============================================
-   FIGHTOS – Calculators
+   BOXSPEC – Calculators
    Makros, HF-Zonen, Wettkampf-Prep, 1RM
    ============================================ */
 
