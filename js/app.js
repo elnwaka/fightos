@@ -1041,6 +1041,16 @@ function saveData(data) {
   if (!currentUser) return;
   localStorage.setItem('fos_data_' + currentUser, JSON.stringify(data));
   // Debounced cloud sync
+  triggerCloudSync();
+}
+
+// Also sync when profile/settings change
+function saveUsers(users) {
+  localStorage.setItem('fos_users', JSON.stringify(users));
+  triggerCloudSync();
+}
+
+function triggerCloudSync() {
   if (_fbSyncEnabled && _fbUser) {
     clearTimeout(_syncTimer);
     _syncTimer = setTimeout(syncToCloud, 2000);
@@ -6208,7 +6218,7 @@ function saveSettings() {
   users[currentUser].weight = document.getElementById('settings-weight').value;
   users[currentUser].workStart = document.getElementById('settings-work-start').value;
   users[currentUser].workEnd = document.getElementById('settings-work-end').value;
-  localStorage.setItem('fos_users', JSON.stringify(users));
+  saveUsers(users);
 
   applyScheduleToUser(readScheduleFromDOM('sched'));
   showToast('Einstellungen gespeichert');
@@ -6262,7 +6272,7 @@ function applyScheduleToUser(ws) {
   users[currentUser].weekSchedule = ws;
   var times = Object.values(ws).filter(function(d) { return d.time; }).map(function(d) { return d.time; });
   users[currentUser].trainingTime = times[0] || '18:00';
-  localStorage.setItem('fos_users', JSON.stringify(users));
+  saveUsers(users);
   var data = getData();
   if (data) {
     data.weekPlan = generateCurrentWeekPlan();
@@ -7426,7 +7436,7 @@ function saveAccountPage() {
   var times = Object.values(ws).filter(function(d) { return d.time; }).map(function(d) { return d.time; });
   users[currentUser].trainingTime = times[0] || '18:00';
 
-  localStorage.setItem('fos_users', JSON.stringify(users));
+  saveUsers(users);
 
   // Update fight date + regenerate week plan
   const data = getData();
