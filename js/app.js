@@ -6685,261 +6685,164 @@ function renderDashboard() {
     }
   }
 
+  // ═══ SIMPLIFIED DASHBOARD — 5 ZONES ═══
+
   el.innerHTML =
 
-    // ══ FULL-BLEED HERO WITH IMAGE ══
-    '<div class="db-hero">' +
-      '<div class="db-hero-img" style="background-image:url(\'img/hero/gym-dark.jpg\');"></div>' +
-      '<div class="db-hero-fade"></div>' +
-      '<div class="db-hero-inner">' +
-        '<div class="db-hero-name">' + escapeHTML(getDisplayName()) + '</div>' +
-        '<div style="display:flex;align-items:baseline;gap:12px;margin-top:8px;flex-wrap:wrap;">' +
-          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(24px,4vw,36px);color:var(--white);">' + wins + 'S<span style="color:var(--text-subtle);"> – </span>' + losses + 'N<span style="color:var(--text-subtle);"> – </span>' + draws + 'U</div>' +
-          (koRate > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);">' + koRate + '% KO</div>' : '') +
-          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:rgba(255,255,255,.3);">' + weightClass + '</div>' +
-        '</div>' +
+    // ══ ZONE 1: COMPACT HEADER ══
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid var(--surface-2);">' +
+      '<div>' +
+        (greeting ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);letter-spacing:1px;">' + greeting.toUpperCase() + '</div>' : '') +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(24px,4vw,32px);color:var(--white);letter-spacing:1px;">' + escapeHTML(getDisplayName()) + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-top:2px;">' + record + (koRate > 0 ? ' · ' + koRate + '% KO' : '') + ' · ' + weightClass + '</div>' +
       '</div>' +
-    '</div>' +
-
-    // ══ FLOATING STATS BAR (overlaps hero) ══
-    '<div class="db-stats-row">' +
-      '<div class="db-stat-cell"><div class="db-stat-num" style="color:var(--gold);">' + (overall !== null ? overall : '\u2014') + '</div><div class="db-stat-lbl">SCORE</div></div>' +
-      '<div class="db-stat-cell"><div class="db-stat-num">' + totalFights + '</div><div class="db-stat-lbl">K\u00c4MPFE</div></div>' +
-      '<div class="db-stat-cell"><div class="db-stat-num">' + totalSessions + '</div><div class="db-stat-lbl">SESSIONS</div></div>' +
-      '<div class="db-stat-cell"><div class="db-stat-num">' + totalDone + '/' + totalPlanned + '</div><div class="db-stat-lbl">WOCHE</div></div>' +
+      '<div style="text-align:center;cursor:pointer;" onclick="showPage(\'training\')">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:' + ringColor + ';">' + (overall !== null ? overall : '\u2014') + '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:8px;color:var(--text-muted);letter-spacing:1px;">SCORE</div>' +
+        weekDiff +
+      '</div>' +
     '</div>' +
 
     '<div class="db-content">' +
 
-    // ══ QUICK ACTIONS (NEW — never existed before) ══
-    '<div class="db-actions">' +
-      '<button class="db-action-btn" onclick="showPage(\'log\')">+ Training loggen</button>' +
-      '<button class="db-action-btn" onclick="document.getElementById(\'fight-date-input\')&&document.getElementById(\'fight-date-input\').focus()">Kampf planen</button>' +
-      '<button class="db-action-btn" onclick="showPage(\'tests\')">Test machen</button>' +
-    '</div>' +
-
-    // ══ NÄCHSTER KAMPF (prominent, with date input) ══
-    '<div class="db-sec">' +
-      '<div class="db-sec-hd"><div class="db-sec-ttl">N\u00c4CHSTER KAMPF</div></div>' +
-      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">' +
-        '<input type="date" id="fight-date-input" class="form-input" style="width:auto;padding:8px 12px;font-size:var(--fs-sm);" onchange="updateFightDate()">' +
-        '<button class="submit-btn" style="padding:4px 10px;font-size:var(--fs-xs);" onclick="clearFightDate()">\u00d7</button>' +
-      '</div>' +
-      '<div id="dash-countdown-hero"></div>' +
-    '</div>' +
-
-    // ══ NÄCHSTE SESSION + 1-TAP ERLEDIGT ══
+    // ══ ZONE 2: NEXT ACTION ══
     (nextBlock ? (function() {
-      var nbLogKey = nextBlockDayKey + '_' + nextBlockIdx + '_' + wkId;
-      // HRV warning check
       var hrvWarn = '';
       if (hrvArr.length > 0 && nextBlock.rpe >= 8) {
-        var lastHrv = hrvArr[hrvArr.length - 1];
-        var lastHrvVal = lastHrv.value || lastHrv;
+        var lastHrv2 = hrvArr[hrvArr.length - 1];
+        var lastHrvVal2 = lastHrv2.value || lastHrv2;
         if (hrvArr.length >= 7) {
-          var avg7 = hrvArr.slice(-7).reduce(function(s,h){return s+(h.value||h);},0)/7;
-          if (lastHrvVal < avg7 * 0.95) {
-            hrvWarn = '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--orange);margin-top:8px;">⚠ HRV unter Durchschnitt (' + Math.round(lastHrvVal) + ' vs. Ø' + Math.round(avg7) + ') — Intensität reduzieren?</div>';
+          var avg7b = hrvArr.slice(-7).reduce(function(s,h){return s+(h.value||h);},0)/7;
+          if (lastHrvVal2 < avg7b * 0.95) {
+            hrvWarn = '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--orange);margin-top:8px;">\u26a0 HRV unter Durchschnitt (' + Math.round(lastHrvVal2) + ' vs. \u00d8' + Math.round(avg7b) + ')</div>';
           }
         }
       }
-      return '<div class="db-sec" style="padding:28px 0;">' +
-        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:3px;margin-bottom:8px;">N\u00c4CHSTE SESSION</div>' +
-        '<div class="db-next-block" style="position:relative;overflow:hidden;">' +
-          '<div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--red);border-radius:2px;"></div>' +
-          '<div style="padding-left:16px;">' +
-            '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">' +
-              '<div class="db-next-time">' + (nextBlock.time || '') + '</div>' +
-              '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">' + nextBlockDay + '</div>' +
-            '</div>' +
-            '<div class="db-next-title" onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" style="font-size:clamp(20px,4vw,28px);cursor:pointer;">' + escapeHTML(nextBlock.title) + '</div>' +
-            (nextBlock.duration > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-top:4px;">' + nextBlock.duration + ' Min.' + (nextBlock.rpe > 0 ? ' \u00b7 RPE ' + nextBlock.rpe : '') + '</div>' : '') +
-            hrvWarn +
-            '<div style="display:flex;gap:8px;margin-top:12px;">' +
-              '<button onclick="event.stopPropagation();toggleBlockDone(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ',\'' + nextBlock.type + '\',\'' + (nextBlock.title||'').replace(/'/g,'') + '\')" style="padding:12px 20px;font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1px;border:none;border-radius:var(--radius-sm);cursor:pointer;background:var(--red);color:#fff;min-height:44px;">ERLEDIGT \u2713</button>' +
-              '<button onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" style="padding:12px 16px;font-family:\'Space Mono\',monospace;font-size:12px;border:1px solid var(--surface-3);background:none;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-muted);min-height:44px;">DETAILS</button>' +
-            '</div>' +
+      // Fight countdown integrated
+      var fightLine = '';
+      if (data.fightDate) {
+        var fDiff = Math.ceil((new Date(data.fightDate + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000);
+        if (fDiff > 0 && fDiff <= 14) {
+          fightLine = '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--red);margin-top:8px;">\ud83e\udd4a ' + fDiff + ' Tage bis Kampf · ' + formatDate(data.fightDate) + '</div>';
+        }
+      }
+      return '<div style="padding:24px 0;border-bottom:1px solid var(--surface-2);">' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:2px;margin-bottom:10px;">N\u00c4CHSTE SESSION</div>' +
+        '<div style="position:relative;padding:16px 16px 16px 20px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid var(--red);">' +
+          '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">' +
+            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--white);">' + (nextBlock.time || '') + '</div>' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">' + nextBlockDay + '</div>' +
+          '</div>' +
+          '<div onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" style="font-family:\'Bebas Neue\',sans-serif;font-size:clamp(18px,3.5vw,24px);color:var(--white);margin-top:4px;cursor:pointer;letter-spacing:1px;">' + escapeHTML(nextBlock.title) + '</div>' +
+          (nextBlock.duration > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);margin-top:4px;">' + nextBlock.duration + ' Min.' + (nextBlock.rpe > 0 ? ' \u00b7 RPE ' + nextBlock.rpe : '') + '</div>' : '') +
+          hrvWarn + fightLine +
+          '<div style="display:flex;gap:8px;margin-top:14px;">' +
+            '<button onclick="event.stopPropagation();toggleBlockDone(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ',\'' + nextBlock.type + '\',\'' + (nextBlock.title||'').replace(/'/g,'') + '\')" class="submit-btn" style="padding:10px 20px;font-size:15px;">ERLEDIGT \u2713</button>' +
+            '<button onclick="openBlockDetail(\'' + nextBlockDayKey + '\',' + nextBlockIdx + ')" class="btn-ghost back-link" style="padding:10px 16px;font-size:12px;">DETAILS</button>' +
           '</div>' +
         '</div>' +
       '</div>';
     })()
-    : '<div class="db-sec" style="padding:20px 0;text-align:center;"><div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">Alle Bl\u00f6cke diese Woche erledigt \u2713</div></div>') +
+    : '<div style="padding:20px 0;text-align:center;border-bottom:1px solid var(--surface-2);"><div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--green);">\u2713 Alle Bl\u00f6cke diese Woche erledigt</div></div>') +
 
-    // ══ HEUTE — Alle Blöcke als Checkliste ══
+    // ══ ZONE 3: HEUTE + WEEK STRIP ══
     (function() {
       var todayBlocks = (data.weekPlan && data.weekPlan[DAY_NAMES[todayDow]]) || [];
-      if (todayBlocks.length === 0) return '';
       var todayDone = 0;
-      var todayHTML = todayBlocks.map(function(b, bi) {
-        var lk = DAY_NAMES[todayDow] + '_' + bi + '_' + wkId;
-        var done = data.completedBlocks && data.completedBlocks[lk];
-        if (done) todayDone++;
-        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-1);">' +
-          '<button onclick="toggleBlockDone(\'' + DAY_NAMES[todayDow] + '\',' + bi + ',\'' + b.type + '\',\'' + (b.title||'').replace(/'/g,'') + '\')" style="width:36px;height:36px;border-radius:50%;border:2px solid ' + (done ? 'var(--green)' : 'var(--surface-3)') + ';background:' + (done ? 'var(--green)' : 'none') + ';color:' + (done ? '#000' : '#333') + ';font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (done ? '\u2713' : '') + '</button>' +
-          '<div onclick="openBlockDetail(\'' + DAY_NAMES[todayDow] + '\',' + bi + ')" style="flex:1;cursor:pointer;min-width:0;">' +
-            '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:' + (done ? '#555' : 'var(--white)') + ';' + (done ? 'text-decoration:line-through;' : '') + '">' + escapeHTML(b.title) + '</div>' +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);">' + (b.time||'') + (b.duration > 0 ? ' · ' + b.duration + ' Min.' : '') + '</div>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-      return '<div class="db-sec">' +
-        '<div class="db-sec-hd"><div class="db-sec-ttl">HEUTE</div><div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:' + (todayDone === todayBlocks.length ? 'var(--green)' : 'var(--text-muted)') + ';">' + todayDone + '/' + todayBlocks.length + '</div></div>' +
-        todayHTML +
-      '</div>';
-    })() +
-
-    // ══ WEEK STRIP ══
-    '<div class="db-sec">' +
-      '<div class="db-week-strip">' +
-        DAY_SHORT.map(function(d, i) {
-          var dc = dayCompletion[i];
-          var pct = dc.total > 0 ? dc.done / dc.total : 0;
-          var c = 2 * Math.PI * 14;
-          var off = c * (1 - pct);
-          var col = pct >= 1 ? 'var(--green)' : pct > 0 ? 'var(--gold)' : 'var(--surface-3)';
-          var isToday = i === todayDow;
-          return '<div class="db-week-day' + (isToday ? ' today' : '') + '">' +
-            '<svg width="32" height="32" viewBox="0 0 32 32">' +
-              '<circle cx="16" cy="16" r="14" stroke="var(--surface-2)" stroke-width="2.5" fill="none"/>' +
-              '<circle id="week-ring-' + i + '" data-target="' + off + '" cx="16" cy="16" r="14" stroke="' + col + '" stroke-width="2.5" fill="none" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + c.toFixed(1) + '" stroke-linecap="round" transform="rotate(-90 16 16)" style="transition:stroke-dashoffset .6s ease;"/>' +
-            '</svg>' +
-            '<div class="db-week-day-lbl">' + d + '</div>' +
+      var todayHTML = '';
+      if (todayBlocks.length > 0) {
+        todayHTML = todayBlocks.map(function(b, bi) {
+          var lk = DAY_NAMES[todayDow] + '_' + bi + '_' + wkId;
+          var done = data.completedBlocks && data.completedBlocks[lk];
+          if (done) todayDone++;
+          return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-1);">' +
+            '<button onclick="toggleBlockDone(\'' + DAY_NAMES[todayDow] + '\',' + bi + ',\'' + b.type + '\',\'' + (b.title||'').replace(/'/g,'') + '\')" style="width:32px;height:32px;border-radius:50%;border:2px solid ' + (done ? 'var(--green)' : 'var(--surface-3)') + ';background:' + (done ? 'var(--green)' : 'none') + ';color:' + (done ? '#000' : 'var(--surface-4)') + ';font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;min-height:32px;">' + (done ? '\u2713' : '') + '</button>' +
+            '<div onclick="openBlockDetail(\'' + DAY_NAMES[todayDow] + '\',' + bi + ')" style="flex:1;cursor:pointer;min-width:0;">' +
+              '<div style="font-size:13px;color:' + (done ? 'var(--text-muted)' : 'var(--white)') + ';' + (done ? 'text-decoration:line-through;' : '') + '">' + escapeHTML(b.title) + '</div>' +
+              '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);">' + (b.time||'') + (b.duration > 0 ? ' \u00b7 ' + b.duration + ' Min.' : '') + '</div>' +
+            '</div>' +
           '</div>';
-        }).join('') +
-      '</div>' +
-    '</div>' +
-
-    // ══ TÄGLICHE GEWOHNHEITEN (Schlaf, Protein etc.) ══
-    '<div class="db-sec">' +
-      '<div class="db-sec-hd"><div class="db-sec-ttl">GEWOHNHEITEN</div><div id="checklist-score" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);"></div></div>' +
-      '<div id="daily-combined"></div>' +
-    '</div>' +
-
-    // ══ KRAFT-FORTSCHRITT (liftLog) ══
-    (function() {
-      var ll = data.liftLog || {};
-      var exIds = Object.keys(ll).filter(function(k) { return ll[k].length >= 2; });
-      if (exIds.length === 0) return '';
-      // Show top 4 exercises by most entries
-      exIds.sort(function(a,b) { return ll[b].length - ll[a].length; });
-      exIds = exIds.slice(0, 4);
-      var rows = exIds.map(function(exId) {
-        var entries = ll[exId];
-        var first = entries[0].weight;
-        var last = entries[entries.length - 1].weight;
-        var diff = last - first;
-        var libEx = (typeof getExerciseById === 'function') ? getExerciseById(exId) : null;
-        var name = libEx ? libEx.name : exId.replace(/-/g,' ').toUpperCase();
-        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--surface-1);">' +
-          '<div style="min-width:0;">' +
-            '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHTML(name) + '</div>' +
-            '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);">' + entries.length + ' Einträge · zuletzt ' + last + ' kg</div>' +
-          '</div>' +
-          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:' + (diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : '#555') + ';">' + (diff > 0 ? '+' : '') + diff.toFixed(1) + '</div>' +
-        '</div>';
-      }).join('');
-      return '<div class="db-sec">' +
-        '<div class="db-sec-hd"><div class="db-sec-ttl">KRAFT-FORTSCHRITT</div><div class="db-sec-link" onclick="showPage(\'uebungen\')">Alle Übungen →</div></div>' +
-        rows +
-      '</div>';
-    })() +
-
-    // ══ PERFORMANCE (Radar + Stats, two-col) ══
-    (hasScores ?
-      '<div class="db-sec">' +
-        '<div class="db-sec-hd"><div class="db-sec-ttl">PERFORMANCE</div><div class="db-sec-link" onclick="showPage(\'tests\')">Alle Tests \u2192</div></div>' +
-        '<div class="db-two">' +
-          '<div id="rpg-radar" style="height:320px;"></div>' +
-          '<div id="dash-stats"></div>' +
+        }).join('');
+      }
+      // Progress bar
+      var pctToday = todayBlocks.length > 0 ? Math.round(todayDone / todayBlocks.length * 100) : 0;
+      return '<div style="padding:20px 0;border-bottom:1px solid var(--surface-2);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:2px;">HEUTE</div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:' + (todayDone === todayBlocks.length && todayBlocks.length > 0 ? 'var(--green)' : 'var(--text-muted)') + ';">' + todayDone + '/' + todayBlocks.length + '</div>' +
         '</div>' +
-      '</div>'
-    : '') +
-
-    // ══ HRV ══
-    (hasHRV ?
-      '<div class="db-sec">' +
-        '<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid ' + hrvColor + ';">' +
-          '<div style="font-size:20px;">' + hrvStatus + '</div>' +
-          '<div style="flex:1;"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-base);color:' + hrvColor + ';">HRV ' + hrvLabel + '</div></div>' +
-          '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-xl);color:var(--white);">0<span style="font-size:var(--fs-xs);color:var(--text-subtle);"> ms</span></div>' +
-        '</div>' +
-      '</div>'
-    : '') +
-
-    // ══ HINWEISE ══
-    '<div id="dash-hinweise"></div>' +
-
-    // ══ AKTIVITÄT + KÄMPFE (two-col) ══
-    '<div class="db-sec">' +
-      '<div class="db-two">' +
-        '<div>' +
-          '<div class="db-sec-hd"><div class="db-sec-ttl">AKTIVIT\u00c4T</div></div>' +
-          (recentBlocks.length > 0 ?
-            recentBlocks.map(function(rb) {
-              var tc = TYPE_COLORS[rb.type] || 'var(--grey)';
-              var d2 = rb.date ? new Date(rb.date) : null;
-              var ts = d2 ? (d2.getHours()<10?'0':'') + d2.getHours() + ':' + (d2.getMinutes()<10?'0':'') + d2.getMinutes() : '';
-              return '<div class="dash-act-item"><div style="width:3px;height:20px;border-radius:2px;background:' + tc + ';"></div><div style="flex:1;font-size:var(--fs-sm);color:var(--light);">' + escapeHTML(rb.title||rb.type) + '</div><div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);">' + ts + '</div></div>';
-            }).join('') :
-            (hasLog ? '<div id="recent-log"></div>' : '<div style="font-size:var(--fs-xs);color:var(--text-subtle);">Noch keine Aktivit\u00e4t.</div>')
-          ) +
-        '</div>' +
-        '<div>' +
-          '<div class="db-sec-hd"><div class="db-sec-ttl" style="cursor:pointer;" onclick="showPage(\'fights\')">K\u00c4MPFE</div><button class="submit-btn" style="padding:3px 10px;font-size:var(--fs-xs);" onclick="openFightModal()">+</button></div>' +
-          '<div id="fight-log-list"></div>' +
-        '</div>' +
-      '</div>' +
-    '</div>' +
-
-    // ══ BENCHMARKS ══
-    (topBench.length > 0 ?
-      '<div class="db-sec">' +
-        '<div class="db-sec-hd"><div class="db-sec-ttl" style="cursor:pointer;" onclick="showPage(\'tests\')">BENCHMARKS</div></div>' +
-        '<div class="dash-sparks">' +
-          topBench.map(function(b) {
-            var hh = hist[b.id]||[]; var vv = data.benchmarks[b.id]||0; var tt = getBenchTrend(hh,b.inverse);
-            return '<div class="dash-spark-item" onclick="showPage(\'tests\')"><canvas id="dash-spark-' + b.id + '" width="100" height="36" style="display:block;width:100px;height:36px;"></canvas><div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--white);margin-top:4px;">' + vv + ' <span style="color:' + tt.color + ';">' + tt.arrow + '</span></div><div style="font-family:\'Space Mono\',monospace;font-size:8px;color:var(--text-subtle);">' + b.name.replace(/\s.*/,'') + '</div></div>';
+        (todayBlocks.length > 0 ? '<div style="height:4px;background:var(--surface-2);border-radius:2px;margin-bottom:12px;overflow:hidden;"><div style="height:100%;width:' + pctToday + '%;background:' + (pctToday >= 100 ? 'var(--green)' : 'var(--gold)') + ';border-radius:2px;transition:width .4s ease;"></div></div>' : '') +
+        todayHTML +
+        // Week strip
+        '<div class="db-week-strip" style="margin-top:16px;">' +
+          DAY_SHORT.map(function(d, i) {
+            var dc = dayCompletion[i];
+            var pct2 = dc.total > 0 ? dc.done / dc.total : 0;
+            var c = 2 * Math.PI * 14;
+            var off = c * (1 - pct2);
+            var col = pct2 >= 1 ? 'var(--green)' : pct2 > 0 ? 'var(--gold)' : 'var(--surface-3)';
+            var isToday = i === todayDow;
+            return '<div class="db-week-day' + (isToday ? ' today' : '') + '">' +
+              '<svg width="32" height="32" viewBox="0 0 32 32">' +
+                '<circle cx="16" cy="16" r="14" stroke="var(--surface-2)" stroke-width="2.5" fill="none"/>' +
+                '<circle id="week-ring-' + i + '" data-target="' + off + '" cx="16" cy="16" r="14" stroke="' + col + '" stroke-width="2.5" fill="none" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + c.toFixed(1) + '" stroke-linecap="round" transform="rotate(-90 16 16)" style="transition:stroke-dashoffset .6s ease;"/>' +
+              '</svg>' +
+              '<div class="db-week-day-lbl">' + d + '</div>' +
+            '</div>';
           }).join('') +
         '</div>' +
+      '</div>';
+    })() +
+
+    // ══ ZONE 4: PERFORMANCE SNAPSHOT ══
+    (hasScores ?
+      '<div style="padding:20px 0;border-bottom:1px solid var(--surface-2);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-subtle);letter-spacing:2px;">PERFORMANCE</div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'training\')">Alle Tests \u2192</div>' +
+        '</div>' +
+        '<div id="rpg-radar" style="height:280px;"></div>' +
+        (hasHRV ?
+          '<div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 14px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid ' + hrvColor + ';">' +
+            '<div style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:' + hrvColor + ';">HRV ' + hrvLabel + '</div>' +
+            '<div style="flex:1;"></div>' +
+            '<div id="dash-hrv-val" data-target="' + hrvArr[0].value + '" style="font-family:\'Bebas Neue\',sans-serif;font-size:var(--fs-lg);color:var(--white);">0<span style="font-size:var(--fs-xs);color:var(--text-subtle);"> ms</span></div>' +
+          '</div>'
+        : '') +
       '</div>'
     : '') +
 
-    // ══ FOOTER ══
-    '<div id="bench-summary" style="padding:8px 0;font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);cursor:pointer;" onclick="showPage(\'tests\')"></div>' +
-    '' +
+    // ══ ZONE 5: QUICK LINKS ══
+    '<div style="padding:20px 0;display:flex;gap:8px;flex-wrap:wrap;">' +
+      '<button onclick="showPage(\'training\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);background:var(--surface-1);border:1px solid var(--surface-2);padding:10px 16px;border-radius:var(--radius-full);cursor:pointer;min-height:36px;transition:border-color var(--duration) var(--ease);">+ Training loggen</button>' +
+      '<button onclick="showPage(\'fights\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);background:var(--surface-1);border:1px solid var(--surface-2);padding:10px 16px;border-radius:var(--radius-full);cursor:pointer;min-height:36px;transition:border-color var(--duration) var(--ease);">Kampf planen</button>' +
+      '<button onclick="showPage(\'training\')" style="font-family:\'Space Mono\',monospace;font-size:var(--fs-xs);color:var(--text-muted);background:var(--surface-1);border:1px solid var(--surface-2);padding:10px 16px;border-radius:var(--radius-full);cursor:pointer;min-height:36px;transition:border-color var(--duration) var(--ease);">Test machen</button>' +
+    '</div>' +
+
+    // Hidden containers for sub-renderers
+    '<div id="dash-countdown-hero" style="display:none;"></div>' +
+    '<div id="dash-stats" style="display:none;"></div>' +
+    '<div id="dash-hinweise"></div>' +
+    '<div id="daily-combined" style="display:none;"></div>' +
+    '<div id="fight-log-list" style="display:none;"></div>' +
+    '<div id="recent-log" style="display:none;"></div>' +
+    '<div id="bench-summary" style="display:none;"></div>' +
 
     '</div>'; // close db-content
 
-  // Render sub-components
+  // Render sub-components (keep them functional even if hidden)
   renderFightCountdown();
-  renderDashStats();
   renderHinweise();
   renderDailyCombined();
-  renderFightLog();
-  if (recentBlocks.length === 0) renderRecentLog();
-  if (!isMobile()) renderSäulenSelfRating();
-  renderBenchSummary();
 
   // ═══ ANIMATION CHOREOGRAPHY ═══
 
-  // 300ms: Score ring + number count-up
-  setTimeout(function() {
-    var ringFg = document.getElementById('dash-ring-fg');
-    var ringNum = document.getElementById('dash-ring-num');
-    if (ringFg && ringNum && overall !== null) {
-      ringFg.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.25,.8,.25,1)';
-      var ringCirc = 2 * Math.PI * 80;
-      ringFg.style.strokeDashoffset = ringCirc * (1 - ringPct / 100);
-      animateValue(ringNum, 0, overall, 1200);
-    }
-  }, 300);
-
-  // 500ms: Radar chart
+  // 300ms: Radar chart
   setTimeout(function() {
     renderRadarChart(scores);
-  }, 500);
+  }, 300);
 
-  // 600ms: Week rings stagger (MO→SO, 50ms apart)
+  // 400ms: Week rings stagger
   setTimeout(function() {
     for (var wi = 0; wi < 7; wi++) {
       (function(idx) {
@@ -6949,23 +6852,16 @@ function renderDashboard() {
         }, idx * 50);
       })(wi);
     }
-  }, 600);
+  }, 400);
 
-  // 700ms: HRV value count-up
+  // 500ms: HRV value count-up
   setTimeout(function() {
     var hrvEl = document.getElementById('dash-hrv-val');
     if (hrvEl) {
       var target = parseInt(hrvEl.getAttribute('data-target')) || 0;
       if (target > 0) animateValue(hrvEl, 0, target, 800, ' ms');
     }
-  }, 700);
-
-  // 800ms: Sparklines
-  setTimeout(function() {
-    topBench.forEach(function(b) {
-      drawSparkline('dash-spark-' + b.id, hist[b.id], b.color || '#e8000d', b.inverse);
-    });
-  }, 800);
+  }, 500);
 }
 
 // Selbsteinschätzung der 8 Säulen (1-5 Punkte)

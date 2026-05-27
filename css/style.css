@@ -318,7 +318,7 @@ html { -webkit-overflow-scrolling: touch; }
 button, .card, .day-block, .nav-btn, .nav-drop-item, .btab, .submit-btn, .log-entry-card {
   -webkit-tap-highlight-color: transparent;
 }
-button:active, .submit-btn:active { transform: scale(.97); transition-duration: .05s; }
+button:active, .submit-btn:active, .card:active, .day-block:active { transform: scale(.97); transition-duration: .05s; }
 
 /* Larger touch targets */
 .nav-btn, .nav-hub-btn, .nav-drop-item { min-height: 44px; display: inline-flex; align-items: center; }
