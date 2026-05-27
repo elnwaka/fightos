@@ -321,8 +321,10 @@ async function doRegister() {
     localStorage.setItem('fos_users', JSON.stringify(users));
     var data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
     localStorage.setItem('fos_data_' + user, JSON.stringify(data));
-    msg.className = 'auth-msg success'; msg.textContent = 'Account erstellt! Logge dich ein.';
-    switchAuthTab('login');
+    // Auto-login after registration — no redirect to login tab
+    currentUser = user;
+    localStorage.setItem('fos_current', user);
+    enterApp();
   } catch(e) {
     msg.className = 'auth-msg error';
     if (e.code === 'auth/email-already-in-use') msg.textContent = 'Name bereits vergeben!';
@@ -704,8 +706,10 @@ function obComplete() {
     saveData(data);
   }
 
-  // Hide onboarding, enter app
+  // Hide onboarding, show 8 Säulen intro, then enter app
   document.getElementById('onboarding-screen').classList.remove('active');
+  users[currentUser].seenIntro = false; // Force intro to show after onboarding
+  localStorage.setItem('fos_users', JSON.stringify(users));
   enterApp();
 }
 
@@ -745,13 +749,17 @@ function enterApp() {
   renderLogEntries();
   if (typeof updateQlogSäulen === 'function') updateQlogSäulen();
 
-  // Show 8 Säulen intro only on very first visit (skip for Firebase returning users)
+  // Show onboarding for NEW users who haven't completed it yet
   var users = safeParse('fos_users', {});
-  var isReturning = _fbUser || (users[currentUser] && users[currentUser].pass === 'firebase');
-  if (!isReturning && users[currentUser] && !users[currentUser].seenIntro) {
+  var u = users[currentUser];
+  if (u && !u.onboardingDone) {
+    // New user — show onboarding wizard to collect profile data
+    showOnboarding();
+  } else if (u && !u.seenIntro) {
+    // Returning user who hasn't seen the 8 Säulen intro
     showSäulenIntro();
   } else {
-    if (users[currentUser]) { users[currentUser].seenIntro = true; localStorage.setItem('fos_users', JSON.stringify(users)); }
+    if (u) { u.seenIntro = true; localStorage.setItem('fos_users', JSON.stringify(users)); }
     showPage(getPageFromHash());
   }
 
@@ -2627,6 +2635,15 @@ function switchFightsTab(tabKey) {
 
 function renderFightsTab1(contentEl, data) {
   const fights = data.fights || [];
+  if (fights.length === 0) {
+    contentEl.innerHTML = '<div style="text-align:center;padding:48px 20px;">' +
+      '<div style="font-size:48px;margin-bottom:16px;">&#129354;</div>' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">NOCH KEINE KÄMPFE</div>' +
+      '<div style="font-size:14px;color:var(--text-muted);line-height:1.6;max-width:400px;margin:0 auto 24px;">Trage deinen ersten Kampf ein um dein Record, Matchup-Statistiken und Kampfanalysen zu sehen.</div>' +
+      '<button class="submit-btn" onclick="openFightModal()" style="padding:14px 32px;">KAMPF EINTRAGEN</button>' +
+    '</div>';
+    return;
+  }
   const wins = fights.filter(f => f.result === 'S').length;
   const losses = fights.filter(f => f.result === 'N').length;
   const draws = fights.filter(f => f.result === 'U').length;
@@ -5002,6 +5019,7 @@ function _renderWeekPlanInner() {
       ${is10W ? '' : '</div>'}
       ${_deloadWarnings.length && !isDeloadActive ? '<div style="margin-top:8px;padding:10px 14px;background:var(--surface-0);border:1px solid var(--orange);border-radius:var(--radius-md);font-size:12px;color:var(--orange);">⚠ Dein Körper zeigt Zeichen von Überbelastung: ' + _deloadWarnings.join(', ') + '. Brauchst du einen Deload?</div>' : ''}
     </div>
+    ${(!data.log || data.log.length === 0) ? '<div style="padding:14px 20px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid var(--green);margin-bottom:20px;"><div style="font-size:14px;color:var(--white);font-weight:500;margin-bottom:4px;">Dein Plan wurde automatisch erstellt</div><div style="font-size:13px;color:var(--text-muted);line-height:1.6;">Basierend auf deinem Level, Equipment und Zeitplan. Klicke auf einen Block um Details zu sehen. Nach dem Training: Haken setzen um es als erledigt zu markieren.</div></div>' : ''}
     ${(function() {
       var hints = [];
       if (!s.gymAccess || s.gymAccess === 'none') hints.push('Equipment: Körpergewicht');
@@ -6713,6 +6731,28 @@ function renderDashboard() {
 
     '<div class="db-content">' +
 
+    // ══ NEW USER WELCOME BANNER ══
+    (isNewUser ?
+      '<div style="padding:24px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid var(--red);margin-bottom:20px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">WILLKOMMEN BEI FIGHTOS</div>' +
+        '<div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:16px;">Dein Trainingsplan wurde basierend auf deinem Level und Zeitplan generiert. So startest du:</div>' +
+        '<div style="display:flex;flex-direction:column;gap:12px;">' +
+          '<div onclick="showPage(\'wochenplan\')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border-radius:var(--radius);cursor:pointer;">' +
+            '<div style="width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:14px;flex-shrink:0;">1</div>' +
+            '<div><div style="font-size:14px;color:var(--white);font-weight:500;">Wochenplan ansehen</div><div style="font-size:12px;color:var(--text-muted);">Dein personalisierter Trainingsplan für diese Woche</div></div>' +
+          '</div>' +
+          '<div onclick="showPage(\'training\')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border-radius:var(--radius);cursor:pointer;">' +
+            '<div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:14px;flex-shrink:0;">2</div>' +
+            '<div><div style="font-size:14px;color:var(--white);font-weight:500;">Übungen entdecken</div><div style="font-size:12px;color:var(--text-muted);">Alle Übungen mit Erklärungen und Boxing-Relevanz</div></div>' +
+          '</div>' +
+          '<div onclick="showPage(\'profil\')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border-radius:var(--radius);cursor:pointer;">' +
+            '<div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:14px;flex-shrink:0;">3</div>' +
+            '<div><div style="font-size:14px;color:var(--white);font-weight:500;">8 Säulen verstehen</div><div style="font-size:12px;color:var(--text-muted);">Die Wissenschaft hinter deinem Training</div></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    : '') +
+
     // ══ ZONE 2: NEXT ACTION ══
     (nextBlock ? (function() {
       var hrvWarn = '';
@@ -7304,6 +7344,9 @@ function renderTestsPage() {
     weakest = { label: minKey, val: minVal };
   }
 
+  // Empty state hint for new users
+  var hasBenchmarks = Object.values(data.benchmarks).some(function(v) { return v > 0; });
+
   // Cooper → VO2max estimate
   const cooperVal = data.benchmarks.cooper;
   const vo2max = cooperVal ? ((cooperVal - 504) / 44.7).toFixed(1) : null;
@@ -7582,6 +7625,7 @@ function renderTestsPage() {
       <div class="page-title">LEISTUNGS<span>TESTS</span></div>
       <div class="page-sub">Nationalkader-Benchmarks für ${bw} kg · Trage nur ein was du messen kannst</div>
     </div>
+    ${!hasBenchmarks ? '<div style="padding:16px 20px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid var(--blue);margin-bottom:24px;"><div style="font-size:14px;color:var(--white);font-weight:500;margin-bottom:4px;">Starte mit einem Baseline-Test</div><div style="font-size:13px;color:var(--text-muted);line-height:1.6;">Trage deine aktuellen Werte ein um deinen Score zu berechnen und Fortschritt zu tracken. Du musst nicht alle Tests machen — starte mit dem was du im Gym messen kannst (z.B. Bankdrücken, Klimmzüge, Cooper-Test).</div></div>' : ''}
     <div class="tests-wrap">
       ${heroHTML}
       ${batchHTML}
