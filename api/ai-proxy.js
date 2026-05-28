@@ -27,26 +27,35 @@ module.exports = async function handler(req, res) {
     const model = body.model || 'gemini-2.5-flash';
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: body.contents,
-        generationConfig: body.generationConfig || {
-          temperature: 0.7,
-          maxOutputTokens: 2048,
-          topP: 0.9
-        }
-      })
+    const payload = JSON.stringify({
+      contents: body.contents,
+      generationConfig: body.generationConfig || {
+        temperature: 0.7,
+        maxOutputTokens: 2048,
+        topP: 0.9
+      }
     });
 
-    const data = await response.json();
+    // Retry once on 503/429
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+      });
 
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || 'Gemini API error' });
+      if (response.status === 503 || response.status === 429) {
+        if (attempt === 0) { await new Promise(r => setTimeout(r, 1500)); continue; }
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return res.status(response.status).json({ error: data.error?.message || 'Gemini API error' });
+      }
+
+      return res.status(200).json(data);
     }
-
-    return res.status(200).json(data);
 
   } catch (err) {
     return res.status(500).json({ error: err.message });

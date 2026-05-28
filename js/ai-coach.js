@@ -400,6 +400,9 @@ async function sendToCoach(userMessage) {
     });
 
     if (!response.ok) {
+      if (response.status === 503 || response.status === 429) {
+        return 'Der Coach ist gerade überlastet — versuch es in ein paar Sekunden nochmal.';
+      }
       var errText = await response.text();
       throw new Error('API Error ' + response.status + ': ' + errText.substring(0, 200));
     }
@@ -414,7 +417,7 @@ async function sendToCoach(userMessage) {
     return reply;
   } catch (err) {
     console.error('AI Coach Error:', err);
-    return 'Fehler: ' + err.message;
+    return 'Verbindungsproblem — versuch es nochmal.';
   }
 }
 
