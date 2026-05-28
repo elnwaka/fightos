@@ -1253,6 +1253,8 @@ function renderTrainingPage(subTab) {
   else if (subTab === 'periodisierung') { renderPeriodisierungPage(); contentEl.innerHTML = document.getElementById('page-periodisierung').innerHTML; }
   else if (subTab === 'regeneration') { renderRegenerationPage(); contentEl.innerHTML = document.getElementById('page-regeneration').innerHTML; }
   else if (subTab === 'notizen') { renderNotizenTab(contentEl); }
+  else if (subTab === 'cutten') { renderCuttenPage(); contentEl.innerHTML = document.getElementById('page-cutten').innerHTML; }
+  else if (subTab === 'supplements') { renderSupplementsPage(); contentEl.innerHTML = document.getElementById('page-supplements').innerHTML; }
 }
 
 // ===== NOTIZEN-TAB =====
@@ -1393,6 +1395,7 @@ function renderProfilPage(subTab) {
   else if (subTab === 'saeulen') { renderSaeulenPage(); contentEl.innerHTML = document.getElementById('page-saeulen').innerHTML; }
   else if (subTab === 'rechner') { renderRechnerPage(); contentEl.innerHTML = document.getElementById('page-rechner').innerHTML; }
   else if (subTab === 'faq') { renderFAQPage(); contentEl.innerHTML = document.getElementById('page-faq').innerHTML; }
+  else if (subTab === 'mental') { renderMentalPage(); contentEl.innerHTML = document.getElementById('page-mental').innerHTML; }
 }
 
 function switchProfilTab(tab) {

@@ -1540,7 +1540,8 @@ button:active, .submit-btn:active, .card:active, .day-block:active { transform: 
 }
 .faq-item.open .faq-a { grid-template-rows: 1fr; }
 .faq-a > * { overflow: hidden; }
-.faq-a-inner { padding: 0 0 18px; }
+.faq-a-inner { padding: 0; }
+.faq-item.open .faq-a-inner { padding: 0 0 18px; }
 .faq-a strong { color: var(--white); }
 
 /* ===== WOCHENPLAN ===== */
@@ -3672,6 +3673,91 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   /* --- Calc box inputs on mobile --- */
   .calc-inputs { grid-template-columns: 1fr !important; }
 
+  /* ===== MOBILE DESIGN IMPROVEMENTS ===== */
+
+  /* --- 1. Page headers: reduce vertical overhead --- */
+  .page-header { margin-bottom: 20px; }
+  .page-sub { margin-top: 4px; font-size: 10px; line-height: 1.4; }
+
+  /* --- 2. Training sub-tabs: scrollable with fade hint --- */
+  .sub-tabs {
+    padding-right: 20px;
+    margin-bottom: var(--space-4);
+    gap: 0;
+    position: relative;
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+  .sub-tab {
+    padding: var(--space-2) var(--space-3);
+    font-size: 10px;
+    min-height: 36px;
+  }
+
+  /* --- 3. Account hero: stack vertically on mobile --- */
+  [style*="display:flex"][style*="gap:24px"][style*="border-bottom:1px solid var(--surface-2)"] {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 20px 0 !important;
+  }
+  /* Account stats row: spread evenly */
+  [style*="display:flex"][style*="gap:24px"][style*="border-bottom:1px solid var(--surface-2)"] > [style*="display:flex"][style*="gap:20px"] {
+    width: 100%;
+    justify-content: space-around;
+    padding-top: 8px;
+    border-top: 1px solid var(--surface-2);
+  }
+
+  /* --- 4. Wochenplan: compact info banners --- */
+  [style*="display:flex"][style*="flex-wrap:wrap"][style*="gap:8px"][style*="margin-bottom:16px"] {
+    gap: 4px !important;
+    margin-bottom: 10px !important;
+  }
+  [style*="display:flex"][style*="flex-wrap:wrap"][style*="gap:8px"][style*="margin-bottom:16px"] > span {
+    font-size: 9px !important;
+    padding: 3px 8px !important;
+  }
+  /* Recovery badge compact */
+  [style*="display:inline-flex"][style*="padding:10px 20px"] {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  /* --- 5. AI Coach FAB: avoid overlapping form inputs --- */
+  #ai-coach-fab { bottom: 76px; right: 12px; width: 46px; height: 46px; font-size: 20px; }
+
+  /* --- 6. Video grid: single column on mobile --- */
+  .vid-grid { grid-template-columns: 1fr !important; gap: 10px; }
+
+  /* --- 7. Milestones grid: tighter on mobile --- */
+  [style*="display:flex"][style*="flex-wrap:wrap"][style*="gap:8px"][style*="margin-top:12px"] {
+    gap: 6px !important;
+  }
+  [style*="display:flex"][style*="flex-wrap:wrap"][style*="gap:8px"][style*="margin-top:12px"] > div {
+    min-width: 0 !important;
+    flex: 1 1 calc(50% - 4px) !important;
+    padding: 8px 10px !important;
+  }
+
+  /* --- 8. Kämpfe: fight cards more compact --- */
+  .fight-detail-grid { gap: 8px !important; }
+
+  /* --- 9. Säulen cards: reduce padding for more content visible --- */
+  .si-clusters > div { padding: 12px !important; }
+
+  /* --- 10. Wochenplan first-use info box: more compact --- */
+  [style*="padding:14px 20px"][style*="border-left:3px solid var(--green)"][style*="margin-bottom:20px"] {
+    padding: 10px 12px !important;
+    margin-bottom: 12px !important;
+  }
+  [style*="padding:14px 20px"][style*="border-left:3px solid var(--green)"] > div:first-child {
+    font-size: 13px !important;
+  }
+  [style*="padding:14px 20px"][style*="border-left:3px solid var(--green)"] > div:last-child {
+    font-size: 12px !important;
+  }
+
 }
 
 /* ===== RESPONSIVE: SMALL MOBILE (max-width: 360px) ===== */
@@ -3703,6 +3789,10 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .page { overflow-x: hidden; word-wrap: break-word; overflow-wrap: break-word; }
   .card-body { word-wrap: break-word; overflow-wrap: break-word; }
   .info-box { word-wrap: break-word; overflow-wrap: break-word; }
+
+  /* --- Ultra-compact headers --- */
+  .page-header { margin-bottom: 14px; }
+  .sub-tab { font-size: 9px; padding: var(--space-2) var(--space-2); }
 }
 
 /* Editable field hover indicators */
@@ -4988,7 +5078,7 @@ body.hide-coach #ai-coach-panel { display: none !important; }
 /* Mobile: full width */
 @media (max-width: 480px) {
   #ai-coach-panel { width: 100vw; height: 80vh; max-height: none; border-radius: 16px 16px 0 0; }
-  #ai-coach-fab { bottom: 72px; right: 16px; width: 50px; height: 50px; font-size: 22px; }
+  #ai-coach-fab { bottom: 76px; right: 12px; width: 46px; height: 46px; font-size: 20px; }
 }
 
 /* ===== VIDEO LIBRARY ===== */
