@@ -19,7 +19,9 @@
 <meta name="twitter:title" content="BoxSpec — Trainingssystem für Boxer">
 <meta name="twitter:description" content="Trainingsplan, Ernährung, S&C und AI Coach für Boxer. Kostenlos.">
 <link rel="icon" type="image/svg+xml" href="img/icons/icon.svg">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;700&family=Space+Mono:wght@400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -62,7 +64,7 @@ body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;li
 /* ===== SECTION COMMON ===== */
 .ln-section{padding:120px 32px;position:relative}
 .ln-section-inner{max-width:1100px;margin:0 auto}
-.ln-section-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--red);text-transform:uppercase;margin-bottom:12px}
+.ln-section-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:#ff4444;text-transform:uppercase;margin-bottom:12px}
 .ln-section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:3px;color:var(--white);margin-bottom:16px;line-height:1}
 .ln-section-desc{font-size:16px;color:var(--muted);max-width:600px;line-height:1.7;margin-bottom:48px}
 
@@ -111,7 +113,8 @@ body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;li
 
 /* ===== FOOTER ===== */
 .ln-footer{padding:40px 32px;border-top:1px solid var(--border);text-align:center}
-.ln-footer p{font-family:'Space Mono',monospace;font-size:11px;color:var(--subtle);letter-spacing:1px}
+.ln-footer p{font-family:'Space Mono',monospace;font-size:11px;color:#8888a0;letter-spacing:1px}
+.ln-footer a{color:#8888a0}
 
 /* ===== SCROLL REVEAL ===== */
 .ln-reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
@@ -144,6 +147,7 @@ body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;li
   <a href="app.html" class="ln-cta">KOSTENLOS STARTEN</a>
 </nav>
 
+<main>
 <!-- HERO -->
 <section class="ln-hero">
   <div class="ln-hero-content">
@@ -156,7 +160,7 @@ body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;li
     </div>
   </div>
   <div class="ln-hero-visual">
-    <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1200&q=80" alt="Boxer beim Training">
+    <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&q=60" alt="Boxer beim Training" fetchpriority="high" width="800" height="1024" loading="eager">
   </div>
   <div class="ln-scroll">
     <div class="ln-scroll-line"></div>
@@ -348,6 +352,7 @@ body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;li
 </section>
 
 <!-- FOOTER -->
+</main>
 <footer class="ln-footer">
   <p>BOX<span style="color:var(--red)">SPEC</span> &copy; 2026 &mdash; Built for Fighters.</p>
 </footer>
