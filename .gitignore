@@ -1,8 +1,8 @@
-tlac_full.txt
-tlac_full.txt
-test-*.png
 node_modules/
 test-screenshots/
 test-*.mjs
+test-*.png
 test-report.txt
+tlac_full.txt
 FINDINGS.md
+package-lock.json
