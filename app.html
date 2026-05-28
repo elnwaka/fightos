@@ -679,6 +679,83 @@ if ('serviceWorker' in navigator) {
     console.log('SW failed:', e);
   });
 }
+
+// PWA Install Prompt
+var _pwaInstallEvent = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _pwaInstallEvent = e;
+  // Don't show if already dismissed or installed
+  if (localStorage.getItem('fos_pwa_dismissed') || window.matchMedia('(display-mode: standalone)').matches) return;
+  // Wait 30 seconds so user can explore first
+  setTimeout(showPwaInstallBanner, 30000);
+});
+
+function showPwaInstallBanner() {
+  if (!_pwaInstallEvent) return;
+  var banner = document.createElement('div');
+  banner.id = 'pwa-install-banner';
+  banner.innerHTML =
+    '<div style="display:flex;align-items:center;gap:14px;">' +
+      '<img src="img/icons/icon-96x96.png" alt="BoxSpec" style="width:44px;height:44px;border-radius:10px;">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-weight:700;font-size:15px;color:#fff;">BoxSpec installieren</div>' +
+        '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:2px;">Schneller Zugriff vom Homescreen</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;gap:10px;margin-top:14px;">' +
+      '<button onclick="dismissPwaInstall()" style="flex:1;padding:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);border-radius:8px;font-size:14px;cursor:pointer;">Später</button>' +
+      '<button onclick="acceptPwaInstall()" style="flex:1;padding:10px;border:none;background:#E8000D;color:#fff;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;">Installieren</button>' +
+    '</div>';
+  banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1a1a2e;border-top:1px solid rgba(255,255,255,.1);padding:16px 20px;font-family:DM Sans,sans-serif;animation:slideUpPwa .3s ease;';
+  document.body.appendChild(banner);
+}
+
+function acceptPwaInstall() {
+  if (!_pwaInstallEvent) return;
+  _pwaInstallEvent.prompt();
+  _pwaInstallEvent.userChoice.then(function(result) {
+    if (result.outcome === 'accepted') {
+      localStorage.setItem('fos_pwa_dismissed', '1');
+    }
+    _pwaInstallEvent = null;
+  });
+  removePwaBanner();
+}
+
+function dismissPwaInstall() {
+  localStorage.setItem('fos_pwa_dismissed', '1');
+  _pwaInstallEvent = null;
+  removePwaBanner();
+}
+
+function removePwaBanner() {
+  var b = document.getElementById('pwa-install-banner');
+  if (b) b.remove();
+}
+
+// iOS Safari fallback (no beforeinstallprompt)
+if (/iPhone|iPad/.test(navigator.userAgent) && !window.navigator.standalone && !localStorage.getItem('fos_pwa_dismissed')) {
+  setTimeout(function() {
+    if (document.getElementById('pwa-install-banner')) return;
+    var banner = document.createElement('div');
+    banner.id = 'pwa-install-banner';
+    banner.innerHTML =
+      '<div style="display:flex;align-items:center;gap:14px;">' +
+        '<img src="img/icons/icon-96x96.png" alt="BoxSpec" style="width:44px;height:44px;border-radius:10px;">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-weight:700;font-size:15px;color:#fff;">BoxSpec installieren</div>' +
+          '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:2px;">Tippe <strong style="color:#fff;">Teilen</strong> &#x2794; <strong style="color:#fff;">Zum Home-Bildschirm</strong></div>' +
+        '</div>' +
+      '</div>' +
+      '<button onclick="this.parentElement.remove();localStorage.setItem(\'fos_pwa_dismissed\',\'1\')" style="margin-top:12px;width:100%;padding:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);border-radius:8px;font-size:14px;cursor:pointer;">Verstanden</button>';
+    banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1a1a2e;border-top:1px solid rgba(255,255,255,.1);padding:16px 20px;font-family:DM Sans,sans-serif;animation:slideUpPwa .3s ease;';
+    document.body.appendChild(banner);
+  }, 60000);
+}
 </script>
+<style>
+@keyframes slideUpPwa { from { transform: translateY(100%); } to { transform: translateY(0); } }
+</style>
 </body>
 </html>
