@@ -8050,43 +8050,7 @@ function mobileNav(page) {
 }
 
 // ===== THEME TOGGLE =====
-function toggleTheme() {
-  var html = document.documentElement;
-  var current = html.getAttribute('data-theme');
-  var next = current === 'light' ? 'dark' : 'light';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('fos_theme', next);
-  var btn = document.getElementById('theme-toggle-btn');
-  if (btn) {
-    var sun = btn.querySelector('.icon-sun');
-    var moon = btn.querySelector('.icon-moon');
-    if (sun) sun.style.display = next === 'light' ? 'none' : 'block';
-    if (moon) moon.style.display = next === 'light' ? 'block' : 'none';
-  }
-  var meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = next === 'light' ? '#FFFFFF' : '#E8000D';
-  // Re-render charts with new theme colors
-  if (_lastRadarScores) {
-    setTimeout(function() { renderRadarChart(_lastRadarScores); }, 50);
-  }
-}
-
-// Apply saved theme on load
-(function() {
-  var saved = localStorage.getItem('fos_theme');
-  if (saved === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-    var btn = document.getElementById('theme-toggle-btn');
-    if (btn) {
-      var sun = btn.querySelector('.icon-sun');
-      var moon = btn.querySelector('.icon-moon');
-      if (sun) sun.style.display = 'none';
-      if (moon) moon.style.display = 'block';
-    }
-    var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = '#FFFFFF';
-  }
-})();
+// Light mode removed — BoxSpec is dark only
 
 // ===== PWA SERVICE WORKER =====
 if ('serviceWorker' in navigator) {
