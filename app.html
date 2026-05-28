@@ -59,6 +59,18 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="192x192" href="img/icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="img/icons/icon-180x180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="img/icons/icon-152x152.png">
+<link rel="apple-touch-icon" sizes="144x144" href="img/icons/icon-144x144.png">
+<link rel="apple-touch-icon" sizes="128x128" href="img/icons/icon-128x128.png">
+
+<!-- iOS Splash Screens -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="img/icons/icon-512x512.png">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="img/icons/icon-512x512.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="img/icons/icon-512x512.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="img/icons/icon-512x512.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="img/icons/icon-512x512.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/apexcharts.css">
@@ -659,5 +671,14 @@ if (localStorage.getItem('fos_current')) {
 })();
 </script>
 <div class="toast-container" id="toast-container"></div>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(function(r) {
+    console.log('SW registered:', r.scope);
+  }).catch(function(e) {
+    console.log('SW failed:', e);
+  });
+}
+</script>
 </body>
 </html>

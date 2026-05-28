@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<title>BoxSpec Instagram Ad</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #111;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  padding: 40px;
+  justify-content: center;
+}
+
+/* ===== BANNER 1: Feed Post 1080x1080 ===== */
+.banner {
+  width: 1080px;
+  height: 1080px;
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0b;
+  flex-shrink: 0;
+}
+
+/* Boxer background image */
+.banner-bg {
+  position: absolute;
+  inset: 0;
+  background: url('https://images.pexels.com/photos/28238742/pexels-photo-28238742.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop') center center / cover no-repeat;
+  opacity: 0.35;
+  z-index: 0;
+}
+
+/* Dark gradient overlay */
+.banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(10,10,11,.6) 0%, rgba(10,10,11,.3) 30%, rgba(10,10,11,.85) 70%, rgba(10,10,11,.98) 100%),
+    radial-gradient(ellipse 80% 60% at 20% 90%, rgba(232,0,13,.15) 0%, transparent 70%);
+  z-index: 1;
+}
+
+/* Subtle grid lines */
+.banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  z-index: 1;
+}
+
+.banner-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 72px 80px;
+}
+
+/* Red accent corner */
+.corner-accent {
+  position: absolute;
+  top: 0; left: 0;
+  width: 8px;
+  height: 180px;
+  background: #E8000D;
+  z-index: 3;
+}
+.corner-accent-h {
+  position: absolute;
+  top: 0; left: 0;
+  width: 180px;
+  height: 8px;
+  background: #E8000D;
+  z-index: 3;
+}
+
+/* Bottom right corner */
+.corner-br {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 8px;
+  height: 120px;
+  background: #E8000D;
+  z-index: 3;
+}
+.corner-br-h {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 120px;
+  height: 8px;
+  background: #E8000D;
+  z-index: 3;
+}
+
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px;
+  letter-spacing: 3px;
+  margin-bottom: auto;
+}
+.logo span { color: #E8000D; }
+
+.tagline-pre {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  color: #E8000D;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 120px;
+  line-height: 0.95;
+  color: #fff;
+  letter-spacing: 2px;
+  margin-bottom: 36px;
+  text-shadow: 0 4px 30px rgba(0,0,0,.5);
+}
+.headline em {
+  font-style: normal;
+  color: #E8000D;
+}
+
+.subline {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 28px;
+  color: rgba(255,255,255,.65);
+  line-height: 1.5;
+  max-width: 700px;
+  margin-bottom: 48px;
+}
+
+.features {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+.feature-pill {
+  font-family: 'Space Mono', monospace;
+  font-size: 16px;
+  color: rgba(255,255,255,.8);
+  border: 1px solid rgba(255,255,255,.15);
+  padding: 10px 22px;
+  border-radius: 100px;
+  letter-spacing: 1px;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(4px);
+}
+
+.cta-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: auto;
+}
+.cta-btn {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 3px;
+  color: #fff;
+  background: #E8000D;
+  border: none;
+  padding: 18px 52px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.cta-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 16px;
+  color: rgba(255,255,255,.4);
+  letter-spacing: 1px;
+}
+
+/* ===== BANNER 2: Story 1080x1920 ===== */
+.banner-story {
+  width: 1080px;
+  height: 1920px;
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0b;
+  flex-shrink: 0;
+}
+
+/* Boxer background image for story */
+.story-bg {
+  position: absolute;
+  inset: 0;
+  background: url('https://images.pexels.com/photos/8611257/pexels-photo-8611257.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1920&fit=crop') center top / cover no-repeat;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.banner-story::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(10,10,11,.7) 0%, rgba(10,10,11,.2) 20%, rgba(10,10,11,.15) 40%, rgba(10,10,11,.8) 65%, rgba(10,10,11,.98) 100%),
+    radial-gradient(ellipse 90% 40% at 50% 100%, rgba(232,0,13,.18) 0%, transparent 70%);
+  z-index: 1;
+}
+
+.banner-story::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+  background-size: 54px 54px;
+  z-index: 1;
+}
+
+.story-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 100px 72px 120px;
+}
+
+.story-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 60px;
+}
+.story-logo span { color: #E8000D; }
+
+.story-quote {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 68px;
+  line-height: 1.05;
+  color: rgba(255,255,255,.15);
+  text-align: center;
+  margin-bottom: 80px;
+  padding: 0 20px;
+}
+.story-quote em {
+  font-style: normal;
+  color: rgba(232,0,13,.3);
+}
+
+.story-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 140px;
+  line-height: 0.92;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 3px;
+  margin-bottom: 40px;
+  text-shadow: 0 4px 40px rgba(0,0,0,.6);
+}
+.story-headline em {
+  font-style: normal;
+  color: #E8000D;
+}
+
+.story-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 32px;
+  color: rgba(255,255,255,.5);
+  text-align: center;
+  line-height: 1.55;
+  max-width: 800px;
+  margin: 0 auto 60px;
+}
+
+.story-features {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: auto 0;
+  padding: 0 20px;
+}
+.story-feature {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 36px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  background: rgba(0,0,0,.5);
+  backdrop-filter: blur(8px);
+}
+.story-feature-icon {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: #E8000D;
+  width: 56px;
+  height: 56px;
+  border: 2px solid rgba(232,0,13,.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+.story-feature-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 26px;
+  color: rgba(255,255,255,.8);
+  font-weight: 600;
+}
+.story-feature-text small {
+  display: block;
+  font-size: 20px;
+  font-weight: 400;
+  color: rgba(255,255,255,.35);
+  margin-top: 4px;
+}
+
+.story-cta {
+  text-align: center;
+  margin-top: 80px;
+}
+.story-cta-btn {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 40px;
+  letter-spacing: 4px;
+  color: #fff;
+  background: #E8000D;
+  border: none;
+  padding: 24px 80px;
+  border-radius: 12px;
+  display: inline-block;
+}
+.story-cta-url {
+  font-family: 'Space Mono', monospace;
+  font-size: 22px;
+  color: rgba(255,255,255,.35);
+  margin-top: 20px;
+  letter-spacing: 2px;
+}
+
+.label {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  letter-spacing: 2px;
+}
+</style>
+</head>
+<body>
+
+<!-- LABEL -->
+<div style="width:100%;text-align:center;padding:20px;">
+  <div class="label">FEED POST — 1080 x 1080</div>
+</div>
+
+<!-- BANNER 1: Feed Post -->
+<div class="banner">
+  <div class="banner-bg"></div>
+  <div class="corner-accent"></div>
+  <div class="corner-accent-h"></div>
+  <div class="corner-br"></div>
+  <div class="corner-br-h"></div>
+  <div class="banner-inner">
+    <div class="logo">BOX<span>SPEC</span></div>
+    <div class="tagline-pre">Built for Fighters</div>
+    <div class="headline">TRAINIERE<br>WIE EIN<br><em>CHAMPION.</em></div>
+    <div class="subline">Trainingsplan, Ernährung, AI Coach und Kampfvorbereitung — wissenschaftlich basiert, in einer App.</div>
+    <div class="features">
+      <span class="feature-pill">10-Wochen-Plan</span>
+      <span class="feature-pill">AI Coach</span>
+      <span class="feature-pill">74 Übungen</span>
+      <span class="feature-pill">Ernährung</span>
+    </div>
+    <div class="cta-row">
+      <div class="cta-btn">KOSTENLOS STARTEN</div>
+      <div class="cta-sub">boxspec.app</div>
+    </div>
+  </div>
+</div>
+
+<!-- LABEL -->
+<div style="width:100%;text-align:center;padding:40px 20px 20px;">
+  <div class="label">STORY / REEL — 1080 x 1920</div>
+</div>
+
+<!-- BANNER 2: Story -->
+<div class="banner-story">
+  <div class="story-bg"></div>
+  <div class="corner-accent"></div>
+  <div class="corner-accent-h" style="width:240px;"></div>
+  <div class="corner-br"></div>
+  <div class="corner-br-h" style="width:240px;"></div>
+  <div class="story-inner">
+    <div class="story-logo">BOX<span>SPEC</span></div>
+    <div class="story-quote">"Everybody has a plan until they get <em>punched in the mouth.</em>"</div>
+    <div class="story-headline">DEIN<br><em>BOXING</em><br>SYSTEM.</div>
+    <div class="story-sub">Alles was du brauchst — von der ersten Session bis zum Kampftag.</div>
+    <div class="story-features">
+      <div class="story-feature">
+        <div class="story-feature-icon">S&C</div>
+        <div class="story-feature-text">10-Wochen Trainingsplan<small>Periodisiert nach Boxing Science</small></div>
+      </div>
+      <div class="story-feature">
+        <div class="story-feature-icon">AI</div>
+        <div class="story-feature-text">AI Boxing Coach<small>Taktik, Ernährung, Kampfanalyse</small></div>
+      </div>
+      <div class="story-feature">
+        <div class="story-feature-icon">60+</div>
+        <div class="story-feature-text">Video-Bibliothek<small>Legenden, Technik, Drills</small></div>
+      </div>
+      <div class="story-feature">
+        <div class="story-feature-icon">8</div>
+        <div class="story-feature-text">Säulen-System<small>Kraft, Ausdauer, Ring IQ, Mental & mehr</small></div>
+      </div>
+    </div>
+    <div class="story-cta">
+      <div class="story-cta-btn">JETZT STARTEN</div>
+      <div class="story-cta-url">boxspec.app</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
