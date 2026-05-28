@@ -348,11 +348,13 @@ async function doLogin() {
     _fbUser = cred.user;
     currentUser = user;
     localStorage.setItem('fos_current', user);
-    // Ensure local user entry — keep onboardingDone if already set
+    // Ensure local user entry — LOGIN means user already exists, so onboarding is done
     var users = safeParse('fos_users', {});
     if (!users[user]) users[user] = {};
     users[user].pass = 'firebase';
     users[user].firebaseUid = _fbUser.uid;
+    users[user].onboardingDone = true;  // Login = existing user = onboarding done
+    users[user].seenIntro = true;
     if (!users[user].created) users[user].created = new Date().toISOString();
     localStorage.setItem('fos_users', JSON.stringify(users));
     // Sync from cloud FIRST, then enter app (prevents onboarding on new browser)
