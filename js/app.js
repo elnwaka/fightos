@@ -8091,3 +8091,12 @@ document.addEventListener('click', function(e) {
     tt.classList.toggle('tt-open');
   }
 });
+
+// ===== CARD-BODY TAP-TO-EXPAND (Mobile) =====
+document.addEventListener('click', function(e) {
+  if (window.innerWidth > 480) return;
+  var cb = e.target.closest('.card-body');
+  if (cb && !cb.classList.contains('expanded') && cb.scrollHeight > cb.clientHeight) {
+    cb.classList.add('expanded');
+  }
+});

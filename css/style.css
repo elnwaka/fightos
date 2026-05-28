@@ -3421,6 +3421,11 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .test-card { grid-template-columns: 1fr; }
   .test-card-right { flex-direction: row; align-items: baseline; gap: 12px; width: 100%; }
 
+  /* --- Inline headings scale down on tablet --- */
+  [style*="font-size:34px"] { font-size: clamp(24px, 4vw, 34px) !important; word-wrap: break-word; }
+  [style*="font-size:42px"] { font-size: clamp(28px, 5vw, 42px) !important; }
+  [style*="font-size:48px"] { font-size: clamp(32px, 6vw, 48px) !important; }
+
   /* --- Ernährung --- */
   .ern-nav { flex-wrap: wrap; }
   .ern-nav button { font-size: 11px; padding: 6px 10px; }
@@ -3599,9 +3604,28 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   /* --- Kämpfe Mobile --- */
   .fight-detail-grid { grid-template-columns: 1fr !important; }
 
-  /* --- Content Pages: Card Bodies hidden by default --- */
-  .card-body { max-height: 120px; overflow: hidden; position: relative; }
-  .card-body::after { content:''; position:absolute; bottom:0; left:0; right:0; height:40px; background:linear-gradient(transparent, var(--black)); pointer-events:none; }
+  /* --- Content Pages: Card Bodies collapsible with tap-to-expand --- */
+  .card-body { max-height: 160px; overflow: hidden; position: relative; cursor: pointer; }
+  .card-body::after { content:'Mehr anzeigen ▾'; position:absolute; bottom:0; left:0; right:0; height:52px; background:linear-gradient(transparent 0%, var(--black) 60%); display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px; font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); letter-spacing:1px; pointer-events:none; }
+  .card-body.expanded { max-height: none; overflow: visible; cursor: default; }
+  .card-body.expanded::after { display: none; }
+
+  /* --- ALL inline headings responsive (override inline font-size via !important) --- */
+  [id^="ern-s"] { font-size: clamp(20px, 5.5vw, 34px) !important; word-wrap: break-word; overflow-wrap: break-word; }
+  [id^="ern-s"] span { font-size: inherit; }
+  [style*="font-size:34px"] { font-size: clamp(20px, 5.5vw, 34px) !important; }
+  [style*="font-size:30px"][style*="Bebas Neue"] { font-size: clamp(18px, 5vw, 30px) !important; }
+  [style*="font-size:28px"][style*="Bebas Neue"] { font-size: clamp(18px, 5vw, 28px) !important; }
+  [style*="font-size:26px"][style*="Bebas Neue"] { font-size: clamp(16px, 4.5vw, 26px) !important; }
+  [style*="font-size:42px"] { font-size: clamp(24px, 6vw, 42px) !important; }
+  [style*="font-size:48px"] { font-size: clamp(28px, 7vw, 48px) !important; }
+  [style*="font-size:36px"] { font-size: clamp(22px, 6vw, 36px) !important; }
+
+  /* --- Inline grids: force collapse on mobile --- */
+  [style*="minmax(200px"] { grid-template-columns: 1fr !important; }
+  [style*="minmax(240px"] { grid-template-columns: 1fr !important; }
+  [style*="minmax(280px"] { grid-template-columns: 1fr !important; }
+  [style*="min-width:200px"] { min-width: 0 !important; }
   
   /* --- Tooltips auf Mobile als Tap-to-reveal --- */
   .tt .tt-text {
@@ -3635,6 +3659,19 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   /* --- Data tables --- */
   .data-table { min-width: auto; font-size: 11px; }
   .data-table td, .data-table th { padding: 6px 4px; }
+
+  /* --- Inline info boxes and source text --- */
+  .info-box div { word-wrap: break-word; overflow-wrap: break-word; }
+  .related-links { flex-direction: column; align-items: stretch; }
+  .related-links button { text-align: center; }
+
+  /* --- Timeline items compact --- */
+  .tl-item { padding-left: 20px; }
+  .tl-body { font-size: 12px; }
+
+  /* --- Calc box inputs on mobile --- */
+  .calc-inputs { grid-template-columns: 1fr !important; }
+
 }
 
 /* ===== RESPONSIVE: SMALL MOBILE (max-width: 360px) ===== */
@@ -3657,6 +3694,15 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   #rpg-radar { max-width: 160px; }
   .btab span { font-size: 7px; }
   .form-input, .form-select { padding: 8px 10px; font-size: 12px; }
+
+  /* --- Card body: even more compact on tiny screens --- */
+  .card-body { max-height: 130px; }
+  .card-body::after { font-size: 10px; height: 44px; }
+
+  /* --- Prevent any horizontal overflow --- */
+  .page { overflow-x: hidden; word-wrap: break-word; overflow-wrap: break-word; }
+  .card-body { word-wrap: break-word; overflow-wrap: break-word; }
+  .info-box { word-wrap: break-word; overflow-wrap: break-word; }
 }
 
 /* Editable field hover indicators */
