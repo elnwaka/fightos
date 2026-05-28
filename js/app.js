@@ -2737,11 +2737,35 @@ function renderFightsPage() {
       { key: 'analyse', label: 'ANALYSE' }
     ];
 
+    // Build fight date card
+    var _fd = data.fightDate;
+    var _fDiff = _fd ? Math.ceil((new Date(_fd + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000) : null;
+    var _fPhase = _fDiff !== null && _fDiff > 0 ? getFightPhase(_fDiff) : null;
+    var fightDateCardHTML = '<div class="fc-fight-date-card">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--white);letter-spacing:1px;">N\u00c4CHSTER KAMPF</div>' +
+        (_fd ? '<button onclick="clearFightDate();renderFightsPage();" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:4px;" title="Kampf l\u00f6schen">\u2715</button>' : '') +
+      '</div>' +
+      (_fd && _fDiff !== null && _fDiff >= 0 ?
+        '<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:' + (_fDiff === 0 ? '32px' : '42px') + ';color:' + (_fDiff <= 3 ? 'var(--red)' : _fDiff <= 7 ? 'var(--gold)' : 'var(--white)') + ';line-height:1;">' + (_fDiff === 0 ? 'HEUTE' : _fDiff) + '</div>' +
+          (_fDiff > 0 ? '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:var(--text-muted);">TAGE</div>' : '') +
+        '</div>' +
+        '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);margin-bottom:8px;">' + formatDate(_fd) + '</div>' +
+        (_fPhase ? '<div class="phase-badge ' + _fPhase.cls + '">' + _fPhase.name + '</div>' : '') +
+        '<div style="margin-top:12px;"><input type="date" id="fight-date-input" class="form-input" value="' + _fd + '" onchange="updateFightDate();renderFightsPage();" style="font-size:12px;padding:8px 12px;max-width:180px;"></div>'
+      :
+        '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Trage ein Datum ein \u2014 dein Wochenplan passt sich automatisch an.</div>' +
+        '<input type="date" id="fight-date-input" class="form-input" value="" onchange="updateFightDate();renderFightsPage();" style="font-size:13px;padding:10px 14px;max-width:200px;">'
+      ) +
+    '</div>';
+
     const headerAndTabsHTML = `
     <div class="page-header">
-      <div class="page-title">MEINE <span>KÄMPFE</span></div>
-      <div class="page-sub">Dein komplettes Kampfarchiv – Analyse, Video, Runden-Notizen.</div>
+      <div class="page-title">MEINE <span>K\u00c4MPFE</span></div>
+      <div class="page-sub">Dein komplettes Kampfarchiv \u2013 Analyse, Video, Runden-Notizen.</div>
     </div>
+    ${fightDateCardHTML}
     <div id="fights-tab-bar" style="display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--surface-2);margin-bottom:24px;">
       ${tabs.map(t => {
         const isActive = currentFightsTab === t.key;
@@ -7436,10 +7460,7 @@ function renderAccountPage() {
 
       <div class="account-section">
         <div class="account-section-title">KAMPF</div>
-        <div class="form-group">
-          <label class="form-label">Nächster Kampf (optional)</label>
-          <input class="form-input" id="acc-fightdate" type="date" value="${data?.fightDate||''}">
-        </div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.5;">Kampfdatum kannst du auf der <span style="color:var(--white);cursor:pointer;text-decoration:underline;" onclick="showPage('fights')">K\u00e4mpfe-Seite</span> eintragen.</div>
       </div>
 
       <button class="btn btn-red" onclick="saveAccountPage()" style="margin-bottom:16px;">SPEICHERN</button>
@@ -7485,29 +7506,9 @@ function saveAccountPage() {
 
   saveUsers(users);
 
-  // Update fight date + regenerate week plan
+  // Regenerate week plan
   const data = getData();
   if (data) {
-    if (!data.upcomingFights) data.upcomingFights = [];
-    const newFight = document.getElementById('acc-fightdate').value || '';
-    if (newFight) {
-      // Update primary in upcomingFights or add it
-      if (data.upcomingFights.length > 0) {
-        data.upcomingFights[0].date = newFight;
-      } else {
-        data.upcomingFights.push({ date: newFight, label: '' });
-      }
-      syncPrimaryFightDate(data);
-    } else {
-      // Cleared – remove primary, shift if others exist
-      if (data.upcomingFights.length > 1) {
-        data.upcomingFights.shift();
-        syncPrimaryFightDate(data);
-      } else {
-        data.upcomingFights = [];
-        data.fightDate = '';
-      }
-    }
     // Save 10-week program start date
     var prog = document.getElementById('acc-program').value;
     if (prog === '10w') {
