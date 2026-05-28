@@ -1111,7 +1111,11 @@ function renderUebungenPage() {
   </div>
 
   <!-- GOAL FILTER BAR -->
-  <div class="goal-filter-bar">
+  <div class="goal-filter-toggle" onclick="var b=document.getElementById('goal-filters');b.classList.toggle('collapsed');this.querySelector('.gf-arrow').textContent=b.classList.contains('collapsed')?'\u25b8':'\u25be';">
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:1px;">FILTER NACH ZIEL</span>
+    <span class="gf-arrow" style="color:var(--text-muted);font-size:12px;">${fg !== 'all' ? '\u25be' : '\u25b8'}</span>
+  </div>
+  <div id="goal-filters" class="goal-filter-bar${fg === 'all' ? ' collapsed' : ''}">
     ${goalFilters.map(g => `<button class="goal-filter-btn${fg === g.id ? ' active' : ''}" style="--gfc:${g.color};" onclick="filterExercisesByGoal('${g.id}')">${g.icon ? g.icon + ' ' : ''}${g.label}</button>`).join('')}
   </div>
   ${fg !== 'all' ? `<div class="goal-filter-info" style="border-color:${activeGoal.color}40;">

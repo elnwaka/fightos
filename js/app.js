@@ -1237,7 +1237,18 @@ function renderTrainingPage(subTab) {
   }).join('') + '</div>';
 
   var contentId = 'training-content';
-  el.innerHTML = '<div class="page-header"><div class="page-title">TRAIN<span>ING</span></div><div class="page-sub">Übungen, Tests, Log, Ernährung und Recovery — alles an einem Ort.</div></div>' + tabsHTML + '<div id="' + contentId + '"></div>';
+  var _tData = getData();
+  var _isEarlyUser = !_tData || !_tData.log || _tData.log.length < 3;
+  var trainingHint = _isEarlyUser && subTab === 'uebungen' ?
+    '<div class="fc-training-hint" id="training-hint">' +
+      '<div style="display:flex;justify-content:space-between;align-items:start;">' +
+        '<div style="font-size:13px;color:var(--white);font-weight:500;margin-bottom:4px;">Tipp: Starte mit deinem Wochenplan</div>' +
+        '<span onclick="this.parentElement.parentElement.remove()" style="color:var(--text-muted);cursor:pointer;font-size:16px;padding:0 4px;">\u00d7</span>' +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--text-muted);line-height:1.5;">Hier findest du alle \u00dcbungen. Dein <strong style="color:var(--white);">Wochenplan</strong> sagt dir genau, was du heute trainieren sollst.</div>' +
+      '<button onclick="showPage(\'wochenplan\')" style="margin-top:8px;font-family:\'Space Mono\',monospace;font-size:11px;padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-full);cursor:pointer;">ZUM WOCHENPLAN \u2192</button>' +
+    '</div>' : '';
+  el.innerHTML = '<div class="page-header"><div class="page-title">TRAIN<span>ING</span></div><div class="page-sub">\u00dcbungen, Tests, Log, Ern\u00e4hrung und Recovery \u2014 alles an einem Ort.</div></div>' + tabsHTML + trainingHint + '<div id="' + contentId + '"></div>';
 
   var contentEl = document.getElementById(contentId);
   if (!contentEl) return;
@@ -5069,6 +5080,10 @@ function renderWeekPlan() {
 function _renderWeekPlanInner() {
   const data = getData();
   if (!data) return;
+  // Track that user has seen the plan (for onboarding checklist)
+  if (currentUser && !localStorage.getItem('fos_seen_plan_' + currentUser)) {
+    localStorage.setItem('fos_seen_plan_' + currentUser, '1');
+  }
   const s = getUserSchedule();
   // Only generate if NO plan exists at all — never overwrite manual edits
   if (!data.weekPlan || Object.keys(data.weekPlan).length === 0) {
@@ -6750,6 +6765,17 @@ function renderDashboard() {
   var overall = filled.length ? Math.round(filled.reduce(function(a,b){return a+b;},0) / filled.length) : null;
   var isNewUser = (!data.log || data.log.length === 0) && (!data.fights || data.fights.length === 0);
 
+  // ══ ERSTE SCHRITTE CHECKLIST ══
+  var _steps = [
+    { id: 'account', label: 'Account erstellt', sub: 'Willkommen bei BoxSpec', done: true, action: '' },
+    { id: 'plan', label: 'Wochenplan ansehen', sub: 'Dein personalisierter Trainingsplan', done: !!(localStorage.getItem('fos_seen_plan_' + currentUser)), action: "showPage('wochenplan')" },
+    { id: 'test', label: 'Ersten Leistungstest machen', sub: 'Kraft, Ausdauer oder Speed testen', done: !!(data.tests && Object.keys(data.tests).some(function(k){ return data.tests[k] && data.tests[k].length > 0; })), action: "showPage('tests')" },
+    { id: 'block', label: 'Ersten Block erledigen', sub: 'Ein Training aus dem Wochenplan abhaken', done: !!(data.completedBlocks && Object.keys(data.completedBlocks).length > 0), action: "showPage('wochenplan')" },
+    { id: 'fight', label: 'Ersten Kampf eintragen', sub: 'Dokumentiere deine Ring-Erfahrung', done: !!(data.fights && data.fights.length > 0), action: "showPage('fights')" }
+  ];
+  var _stepsDone = _steps.filter(function(s){ return s.done; }).length;
+  var _showChecklist = _stepsDone < 5;
+
   // Week completion rings data
   var weekId = getWeekId();
   var dayCompletion = DAY_NAMES.map(function(day) {
@@ -6918,7 +6944,10 @@ function renderDashboard() {
 
     // ══ STATS BAR: Glasmorphism cells ══
     '<div class="fc-stats-bar">' +
-      '<div class="fc-stat-cell"><div class="fc-stat-num" style="color:var(--gold);">' + (overall !== null ? overall : '?') + '</div><div class="fc-stat-lbl">' + (overall !== null ? 'SCORE' : 'TESTE DICH') + '</div></div>' +
+      '<div class="fc-stat-cell' + (overall === null ? ' fc-stat-cta' : '') + '" onclick="showPage(\'tests\')">' +
+        '<div class="fc-stat-num" style="color:var(--gold);">' + (overall !== null ? overall : '\u2014') + '</div>' +
+        '<div class="fc-stat-lbl">' + (overall !== null ? 'SCORE' : 'SCORE') + '</div>' +
+      '</div>' +
       '<div class="fc-stat-cell"><div class="fc-stat-num">' + totalFights + '</div><div class="fc-stat-lbl">K\u00c4MPFE</div></div>' +
       '<div class="fc-stat-cell"><div class="fc-stat-num">' + totalSessions + '</div><div class="fc-stat-lbl">SESSIONS</div></div>' +
       '<div class="fc-stat-cell"><div class="fc-stat-num">' + totalDone + '/' + totalPlanned + '</div><div class="fc-stat-lbl">WOCHE</div></div>' +
@@ -6926,23 +6955,24 @@ function renderDashboard() {
 
     '<div class="fc-content">' +
 
-    // ══ NEW USER WELCOME BANNER ══
-    (isNewUser ?
-      '<div class="fc-welcome">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:1px;margin-bottom:8px;">WILLKOMMEN BEI BOXSPEC</div>' +
-        '<div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:16px;">Dein Trainingsplan wurde generiert. So startest du:</div>' +
-        '<div class="fc-welcome-step" onclick="showPage(\'wochenplan\')">' +
-          '<div class="fc-welcome-num" style="background:var(--red);">1</div>' +
-          '<div><div style="font-size:14px;color:var(--white);font-weight:500;">Wochenplan ansehen</div><div style="font-size:12px;color:var(--text-muted);">Dein personalisierter Plan f\u00fcr diese Woche</div></div>' +
+    // ══ ERSTE SCHRITTE CHECKLIST ══
+    (_showChecklist ?
+      '<div class="fc-checklist">' +
+        '<div class="fc-checklist-header">' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--white);letter-spacing:1px;">DEIN START</div>' +
+          '<div class="fc-checklist-progress">' + _stepsDone + '/5</div>' +
         '</div>' +
-        '<div class="fc-welcome-step" onclick="showPage(\'training\')">' +
-          '<div class="fc-welcome-num" style="background:var(--blue);">2</div>' +
-          '<div><div style="font-size:14px;color:var(--white);font-weight:500;">\u00dcbungen entdecken</div><div style="font-size:12px;color:var(--text-muted);">Alle \u00dcbungen mit Erkl\u00e4rungen und Boxing-Relevanz</div></div>' +
-        '</div>' +
-        '<div class="fc-welcome-step" onclick="showPage(\'profil\')">' +
-          '<div class="fc-welcome-num" style="background:var(--green);">3</div>' +
-          '<div><div style="font-size:14px;color:var(--white);font-weight:500;">8 S\u00e4ulen verstehen</div><div style="font-size:12px;color:var(--text-muted);">Die Wissenschaft hinter deinem Training</div></div>' +
-        '</div>' +
+        '<div class="fc-checklist-bar"><div class="fc-checklist-fill" style="width:' + (_stepsDone / 5 * 100) + '%;"></div></div>' +
+        _steps.map(function(s) {
+          return '<div class="fc-checklist-item' + (s.done ? ' done' : '') + '"' + (s.action && !s.done ? ' onclick="' + s.action + '"' : '') + '>' +
+            '<div class="fc-checklist-check">' + (s.done ? '\u2713' : '') + '</div>' +
+            '<div class="fc-checklist-text">' +
+              '<div class="fc-checklist-label">' + s.label + '</div>' +
+              '<div class="fc-checklist-sub">' + s.sub + '</div>' +
+            '</div>' +
+            (!s.done && s.action ? '<div class="fc-checklist-arrow">\u2192</div>' : '') +
+          '</div>';
+        }).join('') +
       '</div>'
     : '') +
 
@@ -7060,11 +7090,11 @@ function renderDashboard() {
       '</div>'
     : '') +
 
-    // ══ QUICK LINKS: Ghost buttons with glow ══
+    // ══ QUICK LINKS ══
     '<div class="fc-quick-links">' +
-      '<button class="fc-quick-btn" onclick="showPage(\'training\')">+ Training loggen</button>' +
+      '<button class="fc-quick-btn" onclick="switchTrainingTab(\'log\');showPage(\'training\')">+ Training loggen</button>' +
       '<button class="fc-quick-btn" onclick="showPage(\'fights\')">Kampf planen</button>' +
-      '<button class="fc-quick-btn" onclick="showPage(\'training\')">Test machen</button>' +
+      '<button class="fc-quick-btn" onclick="switchTrainingTab(\'tests\');showPage(\'training\')">Test machen</button>' +
     '</div>' +
 
     // Hidden containers for sub-renderers
