@@ -6,7 +6,7 @@
 
 // API Key is now hidden server-side in Netlify Function
 var AI_COACH_MODEL = 'gemini-2.5-flash';
-var AI_COACH_ENDPOINT = '/.netlify/functions/ai-proxy';
+var AI_COACH_ENDPOINT = '/api/ai-proxy';
 
 var _aiChatHistory = [];
 var _aiCoachOpen = false;
