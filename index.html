@@ -360,6 +360,10 @@ body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;li
 </footer>
 
 <script>
+// Redirect logged-in users to app
+if (localStorage.getItem('fos_current')) {
+  window.location.href = 'app.html';
+}
 // Scroll reveal
 const observer = new IntersectionObserver(function(entries) {
   entries.forEach(function(entry) {
