@@ -1,5 +1,5 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-05-28b';
+const BUILD = '2026-05-28c';
 const CACHE_NAME = 'boxspec-' + BUILD;
 const PRECACHE = [
   './',
@@ -11,6 +11,7 @@ const PRECACHE = [
   './js/program10w.js',
   './js/ai-coach.js',
   './js/video-library.js',
+  './js/community.js',
   './manifest.json',
   './js/chart.min.js',
   './js/apexcharts.min.js',

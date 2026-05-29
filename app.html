@@ -271,6 +271,7 @@ if (localStorage.getItem('fos_current')) {
       <button class="nav-btn" data-page="wochenplan">Plan</button>
       <button class="nav-btn" data-page="training">Training</button>
       <button class="nav-btn" data-page="fights">Kämpfe</button>
+      <button class="nav-btn" data-page="community">Community</button>
       <button class="nav-btn" data-page="profil">Profil</button>
     </div>
     <div class="topbar-right">
@@ -301,9 +302,9 @@ if (localStorage.getItem('fos_current')) {
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l4-4 4 4"/><path d="M12 8l4-4 4 4"/><path d="M4 8v3a4 4 0 0 0 4 4h1"/><path d="M20 8v3a4 4 0 0 1-4 4h-1"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
       <span>Kämpfe</span>
     </button>
-    <button class="btab" data-page="profil" onclick="showPage('profil')">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Profil</span>
+    <button class="btab" data-page="community" onclick="showPage('community')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Community</span>
     </button>
   </nav>
 
@@ -364,6 +365,11 @@ if (localStorage.getItem('fos_current')) {
 
   <!-- ===== PAGE: RECHNER ===== -->
   <div class="page" id="page-rechner"></div>
+
+  <!-- ===== PAGE: COMMUNITY ===== -->
+  <div class="page" id="page-community"></div>
+  <div class="page" id="page-community-thread"></div>
+  <div class="page" id="page-community-profile"></div>
 
   <!-- ===== PAGE: TESTS ===== -->
   <div class="page" id="page-tests"></div>
@@ -606,6 +612,7 @@ if (localStorage.getItem('fos_current')) {
 <script src="js/program10w.js"></script>
 <script src="js/ai-coach.js"></script>
 <script src="js/video-library.js"></script>
+<script src="js/community.js"></script>
 <script src="js/app.js"></script>
 <script src="js/pages.js"></script>
 <script src="js/calculators.js"></script>

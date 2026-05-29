@@ -1162,12 +1162,13 @@ function showPage(pageId) {
   if (pageId === 'supplement-detail') navPage = 'training';
   if (pageId === 'fight-detail') navPage = 'fights';
   if (pageId === 'block-detail') navPage = 'wochenplan';
+  if (pageId === 'community-thread' || pageId === 'community-profile') navPage = 'community';
 
   const btn = document.querySelector('.nav-btn[data-page="' + navPage + '"]');
   if (btn) btn.classList.add('active');
 
   // Render heavy pages
-  var heavyPages = ['dashboard', 'fights', 'profil'];
+  var heavyPages = ['dashboard', 'fights', 'profil', 'community'];
   if (heavyPages.indexOf(pageId) !== -1) {
     var target = document.getElementById('page-' + pageId);
     var inner = pageId === 'dashboard' ? document.getElementById('dash-app') : target;
@@ -1179,6 +1180,7 @@ function showPage(pageId) {
         if (pageId === 'dashboard') renderDashboard();
         else if (pageId === 'profil') renderProfilPage(subTab);
         else if (pageId === 'fights') renderFightsPage();
+        else if (pageId === 'community') renderCommunityPage();
       });
     });
   }
@@ -1203,6 +1205,7 @@ function showPage(pageId) {
   else if (['fights','fight-detail'].indexOf(btabPage) !== -1) btabPage = 'fights';
   else if (['training','uebung-detail','supplement-detail'].indexOf(btabPage) !== -1) btabPage = 'training';
   else if (['profil','saeulen-detail'].indexOf(btabPage) !== -1) btabPage = 'profil';
+  else if (['community','community-thread','community-profile'].indexOf(btabPage) !== -1) btabPage = 'community';
   else if (btabPage !== 'dashboard') btabPage = 'dashboard';
   var activeTab = document.querySelector('.btab[data-page="' + btabPage + '"]');
   if (activeTab) activeTab.classList.add('active');
@@ -1419,7 +1422,8 @@ function getPageFromHash() {
   if (!hash) return 'dashboard';
   var valid = ['dashboard','fights','fight-detail','wochenplan','block-detail','training','profil',
     'uebungen','uebung-detail','tests','log','periodisierung',
-    'ernaehrung','cutten','supplements','supplement-detail','regeneration','saeulen','saeulen-detail','mental','rechner','faq','account'];
+    'ernaehrung','cutten','supplements','supplement-detail','regeneration','saeulen','saeulen-detail','mental','rechner','faq','account',
+    'community','community-thread','community-profile'];
   return valid.indexOf(hash) !== -1 ? hash : 'dashboard';
 }
 
