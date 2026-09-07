@@ -1110,7 +1110,7 @@ function renderUebungenPage() {
   el.innerHTML = `
   <div class="page-header">
     <div class="page-title">ÜBUNGS<span>BIBLIOTHEK</span></div>
-    <div class="page-sub">Was willst du verbessern? Wähle ein Ziel oder sieh dir alle ${allExercises.length} Übungen an. Basierend auf Boxing Science, Phil Daru und Peer-Review-Studien.</div>
+    <div class="page-sub">Wähle ein Ziel oder sieh dir alle ${allExercises.length} Übungen an.</div>
   </div>
 
   <!-- GOAL FILTER BAR -->

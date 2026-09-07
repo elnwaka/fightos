@@ -6205,3 +6205,29 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
      laengste Textblock ohne Funktion. */
   .page > .page-header + * { margin-top: 0; }
 }
+
+@media (max-width: 768px) {
+  /* Auch die Kopfbloecke INNERHALB der Reiter sind jetzt doppelt:
+     die App-Leiste traegt den Bildschirm, der aktive Reiter den
+     Abschnitt. "TRAINING / ÜBUNGEN / ÜBUNGSBIBLIOTHEK" war dreifach. */
+  .page-header { display: none; }
+
+  /* Die Tipp-Karte stand als erster Block vor dem eigentlichen Inhalt
+     und hatte den Rand-Streifen, den wir sonst nirgends benutzen. */
+  .tip-card,
+  .hint-card {
+    border-left: 0 !important;
+    padding: 12px 14px !important;
+    margin-bottom: 14px !important;
+  }
+
+  /* Filterzeile fluchtet und ist antippbar */
+  .filter-row,
+  .filter-toggle {
+    padding-left: 0 !important;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
