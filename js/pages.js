@@ -389,7 +389,7 @@ Das kubanische Boxsystem und moderne Sportforschung zeigen: Die effektivste Meth
 • <strong>Tempo-Variation:</strong> Runde 1 bei 50%, Runde 2 bei 80%, Runde 3 bei 100% → kognitive Kontrolle über Intensität<br>
 • <strong>Eingeschränktes Sichtfeld:</strong> Sparring nur mit peripherem Sehen (Blick auf Brust fixiert)<br><br>
 
-<strong style="font-size:15px;">KOGNITIVE ERMÜDUNGSRESISTENZ (BET)</strong> <span style="font-size:10px;color:var(--gold);border:1px solid var(--gold);padding:1px 6px;border-radius:var(--radius-sm);">EXPERIMENTELL</span><br>
+<strong style="font-size:15px;">KOGNITIVE ERMÜDUNGSRESISTENZ (BET)</strong> <span style="font-size:10px;color:var(--text-muted);border:1px solid var(--gold);padding:1px 6px;border-radius:var(--radius-sm);">EXPERIMENTELL</span><br>
 ${tt('BET','Brain Endurance Training – kognitives Training unter Ermüdung. Dein Gehirn lernt, bei mentaler Erschöpfung trotzdem präzise zu arbeiten.')} ist ein vielversprechender Zusatz, aber kein Ersatz für boxspezifisches Training. Marcora et al. (2015) zeigten in einer <em>Militärstudie (nicht an Boxern!)</em>: +126% Ausdauer mit BET vs. +42% nur physisch. <strong>Achtung: Diese Studie war an Soldaten</strong> – der Transfer auf den Boxring ist plausibel und wird von GB Boxing genutzt, aber boxspezifische Evidenz fehlt noch. Van Cutsem et al. (2017) bestätigten allgemein: Mentale Ermüdung reduziert physische Leistung um <strong>5–10%</strong>.<br><br>
 
 BET konfrontiert dein Gehirn mit kognitiven Aufgaben (${tt('Stroop-Test','Farbwörter erscheinen in falscher Farbe. Du musst die FARBE benennen, nicht das Wort. Trainiert Impulshemmung und kognitive Belastbarkeit.')}, Rechenaufgaben) WÄHREND oder vor dem Training. Der ${tt('Anteriore cinguläre Cortex','Gehirnregion, die Anstrengung bewertet. Wird durch BET effizienter – wie ein Prozessor-Upgrade für dein Gehirn.')} wird effizienter, dein mentales Erschöpfungslimit verschiebt sich nach oben.<br><br>
@@ -1126,12 +1126,12 @@ function renderUebungenPage() {
     <div><strong style="color:${activeGoal.color};">${activeGoal.label}</strong> – ${fK.length + fA.length + fAr.length + fH.length + fM.length + fPE.length + fS.length} Übungen gefunden</div>
   </div>` : ''}
 
-  ${fK.length ? `<div class="cat-header" style="color:var(--blue);border-color:rgba(41,121,255,.3);">KRAFT & EXPLOSIVITÄT</div>
+  ${fK.length ? `<div class="cat-header" style="color:var(--text-muted);border-color:rgba(41,121,255,.3);">KRAFT & EXPLOSIVITÄT</div>
   <div class="grid-auto" style="margin-bottom:40px;">
     ${fK.map(e => { counter++; return exCard(e, counter, 'var(--blue)'); }).join('')}
   </div>` : ''}
 
-  ${fA.length ? `<div class="cat-header" style="color:var(--green);border-color:rgba(0,200,83,.3);">AUSDAUER & ENERGIESYSTEME</div>
+  ${fA.length ? `<div class="cat-header" style="color:var(--white);border-color:rgba(0,200,83,.3);">AUSDAUER & ENERGIESYSTEME</div>
   <div class="grid-auto" style="margin-bottom:40px;">
     ${fA.map(e => { counter++; return exCard(e, counter, 'var(--green)'); }).join('')}
   </div>` : ''}
@@ -1151,12 +1151,12 @@ function renderUebungenPage() {
     ${fM.map(e => { counter++; return exCard(e, counter, '#26c6da'); }).join('')}
   </div>` : ''}
 
-  ${fPE.length ? `<div class="cat-header" style="color:#ff7043;border-color:rgba(255,112,67,.3);">KRAFTAUSDAUER & KONDITIONIERUNG</div>
+  ${fPE.length ? `<div class="cat-header" style="color:var(--white);border-color:rgba(255,112,67,.3);">KRAFTAUSDAUER & KONDITIONIERUNG</div>
   <div class="grid-auto" style="margin-bottom:40px;">
     ${fPE.map(e => { counter++; return exCard(e, counter, '#ff7043'); }).join('')}
   </div>` : ''}
 
-  ${fS.length ? `<div class="cat-header" style="color:var(--gold);border-color:rgba(245,197,24,.3);">SPEZIALTRAINING</div>
+  ${fS.length ? `<div class="cat-header" style="color:var(--text-muted);border-color:rgba(245,197,24,.3);">SPEZIALTRAINING</div>
   <div class="grid-auto" style="margin-bottom:40px;">
     ${fS.map(e => { counter++; return exCard(e, counter, 'var(--gold)'); }).join('')}
   </div>` : ''}
@@ -1683,7 +1683,7 @@ function renderErnaehrungPage() {
     var n = P10W_NUTRITION;
     var w = userW;
     nut10w = '<div style="margin-bottom:32px;padding:20px;background:var(--surface-0);border-radius:var(--radius-md);border-left:3px solid var(--green);">'
-      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--green);letter-spacing:1px;margin-bottom:12px;">ERNÄHRUNG — WOCHE '+p10wWeekE+'/10'+(p10wPhaseE ? ' · '+p10wPhaseE.name.toUpperCase() : '')+'</div>'
+      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--white);letter-spacing:1px;margin-bottom:12px;">ERNÄHRUNG — WOCHE '+p10wWeekE+'/10'+(p10wPhaseE ? ' · '+p10wPhaseE.name.toUpperCase() : '')+'</div>'
       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">'
       + '<div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;">'
       +   '<div style="font-family:\'Space Mono\',monospace;font-size:9px;color:#555;letter-spacing:1px;">SCHWERE TAGE</div>'
@@ -1761,14 +1761,14 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ MAKRONÄHRSTOFFE ============ -->
-  <div id="ern-s2" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:0 0 20px;border-bottom:2px solid var(--blue);padding-bottom:8px;">2. MAKRONÄHRSTOFFE <span style="color:var(--blue);">IM DETAIL</span></div>
+  <div id="ern-s2" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:0 0 20px;border-bottom:2px solid var(--blue);padding-bottom:8px;">2. MAKRONÄHRSTOFFE <span style="color:var(--text-muted);">IM DETAIL</span></div>
 
   <div class="card card-top" style="--ca:var(--blue);margin-bottom:16px;">
     <div class="card-title">PROTEIN – DER BAUSTOFF</div>
     <div class="card-body" style="line-height:1.8;">
       <strong>Wie viel?</strong><br>
       Die Wissenschaft zeigt einen optimalen Bereich von 2.0–2.4g/kg – wir empfehlen als klaren Richtwert:<br>
-      <strong style="color:var(--blue);">2.2g pro kg Körpergewicht pro Tag.</strong> Bei ${userW}kg = ${Math.round(userW*2.2)}g Protein/Tag.<br>
+      <strong style="color:var(--text-muted);">2.2g pro kg Körpergewicht pro Tag.</strong> Bei ${userW}kg = ${Math.round(userW*2.2)}g Protein/Tag.<br>
       Beim Cutten: <strong>2.6g/kg</strong> (bei ${userW}kg = ${Math.round(userW*2.6)}g) um Muskelverlust zu verhindern.<br><br>
 
       <strong>Warum so viel?</strong><br>
@@ -1777,7 +1777,7 @@ function renderErnaehrungPage() {
       <strong>Wie verteilen?</strong><br>
       4–5 Mahlzeiten mit je <strong>30–50g Protein</strong>. Jede Mahlzeit muss mindestens ${tt('2.5g Leucin','Leucin ist die Aminosäure die den "Schalter" für Muskelaufbau umlegt. Unter 2.5g pro Mahlzeit wird die Muskelproteinsynthese nicht maximal angeregt. Enthalten in: 25g Whey (2.5g), 3 Eier (1.3g), 100g Hähnchen (2.4g), 200g Skyr (1.6g).')} enthalten – darunter wird die Muskelproteinsynthese nicht maximal angeregt.<br><br>
 
-      <strong style="color:var(--blue);">Beste Proteinquellen (sortiert nach biologischer Wertigkeit):</strong><br>
+      <strong style="color:var(--text-muted);">Beste Proteinquellen (sortiert nach biologischer Wertigkeit):</strong><br>
       <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <table class="data-table" style="margin:10px 0;">
         <thead><tr><th>Lebensmittel</th><th>Protein/100g</th><th>Leucin</th><th>Anmerkung</th></tr></thead>
@@ -1816,10 +1816,10 @@ function renderErnaehrungPage() {
       <strong>Warum brauchen Boxer so viele Kohlenhydrate?</strong><br>
       Boxtraining ist zu <strong>~70% glykogenbasiert</strong>. Leere Glykogenspeicher = müde Beine, schwache Schläge, langsame Reaktion. Kohlenhydrate sind KEIN Feind – sie sind dein Benzin. Low-Carb-Diäten und Boxen sind nicht kompatibel.<br><br>
 
-      <strong style="color:var(--green);">Schnelle KH (vor/nach Training):</strong><br>
+      <strong style="color:var(--white);">Schnelle KH (vor/nach Training):</strong><br>
       Hoher glykämischer Index → schnelle Absorption → schnelle Energie / schnelle Glykogen-Auffüllung. Quellen findest du in der Einkaufsliste.<br><br>
 
-      <strong style="color:var(--green);">Langsame KH (restlicher Tag):</strong><br>
+      <strong style="color:var(--white);">Langsame KH (restlicher Tag):</strong><br>
       Niedriger glykämischer Index → langanhaltende Energie, mehr Ballaststoffe, bessere Sättigung. Quellen ebenfalls in der Einkaufsliste.<br><br>
 
       <strong>Timing-Regel:</strong> Schnelle KH 1–2h vor und direkt nach Training. Den Rest des Tages langsame KH. Nie nüchtern ins harte Training.
@@ -1830,13 +1830,13 @@ function renderErnaehrungPage() {
     <div class="card-title">FETT – DIE HORMONE</div>
     <div class="card-body" style="line-height:1.8;">
       <strong>Wie viel?</strong><br>
-      <strong style="color:var(--gold);">0.8–1.2g pro kg Körpergewicht.</strong> Bei ${userW}kg = ${Math.round(userW*0.8)}–${Math.round(userW*1.2)}g Fett/Tag.<br>
+      <strong style="color:var(--text-muted);">0.8–1.2g pro kg Körpergewicht.</strong> Bei ${userW}kg = ${Math.round(userW*0.8)}–${Math.round(userW*1.2)}g Fett/Tag.<br>
       Minimum 0.5g/kg – darunter sinken Testosteron und andere Hormone.<br><br>
 
       <strong>Warum wichtig?</strong><br>
       Fett ist essentiell für: Testosteron-Produktion (Kraft + Recovery), Gelenkschmierung (weniger Verletzungen), Absorption von Vitamin A/D/E/K, Gehirnfunktion (Reaktion + Entscheidungen im Ring).<br><br>
 
-      <strong style="color:var(--gold);">Fettquellen nach Typ:</strong><br>
+      <strong style="color:var(--text-muted);">Fettquellen nach Typ:</strong><br>
       • <strong>Omega-3 (Priorität!):</strong> Anti-entzündlich, beschleunigt Recovery, neuroprotektiv. Quellen in der Einkaufsliste.<br>
       • <strong>Einfach ungesättigt:</strong> Herzgesundheit, Grundlage für Hormonproduktion.<br>
       • <strong>Gesättigt (moderat):</strong> Testosteron-Produktion, nicht eliminieren.<br>
@@ -1847,7 +1847,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ MIKRONÄHRSTOFFE ============ -->
-  <div id="ern-s3" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--gold);padding-bottom:8px;">3. MIKRONÄHRSTOFFE <span style="color:var(--gold);">& HYDRATION</span></div>
+  <div id="ern-s3" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--gold);padding-bottom:8px;">3. MIKRONÄHRSTOFFE <span style="color:var(--text-muted);">& HYDRATION</span></div>
 
   <div class="info-box info-warn" style="margin-bottom:20px;"><span>!</span><div><strong>70% aller Sportler haben mindestens einen Mikronährstoff-Mangel</strong> – meist Vitamin D, Magnesium oder Eisen. Ein Mangel in einem einzigen Mikronährstoff kann Recovery um 20–30% verlangsamen, ohne dass du den Grund erkennst. Blutbild 1–2× pro Jahr machen lassen!</div></div>
 
@@ -1855,27 +1855,27 @@ function renderErnaehrungPage() {
     <div class="card card-top" style="--ca:var(--gold);margin-bottom:12px;">
       <div class="card-title">KRITISCHE MIKRONÄHRSTOFFE FÜR BOXER</div>
       <div class="card-body" style="line-height:1.8;">
-        <strong style="color:#ff5252;">Eisen</strong> – Sauerstofftransport<br>
+        <strong style="color:var(--text-muted);">Eisen</strong> – Sauerstofftransport<br>
         Mangel = schnellere Ermüdung, Atemnot, schlechte Ausdauer. Besonders bei Boxern die viel schwitzen.<br>
         <strong>Quellen:</strong> Rotes Fleisch (beste Absorption), Spinat + Vitamin C, Linsen, dunkle Schokolade.<br>
         <strong>Ziel:</strong> Ferritin >50 µg/L (Blutbild!).<br><br>
 
-        <strong style="color:#ffd740;">Vitamin D</strong> – Knochen, Immunsystem, Testosteron<br>
+        <strong style="color:var(--text-muted);">Vitamin D</strong> – Knochen, Immunsystem, Testosteron<br>
         70% der Deutschen sind mangelhaft, besonders im Winter. Direkt korreliert mit Knochendichte (Frakturen!), Immunfunktion und Testosteronspiegel.<br>
         <strong>Quellen:</strong> Sonnenlicht (20 Min./Tag), fetter Fisch, Eier.<br>
         <strong>Supplementierung:</strong> 2000–4000 IE/Tag im Winter (mit Vitamin K2 kombinieren).<br><br>
 
-        <strong style="color:#69f0ae;">Magnesium</strong> – Muskelfunktion, Schlaf, Recovery<br>
+        <strong style="color:var(--text-muted);">Magnesium</strong> – Muskelfunktion, Schlaf, Recovery<br>
         Wird über Schweiß massiv ausgeschieden. Mangel = Muskelkrämpfe, schlechter Schlaf, langsamere Recovery.<br>
         <strong>Quellen:</strong> Kürbiskerne, dunkle Schokolade, Mandeln, Spinat, Bananen.<br>
         <strong>Supplementierung:</strong> 300–400mg Magnesium-Glycinat abends (verbessert Schlafqualität).<br><br>
 
-        <strong style="color:#42a5f5;">Zink</strong> – Testosteron, Immunsystem, Wundheilung<br>
+        <strong style="color:var(--text-muted);">Zink</strong> – Testosteron, Immunsystem, Wundheilung<br>
         Geht durch Schweiß verloren. Essentiell für Testosteron und Immunabwehr.<br>
         <strong>Quellen:</strong> Austern, Rindfleisch, Kürbiskerne, Cashewnüsse.<br>
         <strong>Supplementierung:</strong> 15–25mg/Tag falls Blutbild niedrig.<br><br>
 
-        <strong style="color:#ce93d8;">Omega-3</strong> – Entzündungshemmung, Gehirn, Gelenke<br>
+        <strong style="color:var(--text-muted);">Omega-3</strong> – Entzündungshemmung, Gehirn, Gelenke<br>
         Boxer haben durch repetitives Training chronisch erhöhte Entzündungswerte. Omega-3 ist der stärkste natürliche Entzündungshemmer.<br>
         <strong>Quellen:</strong> Fetter Fisch 2–3×/Woche ODER 2–3g EPA/DHA Supplement.<br>
         <strong>Boxing-Relevanz:</strong> Auch neuroprotektiv – schützt das Gehirn bei Kopftreffern.
@@ -1897,7 +1897,7 @@ function renderErnaehrungPage() {
         <strong>Selbstgemachter Elektrolyt-Drink:</strong><br>
         1L Wasser + 1/4 TL Salz + Saft einer halben Zitrone + 1 EL Honig. Kostet ~20 Cent, funktioniert besser als teure Sportdrinks.<br><br>
 
-        <strong style="color:var(--green);">Hydration-Regel:</strong><br>
+        <strong style="color:var(--white);">Hydration-Regel:</strong><br>
         • Minimum <strong>35–40ml pro kg Körpergewicht</strong> = ${Math.round(userW*0.035*1000)}–${Math.round(userW*0.04*1000)}ml/Tag<br>
         • + 500ml extra pro Trainingsstunde<br>
         • Urin-Check: hellgelb = gut, dunkelgelb = trinken!<br>
@@ -1907,7 +1907,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ EINKAUFSLISTE ============ -->
-  <div id="ern-s4" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--green);padding-bottom:8px;">4. EINKAUFSLISTE <span style="color:var(--green);">– WAS IM KÜHLSCHRANK SEIN MUSS</span></div>
+  <div id="ern-s4" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--green);padding-bottom:8px;">4. EINKAUFSLISTE <span style="color:var(--white);">– WAS IM KÜHLSCHRANK SEIN MUSS</span></div>
 
   <div class="info-box info-tip" style="margin-bottom:20px;"><span>*</span><div><strong>Grundregel:</strong> Kaufe zu 80% unverarbeitete Lebensmittel. Wenn es keine Zutatenliste hat (Reis, Fleisch, Gemüse, Obst) oder maximal 5 Zutaten – kauf es. 20% darf Convenience sein (Whey, Reiswaffeln, Tiefkühl-Gemüse).</div></div>
 
@@ -2006,7 +2006,7 @@ function renderErnaehrungPage() {
         <div class="card-title">POST-TRAINING (0–60 Min. danach)</div>
         <div class="card-body" style="line-height:1.8;">
           <strong>Ziel:</strong> Muskelreparatur starten, Glykogen auffüllen.<br>
-          <strong>Was:</strong> <strong style="color:var(--green);">30–40g schnelles Protein + 40–80g schnelle KH.</strong><br>
+          <strong>Was:</strong> <strong style="color:var(--white);">30–40g schnelles Protein + 40–80g schnelle KH.</strong><br>
           Whey ist hier ideal wegen schnellster Absorption. Schnelle KH-Quelle dazu.<br><br>
           <strong>Das "anabole Fenster" ist real</strong> – Muskelproteinsynthese ist 0–2h nach Training am höchsten. Nicht verpassen.
         </div>
@@ -2057,7 +2057,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ HÄUFIGE FEHLER ============ -->
-  <div id="ern-s7" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid #ff7043;padding-bottom:8px;">7. HÄUFIGE FEHLER <span style="color:#ff7043;">– WAS BOXER FALSCH MACHEN</span></div>
+  <div id="ern-s7" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid #ff7043;padding-bottom:8px;">7. HÄUFIGE FEHLER <span style="color:var(--white);">– WAS BOXER FALSCH MACHEN</span></div>
 
   <div class="grid-2" style="margin-bottom:16px;">
     <div class="card card-top" style="--ca:var(--red);margin-bottom:12px;">
@@ -2224,7 +2224,7 @@ function renderErnaehrungPage() {
   </div>
 
   <!-- ============ GEWICHT & KLASSEN ============ -->
-  <div id="ern-s9" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--gold);padding-bottom:8px;">9. GEWICHTSKLASSE <span style="color:var(--gold);">RICHTIG WÄHLEN</span></div>
+  <div id="ern-s9" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid var(--gold);padding-bottom:8px;">9. GEWICHTSKLASSE <span style="color:var(--text-muted);">RICHTIG WÄHLEN</span></div>
 
   <div class="card card-top" style="--ca:var(--gold);margin-bottom:16px;">
     <div class="card-title">IN WELCHER KLASSE SOLLTEST DU BOXEN?</div>
@@ -2255,9 +2255,9 @@ function renderErnaehrungPage() {
   <div class="related-links" style="margin-top:32px;padding-top:24px;border-top:1px solid var(--surface-2);display:flex;flex-wrap:wrap;gap:10px;">
     <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);align-self:center;">SIEHE AUCH:</span>
     <button onclick="showPage('cutten')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--red);background:none;border:1px solid rgba(232,0,13,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Gewicht machen</button>
-    <button onclick="showPage('supplements')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);background:none;border:1px solid rgba(0,200,83,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Supplements</button>
-    <button onclick="showPage('regeneration')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Recovery</button>
-    <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
+    <button onclick="showPage('supplements')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--white);background:none;border:1px solid rgba(0,200,83,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Supplements</button>
+    <button onclick="showPage('regeneration')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);background:none;border:1px solid rgba(41,121,255,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Recovery</button>
+    <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
   </div>`;
 
   if (typeof applyCollapsibleSections === "function") applyCollapsibleSections();
@@ -2349,15 +2349,15 @@ function renderCuttenPage() {
   <table class="data-table" style="margin-bottom:24px;">
     <thead><tr><th>Szenario</th><th>Zu reduzieren</th><th>Methode</th><th>Zeitrahmen</th><th>Risiko</th></tr></thead>
     <tbody>
-      <tr><td>1–2 kg über Klasse</td><td>Wassergewicht</td><td>Natrium reduzieren, Sauna</td><td>48–72h</td><td style="color:var(--green)">Niedrig</td></tr>
-      <tr><td>3–5 kg über Klasse</td><td>Wasser + Fett</td><td>4–6 Wo. moderates Defizit</td><td>4–6 Wochen</td><td style="color:var(--gold)">Moderat</td></tr>
+      <tr><td>1–2 kg über Klasse</td><td>Wassergewicht</td><td>Natrium reduzieren, Sauna</td><td>48–72h</td><td style="color:var(--white)">Niedrig</td></tr>
+      <tr><td>3–5 kg über Klasse</td><td>Wasser + Fett</td><td>4–6 Wo. moderates Defizit</td><td>4–6 Wochen</td><td style="color:var(--text-muted)">Moderat</td></tr>
       <tr><td>5–8 kg über Klasse</td><td>Echte Abnahme</td><td>8–12 Wo. strukturiert</td><td>8–12 Wochen</td><td style="color:var(--orange)">Planung nötig</td></tr>
       <tr><td>>8 kg über Klasse</td><td>Klasse wechseln</td><td>Nächsthöhere Klasse</td><td>–</td><td style="color:var(--red)">Leistungsverlust</td></tr>
     </tbody>
   </table>
   </div>
 
-  <div class="section-header"><div class="section-label">Tool</div><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--white);">WETTKAMPF-PREP <span style="color:var(--gold);">RECHNER</span></div></div>
+  <div class="section-header"><div class="section-label">Tool</div><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--white);">WETTKAMPF-PREP <span style="color:var(--text-muted);">RECHNER</span></div></div>
   <div class="calc-box" style="margin-bottom:24px;">
     <div class="calc-inputs">
       <div class="calc-group"><label>Aktuelles Gewicht (kg)</label><input type="number" id="cut-current" placeholder="82" min="40" max="150" step="0.5"></div>
@@ -2414,15 +2414,15 @@ function renderPeriodisierungPage() {
       + '<div style="font-size:12px;color:#888;margin-bottom:16px;line-height:1.6;">Periodisiertes Kraft-, Conditioning- und Movement-Programm. 3:1 Loading-Pattern: 3 Wochen aufbauen, 1 Woche Deload. Wochen 4 und 8 sind Erholungswochen mit reduziertem Volumen.</div>'
       + phaseBlocks
       + '<div style="margin-top:16px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px;font-size:11px;color:#666;line-height:1.6;">'
-      + '<strong style="color:var(--green);">Grundlagen (Wo. 1-3):</strong> Kraft A/B — KB Sumo DL, Goblet Squat, Press-Ups, Shoulder Press + Core Circuit<br>'
-      + '<strong style="color:var(--blue);">Kraft-Schnelligkeit (Wo. 4-7):</strong> Trap Bar DL, Landmine Squat, DB Floor Press + Extended Plyometric Warm-Up<br>'
+      + '<strong style="color:var(--white);">Grundlagen (Wo. 1-3):</strong> Kraft A/B — KB Sumo DL, Goblet Squat, Press-Ups, Shoulder Press + Core Circuit<br>'
+      + '<strong style="color:var(--text-muted);">Kraft-Schnelligkeit (Wo. 4-7):</strong> Trap Bar DL, Landmine Squat, DB Floor Press + Extended Plyometric Warm-Up<br>'
       + '<strong style="color:var(--red);">Spitzenleistung (Wo. 8-9):</strong> Banded KB Swing, Landmine Punch Throw, MB Box Jumps — maximale Explosivität<br>'
-      + '<strong style="color:var(--gold);">Taper (Wo. 10):</strong> Volumen -50%, Intensität beibehalten — Fitness erhalten, Ermüdung abbauen'
+      + '<strong style="color:var(--text-muted);">Taper (Wo. 10):</strong> Volumen -50%, Intensität beibehalten — Fitness erhalten, Ermüdung abbauen'
       + '</div>'
       + '<div style="margin-top:12px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px;font-size:11px;color:#666;line-height:1.6;">'
       + '<strong>Conditioning:</strong><br>'
-      + '<span style="color:var(--green);">Wo. 1-3:</span> Muscle Buffering (1-2 Min. Intervalle, RPE 7-8)<br>'
-      + '<span style="color:var(--blue);">Wo. 4-7:</span> HIIT — Zentrale Adaptationen (4 Min. @ >90% HFmax)<br>'
+      + '<span style="color:var(--white);">Wo. 1-3:</span> Muscle Buffering (1-2 Min. Intervalle, RPE 7-8)<br>'
+      + '<span style="color:var(--text-muted);">Wo. 4-7:</span> HIIT — Zentrale Adaptationen (4 Min. @ >90% HFmax)<br>'
       + '<span style="color:var(--red);">Wo. 8-10:</span> Speed Endurance (15-20 Sek. Sprints, kampfspezifisch)'
       + '</div>'
       + '</div>';
@@ -2441,13 +2441,13 @@ function renderPeriodisierungPage() {
   <div id="peri-s1" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);margin:0 0 16px;border-bottom:2px solid var(--red);padding-bottom:8px;">PHASEN-ZYKLUS</div>
   <div class="phase-cycle">
     <div class="phase-block ${currentPhase==='training'?'current':''}" style="background:#0f1f0a;">
-      <div class="phase-week" style="color:var(--green);">4+ TAGE</div>
+      <div class="phase-week" style="color:var(--white);">4+ TAGE</div>
       <div class="phase-name">NORMALES TRAINING</div>
       <div class="phase-bar" style="background:var(--green);width:90%;"></div>
       <div class="phase-details">Volles Programm<br>S&C: 3× Morgen<br>Sparring: hart<br>Ausdauer: Zone 2 + SIT<br>BET/IMT/Nacken: täglich</div>
     </div>
     <div class="phase-block ${currentPhase==='schaerfen'?'current':''}" style="background:#0a0f1f;">
-      <div class="phase-week" style="color:var(--blue);">2–3 TAGE</div>
+      <div class="phase-week" style="color:var(--text-muted);">2–3 TAGE</div>
       <div class="phase-name">SCHÄRFEN</div>
       <div class="phase-bar" style="background:var(--blue);width:60%;"></div>
       <div class="phase-details">Volumen: −30%<br>Intensität: 100%<br>S&C: 1× leicht<br>Sparring: taktisch/leicht<br>Kurze explosive Reize</div>
@@ -2459,7 +2459,7 @@ function renderPeriodisierungPage() {
       <div class="phase-details">Kein Training<br>Mobility/Stretching<br>Gewicht machen<br>Mental: Visualisierung<br>PAPE Warm-Up am Kampftag</div>
     </div>
     <div class="phase-block ${currentPhase==='recovery'?'current':''}" style="background:#0f1f0a;">
-      <div class="phase-week" style="color:var(--green);">NACH KAMPF</div>
+      <div class="phase-week" style="color:var(--white);">NACH KAMPF</div>
       <div class="phase-name">RECOVERY</div>
       <div class="phase-bar" style="background:var(--green);width:40%;"></div>
       <div class="phase-details">24–48h Pause<br>Leichtes Zone 2 Cardio<br>Kältebad/Sauna<br>Extra Protein + Schlaf<br>Dann zurück ins Training</div>
@@ -2538,7 +2538,7 @@ function renderPeriodisierungPage() {
   </div>
 
   <div class="card" style="margin-top:24px;">
-    <div class="card-title" style="color:var(--gold);">RUNDENSTRATEGIE – 3×3 MIN. AMATEUR</div>
+    <div class="card-title" style="color:var(--text-muted);">RUNDENSTRATEGIE – 3×3 MIN. AMATEUR</div>
     <div class="card-body">
       <strong>Runde 1 – DOMINANZ SETZEN:</strong><br>
       • Jab sofort etablieren – zeig dass du da bist<br>
@@ -2620,13 +2620,13 @@ function renderRegenerationPage() {
   <div class="hrv-grid">
     <div class="hrv-box" style="background:rgba(0,200,83,.06);border:1px solid rgba(0,200,83,.2);">
       <div class="hrv-dot" style="background:var(--green);box-shadow:0 0 20px rgba(0,200,83,.4);"></div>
-      <div class="hrv-title" style="color:var(--green);">GRÜN</div>
+      <div class="hrv-title" style="color:var(--white);">GRÜN</div>
       <div class="hrv-range">+5% über 7-Tage-Mittel</div>
       <div class="hrv-desc">Volles Training, kann steigern. Perfekt für intensives S&C oder hartes Sparring.</div>
     </div>
     <div class="hrv-box" style="background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.2);">
       <div class="hrv-dot" style="background:var(--gold);box-shadow:0 0 20px rgba(245,197,24,.4);"></div>
-      <div class="hrv-title" style="color:var(--gold);">GELB</div>
+      <div class="hrv-title" style="color:var(--text-muted);">GELB</div>
       <div class="hrv-range">±5% um 7-Tage-Mittel</div>
       <div class="hrv-desc">Training wie geplant. Beobachte ob Trend rot oder grün wird.</div>
     </div>
@@ -2997,10 +2997,10 @@ function openSupplementDetail(id) {
       <div class="supp-sidebar-meta">
         <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-subtle);letter-spacing:2px;margin-bottom:8px;">STECKBRIEF</div>
         <div class="supp-sidebar-row"><span>Kategorie</span><span style="color:${headerColor};">${s.category}</span></div>
-        <div class="supp-sidebar-row"><span>Evidenz</span><span style="color:var(--gold);">${'★'.repeat(s.stars)}${'☆'.repeat(5 - s.stars)}</span></div>
+        <div class="supp-sidebar-row"><span>Evidenz</span><span style="color:var(--text-muted);">${'★'.repeat(s.stars)}${'☆'.repeat(5 - s.stars)}</span></div>
         ${!isSkip ? `<div class="supp-sidebar-row"><span>Dosis</span><span>${s.dose}</span></div>` : ''}
         ${!isSkip ? `<div class="supp-sidebar-row"><span>Form</span><span>${s.id === 'kreatin' || s.id === 'beta-alanin' ? 'Pulver' : s.id === 'rote-beete' ? 'Shot / Saft' : s.id === 'koffein' ? 'Tablette / Kaffee' : 'Kapseln'}</span></div>` : ''}
-        <div class="supp-sidebar-row"><span>NADA</span><span style="color:var(--green);">Konform</span></div>
+        <div class="supp-sidebar-row"><span>NADA</span><span style="color:var(--white);">Konform</span></div>
       </div>
     </div>` : '';
 
@@ -3011,7 +3011,7 @@ function openSupplementDetail(id) {
       <header class="supp-article-header">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;flex-wrap:wrap;">
           <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;color:${headerColor};border:1px solid ${headerColor}40;padding:3px 12px;border-radius:var(--radius-sm);">${s.category}</span>
-          <span style="color:var(--gold);font-size:12px;letter-spacing:1px;">${'★'.repeat(s.stars)}${'☆'.repeat(5 - s.stars)}</span>
+          <span style="color:var(--text-muted);font-size:12px;letter-spacing:1px;">${'★'.repeat(s.stars)}${'☆'.repeat(5 - s.stars)}</span>
         </div>
         <h1 style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--white);line-height:1.1;">${s.name}</h1>
         ${!isSkip ? `<div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);margin-top:8px;">${s.dose}</div>` : ''}
@@ -3057,7 +3057,7 @@ function renderProductCards(products) {
         imgHTML +
         '<div style="flex:1;min-width:0;">' +
           '<div style="font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);font-weight:600;">' + p.name + '</div>' +
-          '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);margin-top:2px;">' + p.cat + ' · <span style="color:var(--gold);">~' + p.price + '</span></div>' +
+          '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);margin-top:2px;">' + p.cat + ' · <span style="color:var(--text-muted);">~' + p.price + '</span></div>' +
           '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:var(--text-subtle);margin-top:4px;line-height:1.4;">' + p.desc + '</div>' +
         '</div>' +
       '</a>';
@@ -3208,7 +3208,7 @@ function renderMentalPage() {
       <button class="mt-ego-save" onclick="saveAlterEgo()">
         ${eName ? 'Aktualisieren' : 'Alter Ego erstellen'}
       </button>
-      <div id="mt-ego-msg" style="font-size:12px;color:var(--green);margin-top:6px;"></div>
+      <div id="mt-ego-msg" style="font-size:12px;color:var(--white);margin-top:6px;"></div>
     </div>
   </div>
 
@@ -3243,7 +3243,7 @@ function renderMentalPage() {
 
   <!-- DAILY PROTOCOL -->
   <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--surface-2);">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin-bottom:16px;">TÄGLICHES PROTOKOLL <span style="color:var(--gold);">15 MIN.</span></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin-bottom:16px;">TÄGLICHES PROTOKOLL <span style="color:var(--text-muted);">15 MIN.</span></div>
     <div class="mt-daily">
       <div class="mt-slot" style="--mc:var(--blue);">
         <div class="mt-slot-time">MORGENS · 5 MIN.</div>
@@ -3373,7 +3373,7 @@ function renderRechnerPage() {
 
   <div class="grid-2" style="margin-bottom:32px;">
     <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">HERZFREQUENZ <span style="color:var(--blue);">ZONEN</span></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:20px;">HERZFREQUENZ <span style="color:var(--text-muted);">ZONEN</span></div>
       <div class="calc-box">
         <div class="calc-inputs">
           <div class="calc-group"><label>Alter (Jahre)</label><input type="number" id="hf-age" placeholder="25" min="14" max="60"></div>
