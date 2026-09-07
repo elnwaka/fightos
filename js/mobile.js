@@ -204,7 +204,7 @@
   }};
 
   S.wissen = { title: 'Wissen', root: 1, view: function () {
-    var n = (window.allExercises || []).length;
+    var n = exCount();
     return '<h1 class="big">Wissen</h1>' +
     grp([
       row({ t:'Übungen', s: (n ? n + ' Bewegungen mit Anleitung' : 'Bewegungen mit Anleitung'), chev:1, go:'M.go(&quot;uebungen&quot;)' }),
@@ -284,15 +284,23 @@
     return nice(t.trim().replace(/,\s*$/, ''));
   }
 
-  var EX_GROUPS = [
-    ['Kraft und Explosivität', 'exercisesKraft'],
-    ['Ausdauer', 'exercisesAusdauer'],
-    ['Nacken und Rumpf', 'exercisesArmor'],
-    ['Hand und Handgelenk', 'exercisesHands'],
-    ['Mobilität', 'exercisesMobility'],
-    ['Kraftausdauer', 'exercisesPowerEndurance'],
-    ['Spezialtraining', 'exercisesSpecial']
-  ];
+  // Die Listen sind in pages.js mit const deklariert und liegen damit
+  // NICHT auf window. Erreichbar sind sie nur ueber den blanken Namen,
+  // weil alle Skripte dieselbe globale lexikalische Umgebung teilen.
+  function exGroups() {
+    var g = [];
+    function add(label, arr) { if (arr && arr.length) g.push([label, arr]); }
+    try { add('Kraft und Explosivität', exercisesKraft); } catch (e) {}
+    try { add('Ausdauer', exercisesAusdauer); } catch (e) {}
+    try { add('Nacken und Rumpf', exercisesArmor); } catch (e) {}
+    try { add('Hand und Handgelenk', exercisesHands); } catch (e) {}
+    try { add('Mobilität', exercisesMobility); } catch (e) {}
+    try { add('Kraftausdauer', exercisesPowerEndurance); } catch (e) {}
+    try { add('Spezialtraining', exercisesSpecial); } catch (e) {}
+    if (!g.length) { try { add('Alle Übungen', allExercises); } catch (e) {} }
+    return g;
+  }
+  function exCount() { try { return allExercises.length; } catch (e) { return 0; } }
 
   function exRow(e) {
     var img = (typeof exerciseImgUrl === 'function') ? exerciseImgUrl(e.id, 0) : null;
@@ -307,11 +315,10 @@
   }
 
   S.uebungen = { title: 'Übungen', view: function () {
-    var out = '<h1 class="big">Übungen</h1>';
-    EX_GROUPS.forEach(function (g) {
-      var arr = window[g[1]];
-      if (!arr || !arr.length) return;
-      out += lbl(g[0]) + '<div class="grp">' + arr.map(exRow).join('') + '</div>';
+    var out = '<h1 class="big">Übungen</h1>', gs = exGroups();
+    if (!gs.length) return out + '<div class="empty"><b>Keine Übungen geladen</b></div>';
+    gs.forEach(function (g) {
+      out += lbl(g[0]) + '<div class="grp">' + g[1].map(exRow).join('') + '</div>';
     });
     return out;
   }};
@@ -341,7 +348,8 @@
   }};
 
   S.videos = { title: 'Videos', view: function () {
-    var lib = window.VIDEO_LIBRARY || [];
+    var lib = [];
+    try { lib = VIDEO_LIBRARY || []; } catch (e) { lib = window.VIDEO_LIBRARY || []; }
     var cats = {};
     lib.forEach(function (v) {
       var k = v.categoryLabel || v.category || 'Videos';
