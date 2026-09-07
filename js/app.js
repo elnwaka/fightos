@@ -102,12 +102,44 @@ function applyCloudData(cloud) {
 // wiederhergestellt hat — auch wenn das erst NACH enterApp() passiert.
 // Ohne das startet der Cloud-Sync auf langsamen Verbindungen nie.
 window._boxspecAuthReady = function(fbUser) {
-  if (!fbUser || !_fbSyncEnabled) return;
+  // Kein Firebase-Login, aber lokal "eingeloggt"? Dann laeuft die App im
+  // Blindflug: Cloud-Sync, Community und AI Coach koennen nicht funktionieren.
+  // Das darf nicht still passieren.
+  if (!fbUser) {
+    if (localStorage.getItem('fos_current')) showCloudDisconnectedBanner();
+    return;
+  }
+  hideCloudDisconnectedBanner();
+  if (!_fbSyncEnabled) return;
   if (_snapshotUnsub) return; // laeuft schon
   if (typeof currentUser === 'undefined' || !currentUser) return;
   syncFromCloud(function() {});
   startRealtimeSync();
 };
+
+function showCloudDisconnectedBanner() {
+  if (document.getElementById('cloud-disconnected')) return;
+  var b = document.createElement('div');
+  b.id = 'cloud-disconnected';
+  b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9998;background:#7a1216;'
+    + 'padding:12px 16px;display:flex;gap:12px;justify-content:space-between;align-items:center;'
+    + 'font-family:monospace;font-size:12px;color:#fff;';
+  var txt = document.createElement('span');
+  txt.textContent = 'Nicht mit der Cloud verbunden — Sync, Community und AI Coach sind aus.';
+  var btn = document.createElement('button');
+  btn.textContent = 'NEU EINLOGGEN';
+  btn.style.cssText = 'font-family:inherit;font-size:12px;color:#fff;background:rgba(255,255,255,.18);'
+    + 'border:none;padding:6px 16px;border-radius:4px;cursor:pointer;letter-spacing:1px;white-space:nowrap;';
+  btn.onclick = function() { doLogout(); };
+  b.appendChild(txt);
+  b.appendChild(btn);
+  document.body.appendChild(b);
+}
+
+function hideCloudDisconnectedBanner() {
+  var b = document.getElementById('cloud-disconnected');
+  if (b) b.remove();
+}
 
 // Real-time listener — auto-receives changes from other devices
 var _snapshotUnsub = null;
