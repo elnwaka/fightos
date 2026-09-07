@@ -1,471 +1,465 @@
 /* ============================================================
-   BOXSPEC · HANDY-OBERFLÄCHE (Neubau)
-   ------------------------------------------------------------
-   Eigene Oberfläche für Viewports unter 768px. Erzeugt eigenes,
-   sauberes Markup und nutzt ausschliesslich die vorhandenen
-   Datenfunktionen (getData, weekPlan, completedBlocks, …).
-   Die Desktop-Oberfläche bleibt vollständig unberührt.
-
-   Gebaut nach den Apple Human Interface Guidelines:
-   - Tab-Leiste: 5 Einträge, nur Navigation, nie Aktionen
-   - Navigationsleiste: Titel + Zurück + höchstens EIN Bedienelement
-   - Der Zurück-Knopf trägt den Titel des übergeordneten Bildschirms
-   - Wischen von der linken Kante führt zurück
-   - Eine Entscheidung pro Bildschirm: Liste → antippen → tiefer
+   BOXSPEC · HANDY-OBERFLÄCHE
+   1:1 aus dem freigegebenen Prototyp, mit echten Daten.
+   Nutzt ausschliesslich die vorhandenen Datenfunktionen.
+   Der Desktop bleibt unberührt.
    ============================================================ */
 
 (function () {
   'use strict';
+  if (!window.matchMedia('(max-width: 768px)').matches) return;
+  if (window.__mob) return;
+  window.__mob = true;
 
-  var MQ = window.matchMedia('(max-width: 768px)');
-  if (!MQ.matches) return;           // Desktop bleibt, wie er ist
-  if (window.__mobileApp) return;
+  var E = function (v) { return (typeof esc === 'function') ? esc(v) : String(v == null ? '' : v); };
+  var D = function () { return (typeof getData === 'function' && getData()) || {}; };
+  var SCH = function () { return (typeof getUserSchedule === 'function' && getUserSchedule()) || {}; };
 
-  // ---------- Werkzeug ----------
+  var DAY  = ['mo','di','mi','do','fr','sa','so'];
+  var DAYL = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
+  var MON  = ['Januar','Februar','März','April','Mai','Juni','Juli','August',
+              'September','Oktober','November','Dezember'];
 
-  function h(html) {
-    var t = document.createElement('template');
-    t.innerHTML = html.trim();
-    return t.content.firstElementChild;
+  function ti() { return (new Date().getDay() + 6) % 7; }
+  function wid() { return (typeof getWeekId === 'function') ? getWeekId() : ''; }
+  function blocks(d) {
+    var all = (D().weekPlan && D().weekPlan[d]) || [];
+    return { all: all, vis: all.filter(function (b) { return b.type !== 'meta'; }) };
   }
-  function E(v) { return (typeof esc === 'function') ? esc(v) : String(v == null ? '' : v); }
-  function data() { return (typeof getData === 'function' && getData()) || {}; }
-  function schedule() { return (typeof getUserSchedule === 'function' && getUserSchedule()) || {}; }
-
-  var DAYS  = ['mo','di','mi','do','fr','sa','so'];
-  var DAYSL = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
-  function todayIdx() { return (new Date().getDay() + 6) % 7; }
-  function weekId() { return (typeof getWeekId === 'function') ? getWeekId() : ''; }
-
-  function blocksFor(dayKey) {
-    var d = data();
-    var all = (d.weekPlan && d.weekPlan[dayKey]) || [];
-    return { all: all, visible: all.filter(function (b) { return b.type !== 'meta'; }) };
-  }
-  function isDone(dayKey, realIdx) {
-    var d = data();
-    return !!(d.completedBlocks && d.completedBlocks[dayKey + '_' + realIdx + '_' + weekId()]);
+  function done(d, i) {
+    var c = D().completedBlocks;
+    return !!(c && c[d + '_' + i + '_' + wid()]);
   }
 
-  // ---------- Bausteine ----------
+  /* ---------- Bausteine (identisch zum Prototyp) ---------- */
 
-  function list(rows) {
-    return '<div class="m-group">' + rows.join('') + '</div>';
-  }
-
+  function grp(r) { return '<div class="grp">' + r.join('') + '</div>'; }
+  function lbl(t) { return '<p class="lbl">' + E(t) + '</p>'; }
   function row(o) {
-    // o: { title, sub, value, chevron, lead, onclick, done, id }
-    var tag = o.onclick ? 'button' : 'div';
-    return '<' + tag + ' class="m-row' + (o.done ? ' is-done' : '') + (o.lead ? ' has-lead' : '') + '"' +
-      (o.onclick ? ' onclick="' + o.onclick + '"' : '') + (o.id ? ' id="' + o.id + '"' : '') + '>' +
-      (o.lead || '') +
-      '<span class="m-row-main">' +
-        '<span class="m-row-title">' + E(o.title) + '</span>' +
-        (o.sub ? '<span class="m-row-sub">' + E(o.sub) + '</span>' : '') +
-      '</span>' +
-      (o.value ? '<span class="m-row-value">' + E(o.value) + '</span>' : '') +
-      (o.chevron ? '<span class="m-chev" aria-hidden="true"></span>' : '') +
-    '</' + tag + '>';
+    var inner = '<span class="row-m"><span class="row-t">' + E(o.t) + '</span>' +
+      (o.s ? '<span class="row-s">' + E(o.s) + '</span>' : '') + '</span>' +
+      (o.v ? '<span class="row-v">' + E(o.v) + '</span>' : '') +
+      (o.chev ? '<span class="chev"></span>' : '');
+    // Ein Button darf keinen Button enthalten.
+    if (o.lead) {
+      return '<div class="row lead' + (o.done ? ' done' : '') + '">' + o.lead +
+        '<button class="row-hit"' + (o.go ? ' onclick="' + o.go + '"' : '') + '>' + inner + '</button></div>';
+    }
+    var tag = o.go ? 'button' : 'div';
+    return '<' + tag + ' class="row' + (o.done ? ' done' : '') + '"' +
+      (o.go ? ' onclick="' + o.go + '"' : '') + '>' + inner + '</' + tag + '>';
+  }
+  function tick(d, i, on) {
+    return '<button class="tick' + (on ? ' on' : '') + '" aria-label="' +
+      (on ? 'Wieder öffnen' : 'Als erledigt markieren') + '" ' +
+      'onclick="event.stopPropagation();M.tick(&quot;' + d + '&quot;,' + i + ')"></button>';
+  }
+  function stat(l, v, p) {
+    return '<div class="stat"><span class="stat-l">' + E(l) + '</span>' +
+      '<span class="stat-v">' + E(v) + '</span>' +
+      '<span class="stat-b"><i style="width:' + p + '%"></i></span></div>';
+  }
+  function btn(t, go, gh) {
+    return '<button class="btn' + (gh ? ' ghost' : '') + '" onclick="' + go + '">' + E(t) + '</button>';
   }
 
-  function label(text) { return '<p class="m-label">' + E(text) + '</p>'; }
+  /* ---------- Bildschirme ---------- */
 
-  function button(text, onclick, variant) {
-    return '<button class="m-btn' + (variant ? ' m-btn-' + variant : '') + '" onclick="' + onclick + '">' +
-      E(text) + '</button>';
-  }
+  var S = {};
 
-  function empty(title, text, action) {
-    return '<div class="m-empty">' +
-      '<p class="m-empty-title">' + E(title) + '</p>' +
-      (text ? '<p class="m-empty-text">' + E(text) + '</p>' : '') +
-      (action || '') +
-    '</div>';
-  }
+  S.heute = { title: 'Heute', root: 1, act: 'chat', view: function () {
+    var i = ti(), k = DAY[i], b = blocks(k);
+    var ds = new Date().toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
+    var out = '<h1 class="big">Heute</h1>';
 
-  // ---------- Bildschirme ----------
-
-  var SCREENS = {};
-
-  SCREENS.heute = {
-    title: 'Heute',
-    root: true,
-    render: function () {
-      var i = todayIdx(), key = DAYS[i], d = data();
-      var b = blocksFor(key);
-      var dateStr = new Date().toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
-      var out = '';
-
-      if (!b.visible.length) {
-        out += label(DAYSL[i] + ', ' + dateStr);
-        out += list([ row({ title: 'Ruhetag', sub: 'Erholung ist Teil des Plans.' }) ]);
-        out += button('Woche ansehen', 'MobileApp.go("plan")', 'ghost');
-      } else {
-        var done = 0, firstOpen = -1;
-        var rows = b.visible.map(function (blk) {
-          var ri = b.all.indexOf(blk);
-          var dn = isDone(key, ri);
-          if (dn) done++; else if (firstOpen < 0) firstOpen = ri;
-          var meta = [];
-          if (blk.duration) meta.push(blk.duration + ' Min');
-          if (blk.rpe) meta.push('RPE ' + blk.rpe);
-          var tick = '<button class="m-tick' + (dn ? ' on' : '') + '" ' +
-            'aria-label="' + (dn ? 'Wieder öffnen' : 'Als erledigt markieren') + '" ' +
-            'onclick="event.stopPropagation();MobileApp.toggle(\'' + key + '\',' + ri + ')"></button>';
-          return row({
-            title: blk.title || 'Einheit', sub: meta.join(' · '), done: dn,
-            lead: tick, chevron: true,
-            onclick: 'MobileApp.openBlock(\'' + key + '\',' + ri + ')'
-          });
-        });
-        out += label(DAYSL[i] + ', ' + dateStr + ' · ' + done + ' von ' + b.visible.length);
-        out += list(rows);
-        out += (done === b.visible.length)
-          ? button('Woche ansehen', 'MobileApp.go("plan")', 'ghost')
-          : button('Einheit starten', 'MobileApp.openBlock(\'' + key + '\',' + firstOpen + ')');
-      }
-
-      // Woche als sieben Felder
-      out += label('Diese Woche');
-      out += '<div class="m-week">' + DAYS.map(function (dk, di) {
-        var bb = blocksFor(dk);
-        var all = bb.visible.length && bb.visible.every(function (x) {
-          return isDone(dk, bb.all.indexOf(x));
-        });
-        var cls = 'm-day' + (di === i ? ' is-now' : (all ? ' is-done' : ''));
-        return '<button class="' + cls + '" onclick="MobileApp.go(\'plan\')">' +
-          '<span class="m-day-l">' + DAYSL[di].slice(0, 2).toUpperCase() + '</span>' +
-          '<span class="m-day-d"></span></button>';
-      }).join('') + '</div>';
-
-      return out;
-    }
-  };
-
-  SCREENS.plan = {
-    title: 'Plan',
-    root: true,
-    render: function () {
-      var s = schedule(), out = '';
-      var wk = (typeof getProgram10WCurrentWeek === 'function') ? getProgram10WCurrentWeek() : 0;
-      var ph = (wk && typeof getP10WPhase === 'function') ? getP10WPhase(wk) : null;
-
-      if (wk) out += label('Woche ' + wk + ' von 10' + (ph ? ' · ' + ph.name : ''));
-
-      var equip = (!s.gymAccess || s.gymAccess === 'none') ? 'Körpergewicht'
-                : (s.gymAccess === 'basic' ? 'Basis' : 'Volles Gym');
-      var lvl = s.experienceLevel === 'anfaenger' ? 'Anfänger'
-              : s.experienceLevel === 'wettkampf' ? 'Wettkämpfer' : 'Fortgeschritten';
-
-      out += list([
-        row({ title: 'Equipment', value: equip, chevron: true, onclick: 'MobileApp.go("account")' }),
-        row({ title: 'Level',     value: lvl,   chevron: true, onclick: 'MobileApp.go("account")' })
-      ]);
-
-      DAYS.forEach(function (dk, di) {
-        var b = blocksFor(dk);
-        if (!b.visible.length) return;
-        out += label(DAYSL[di] + (di === todayIdx() ? ' · heute' : ''));
-        out += list(b.visible.map(function (blk) {
-          var ri = b.all.indexOf(blk);
-          var meta = [];
-          if (blk.time) meta.push(blk.time);
-          if (blk.duration) meta.push(blk.duration + ' Min');
-          return row({
-            title: blk.title || 'Einheit', sub: meta.join(' · '),
-            done: isDone(dk, ri), chevron: true,
-            onclick: 'MobileApp.openBlock(\'' + dk + '\',' + ri + ')'
-          });
-        }));
-      });
-
-      if (out.indexOf('m-row') === -1) {
-        out += empty('Noch kein Plan', 'Trag deine Trainingszeiten ein, dann erstellt BoxSpec den Wochenplan.',
-                     button('Zeitplan einrichten', 'MobileApp.go("account")'));
-      }
-      return out;
-    }
-  };
-
-  SCREENS.wissen = {
-    title: 'Wissen',
-    root: true,
-    render: function () {
-      return list([
-        row({ title: 'Übungen',        sub: 'Bewegungen mit Fotos und Anleitung', chevron: true, onclick: 'MobileApp.legacy("training","uebungen","Übungen")' }),
-        row({ title: 'Videos',         sub: 'Kampf-Breakdowns und Technik',       chevron: true, onclick: 'MobileApp.legacy("training","wissen","Videos")' }),
-        row({ title: 'Ernährung',      sub: 'Kalorien, Makros, Timing',           chevron: true, onclick: 'MobileApp.legacy("training","ernaehrung","Ernährung")' }),
-        row({ title: 'Periodisierung', sub: 'Wie sich der Plan aufbaut',          chevron: true, onclick: 'MobileApp.legacy("training","periodisierung","Periodisierung")' }),
-        row({ title: 'Regeneration',   sub: 'Schlaf, HRV, Belastung',             chevron: true, onclick: 'MobileApp.legacy("training","regeneration","Regeneration")' }),
-        row({ title: '8 Säulen',       sub: 'Worauf das System aufbaut',          chevron: true, onclick: 'MobileApp.legacy("profil","saeulen","8 Säulen")' })
-      ]) +
-      label('Deine Daten') +
-      list([
-        row({ title: 'Tests',   sub: 'Kraft, Ausdauer, Schnelligkeit', chevron: true, onclick: 'MobileApp.legacy("training","tests","Tests")' }),
-        row({ title: 'Log',     sub: 'Was du trainiert hast',          chevron: true, onclick: 'MobileApp.legacy("training","log","Log")' }),
-        row({ title: 'Notizen', sub: 'Gedanken und Beobachtungen',     chevron: true, onclick: 'MobileApp.legacy("training","notizen","Notizen")' })
-      ]);
-    }
-  };
-
-  SCREENS.kaempfe = {
-    title: 'Kämpfe',
-    root: true,
-    render: function () {
-      var d = data(), f = d.fights || [];
-      if (!f.length) {
-        return empty('Noch keine Kämpfe',
-          'Trag deine Kämpfe ein, dann siehst du hier deine Bilanz und Auswertung.',
-          button('Kampf eintragen', 'MobileApp.legacy("fights",null,"Kämpfe")'));
-      }
-      var w = f.filter(function (x) { return x.result === 'sieg'; }).length;
-      var l = f.filter(function (x) { return x.result === 'niederlage'; }).length;
-      var u = f.length - w - l;
-      return label('Bilanz') +
-        list([ row({ title: 'Siege', value: String(w) }),
-               row({ title: 'Niederlagen', value: String(l) }),
-               row({ title: 'Unentschieden', value: String(u) }) ]) +
-        label('Alle Kämpfe') +
-        list(f.slice().reverse().map(function (x) {
-          return row({
-            title: x.opponent || 'Gegner',
-            sub: [x.date, x.method].filter(Boolean).join(' · '),
-            value: x.result === 'sieg' ? 'S' : x.result === 'niederlage' ? 'N' : 'U',
-            chevron: true, onclick: 'MobileApp.legacy("fights",null,"Kämpfe")'
-          });
-        })) +
-        button('Kampf eintragen', 'MobileApp.legacy("fights",null,"Kämpfe")');
-    }
-  };
-
-  SCREENS.profil = {
-    title: 'Profil',
-    root: true,
-    render: function () {
-      var name = (typeof getDisplayName === 'function') ? getDisplayName() : '';
-      return list([
-        row({ title: name || 'Dein Profil', sub: 'Name, Gewicht, Zeitplan', chevron: true, onclick: 'MobileApp.legacy("profil","account","Account")' })
-      ]) +
-      label('Verein') +
-      list([
-        row({ title: 'Feed und Forum', sub: 'Beiträge anderer Boxer', chevron: true, onclick: 'MobileApp.legacy("community",null,"Verein")' })
-      ]) +
-      label('Hilfe') +
-      list([
-        row({ title: 'Rechner', sub: 'Makros und Herzfrequenzzonen', chevron: true, onclick: 'MobileApp.legacy("profil","rechner","Rechner")' }),
-        row({ title: 'FAQ',     sub: 'Häufige Fragen',               chevron: true, onclick: 'MobileApp.legacy("profil","faq","FAQ")' })
-      ]) +
-      button('Abmelden', 'doLogout()', 'ghost');
-    }
-  };
-
-  var TABS = [
-    { id: 'heute',   label: 'Heute'  },
-    { id: 'plan',    label: 'Plan'   },
-    { id: 'wissen',  label: 'Wissen' },
-    { id: 'kaempfe', label: 'Kämpfe' },
-    { id: 'profil',  label: 'Profil' }
-  ];
-
-  // ---------- Navigation ----------
-
-  var stack = [];                 // [{id, title, legacy}]
-  var rootId = 'heute';
-
-  function current() { return stack[stack.length - 1]; }
-
-  function renderBar() {
-    var cur = current();
-    var parent = stack.length > 1 ? stack[stack.length - 2] : null;
-    var bar = document.getElementById('m-bar');
-    if (!bar) return;
-    bar.innerHTML =
-      (parent
-        ? '<button class="m-back" onclick="MobileApp.back()">' +
-            '<span class="m-back-icon" aria-hidden="true"></span>' +
-            '<span class="m-back-label">' + E(parent.title) + '</span></button>'
-        : '<span class="m-bar-lead"></span>') +
-      '<span class="m-bar-title' + (stack.length > 1 ? '' : ' is-root') + '">' + E(cur.title) + '</span>' +
-      // Genau EIN Bedienelement, wie die Richtlinien es vorsehen.
-      '<button class="m-bar-action" onclick="toggleAICoach()" aria-label="Coach">' +
-        '<span class="m-coach-icon" aria-hidden="true"></span></button>';
-    var big = document.getElementById('m-bigtitle');
-    if (big) { big.textContent = cur.title; big.hidden = stack.length > 1; }
-  }
-
-  function renderBody(dir) {
-    var cur = current();
-    var body = document.getElementById('m-body');
-    if (!body) return;
-
-    var inner = document.createElement('div');
-    inner.className = 'm-screen';
-    if (cur.legacy) {
-      inner.innerHTML = '<div class="m-legacy" id="m-legacy-host"></div>';
+    if (!b.vis.length) {
+      out += lbl(DAYL[i] + ', ' + ds) +
+        grp([row({ t: 'Ruhetag', s: 'Erholung gehört zum Plan.' })]) +
+        btn('Woche ansehen', 'M.go(&quot;plan&quot;)', 1);
     } else {
-      inner.innerHTML = SCREENS[cur.id].render();
+      var n = 0, first = -1;
+      var rows = b.vis.map(function (x) {
+        var ri = b.all.indexOf(x), dn = done(k, ri);
+        if (dn) n++; else if (first < 0) first = ri;
+        var m = [];
+        if (x.duration) m.push(x.duration + ' Min');
+        if (x.rpe) m.push('RPE ' + x.rpe);
+        return row({ lead: tick(k, ri, dn), t: x.title || 'Einheit', s: m.join(' · '),
+          done: dn, chev: 1, go: 'M.block(&quot;' + k + '&quot;,' + ri + ')' });
+      });
+      out += '<div class="sess">' +
+          '<div class="sess-top"><span class="sess-k">' + E(DAYL[i] + ', ' + ds) + '</span>' +
+          '<span class="sess-n">' + n + ' von ' + b.vis.length + '</span></div>' +
+          '<p class="sess-t">' + E((b.vis[first < 0 ? 0 : b.all.indexOf(b.all[first])] || b.vis[0]).title || 'Training') + '</p>' +
+          '<div class="bar"><i style="width:' + Math.round(n / b.vis.length * 100) + '%"></i></div>' +
+        '</div>' + grp(rows);
+      out += (n === b.vis.length)
+        ? btn('Woche ansehen', 'M.go(&quot;plan&quot;)', 1)
+        : btn('Einheit starten', 'M.block(&quot;' + k + '&quot;,' + first + ')');
     }
 
-    if (dir) {
-      inner.classList.add(dir === 'push' ? 'enter-right' : 'enter-left');
-      requestAnimationFrame(function () { inner.classList.remove('enter-right', 'enter-left'); });
-    }
-    body.innerHTML = '';
-    body.appendChild(inner);
-    window.scrollTo(0, 0);
+    out += lbl('Diese Woche') + '<div class="week">' + DAY.map(function (d, j) {
+      var bb = blocks(d), t = bb.vis.length, dn = 0;
+      bb.vis.forEach(function (x) { if (done(d, bb.all.indexOf(x))) dn++; });
+      var p = t ? Math.round(dn / t * 100) : 0;
+      return '<button class="wd' + (j === i ? ' now' : '') + (t && dn === t ? ' full' : '') +
+        '" onclick="M.go(&quot;plan&quot;)"><span>' + DAYL[j].slice(0, 2).toUpperCase() +
+        '</span><span class="ring" style="--p:' + p + '%"></span></button>';
+    }).join('') + '</div>';
 
-    if (cur.legacy) mountLegacy(cur.legacy);
-    renderTabs();
+    // Bilanz aus echten Werten
+    var tot = 0, dn2 = 0, mins = 0;
+    DAY.forEach(function (d) {
+      var bb = blocks(d);
+      bb.vis.forEach(function (x) {
+        tot++; mins += (x.duration || 0);
+        if (done(d, bb.all.indexOf(x))) dn2++;
+      });
+    });
+    var pct = tot ? Math.round(dn2 / tot * 100) : 0;
+    out += lbl('Bilanz') + '<div class="grp">' +
+      stat('Plan erfüllt', pct + ' %', pct) +
+      stat('Einheiten', dn2 + ' von ' + tot, tot ? dn2 / tot * 100 : 0) +
+      stat('Trainingszeit', (mins / 60).toFixed(1).replace('.', ',') + ' Std', Math.min(100, mins / 6)) +
+    '</div>';
+    return out;
+  }};
+
+  S.plan = { title: 'Plan', root: 1, view: function () {
+    var now = new Date(), y = now.getFullYear(), m = now.getMonth(), td = now.getDate();
+    var first = new Date(y, m, 1), off = (first.getDay() + 6) % 7;
+    var len = new Date(y, m + 1, 0).getDate();
+    var prev = new Date(y, m, 0).getDate();
+    var cells = '';
+    for (var c = 0; c < 42; c++) {
+      var d = c - off + 1, out = d < 1 || d > len;
+      var show = out ? (d < 1 ? prev + d : d - len) : d;
+      var dow = (c % 7);
+      var bb = out ? { vis: [] } : blocks(DAY[dow]);
+      var has = bb.vis.length > 0;
+      var ok = has && !out && d < td;
+      cells += '<button class="cal-d' + (out ? ' out' : '') + (d === td && !out ? ' today' : '') +
+        (has ? (ok ? ' has ok' : ' has') : '') + '" onclick="M.tag(' + (out ? td : d) + ')">' + show +
+        (has ? '<u></u>' : '<u style="background:transparent"></u>') + '</button>';
+      if (c > 34 && d > len) break;
+    }
+    var wk = (typeof getProgram10WCurrentWeek === 'function') ? getProgram10WCurrentWeek() : 0;
+    var ph = (wk && typeof getP10WPhase === 'function') ? getP10WPhase(wk) : null;
+    var k = DAY[ti()], b = blocks(k);
+
+    return '<h1 class="big">Plan</h1>' +
+      '<div class="cal">' +
+        '<div class="cal-h"><b>' + MON[m] + ' ' + y + '</b>' +
+        '<span class="cal-nav"><button><i></i></button><button><i></i></button></span></div>' +
+        '<div class="cal-w">' + ['M','D','M','D','F','S','S'].map(function (x) {
+          return '<span>' + x + '</span>'; }).join('') + '</div>' +
+        '<div class="cal-g">' + cells + '</div>' +
+      '</div>' +
+      lbl('Heute, ' + DAYL[ti()] + ' ' + td + '. ' + MON[m]) +
+      grp(b.vis.map(function (x) {
+        var ri = b.all.indexOf(x), mm = [];
+        if (x.time) mm.push(x.time);
+        if (x.duration) mm.push(x.duration + ' Min');
+        return row({ t: x.title || 'Einheit', s: mm.join(', '), done: done(k, ri), chev: 1,
+          go: 'M.block(&quot;' + k + '&quot;,' + ri + ')' });
+      }).concat([row({ t: 'Ganzen Tag ansehen', chev: 1, go: 'M.tag(' + td + ')' })])) +
+      (wk ? lbl('Programm') + grp([
+        row({ t: 'Woche', v: wk + ' von 10' }),
+        row({ t: 'Phase', v: ph ? ph.name : '' })
+      ]) : '');
+  }};
+
+  S.tag = { title: 'Tag', view: function () {
+    var d = M.sel, now = new Date(), m = now.getMonth(), td = now.getDate();
+    var dow = (new Date(now.getFullYear(), m, d).getDay() + 6) % 7;
+    var k = DAY[dow], b = blocks(k);
+    if (!b.vis.length) {
+      return '<h1 class="big">' + d + '. ' + MON[m] + '</h1>' + lbl('Ruhetag') +
+        grp([row({ t: 'Kein Training geplant',
+          s: 'Erholung gehört zum Plan. Schlaf und lockere Bewegung zählen.' })]) +
+        btn('Zurück zum Monat', 'M.back()', 1);
+    }
+    var mins = 0, rpes = [];
+    var tl = b.vis.map(function (x, j) {
+      var ri = b.all.indexOf(x), dn = done(k, ri);
+      mins += (x.duration || 0); if (x.rpe) rpes.push(x.rpe);
+      var mm = [];
+      if (x.duration) mm.push(x.duration + ' Min');
+      if (x.rpe) mm.push('RPE ' + x.rpe);
+      return '<div class="tl-e' + (dn ? ' is-done' : (d === td && j === 0 ? ' is-now' : '')) + '">' +
+        '<span class="tl-t">' + E(x.time || '') + '</span>' +
+        '<button class="tl-c" onclick="M.block(&quot;' + k + '&quot;,' + ri + ')">' +
+          '<span class="tl-n">' + E(x.title || 'Einheit') + '</span>' +
+          '<span class="tl-s">' + E(mm.join(', ')) + '</span>' +
+        '</button></div>';
+    }).join('');
+    var rpe = rpes.length ? (rpes.reduce(function (a, x) { return a + x; }, 0) / rpes.length) : 0;
+    return '<h1 class="big">' + d + '. ' + MON[m] + '</h1>' +
+      lbl((d === td ? 'Heute, ' : '') + b.vis.length + (b.vis.length === 1 ? ' Einheit' : ' Einheiten')) +
+      '<div class="tl">' + tl + '</div>' +
+      lbl('Belastung') + '<div class="grp">' +
+        stat('Gesamtdauer', mins + ' Min', Math.min(100, mins / 2)) +
+        stat('Mittlerer RPE', rpe.toFixed(1).replace('.', ','), rpe * 10) +
+      '</div>';
+  }};
+
+  S.wissen = { title: 'Wissen', root: 1, view: function () {
+    return '<h1 class="big">Wissen</h1>' +
+    grp([
+      row({ t:'Übungen', s:'Bewegungen mit Fotos und Anleitung', chev:1, go:'M.old(&quot;training&quot;,&quot;uebungen&quot;,&quot;Übungen&quot;)' }),
+      row({ t:'Videos', s:'Kampf-Breakdowns und Technik', chev:1, go:'M.old(&quot;training&quot;,&quot;wissen&quot;,&quot;Videos&quot;)' }),
+      row({ t:'Ernährung', s:'Kalorien, Makros, Timing', chev:1, go:'M.old(&quot;training&quot;,&quot;ernaehrung&quot;,&quot;Ernährung&quot;)' }),
+      row({ t:'Periodisierung', s:'Wie sich der Plan aufbaut', chev:1, go:'M.old(&quot;training&quot;,&quot;periodisierung&quot;,&quot;Periodisierung&quot;)' }),
+      row({ t:'Regeneration', s:'Schlaf, HRV, Belastung', chev:1, go:'M.old(&quot;training&quot;,&quot;regeneration&quot;,&quot;Regeneration&quot;)' }),
+      row({ t:'8 Säulen', s:'Worauf das System aufbaut', chev:1, go:'M.old(&quot;profil&quot;,&quot;saeulen&quot;,&quot;8 Säulen&quot;)' })
+    ]) + lbl('Deine Daten') + grp([
+      row({ t:'Tests', s:'Kraft, Ausdauer, Schnelligkeit', chev:1, go:'M.old(&quot;training&quot;,&quot;tests&quot;,&quot;Tests&quot;)' }),
+      row({ t:'Log', s:'Was du trainiert hast', chev:1, go:'M.old(&quot;training&quot;,&quot;log&quot;,&quot;Log&quot;)' }),
+      row({ t:'Notizen', s:'Gedanken und Beobachtungen', chev:1, go:'M.old(&quot;training&quot;,&quot;notizen&quot;,&quot;Notizen&quot;)' })
+    ]);
+  }};
+
+  S.kaempfe = { title: 'Kämpfe', root: 1, view: function () {
+    var f = D().fights || [];
+    if (!f.length) {
+      return '<h1 class="big">Kämpfe</h1>' +
+        '<div class="empty"><b>Noch keine Kämpfe</b>' +
+        '<p>Trag deine Kämpfe ein, dann siehst du hier Bilanz und Auswertung.</p>' +
+        btn('Kampf eintragen', 'M.old(&quot;fights&quot;,null,&quot;Kämpfe&quot;)') + '</div>';
+    }
+    var w = f.filter(function (x) { return x.result === 'sieg'; }).length;
+    var l = f.filter(function (x) { return x.result === 'niederlage'; }).length;
+    var u = f.length - w - l;
+    return '<h1 class="big">Kämpfe</h1>' + lbl('Bilanz') + '<div class="grp">' +
+      stat('Siege', String(w), f.length ? w / f.length * 100 : 0) +
+      stat('Niederlagen', String(l), f.length ? l / f.length * 100 : 0) +
+      stat('Unentschieden', String(u), f.length ? u / f.length * 100 : 0) +
+    '</div>' + lbl('Alle Kämpfe') +
+    grp(f.slice().reverse().map(function (x) {
+      return row({ t: x.opponent || 'Gegner',
+        s: [x.date, x.method].filter(Boolean).join(', '),
+        v: x.result === 'sieg' ? 'S' : x.result === 'niederlage' ? 'N' : 'U',
+        chev: 1, go: 'M.old(&quot;fights&quot;,null,&quot;Kämpfe&quot;)' });
+    }));
+  }};
+
+  S.profil = { title: 'Profil', root: 1, view: function () {
+    var s = SCH();
+    var lv = { anfaenger:'Anfänger', fortgeschritten:'Fortgeschritten', wettkampf:'Wettkämpfer', profi:'Profi' };
+    var eq = (!s.gymAccess || s.gymAccess === 'none') ? 'Körpergewicht'
+           : (s.gymAccess === 'basic' ? 'Basis' : 'Volles Gym');
+    return '<h1 class="big">Profil</h1>' +
+      grp([row({ t: (typeof getDisplayName === 'function' ? getDisplayName() : 'Dein Profil'),
+                 s: 'Name und Konto', chev: 1, go: 'M.old(&quot;profil&quot;,&quot;account&quot;,&quot;Account&quot;)' })]) +
+      lbl('Training') + grp([
+        row({ t:'Gewicht', v: (s.weight || '-') + ' kg', chev:1, go:'M.pick(&quot;weight&quot;)' }),
+        row({ t:'Größe', v: (s.height || '-') + ' cm', chev:1, go:'M.pick(&quot;height&quot;)' }),
+        row({ t:'Level', v: lv[s.experienceLevel] || 'Fortgeschritten', chev:1, go:'M.pick(&quot;level&quot;)' }),
+        row({ t:'Equipment', v: eq, chev:1, go:'M.pick(&quot;gym&quot;)' })
+      ]) +
+      lbl('Verein') + grp([
+        row({ t:'Feed und Forum', s:'Beiträge anderer Boxer', chev:1, go:'M.old(&quot;community&quot;,null,&quot;Verein&quot;)' })
+      ]) +
+      lbl('Hilfe') + grp([
+        row({ t:'Rechner', chev:1, go:'M.old(&quot;profil&quot;,&quot;rechner&quot;,&quot;Rechner&quot;)' }),
+        row({ t:'FAQ', chev:1, go:'M.old(&quot;profil&quot;,&quot;faq&quot;,&quot;FAQ&quot;)' })
+      ]) +
+      btn('Abmelden', 'doLogout()', 1);
+  }};
+
+  var TABS = [['heute','Heute','h'],['plan','Plan','p'],['wissen','Wissen','w'],
+              ['kaempfe','Kämpfe','k'],['profil','Profil','i']];
+
+  /* ---------- Auswahlrad ---------- */
+
+  var PICKS = {
+    weight: { t:'Gewicht', u:'kg', get:function(){return SCH().weight||75;},
+              opts:function(){var a=[];for(var i=40;i<=140;i++)a.push(i);return a;},
+              set:function(v){ setSched('weight', v); } },
+    height: { t:'Größe', u:'cm', get:function(){return SCH().height||180;},
+              opts:function(){var a=[];for(var i=140;i<=220;i++)a.push(i);return a;},
+              set:function(v){ setSched('height', v); } },
+    level:  { t:'Level', get:function(){return SCH().experienceLevel||'fortgeschritten';},
+              opts:function(){return [['anfaenger','Anfänger'],['fortgeschritten','Fortgeschritten'],
+                ['wettkampf','Wettkämpfer'],['profi','Profi']];},
+              set:function(v){ setSched('experienceLevel', v); } },
+    gym:    { t:'Equipment', get:function(){return SCH().gymAccess||'none';},
+              opts:function(){return [['none','Körpergewicht'],['basic','Basis'],['full','Volles Gym']];},
+              set:function(v){ setSched('gymAccess', v); } }
+  };
+
+  function setSched(key, val) {
+    try {
+      var users = safeParse('fos_users', {});
+      if (!users[currentUser]) users[currentUser] = {};
+      users[currentUser][key] = val;
+      localStorage.setItem('fos_users', JSON.stringify(users));
+      if (typeof syncToCloud === 'function') syncToCloud();
+      if (typeof generateCurrentWeekPlan === 'function') {
+        var d = getData(); d.weekPlan = generateCurrentWeekPlan(); saveData(d);
+      }
+    } catch (e) {}
   }
 
-  // Bildschirme, die noch die alte Ausgabe nutzen, werden sauber
-  // eingehängt statt nachgebaut — der Inhalt stimmt ja, nur der
-  // Rahmen war das Problem.
-  function mountLegacy(spec) {
-    var host = document.getElementById('m-legacy-host');
+  /* ---------- Navigation ---------- */
+
+  var stack = [], M;
+
+  function cur() { return stack[stack.length - 1]; }
+
+  function bar() {
+    var c = S[cur().id] || { title: cur().title }, par = stack.length > 1 ? stack[stack.length - 2] : null;
+    var title = cur().title || c.title;
+    document.getElementById('m-nav').innerHTML =
+      (par ? '<button class="nav-back" onclick="M.back()"><span>' +
+              E(par.title || (S[par.id] || {}).title || 'Zurück') + '</span></button>'
+           : '<span class="nav-spacer"></span>') +
+      '<span class="nav-title">' + E(title) + '</span>' +
+      (c.act === 'chat'
+        ? '<button class="nav-act" onclick="toggleAICoach()" aria-label="Coach"><span class="ico ico-chat"></span></button>'
+        : '<span class="nav-spacer"></span>');
+  }
+
+  function body(dir) {
+    var c = cur(), el = document.getElementById('m-body');
+    var html = c.old ? '<div class="legacy" id="m-old"></div>' : S[c.id].view();
+    el.innerHTML = '<div class="screen' + (dir === 'pop' ? ' pop' : '') + '">' + html + '</div>';
+    el.scrollTop = 0;
+    document.getElementById('m-nav').classList.remove('compact');
+    if (c.old) mountOld(c.old);
+    tabs();
+  }
+
+  function mountOld(spec) {
+    var host = document.getElementById('m-old');
     if (!host) return;
     try {
-      if (spec.parent === 'training' && typeof renderTrainingPage === 'function') {
-        window._trainingSubTab = spec.sub; renderTrainingPage(spec.sub);
-      } else if (spec.parent === 'profil' && typeof renderProfilPage === 'function') {
-        window._profilSubTab = spec.sub; renderProfilPage(spec.sub);
-      } else if (spec.parent === 'community' && typeof renderCommunityPage === 'function') {
+      if (spec.p === 'training' && typeof renderTrainingPage === 'function') {
+        window._trainingSubTab = spec.s; renderTrainingPage(spec.s);
+      } else if (spec.p === 'profil' && typeof renderProfilPage === 'function') {
+        window._profilSubTab = spec.s; renderProfilPage(spec.s);
+      } else if (spec.p === 'community' && typeof renderCommunityPage === 'function') {
         renderCommunityPage();
-      } else if (spec.parent === 'fights' && typeof renderFightsPage === 'function') {
+      } else if (spec.p === 'fights' && typeof renderFightsPage === 'function') {
         renderFightsPage();
       }
-      var src = document.getElementById('page-' + spec.parent);
+      var src = document.getElementById('page-' + spec.p);
       if (src) {
         host.innerHTML = src.innerHTML;
-        // Die alte Reiterleiste hat hier nichts mehr verloren
         host.querySelectorAll('.sub-tabs, .page-header').forEach(function (n) { n.remove(); });
       }
-    } catch (e) {
-      host.innerHTML = '<p class="m-empty-text">Dieser Bereich konnte nicht geladen werden.</p>';
-    }
+    } catch (e) { host.innerHTML = '<div class="empty"><b>Nicht verfügbar</b></div>'; }
   }
 
-  function renderTabs() {
-    var el = document.getElementById('m-tabs');
-    if (!el) return;
-    var activeRoot = stack[0] ? stack[0].id : rootId;
-    el.innerHTML = TABS.map(function (t) {
-      return '<button class="m-tab' + (t.id === activeRoot ? ' is-active' : '') + '" ' +
-        'onclick="MobileApp.go(\'' + t.id + '\')" aria-label="' + E(t.label) + '">' +
-        '<span class="m-tab-icon m-icon-' + t.id + '" aria-hidden="true"></span>' +
-        '<span class="m-tab-label">' + E(t.label) + '</span></button>';
+  function tabs() {
+    document.getElementById('m-tabs').innerHTML = TABS.map(function (t) {
+      return '<button class="tab' + (t[0] === stack[0].id ? ' on' : '') +
+        '" onclick="M.go(&quot;' + t[0] + '&quot;)"><span class="ti ti-' + t[2] + '"></span>' +
+        '<u>' + E(t[1]) + '</u></button>';
     }).join('');
   }
 
-  var MobileApp = {
+  M = {
+    sel: new Date().getDate(),
     go: function (id) {
-      if (SCREENS[id] && SCREENS[id].root) {
-        // Ein Tab-Wechsel setzt den Stapel zurueck — kein halb
-        // erinnerter Unterbildschirm.
-        stack = [{ id: id, title: SCREENS[id].title }];
-        rootId = id;
-        renderBar(); renderBody(null);
-      } else if (SCREENS[id]) {
-        stack.push({ id: id, title: SCREENS[id].title });
-        renderBar(); renderBody('push');
-      }
+      if (!S[id]) return;
+      if (S[id].root) { stack = [{ id: id, title: S[id].title }]; bar(); body(); }
+      else { stack.push({ id: id, title: S[id].title }); bar(); body('push'); }
     },
-    legacy: function (parent, sub, title) {
-      stack.push({ id: 'legacy', title: title, legacy: { parent: parent, sub: sub } });
-      renderBar(); renderBody('push');
+    tag: function (d) { M.sel = d; stack.push({ id: 'tag', title: 'Tag' }); bar(); body('push'); },
+    old: function (p, s, t) { stack.push({ id: 'old', title: t, old: { p: p, s: s } }); bar(); body('push'); },
+    back: function () { if (stack.length > 1) { stack.pop(); bar(); body('pop'); } },
+    tick: function (d, i) {
+      var b = blocks(d), x = b.all[i] || {};
+      if (typeof toggleBlockDone === 'function') toggleBlockDone(d, i, x.type || '', x.title || '');
+      body();
     },
-    back: function () {
-      if (stack.length < 2) return;
-      stack.pop();
-      renderBar(); renderBody('pop');
+    block: function (d, i) {
+      if (typeof openBlockDetail === 'function') openBlockDetail(d, i);
+      var b = blocks(d), x = b.all[i] || {};
+      stack.push({ id: 'old', title: x.title || 'Einheit', old: { p: 'block-detail' } });
+      bar();
+      var el = document.getElementById('m-body'), src = document.getElementById('page-block-detail');
+      el.innerHTML = '<div class="screen"><div class="legacy">' + (src ? src.innerHTML : '') + '</div></div>';
+      el.scrollTop = 0; tabs();
     },
-    toggle: function (dayKey, idx) {
-      var b = blocksFor(dayKey);
-      var blk = b.all[idx] || {};
-      if (typeof toggleBlockDone === 'function') toggleBlockDone(dayKey, idx, blk.type || '', blk.title || '');
-      renderBody(null);
+    pick: function (key) {
+      var P = PICKS[key]; if (!P) return;
+      var opts = P.opts(), cur = P.get();
+      var pairs = opts.map(function (o) { return Array.isArray(o) ? o : [o, String(o)]; });
+      var idx = Math.max(0, pairs.findIndex(function (p) { return String(p[0]) === String(cur); }));
+      var sheet = document.getElementById('m-sheet');
+      sheet.innerHTML =
+        '<div class="sheet-bd" onclick="M.close()"></div>' +
+        '<div class="pick-p">' +
+          '<div class="pick-h"><button onclick="M.close()">Abbrechen</button>' +
+            '<span>' + E(P.t) + '</span>' +
+            '<button class="done" onclick="M.pickDone(&quot;' + key + '&quot;)">Fertig</button></div>' +
+          '<div class="pick-w"><div class="pick-band"></div>' +
+            '<div class="pick-c"><div class="pick-col" id="m-pickcol">' +
+              pairs.map(function (p, i) {
+                return '<div class="pick-o' + (i === idx ? ' sel' : '') + '" data-v="' + E(p[0]) + '">' +
+                  E(p[1]) + (P.u ? ' ' + P.u : '') + '</div>'; }).join('') +
+            '</div></div>' +
+          '</div>' +
+        '</div>';
+      sheet.classList.add('open');
+      var col = document.getElementById('m-pickcol');
+      col.scrollTop = idx * 44;
+      col.addEventListener('scroll', function () {
+        var i = Math.round(col.scrollTop / 44);
+        [].forEach.call(col.children, function (c, j) { c.classList.toggle('sel', j === i); });
+      }, { passive: true });
     },
-    openBlock: function (dayKey, idx) {
-      if (typeof openBlockDetail === 'function') openBlockDetail(dayKey, idx);
-      var b = blocksFor(dayKey);
-      var blk = b.all[idx] || {};
-      stack.push({ id: 'legacy', title: blk.title || 'Einheit', legacy: { parent: 'block-detail' } });
-      renderBar();
-      var body = document.getElementById('m-body');
-      var src = document.getElementById('page-block-detail');
-      if (body && src) {
-        body.innerHTML = '<div class="m-screen enter-right"><div class="m-legacy">' + src.innerHTML + '</div></div>';
-        requestAnimationFrame(function () {
-          var s = body.querySelector('.m-screen'); if (s) s.classList.remove('enter-right');
-        });
-        window.scrollTo(0, 0);
-      }
-      renderTabs();
+    pickDone: function (key) {
+      var col = document.getElementById('m-pickcol');
+      var i = Math.round(col.scrollTop / 44);
+      var el = col.children[i];
+      if (el) PICKS[key].set(isNaN(+el.dataset.v) ? el.dataset.v : +el.dataset.v);
+      M.close(); body();
     },
-    refresh: function () { renderBar(); renderBody(null); }
+    close: function () { document.getElementById('m-sheet').classList.remove('open'); }
   };
-  window.MobileApp = MobileApp;
-  window.__mobileApp = true;
+  window.M = M;
 
-  // ---------- Aufbau ----------
+  /* ---------- Aufbau ---------- */
 
   function build() {
     var app = document.getElementById('app-screen');
     if (!app) return;
-
-    var shell = h(
-      '<div id="m-app">' +
-        '<header id="m-bar" class="m-bar"></header>' +
-        '<h1 id="m-bigtitle" class="m-bigtitle"></h1>' +
-        '<main id="m-body" class="m-body"></main>' +
-        '<nav id="m-tabs" class="m-tabs"></nav>' +
-      '</div>');
-    app.appendChild(shell);
+    var d = document.createElement('div');
+    d.id = 'm-app';
+    d.innerHTML =
+      '<div class="nav" id="m-nav"></div>' +
+      '<div class="body" id="m-body"></div>' +
+      '<nav class="tabs" id="m-tabs"></nav>' +
+      '<div class="sheet" id="m-sheet"></div>';
+    app.appendChild(d);
     document.body.classList.add('m-on');
-
     stack = [{ id: 'heute', title: 'Heute' }];
-    renderBar(); renderBody(null);
+    bar(); body();
 
-    // Grosser Titel faellt beim Scrollen in die Leiste
-    var ticking = false;
-    window.addEventListener('scroll', function () {
-      if (ticking) return; ticking = true;
-      requestAnimationFrame(function () {
-        ticking = false;
-        var big = document.getElementById('m-bigtitle');
-        var bar = document.getElementById('m-bar');
-        if (!big || !bar) return;
-        var collapsed = window.scrollY > 26;
-        big.classList.toggle('is-collapsed', collapsed);
-        bar.classList.toggle('shows-title', collapsed || stack.length > 1);
-      });
+    document.getElementById('m-body').addEventListener('scroll', function (e) {
+      document.getElementById('m-nav').classList.toggle('compact', e.target.scrollTop > 28);
     }, { passive: true });
 
-    // Wischen von der linken Kante fuehrt zurueck
-    var x0 = null, y0 = null;
+    var x0 = null;
     document.addEventListener('touchstart', function (e) {
-      var t = e.touches[0];
-      if (t.clientX < 28) { x0 = t.clientX; y0 = t.clientY; } else { x0 = null; }
+      var t = e.touches[0]; x0 = t.clientX < 26 ? t.clientX : null;
     }, { passive: true });
     document.addEventListener('touchend', function (e) {
       if (x0 === null) return;
-      var t = e.changedTouches[0];
-      if (t.clientX - x0 > 60 && Math.abs(t.clientY - y0) < 50) MobileApp.back();
+      if (e.changedTouches[0].clientX - x0 > 60) M.back();
       x0 = null;
     }, { passive: true });
   }
 
   function start() {
-    var app = document.getElementById('app-screen');
-    if (!app || app.style.display === 'none' || !app.classList.contains('active')) {
-      return setTimeout(start, 400);
-    }
+    var a = document.getElementById('app-screen');
+    if (!a || !a.classList.contains('active')) return setTimeout(start, 400);
     build();
   }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { setTimeout(start, 600); });
-  } else {
-    setTimeout(start, 600);
-  }
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(start, 700); });
+  else setTimeout(start, 700);
 })();
