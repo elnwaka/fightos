@@ -62,6 +62,7 @@ function escJs(v) {
 // selector: die Ueberschriften. openFirst: erster Abschnitt offen.
 function makeCollapsible(rootEl, selector, openFirst) {
   if (!rootEl) return;
+  var bareSelector = selector.replace(/^:scope\s*>\s*/, '');
   var heads = [].slice.call(rootEl.querySelectorAll(selector));
   if (heads.length < 2) return;
 
@@ -75,7 +76,7 @@ function makeCollapsible(rootEl, selector, openFirst) {
     var n = head.nextSibling;
     while (n) {
       var next = n.nextSibling;
-      if (n.nodeType === 1 && n.matches && n.matches(selector)) break;
+      if (n.nodeType === 1 && n.matches && n.matches(bareSelector)) break;
       body.appendChild(n);
       n = next;
     }
@@ -110,12 +111,22 @@ function makeCollapsible(rootEl, selector, openFirst) {
 }
 
 // Nach dem Rendern der langen Seiten anwenden.
+// Container nicht raten: die Ueberschriften selbst sagen, wo sie stehen.
+// (Die Uebungen rendern je nach Einstieg in #training-content, nicht in
+// #page-uebungen — Raten hat vorher die falsche, leere Kiste erwischt.)
 function applyCollapsibleSections() {
-  var ern = document.getElementById('page-ernaehrung');
-  if (ern) makeCollapsible(ern, '[id^="ern-s"]', true);
+  foldByHeadings('[id^="ern-s"]');
+  foldByHeadings('.cat-header');
+}
 
-  var ueb = document.getElementById('page-uebungen') ||
-            document.getElementById('training-content') ||
-            document.querySelector('.page.active');
-  if (ueb) makeCollapsible(ueb, '.cat-header', true);
+function foldByHeadings(selector) {
+  var heads = [].slice.call(document.querySelectorAll(selector));
+  if (!heads.length) return;
+  var parents = [];
+  heads.forEach(function(h) {
+    if (parents.indexOf(h.parentElement) === -1) parents.push(h.parentElement);
+  });
+  parents.forEach(function(parent) {
+    makeCollapsible(parent, ':scope > ' + selector, true);
+  });
 }
