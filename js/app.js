@@ -6794,9 +6794,9 @@ function buildDailyRoutineHTML() {
 
   // Filter out noise blocks
   var noiseLabels = ['Arbeit', 'Feierabend', 'Meal Prep'];
-  routine = routine.filter(function(r) { return noiseLabels.indexOf(r.label) === -1; });
+  var visibleRoutine = routine.filter(function(r) { return noiseLabels.indexOf(r.label) === -1; });
 
-  return headerHTML + warningsHTML + routine.map(r => {
+  return headerHTML + warningsHTML + visibleRoutine.map(r => {
     const [rh, rm] = r.time.split(':').map(Number);
     const rMin = rh * 60 + rm;
     const isNow = Math.abs(currentMin - rMin) < 30;
