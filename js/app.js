@@ -6903,6 +6903,81 @@ function checkAndSaveWeeklySnapshot() {
   saveData(data);
 }
 
+// ===== HEUTE-KARTE =====
+// Die eine Frage, die der Startbildschirm beantworten muss:
+// Was trainiere ich jetzt? Alles andere steht darunter.
+// Nutzt dieselbe Mechanik wie der Wochenplan (weekPlan, completedBlocks,
+// toggleBlockDone, openBlockDetail) — kein zweiter Datenpfad.
+function renderHeuteCard(data) {
+  var todayKey = DAY_NAMES[(new Date().getDay() + 6) % 7];
+  var dayLabel = DAY_LABELS[(new Date().getDay() + 6) % 7];
+  var weekId = getWeekId();
+  var blocks = (data.weekPlan && data.weekPlan[todayKey])
+    ? data.weekPlan[todayKey].filter(function(b) { return b.type !== 'meta'; })
+    : [];
+
+  var dateStr = new Date().toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
+
+  // Ruhetag
+  if (!blocks.length) {
+    return '<section class="heute">' +
+      '<div class="heute-kopf">' +
+        '<span class="heute-tag">' + esc(dayLabel) + ', ' + esc(dateStr) + '</span>' +
+      '</div>' +
+      '<h2 class="heute-titel">Ruhetag</h2>' +
+      '<p class="heute-text">Erholung ist Teil des Plans. Wenn du trotzdem etwas tun willst: locker bewegen, dehnen, schlafen.</p>' +
+      '<button class="heute-zweit" onclick="showPage(\'wochenplan\')">Woche ansehen</button>' +
+    '</section>';
+  }
+
+  var done = 0;
+  var rows = blocks.map(function(b, i) {
+    // Index im ungefilterten Plan, damit toggleBlockDone denselben Key bildet
+    var realIdx = data.weekPlan[todayKey].indexOf(b);
+    var logKey = todayKey + '_' + realIdx + '_' + weekId;
+    var isDone = !!(data.completedBlocks && data.completedBlocks[logKey]);
+    if (isDone) done++;
+
+    var meta = [];
+    if (b.duration) meta.push(b.duration + ' Min');
+    if (b.rpe) meta.push('RPE ' + b.rpe);
+
+    return '<li class="heute-block' + (isDone ? ' is-done' : '') + '">' +
+      '<button class="heute-haken" aria-label="' + (isDone ? 'Wieder öffnen' : 'Als erledigt markieren') + '"' +
+        ' onclick="event.stopPropagation();toggleBlockDone(\'' + escJs(todayKey) + '\',' + realIdx +
+        ',\'' + escJs(b.type || '') + '\',\'' + escJs(b.title || '') + '\');renderDashboard();">' +
+        (isDone ? '&#10003;' : '') +
+      '</button>' +
+      '<button class="heute-block-text" onclick="openBlockDetail(\'' + escJs(todayKey) + '\',' + realIdx + ')">' +
+        '<span class="heute-block-titel">' + esc(b.title || 'Einheit') + '</span>' +
+        (meta.length ? '<span class="heute-block-meta">' + esc(meta.join(' · ')) + '</span>' : '') +
+      '</button>' +
+    '</li>';
+  }).join('');
+
+  var alleFertig = done === blocks.length;
+  var ersterOffen = blocks.findIndex(function(b, i) {
+    var realIdx = data.weekPlan[todayKey].indexOf(b);
+    return !(data.completedBlocks && data.completedBlocks[todayKey + '_' + realIdx + '_' + weekId]);
+  });
+  var haupttitel = alleFertig
+    ? 'Heute erledigt'
+    : (blocks[ersterOffen < 0 ? 0 : ersterOffen].title || 'Training');
+
+  return '<section class="heute' + (alleFertig ? ' heute-fertig' : '') + '">' +
+    '<div class="heute-kopf">' +
+      '<span class="heute-tag">' + esc(dayLabel) + ', ' + esc(dateStr) + '</span>' +
+      '<span class="heute-zaehler">' + done + '/' + blocks.length + '</span>' +
+    '</div>' +
+    '<h2 class="heute-titel">' + esc(haupttitel) + '</h2>' +
+    '<ul class="heute-liste">' + rows + '</ul>' +
+    (alleFertig
+      ? '<p class="heute-text">Alles abgehakt. Morgen weiter.</p>'
+      : '<button class="heute-haupt" onclick="openBlockDetail(\'' + escJs(todayKey) + '\',' +
+          data.weekPlan[todayKey].indexOf(blocks[ersterOffen < 0 ? 0 : ersterOffen]) + ')">Einheit öffnen</button>') +
+  '</section>';
+}
+
 function renderDashboard() {
   checkAndSaveWeeklySnapshot();
   var el = document.getElementById('dash-app');
@@ -7071,6 +7146,9 @@ function renderDashboard() {
   // ═══ FIGHT COMMAND DASHBOARD ═══
 
   el.innerHTML =
+
+    // Heute zuerst — die Frage, die beim Oeffnen zaehlt.
+    renderHeuteCard(data) +
 
     // ══ HERO: Full-width image like before ══
     '<div class="db-hero">' +

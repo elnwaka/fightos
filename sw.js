@@ -1,5 +1,5 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-09-07k';
+const BUILD = '2026-09-07m';
 const CACHE_NAME = 'boxspec-' + BUILD;
 const PRECACHE = [
   './',

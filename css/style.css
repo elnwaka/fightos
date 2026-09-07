@@ -5944,3 +5944,151 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   .cm-tabs > .cm-tab:first-child { padding-left: 0; }
   .sub-tabs, .cm-tabs { scroll-behavior: smooth; }
 }
+
+/* ============================================================
+   HEUTE — die Schleife: oeffnen, sehen, abhaken
+   Gleiche Farben und Schriften wie der Rest der App.
+   ============================================================ */
+.heute {
+  background: var(--surface-1);
+  border: 1px solid var(--surface-2);
+  border-radius: var(--radius-lg, 14px);
+  padding: 18px 18px 16px;
+  margin-bottom: 20px;
+}
+.heute-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.heute-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.heute-zaehler {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.heute-titel {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(30px, 9vw, 42px);
+  line-height: 1;
+  letter-spacing: .01em;
+  color: var(--white);
+  margin: 8px 0 0;
+  text-wrap: balance;
+}
+.heute-fertig .heute-titel { color: var(--green); }
+.heute-text {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 10px 0 0;
+  max-width: 46ch;
+}
+.heute-liste {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.heute-block {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  border-top: 1px solid var(--surface-2);
+  padding: 2px 0;
+}
+.heute-block:last-child { border-bottom: 1px solid var(--surface-2); }
+.heute-haken {
+  flex: 0 0 auto;
+  width: 44px;
+  min-height: 52px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--green);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.heute-haken::before {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--surface-3);
+  border-radius: 50%;
+}
+.heute-block.is-done .heute-haken::before {
+  border-color: var(--green);
+  background: rgba(16,185,129,.12);
+}
+.heute-haken { position: relative; }
+.heute-haken > * , .heute-block.is-done .heute-haken { position: relative; z-index: 1; }
+.heute-block-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 14px 0;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+.heute-block-titel {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.25;
+}
+.heute-block.is-done .heute-block-titel {
+  color: var(--text-subtle);
+  text-decoration: line-through;
+}
+.heute-block-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+}
+.heute-haupt,
+.heute-zweit {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  min-height: 52px;
+  border-radius: var(--radius-md, 10px);
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.heute-haupt {
+  background: var(--red);
+  border: none;
+  color: #fff;
+  font-weight: 700;
+}
+.heute-zweit {
+  background: none;
+  border: 1px solid var(--surface-3);
+  color: var(--light);
+}
+.heute-haupt:active { transform: scale(.99); }
