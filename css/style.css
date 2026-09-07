@@ -6353,3 +6353,63 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
 @media (prefers-reduced-motion: reduce) {
   .appbar-large, .appbar-title { transition: none; }
 }
+
+/* Zusammenfassungszeile statt Chip-Reihe (iOS-Muster) */
+.plan-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.plan-summary-text {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.plan-summary-edit {
+  flex: 0 0 auto;
+  background: none;
+  border: none;
+  color: var(--red);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 8px 0 8px 8px;
+  min-height: 44px;
+}
+.plan-warn {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--orange);
+  margin: -8px 0 16px;
+  line-height: 1.45;
+}
+
+@media (max-width: 768px) {
+  /* Rand-Streifen links: das Muster, das jede KI-Oberflaeche benutzt
+     und iOS nirgends. Ersetzt durch Flaeche. */
+  [style*="border-left:3px solid"],
+  [style*="border-left: 3px solid"] {
+    border-left: 0 !important;
+    border-radius: 12px !important;
+  }
+
+  /* Die acht Saeulen-Kacheln waren acht Farben mit acht Rahmen.
+     Inaktive treten zurueck, aktive bekommen eine Toenung — kein Rahmen. */
+  .saeule-chip,
+  .pillar-chip {
+    border: none !important;
+    background: var(--surface-2) !important;
+    color: var(--text-muted) !important;
+  }
+  .saeule-chip.active,
+  .pillar-chip.active {
+    background: rgba(232,0,13,.14) !important;
+    color: var(--white) !important;
+  }
+}
