@@ -1,5 +1,5 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-09-07z';
+const BUILD = '2026-09-08a';
 const CACHE_NAME = 'boxspec-' + BUILD;
 const PRECACHE = [
   './',
@@ -102,7 +102,16 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
-  // App files (HTML/JS/CSS): Stale-While-Revalidate
+  // App-Dateien (HTML/JS/CSS): NETZWERK ZUERST.
+  //
+  // Vorher lief das als Stale-While-Revalidate: der Cache wurde sofort
+  // ausgeliefert und die neue Fassung erst danach geholt. Der Nutzer sah
+  // damit grundsaetzlich den Stand des VORHERIGEN Aufrufs — bei haeufigen
+  // Deploys hinkt man dauerhaft eine Version hinterher.
+  //
+  // Jetzt: Netz zuerst, Cache nur als Rueckfallebene (offline oder Timeout).
+  // Damit ist online immer der aktuelle Stand zu sehen, offline weiterhin
+  // der letzte bekannte.
   event.respondWith(
     caches.match(event.request).then(function(cached) {
       var fetchPromise = fetch(event.request).then(function(response) {
@@ -138,7 +147,13 @@ self.addEventListener('fetch', function(event) {
         return new Response('', { status: 404 });
       });
 
-      return cached || fetchPromise;
+      // Netz gewinnt, aber nicht ewig: nach 3s aus dem Cache liefern,
+      // damit ein haengendes Netz die App nicht blockiert.
+      if (!cached) return fetchPromise;
+      return Promise.race([
+        fetchPromise,
+        new Promise(function(resolve) { setTimeout(function() { resolve(cached); }, 3000); })
+      ]).catch(function() { return cached; });
     })
   );
 });

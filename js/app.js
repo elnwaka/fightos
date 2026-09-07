@@ -8395,6 +8395,18 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js')
       .then(function(reg) {
         console.log('BoxSpec SW registered, scope:', reg.scope);
+        // Damit man ohne Raten sieht, welcher Stand laeuft:
+        // in der Konsole boxspecVersion() aufrufen.
+        window.boxspecVersion = function() {
+          return fetch('sw.js?v=' + Date.now()).then(function(r) { return r.text(); })
+            .then(function(t) {
+              var m = t.match(/const BUILD = '([^']+)'/);
+              var server = m ? m[1] : '?';
+              console.log('[BoxSpec] Server:', server,
+                          '| Diese Seite geladen:', document.lastModified);
+              return server;
+            });
+        };
         setInterval(function() { reg.update(); }, 60 * 60 * 1000);
       })
       .catch(function(err) {
