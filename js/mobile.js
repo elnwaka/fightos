@@ -284,10 +284,15 @@
   // Grosstext in gemischte Schreibweise bringen: die Datenbank haelt
   // Namen in Versalien, das ist Plakatschrift-Erbe.
   function nice(s) {
-    s = String(s || '');
+    s = String(s || '').replace(/\s*—\s*/g, ': ');
     if (s !== s.toUpperCase()) return s;
-    return s.toLowerCase().replace(/(^|[\s\-\u2013/(])([a-zäöüß])/g,
-      function (m, a, b) { return a + b.toUpperCase(); });
+    s = s.toLowerCase();
+    // Kurze Bezeichnungen Wort fuer Wort gross, ganze Saetze nur vorn.
+    if (s.split(/\s+/).length <= 4) {
+      return s.replace(/(^|[\s\-–\/(])([a-zäöüß])/g,
+        function (m, a, b) { return a + b.toUpperCase(); });
+    }
+    return s.charAt(0).toUpperCase() + s.slice(1);
   }
   function firstMuscle(m) {
     var t = String(m || '').replace(/PRIMÄR:\s*/i, '');
@@ -419,7 +424,20 @@
     var A = ARTICLES[M.art];
     var secs = sections(M.art);
     M.secs = secs;
-    if (!secs.length) return '<div class="empty"><b>Kein Inhalt</b></div>';
+    if (!secs.length) {
+      // Zerlegung fehlgeschlagen: lieber den ganzen Inhalt zeigen als
+      // einen leeren Bildschirm.
+      var host = document.getElementById('m-scratch');
+      var raw = host ? host.innerHTML : '';
+      if (raw && raw.replace(/<[^>]+>/g, '').trim().length > 40) {
+        return '<h1 class="big">' + E(A.t) + '</h1>' +
+          '<div class="legacy article">' + raw + '</div>';
+      }
+      return '<h1 class="big">' + E(A.t) + '</h1>' +
+        '<div class="empty"><b>Inhalt nicht geladen</b>' +
+        '<p>Der Bereich konnte nicht aufgebaut werden.</p>' +
+        '<button class="btn" onclick="M.reset()">Neu laden</button></div>';
+    }
     return '<h1 class="big">' + E(A.t) + '</h1>' +
       lbl(secs.length + ' Kapitel') +
       grp(secs.map(function (s, i) {
