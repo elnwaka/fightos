@@ -393,3 +393,108 @@
   .milestone.done .ms-check,
   .milestone.done::first-letter { color: var(--n-done) !important; }
 }
+
+/* ============================================================
+   ZWEITER DURCHGANG — die Faelle, die in Inline-Styles sitzen
+   und deshalb nur mit breiten Selektoren erreichbar sind.
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* --- 1. Wirklich EINE Schrift ---------------------------- */
+  /* Die Ausnahmeliste war zu kurz: Monospace stand noch im
+     Cloud-Banner, im Namens-Chip und bei AI-POWERED. */
+  body *, body *::before, body *::after {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                 "Segoe UI", Roboto, system-ui, sans-serif !important;
+  }
+  .topbar-logo, .topbar-logo * {
+    font-family: 'Bebas Neue', sans-serif !important;
+  }
+
+  /* --- 2. Eine linke Fluchtlinie: 16px --------------------- */
+  .page {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .topbar, .appbar-large { padding-left: 16px !important; padding-right: 16px !important; }
+  .page > * { margin-left: 0 !important; margin-right: 0 !important; }
+
+  /* --- 3. Inhalt lief unter die Tab-Leiste ----------------- */
+  #app-screen { padding-bottom: 0 !important; }
+  .page > :last-child { margin-bottom: 24px !important; }
+
+  /* --- 4. Keine farbigen Randstreifen, nirgends ------------ */
+  .page [style*="border-left"],
+  .page [class*="border-left"],
+  .day-block, .day-col, .log-entry-card, .tip-card,
+  .info-box, .phase-banner, .fc-next-session {
+    border-left: 0 !important;
+    border-right: 0 !important;
+  }
+
+  /* --- 5. Keine Rahmen und keine Verlaeufe ----------------- */
+  .page *,
+  .page *::before,
+  .page *::after {
+    border-color: transparent !important;
+  }
+  .page [style*="linear-gradient"],
+  .page [style*="radial-gradient"] {
+    background-image: none !important;
+  }
+  /* Haarlinien sind erlaubt — sie werden ueber background gezeichnet,
+     nicht ueber border, und bleiben deshalb erhalten. */
+  .grow + .grow::before,
+  .form-group + .form-group::before,
+  .data-table tr + tr::before,
+  .heute-block + .heute-block::before {
+    background: var(--n-sep) !important;
+  }
+
+  /* --- 6. Fremdfarben auf Grau ---------------------------- */
+  /* Blau, Orange, Gold, Violett, Tuerkis kommen aus Inline-Styles.
+     Rot bleibt Akzent, Gruen bleibt fuer erledigt. */
+  .page [style*="color:#2979ff"], .page [style*="color: #2979ff"],
+  .page [style*="color:#3b82f6"], .page [style*="color:var(--blue)"],
+  .page [style*="color:#ff6d00"], .page [style*="color:var(--orange)"],
+  .page [style*="color:#f5c518"], .page [style*="color:var(--gold)"],
+  .page [style*="color:#ab47bc"], .page [style*="color:#00bcd4"],
+  .page [style*="color:#8bc34a"], .page [style*="color:#4caf50"] {
+    color: var(--n-label-2) !important;
+  }
+  .page [style*="background:#2979ff"], .page [style*="background:var(--blue)"],
+  .page [style*="background:#ff6d00"], .page [style*="background:var(--orange)"],
+  .page [style*="background:#f5c518"], .page [style*="background:var(--gold)"],
+  .page [style*="background:#ab47bc"], .page [style*="background:#00bcd4"],
+  .page [style*="background:#8bc34a"], .page [style*="background:#4caf50"] {
+    background: var(--n-elev-2) !important;
+  }
+
+  /* --- 7. Restliche Versalien ----------------------------- */
+  .page * { text-transform: none !important; }
+  .sec-title, .cat-header, .sec-label, .fc-section-label,
+  .form-label.is-caps, .stat-label, .fc-stat-lbl, .db-stat-lbl {
+    text-transform: uppercase !important;
+    font-size: 13px !important;
+    letter-spacing: .02em !important;
+  }
+
+  /* --- 8. Umrandete Pillen werden Flaechen ---------------- */
+  .ai-quick-btn, .chip, .pill, .ex-chip, .wk-btn,
+  .cm-trending-tag, .cm-feed-filter, .cm-sort-btn, .phase-badge {
+    background: var(--n-elev-2) !important;
+    border: none !important;
+    border-radius: 999px !important;
+    color: var(--n-label-2) !important;
+    font-size: 15px !important;
+  }
+
+  /* --- 9. Kaestchen werden Kreise ------------------------- */
+  .block-check, .day-block .check, [class*="checkbox"] {
+    border-radius: 50% !important;
+    border: 1.6px solid var(--n-label-3) !important;
+    background: none !important;
+    width: 26px !important; height: 26px !important;
+  }
+}
