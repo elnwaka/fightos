@@ -1,0 +1,365 @@
+/* ============================================================
+   BOXSPEC · NATIVE-SCHICHT FÜR DAS HANDY
+   ------------------------------------------------------------
+   Bildet die wiederkehrenden Bausteine der App auf ein einziges
+   Regelwerk ab — dasselbe, nach dem der Entwurf gebaut ist.
+   Wirkt ausschliesslich unter 768px. Der Desktop bleibt unberührt.
+
+   Das Regelwerk:
+     Grund            #000000
+     Fläche           #1C1C1E
+     Fläche darin     #2C2C2E
+     Trennlinie       rgba(255,255,255,.10), bei Zeilen mit
+                      Vorspalte auf 56px eingerückt
+     Text             #FFFFFF
+     Text zweitrangig rgba(235,235,245,.60)
+     Text drittrangig rgba(235,235,245,.30)
+     Akzent           #E8000D — und sonst nichts
+     Erledigt         #30D158 — ausschliesslich dafür
+     Schrift          eine, der Systemstack (SF Pro auf iOS)
+     Typoskala        34 / 22 / 17 / 15 / 13
+     Seitenrand       16px, Radius 12px, Zeilenhöhe min. 56px
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  :root {
+    --n-bg:      #000000;
+    --n-elev:    #1C1C1E;
+    --n-elev-2:  #2C2C2E;
+    --n-sep:     rgba(255,255,255,.10);
+    --n-label:   #FFFFFF;
+    --n-label-2: rgba(235,235,245,.60);
+    --n-label-3: rgba(235,235,245,.30);
+    --n-accent:  #E8000D;
+    --n-done:    #30D158;
+    --n-radius:  12px;
+    --n-pad:     16px;
+  }
+
+  /* ---------- 1. Grundfläche ---------- */
+
+  html, body, #app-screen, .page {
+    background: var(--n-bg) !important;
+  }
+
+  /* ---------- 2. Karten werden gruppierte Listen ---------- */
+
+  .card,
+  .account-section,
+  .calc-group,
+  .cm-card,
+  .data-table,
+  .modal-body > .card {
+    background: var(--n-elev) !important;
+    border: none !important;
+    border-radius: var(--n-radius) !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 0 18px !important;
+    overflow: hidden;
+  }
+
+  /* Der Inhalt bekommt seinen Rand von innen, damit Trennlinien
+     bis zur Kartenkante laufen können — wie in iOS-Listen. */
+  .card > *,
+  .account-section > *,
+  .calc-group > * {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .card > .card-body:last-child,
+  .account-section > :last-child { padding-bottom: 14px; }
+
+  /* Kartenkopf: keine eigene Fläche, nur eine Zeile */
+  .card-top,
+  .card-header {
+    background: none !important;
+    border: none !important;
+    padding-top: 14px !important;
+    padding-bottom: 2px !important;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .card-title,
+  .account-section-title,
+  .modal-title {
+    font-size: 17px !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    text-transform: none !important;
+    color: var(--n-label) !important;
+    margin: 0 !important;
+    border: none !important;
+  }
+  .card-body {
+    font-size: 15px !important;
+    line-height: 1.47 !important;
+    color: var(--n-label-2) !important;
+    padding-top: 6px !important;
+  }
+
+  /* ---------- 3. Abschnittsüberschriften ---------- */
+
+  .sec-title, .cat-header, .sec-label, .fc-section-label {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    letter-spacing: .02em !important;
+    text-transform: uppercase !important;
+    color: var(--n-label-2) !important;
+    background: none !important;
+    border: none !important;
+    padding: 0 0 8px 4px !important;
+    margin: 2px 0 0 !important;
+  }
+
+  /* ---------- 4. Formulare als iOS-Zeilen ---------- */
+
+  .form-group,
+  .form-group-inline {
+    background: var(--n-elev);
+    border: none;
+    border-radius: 0;
+    margin: 0 !important;
+    padding: 12px 15px !important;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .form-group + .form-group::before,
+  .form-group-inline + .form-group-inline::before {
+    content: "";
+    position: absolute;
+    left: 15px; right: 0; top: 0;
+    height: 1px;
+    background: var(--n-sep);
+  }
+  /* Erste und letzte Zeile runden die Gruppe ab */
+  .form-group:first-of-type { border-radius: var(--n-radius) var(--n-radius) 0 0; }
+  .form-group:last-of-type  { border-radius: 0 0 var(--n-radius) var(--n-radius); margin-bottom: 18px !important; }
+
+  .form-label {
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    color: var(--n-label-2) !important;
+    margin: 0 !important;
+  }
+  .form-input,
+  .form-select,
+  .cm-input,
+  input[type="text"], input[type="number"], input[type="date"],
+  input[type="time"], input[type="password"], input[type="email"],
+  select, textarea {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    min-height: 28px;
+    font-size: 17px !important;
+    color: var(--n-label) !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .form-input::placeholder, textarea::placeholder {
+    color: var(--n-label-3) !important;
+  }
+  select {
+    background-image: none !important;
+    color: var(--n-label) !important;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    box-shadow: none !important;
+  }
+  /* Der Fokus wird über die Zeile angezeigt, nicht über einen Rahmen */
+  .form-group:focus-within { background: var(--n-elev-2); }
+
+  /* ---------- 5. Knöpfe ---------- */
+
+  .btn, .submit-btn, .cm-submit-btn, .heute-haupt, .cta {
+    display: block;
+    width: 100%;
+    background: var(--n-accent) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: var(--n-radius) !important;
+    padding: 15px 18px !important;
+    min-height: 50px;
+    font-size: 17px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    margin-bottom: 18px;
+  }
+  .btn-ghost, .btn-secondary, .heute-haupt.ghost {
+    background: var(--n-elev) !important;
+    color: var(--n-accent) !important;
+    font-weight: 500 !important;
+  }
+  .btn-sm {
+    width: auto;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 14px !important;
+    min-height: 44px;
+    font-size: 15px !important;
+    background: var(--n-elev) !important;
+    color: var(--n-accent) !important;
+  }
+
+  /* ---------- 6. Tabellen werden Listen ---------- */
+
+  .data-table { display: block; }
+  .data-table thead { display: none; }
+  .data-table tbody, .data-table tr { display: block; }
+  .data-table tr {
+    position: relative;
+    padding: 12px 15px;
+    min-height: 56px;
+  }
+  .data-table tr + tr::before {
+    content: "";
+    position: absolute;
+    left: 15px; right: 0; top: 0;
+    height: 1px;
+    background: var(--n-sep);
+  }
+  .data-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border: none !important;
+    padding: 3px 0 !important;
+    font-size: 15px;
+    color: var(--n-label);
+  }
+  .data-table td::before {
+    content: attr(data-label);
+    color: var(--n-label-2);
+  }
+
+  /* ---------- 7. Modale als iOS-Blatt ---------- */
+
+  .modal {
+    background: var(--n-elev) !important;
+    border: none !important;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 0 !important;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    top: auto !important;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+  /* Griffleiste oben, wie bei jedem iOS-Blatt */
+  .modal::before {
+    content: "";
+    display: block;
+    width: 36px; height: 5px;
+    border-radius: 3px;
+    background: var(--n-label-3);
+    margin: 8px auto 4px;
+  }
+  .modal-header {
+    background: none !important;
+    border: none !important;
+    padding: 8px 16px 4px !important;
+  }
+  .modal-close {
+    color: var(--n-accent) !important;
+    background: none !important;
+    border: none !important;
+    font-size: 17px !important;
+    min-width: 44px; min-height: 44px;
+  }
+  .modal-body { padding: 0 16px 16px !important; }
+
+  /* ---------- 8. Raster stapeln ---------- */
+
+  .grid-2, .grid-auto, .grid-3 {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0 !important;
+  }
+  .grid-2 > *, .grid-auto > *, .grid-3 > * { width: 100% !important; }
+
+  /* ---------- 9. Community auf dasselbe Regelwerk ---------- */
+
+  .cm-card {
+    padding: 14px 15px !important;
+    margin-bottom: 12px !important;
+  }
+  .cm-tab, .cm-feed-filter, .cm-sort-btn, .cm-trending-tag {
+    background: var(--n-elev) !important;
+    border: none !important;
+    border-radius: 999px !important;
+    color: var(--n-label-2) !important;
+    font-size: 14px !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+  }
+  .cm-tab.active, .cm-feed-filter.active {
+    background: rgba(232,0,13,.16) !important;
+    color: #fff !important;
+  }
+  .cm-avatar, .cm-avatar-img, .cm-create-avatar, .cm-comment-avatar {
+    border-radius: 50% !important;
+    border: none !important;
+  }
+  .cm-verified { background: rgba(48,209,88,.18) !important; color: var(--n-done) !important; }
+  .cm-weight-badge, .cm-exp-pill, .cm-gym-badge, .cm-type-badge {
+    background: var(--n-elev-2) !important;
+    color: var(--n-label-2) !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    letter-spacing: 0 !important;
+  }
+  .cm-hot-badge, .cm-pinned-badge, .cm-hot-indicator {
+    background: var(--n-elev-2) !important;
+    color: var(--n-label-2) !important;
+  }
+
+  /* ---------- 10. Säulen-Folien ---------- */
+
+  .si-slide {
+    background: var(--n-elev) !important;
+    border: none !important;
+    border-radius: var(--n-radius) !important;
+    padding: 16px 15px !important;
+  }
+  .si-num { color: var(--n-label-3) !important; background: none !important; }
+  .si-title { font-size: 22px !important; font-weight: 700 !important;
+              text-transform: none !important; letter-spacing: -0.01em !important;
+              color: var(--n-label) !important; }
+  .si-body, .si-why, .si-reason {
+    font-size: 15px !important; line-height: 1.47 !important;
+    color: var(--n-label-2) !important; text-transform: none !important;
+    letter-spacing: 0 !important;
+  }
+  .si-pillar { background: var(--n-elev-2) !important; border: none !important;
+               color: var(--n-label-2) !important; }
+
+  /* ---------- 11. Alles, was noch Rahmen trägt ---------- */
+
+  .page [style*="border:1px solid"],
+  .page [style*="border: 1px solid"] {
+    border-color: transparent !important;
+  }
+  .page [style*="box-shadow"] { box-shadow: none !important; }
+
+  /* ---------- 12. Bilder ---------- */
+
+  .page img { border-radius: 10px; }
+  .vid-card, .ex-card {
+    background: var(--n-elev) !important;
+    border: none !important;
+    border-radius: var(--n-radius) !important;
+  }
+}
