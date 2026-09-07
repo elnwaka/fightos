@@ -692,6 +692,11 @@ function initAICoach() {
   } else {
     document.body.appendChild(btn);
   }
+
+  // Ohne diesen Aufruf blieb der Nachrichtenbereich beim ersten Oeffnen
+  // komplett leer — 415px schwarze Flaeche statt Leerzustand.
+  loadCoachHistory();
+  renderCoachMessages();
 }
 
 // Auto-init when DOM ready

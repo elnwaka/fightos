@@ -6130,3 +6130,16 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
 @media (prefers-reduced-motion: reduce) {
   .acc-mark { transition: none; }
 }
+
+/* Eine linke Kante auf dem Startbildschirm.
+   Vorher: Hero 8px, Heute-Karte 19px, Name 24px, Kacheln 34px. */
+@media (max-width: 768px) {
+  #dash-app > .heute,
+  #dash-app > .db-hero,
+  #dash-app > * { margin-left: 0; margin-right: 0; }
+  #dash-app { padding-left: 0; padding-right: 0; }
+  .db-hero { border-radius: var(--radius-md, 10px); overflow: hidden; }
+  .db-hero-inner { padding-left: 18px; padding-right: 18px; }
+  .db-stats,
+  .db-stat-grid { padding-left: 0; padding-right: 0; }
+}
