@@ -5002,7 +5002,7 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
 }
 
 /* ===== AI COACH PANEL ===== */
-body.hide-coach #ai-coach-fab,
+body.hide-coach #ai-coach-btn,
 body.hide-coach #ai-coach-panel { display: none !important; }
 #ai-coach-fab {
   position: fixed;
@@ -5788,4 +5788,112 @@ body.hide-coach #ai-coach-panel { display: none !important; }
   .btab { width: 100%; }
   .bottom-bar { display: flex; }
   .bottom-bar > * { flex: 1 1 0; }
+}
+
+/* Cloud-Banner schiebt den Inhalt nach unten, statt die Kopfzeile
+   zu verdecken (siehe showCloudDisconnectedBanner in js/app.js) */
+body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
+
+/* ============================================================
+   UMBAU · SATZART, DICHTE, LAYOUTDEFEKTE
+   ------------------------------------------------------------
+   Gleiche Farben, gleiche Schriften, gleiches Raster.
+   Geaendert wird, WIE gesetzt wird — nicht womit.
+   ============================================================ */
+
+/* --- 1. Fliesstext ist kein Etikett ------------------------
+   Beschreibungen standen in Space Mono, Versalien, 2px Sperrsatz.
+   Damit schreit jeder Satz und nichts tritt zurueck. Versal-Mono
+   bleibt den echten Mikro-Labels vorbehalten. */
+.page-sub,
+.card-sub,
+.sec-sub,
+.hint-text,
+.empty-text,
+.cm-empty-text {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 58ch;
+}
+
+/* --- 2. Der alte schwebende Knopf ist weg ------------------ */
+#ai-coach-fab { display: none !important; }
+
+#ai-coach-btn {
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+#ai-coach-btn:hover,
+#ai-coach-btn:focus-visible { color: var(--red); }
+
+/* --- 3. Tab-Leisten: abgeschnittener letzter Tab ----------- */
+.sub-tabs,
+.cm-tabs,
+.ern-nav {
+  position: relative;
+  scroll-padding-inline: 16px;
+  scroll-snap-type: x proximity;
+}
+.sub-tabs > *,
+.cm-tabs > * { scroll-snap-align: start; }
+/* Abblendkante als Scroll-Hinweis */
+.sub-tabs::after,
+.cm-tabs::after {
+  content: "";
+  position: sticky;
+  right: 0;
+  flex: 0 0 28px;
+  align-self: stretch;
+  margin-left: -28px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--surface-0));
+}
+
+@media (max-width: 768px) {
+
+  /* --- 4. Letzte Inhaltszeile lief unter die Navileiste ---- */
+  .page,
+  .page-content,
+  .tab-content {
+    padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* --- 5. Kein seitliches Scrollen (Log-Seite lief 34px ueber) */
+  html, body { overflow-x: hidden; }
+  .page, .card, .form-group, .form-row { max-width: 100%; }
+  .form-input,
+  .form-select,
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  select,
+  textarea {
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .form-row { flex-wrap: wrap; gap: 10px; }
+  .form-row > * { min-width: 0; flex: 1 1 140px; }
+
+  /* --- 6. Eine linke Kante fuer alles ---------------------- */
+  .page-header,
+  .page-title,
+  .page-sub,
+  .sec-title,
+  .filter-label { padding-left: 0; margin-left: 0; }
+
+  /* --- 7. Zwei Titel uebereinander: der zweite tritt zurueck */
+  .page-header + * .sec-title,
+  .sub-tab-content > .sec-title:first-child {
+    font-size: 20px;
+  }
 }

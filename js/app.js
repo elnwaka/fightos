@@ -138,11 +138,19 @@ function showCloudDisconnectedBanner() {
   b.appendChild(txt);
   b.appendChild(btn);
   document.body.appendChild(b);
+  // Inhalt nach unten schieben statt die Kopfzeile zu verdecken
+  requestAnimationFrame(function() {
+    var h = b.getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--cloud-banner-h', h + 'px');
+    document.body.classList.add('has-cloud-banner');
+  });
 }
 
 function hideCloudDisconnectedBanner() {
   var b = document.getElementById('cloud-disconnected');
   if (b) b.remove();
+  document.body.classList.remove('has-cloud-banner');
+  document.documentElement.style.removeProperty('--cloud-banner-h');
 }
 
 // Real-time listener — auto-receives changes from other devices

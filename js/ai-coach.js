@@ -658,13 +658,28 @@ function initAICoach() {
 
   document.body.appendChild(panel);
 
-  // Add floating toggle button
-  var fab = document.createElement('button');
-  fab.id = 'ai-coach-fab';
-  fab.innerHTML = '🥊';
-  fab.title = 'AI Coach';
-  fab.onclick = toggleAICoach;
-  document.body.appendChild(fab);
+  // Der Coach-Knopf gehoert in die Kopfzeile, nicht schwebend ueber den
+  // Inhalt: mit einer Tab-Leiste unten konkurriert ein FAB mit der
+  // Navigation und verdeckt auf jeder Seite Inhalt.
+  var btn = document.createElement('button');
+  btn.id = 'ai-coach-btn';
+  btn.className = 'topbar-icon-btn';
+  btn.title = 'AI Coach';
+  btn.setAttribute('aria-label', 'AI Coach oeffnen');
+  btn.innerHTML = '<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    + 'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'
+    + '<circle cx="8.5" cy="10" r="1" fill="currentColor" stroke="none"/>'
+    + '<circle cx="12" cy="10" r="1" fill="currentColor" stroke="none"/>'
+    + '<circle cx="15.5" cy="10" r="1" fill="currentColor" stroke="none"/></svg>';
+  btn.onclick = toggleAICoach;
+
+  var right = document.querySelector('.topbar-right');
+  if (right) {
+    right.insertBefore(btn, right.firstChild);
+  } else {
+    document.body.appendChild(btn);
+  }
 }
 
 // Auto-init when DOM ready
