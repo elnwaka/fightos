@@ -520,3 +520,12 @@
     font-size: 13px !important;
   }
 }
+
+@media (max-width: 768px) {
+  /* Untermenü-Zeilen: der Chevron sagt, dass es weitergeht */
+  .grp > button.grow { width: 100%; }
+  .grow-s { display: block; }
+
+  /* Zurück-Pfeil sichtbar machen, wenn ein Unterbildschirm offen ist */
+  .appbar-back:not([hidden]) { display: inline-flex !important; }
+}

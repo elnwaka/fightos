@@ -1293,6 +1293,8 @@ window.addEventListener('scroll', function() {
 }, { passive: true });
 
 function goBackScreen() {
+  // Steht ein Untermenue offen, fuehrt Zurueck dorthin — nicht weg.
+  if (typeof _subScreen !== 'undefined' && _subScreen) { closeSubScreen(); return; }
   var prev = _screenStack.pop();
   if (prev && typeof showPage === 'function') showPage(prev, true);
   else if (typeof showPage === 'function') showPage('dashboard', true);
@@ -1304,6 +1306,11 @@ function showPage(pageId) {
     if (_screenStack.length > 12) _screenStack.shift();
   }
   window._currentScreen = pageId;
+  if (typeof _subScreen !== 'undefined' && _subScreen && _subScreen.parent !== pageId) _subScreen = null;
+  // Ueber die Tab-Leiste betritt man immer das Menue, nie einen
+  // halb erinnerten Unterbildschirm.
+  if (pageId === 'training' && typeof _trainingSubTab !== 'undefined') { _trainingSubTab = null; _subScreen = null; }
+  if (pageId === 'profil'   && typeof _profilSubTab   !== 'undefined') { _profilSubTab   = null; _subScreen = null; }
   updateAppBar(pageId);
 
   // Lange Nachschlage-Abschnitte falten. Zentral hier, weil die
@@ -1410,11 +1417,82 @@ function showPage(pageId) {
 
 // ===== TRAINING PAGE — merged hub with sub-tabs =====
 var _trainingSubTab = 'uebungen';
+// ===== MENÜ-LISTE (App-Navigation statt Reiter) =====
+// Eine Website legt Reiter nebeneinander. Eine App zeigt eine Liste,
+// man tippt eine Zeile an, ein neuer Bildschirm schiebt sich darüber,
+// und der Zurück-Pfeil bringt einen wieder heraus. Genau das hier.
+function renderMenuList(items) {
+  return '<div class="grp">' + items.map(function(it) {
+    return '<button class="grow" onclick="' + it.action + '">' +
+        '<span class="grow-main">' +
+          '<span class="grow-t">' + esc(it.label) + '</span>' +
+          (it.sub ? '<span class="grow-s">' + esc(it.sub) + '</span>' : '') +
+        '</span>' +
+        (it.value ? '<span class="grow-v">' + esc(it.value) + '</span>' : '') +
+        '<span class="chev">›</span>' +
+      '</button>';
+  }).join('') + '</div>';
+}
+
+// Untermenüs verhalten sich wie eigene Bildschirme: Titel in der Leiste,
+// Zurück-Pfeil, und die Tab-Leiste bleibt stehen.
+var _subScreen = null;
+
+function openSubScreen(parent, id, label) {
+  _subScreen = { parent: parent, id: id, label: label };
+  if (parent === 'training') { _trainingSubTab = id; renderTrainingPage(id); }
+  else if (parent === 'profil') { _profilSubTab = id; renderProfilPage(id); }
+  var t = document.getElementById('appbar-title');
+  var l = document.getElementById('appbar-large');
+  var b = document.getElementById('appbar-back');
+  if (l) { l.firstElementChild.textContent = label; l.hidden = false; }
+  if (t) t.textContent = label;
+  if (b) b.hidden = false;
+  window.scrollTo(0, 0);
+  if (typeof syncLargeTitle === 'function') syncLargeTitle();
+}
+
+function closeSubScreen() {
+  var parent = _subScreen ? _subScreen.parent : 'training';
+  _subScreen = null;
+  if (parent === 'training') { _trainingSubTab = null; renderTrainingPage(null); }
+  else { _profilSubTab = null; renderProfilPage(null); }
+  var b = document.getElementById('appbar-back');
+  if (b) b.hidden = true;
+  var label = parent === 'training' ? 'Wissen' : 'Profil';
+  var t = document.getElementById('appbar-title');
+  var l = document.getElementById('appbar-large');
+  if (l) { l.firstElementChild.textContent = label; l.hidden = false; }
+  if (t) t.textContent = label;
+  window.scrollTo(0, 0);
+  if (typeof syncLargeTitle === 'function') syncLargeTitle();
+}
+
 function renderTrainingPage(subTab) {
-  subTab = subTab || _trainingSubTab || 'uebungen';
-  _trainingSubTab = subTab;
   var el = document.getElementById('page-training');
   if (!el) return;
+
+  // Kein Eintrag gewaehlt -> Menue. So funktioniert Navigation in einer App.
+  if (subTab === null || (!subTab && !_trainingSubTab)) {
+    _trainingSubTab = null;
+    el.innerHTML = renderMenuList([
+      { label: 'Übungen',        sub: 'Bewegungen mit Fotos und Anleitung', action: "openSubScreen('training','uebungen','Übungen')" },
+      { label: 'Videos',         sub: 'Kampf-Breakdowns und Technik',       action: "openSubScreen('training','wissen','Videos')" },
+      { label: 'Ernährung',      sub: 'Kalorien, Makros, Timing',           action: "openSubScreen('training','ernaehrung','Ernährung')" },
+      { label: 'Periodisierung', sub: 'Wie sich der Plan aufbaut',          action: "openSubScreen('training','periodisierung','Periodisierung')" },
+      { label: 'Regeneration',   sub: 'Schlaf, HRV, Belastung',             action: "openSubScreen('training','regeneration','Regeneration')" }
+    ]) +
+    '<p class="sec-label">Deine Daten</p>' +
+    renderMenuList([
+      { label: 'Tests',   sub: 'Kraft, Ausdauer, Schnelligkeit', action: "openSubScreen('training','tests','Tests')" },
+      { label: 'Log',     sub: 'Was du trainiert hast',          action: "openSubScreen('training','log','Log')" },
+      { label: 'Notizen', sub: 'Gedanken und Beobachtungen',     action: "openSubScreen('training','notizen','Notizen')" }
+    ]);
+    return;
+  }
+
+  subTab = subTab || _trainingSubTab || 'uebungen';
+  _trainingSubTab = subTab;
 
   var tabs = [
     { id: 'uebungen', label: 'Übungen' },
@@ -1427,9 +1505,9 @@ function renderTrainingPage(subTab) {
     { id: 'notizen', label: 'Notizen' }
   ];
 
-  var tabsHTML = '<div class="sub-tabs">' + tabs.map(function(t) {
-    return '<button class="sub-tab' + (t.id === subTab ? ' active' : '') + '" onclick="switchTrainingTab(\'' + t.id + '\')">' + t.label + '</button>';
-  }).join('') + '</div>';
+  // Im geoeffneten Eintrag traegt die Leiste den Titel und den
+  // Zurueck-Pfeil — eine zweite Reiterreihe waere Website-Denke.
+  var tabsHTML = '';
 
   var contentId = 'training-content';
   var _tData = getData();
@@ -1597,10 +1675,22 @@ function switchTrainingTab(tab) {
 // ===== PROFIL PAGE — merged hub =====
 var _profilSubTab = 'account';
 function renderProfilPage(subTab) {
-  subTab = subTab || _profilSubTab || 'account';
-  _profilSubTab = subTab;
   var el = document.getElementById('page-profil');
   if (!el) return;
+
+  if (subTab === null || (!subTab && !_profilSubTab)) {
+    _profilSubTab = null;
+    el.innerHTML = renderMenuList([
+      { label: 'Account',  sub: 'Name, Gewicht, Zeitplan, Kampfdatum', action: "openSubScreen('profil','account','Account')" },
+      { label: '8 Säulen', sub: 'Worauf das Training aufbaut',         action: "openSubScreen('profil','saeulen','8 Säulen')" },
+      { label: 'Rechner',  sub: 'Makros und Herzfrequenzzonen',        action: "openSubScreen('profil','rechner','Rechner')" },
+      { label: 'FAQ',      sub: 'Häufige Fragen',                      action: "openSubScreen('profil','faq','FAQ')" }
+    ]);
+    return;
+  }
+
+  subTab = subTab || _profilSubTab || 'account';
+  _profilSubTab = subTab;
 
   var tabs = [
     { id: 'account', label: 'Account' },
