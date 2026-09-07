@@ -6574,3 +6574,100 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
     border: none !important;
   }
 }
+
+/* ============================================================
+   NATIVE-SCHICHT · komplett (nur Handy, <=768px)
+   ------------------------------------------------------------
+   Der groesste Unterschied zu einer echten iPhone-App war die
+   Schrift: Bebas Neue (Plakat) + Space Mono (Schreibmaschine) +
+   DM Sans = drei Schriften, zwei davon Displayschriften, dazu
+   viele Versalien. Native Apps benutzen EINE Schrift — SF Pro —
+   in Groessen und Gewichten. Genau das macht der Systemstack.
+   Bebas bleibt nur fuer die Wortmarke.
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* --- 1. Eine Schrift ------------------------------------ */
+  html, body,
+  .page, .page *,
+  .card, .card *,
+  .topbar, .topbar *,
+  .bottom-bar, .bottom-bar *,
+  .heute, .heute *,
+  .cm-card, .cm-card *,
+  input, select, textarea, button {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                 "Segoe UI", Roboto, system-ui, sans-serif !important;
+  }
+  /* Nur die Wortmarke behaelt die Marke. */
+  .topbar-logo, .topbar-logo * {
+    font-family: 'Bebas Neue', sans-serif !important;
+  }
+
+  /* --- 2. Gemischte Schreibweise -------------------------- */
+  /* Versalien nur noch, wo iOS sie auch benutzt: winzige
+     Abschnittsueberschriften. Sonst nirgends. */
+  .page-title, .card-title, .sec-title, .day-name, .block-title,
+  .heute-titel, .appbar-large > span, .appbar-title,
+  .db-hero-name, .fc-hero-record, .phase-badge, .cat-header,
+  .btab, .btab span, .sub-tab, .cm-tab, .heute-block-titel,
+  h1, h2, h3, h4 {
+    text-transform: none !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  /* --- 3. iOS-Typoskala ----------------------------------- */
+  .appbar-large > span {
+    font-size: 34px !important;
+    font-weight: 700;
+    line-height: 1.06;
+  }
+  .appbar-title { font-size: 17px !important; font-weight: 600; }
+  .heute-titel  { font-size: 28px !important; font-weight: 700; line-height: 1.12; }
+  .page-title, .card-title, h2 { font-size: 22px !important; font-weight: 700; }
+  .sec-title, .cat-header {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    letter-spacing: .02em !important;
+    text-transform: uppercase !important;
+    color: var(--text-muted) !important;
+  }
+  .day-name { font-size: 20px !important; font-weight: 700; }
+  .heute-block-titel { font-size: 17px !important; font-weight: 400; }
+  .heute-block-meta, .row-s, .block-hint {
+    font-size: 13px !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+  }
+  .heute-tag, .heute-zaehler { font-size: 13px !important; letter-spacing: .02em !important; }
+
+  /* --- 4. Echtes Schwarz, zwei Ebenen --------------------- */
+  html, body,
+  .page, #app-screen { background: #000 !important; }
+  .card, .heute, .pillars, .cm-card, .day-col, .grp,
+  .info-box, .fc-card, .db-stat, .plan-summary + *,
+  .phase-banner {
+    background: #1C1C1E !important;
+  }
+  .day-block { background: #2C2C2E !important; }
+  .topbar, .bottom-bar { background: rgba(0,0,0,.86) !important; }
+
+  /* --- 5. Knoepfe in iOS-Form ----------------------------- */
+  .btn, .heute-haupt, .cta {
+    border-radius: 12px !important;
+    font-size: 17px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    min-height: 50px;
+  }
+  .btn-red, .heute-haupt { background: var(--red) !important; border: none !important; }
+
+  /* --- 6. Tab-Leiste ------------------------------------- */
+  .btab span {
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    letter-spacing: .01em !important;
+  }
+  .btab svg { stroke-width: 1.6 !important; }
+}
