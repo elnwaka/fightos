@@ -4657,7 +4657,9 @@ function updateQlogSäulen() {
   var type = document.getElementById('qlog-type').value;
   var saeulen = TYPE_SAEULEN[type] || [];
   var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNÄHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITÄT'];
-  var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
+  // Acht Eigenfarben fuer acht Abzeichen widersprechen dem Regelwerk:
+  // eine Akzentfarbe, sonst Grautoene.
+  var saeulenColors = ['#e8000d','#8a8a92','#8a8a92','#8a8a92','#8a8a92','#8a8a92','#8a8a92','#8a8a92'];
   el.innerHTML = saeulen.map(function(si) {
     return '<span style="font-family:\'Space Mono\',monospace;font-size:8px;padding:2px 5px;border-radius:var(--radius-sm);background:' + saeulenColors[si] + '22;color:' + saeulenColors[si] + ';letter-spacing:0.5px;">' + saeulenLabels[si] + '</span>';
   }).join('');

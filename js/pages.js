@@ -1071,16 +1071,16 @@ function exerciseIcon(id) {
 const goalFilters = [
   { id:'all', label:'ALLE', icon:'', color:'var(--white)' },
   { id:'power', label:'HÄRTERE SCHLÄGE', icon:'', color:'var(--red)' },
-  { id:'jab', label:'STÄRKERER JAB', icon:'', color:'#4fc3f7' },
+  { id:'jab', label:'STÄRKERER JAB', icon:'', color:'var(--text-muted)' },
   { id:'speed', label:'SCHNELLERE HÄNDE', icon:'', color:'var(--gold)' },
   { id:'footwork', label:'BEINARBEIT', icon:'', color:'var(--green)' },
-  { id:'stamina', label:'MEHR AUSDAUER', icon:'', color:'#26c6da' },
-  { id:'shoulders', label:'DECKUNG HALTEN', icon:'', color:'#ab47bc' },
+  { id:'stamina', label:'MEHR AUSDAUER', icon:'', color:'var(--text-muted)' },
+  { id:'shoulders', label:'DECKUNG HALTEN', icon:'', color:'var(--text-muted)' },
   { id:'chin', label:'HÄRTERES KINN', icon:'', color:'var(--red)' },
-  { id:'clinch', label:'CLINCH-KRAFT', icon:'', color:'#ff7043' },
-  { id:'rotation', label:'HÜFTROTATION', icon:'', color:'#ffa726' },
-  { id:'hands', label:'HÄRTERE HÄNDE', icon:'', color:'#ef5350' },
-  { id:'injury', label:'VERLETZUNGSFREI', icon:'', color:'#66bb6a' }
+  { id:'clinch', label:'CLINCH-KRAFT', icon:'', color:'var(--text-muted)' },
+  { id:'rotation', label:'HÜFTROTATION', icon:'', color:'var(--text-muted)' },
+  { id:'hands', label:'HÄRTERE HÄNDE', icon:'', color:'var(--text-muted)' },
+  { id:'injury', label:'VERLETZUNGSFREI', icon:'', color:'var(--text-muted)' }
 ];
 
 let activeGoalFilter = 'all';
@@ -1141,12 +1141,12 @@ function renderUebungenPage() {
     ${fAr.map(e => { counter++; return exCard(e, counter, 'var(--red)'); }).join('')}
   </div>` : ''}
 
-  ${fH.length ? `<div class="cat-header" style="color:#ef5350;border-color:rgba(239,83,80,.3);">HAND & HANDGELENK</div>
+  ${fH.length ? `<div class="cat-header" style="color:var(--text-muted);border-color:rgba(239,83,80,.3);">HAND & HANDGELENK</div>
   <div class="grid-auto" style="margin-bottom:40px;">
     ${fH.map(e => { counter++; return exCard(e, counter, '#ef5350'); }).join('')}
   </div>` : ''}
 
-  ${fM.length ? `<div class="cat-header" style="color:#26c6da;border-color:rgba(38,198,218,.3);">MOBILITÄT & BEWEGLICHKEIT</div>
+  ${fM.length ? `<div class="cat-header" style="color:var(--text-muted);border-color:rgba(38,198,218,.3);">MOBILITÄT & BEWEGLICHKEIT</div>
   <div class="grid-auto" style="margin-bottom:40px;">
     ${fM.map(e => { counter++; return exCard(e, counter, '#26c6da'); }).join('')}
   </div>` : ''}
@@ -1984,7 +1984,7 @@ function renderErnaehrungPage() {
   <div class="info-box info-warn" style="margin-bottom:30px;"><span>!</span><div><strong>Was NICHT im Einkaufswagen landen sollte:</strong> Softdrinks, Fruchtsäfte (purer Zucker ohne Ballaststoffe), Tiefkühlpizza, Fertiggerichte mit >10 Zutaten, Energy-Drinks (Koffein ja, aber als Kaffee oder Tablette – nicht mit 30g Zucker). Alkohol: schon 2 Bier nach dem Training reduzieren die Muskelproteinsynthese um 24%.</div></div>
 
   <!-- ============ TIMING ============ -->
-  <div id="ern-s5" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid #ab47bc;padding-bottom:8px;">5. TIMING <span style="color:#ab47bc;">– WANN WAS ESSEN</span></div>
+  <div id="ern-s5" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);margin:30px 0 20px;border-bottom:2px solid #ab47bc;padding-bottom:8px;">5. TIMING <span style="color:var(--text-muted);">– WANN WAS ESSEN</span></div>
 
   <div class="grid-2" style="margin-bottom:16px;">
     <div>
@@ -2015,7 +2015,7 @@ function renderErnaehrungPage() {
         <div class="card-title">VOR DEM SCHLAFEN</div>
         <div class="card-body" style="line-height:1.8;">
           <strong>Ziel:</strong> 7–8h Aminosäuren-Versorgung im Schlaf.<br>
-          <strong>Was:</strong> <strong style="color:#ab47bc;">30–40g langsames Protein (Casein-basiert).</strong><br>
+          <strong>Was:</strong> <strong style="color:var(--text-muted);">30–40g langsames Protein (Casein-basiert).</strong><br>
           Casein wird über 6–8 Stunden absorbiert → konstante Aminosäure-Versorgung während dein Körper im Schlaf repariert. Casein-Quellen findest du in der Einkaufsliste (Milchprodukte).
         </div>
       </div>
