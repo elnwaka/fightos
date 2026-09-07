@@ -363,3 +363,33 @@
     border-radius: var(--n-radius) !important;
   }
 }
+
+@media (max-width: 768px) {
+  /* Die Abblendkante der Reiterleiste rendert als deckender Kasten
+     ueber dem letzten Reiter. Der aktive Reiter wird ohnehin in den
+     Sichtbereich gescrollt — die Kante ist ueberfluessig und schaedlich. */
+  .sub-tabs::after,
+  .cm-tabs::after { display: none !important; content: none !important; }
+
+  /* Restliche Versalien in Ueberschriftsgroesse */
+  .profil-name, .account-name, .db-hero-name,
+  .milestone-title, .ms-title,
+  .section-heading, .stat-label, .fc-stat-lbl, .db-stat-lbl {
+    text-transform: none !important;
+    letter-spacing: -0.01em !important;
+  }
+  .fc-stat-lbl, .db-stat-lbl, .stat-label {
+    font-size: 13px !important;
+    letter-spacing: .02em !important;
+    text-transform: uppercase !important;
+    color: var(--n-label-2) !important;
+  }
+
+  /* Erledigte Meilensteine: neutrale Flaeche, gruen nur im Zeichen */
+  .milestone.done, .ms-done, [class*="milestone"][class*="done"] {
+    background: var(--n-elev) !important;
+    border: none !important;
+  }
+  .milestone.done .ms-check,
+  .milestone.done::first-letter { color: var(--n-done) !important; }
+}
