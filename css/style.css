@@ -5775,3 +5775,17 @@ body.hide-coach #ai-coach-panel { display: none !important; }
   .score-label { letter-spacing: .02em; }
   .btab span { font-size: 10.5px; letter-spacing: 0; }
 }
+
+@media (max-width: 768px) {
+  /* Restliche Ziele auf 44px: Standardbuttons lagen bei 39px */
+  .btn,
+  .dash-action,
+  .quick-action,
+  button.btn { min-height: 44px; }
+
+  /* Tab-Innenflaeche auf volle Spaltenbreite ziehen, damit der
+     Treffer nicht nur 37px breit ist */
+  .btab { width: 100%; }
+  .bottom-bar { display: flex; }
+  .bottom-bar > * { flex: 1 1 0; }
+}
