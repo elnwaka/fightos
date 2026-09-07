@@ -6932,3 +6932,28 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   html { scroll-behavior: auto; }
   .grow-main, .tick, .wday, .btab, .heute-haupt, .btn { transition: none; }
 }
+
+/* Werte-Spalte in gruppierten Zeilen */
+.grow-v {
+  flex: 0 0 auto;
+  font-size: 17px;
+  color: rgba(235,235,245,.6);
+  font-variant-numeric: tabular-nums;
+}
+button.grow {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.pillars-bar {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,.12);
+  overflow: hidden;
+  margin-top: 2px;
+}

@@ -5395,14 +5395,10 @@ function _renderWeekPlanInner() {
       var cls = pw < p10wWeek ? 'wdot done' : (pw === p10wWeek ? 'wdot now' : 'wdot');
       progressDots += '<div class="' + cls + '"></div>';
     }
-    p10wBanner = '<div class="phase-banner" style="margin-bottom:16px;padding:14px 18px;background:var(--surface-1);border-radius:12px;">'
-      + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'
-      + '<div><span class="phase-week">Woche '+p10wWeek+' von 10</span>'
-      + '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);margin-left:12px;">'+p10wPhase.name.toUpperCase()+'</span></div>'
-      + (isP10WDeload(p10wWeek) ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--green);border:1px solid var(--green);padding:2px 8px;border-radius:4px;">DELOAD</span>' : '')
-      + '</div>'
-      + '<div style="display:flex;gap:4px;align-items:center;margin-top:8px;">'+progressDots+'</div>'
-      + '</div>';
+    // Abschnittszeile statt Karte — der Entwurf setzt die Woche als
+    // Label ueber die Liste, nicht als eigenen Kasten.
+    p10wBanner = '<p class="sec-label">Woche ' + p10wWeek + ' von 10 · '
+      + esc(p10wPhase.name) + (isP10WDeload(p10wWeek) ? ' · Deload' : '') + '</p>';
   }
 
   el.innerHTML = `
@@ -5430,13 +5426,15 @@ function _renderWeekPlanInner() {
       if (wh >= 12 || wh < 5) hints.push('\u26A0 Ungewöhnliche Arbeitszeiten – prüfe ob Trainingszeiten passen');
       // Eine Zusammenfassungszeile statt vier umrandeter Kaestchen —
       // so fasst iOS Einstellungen zusammen: Text plus getoenter Knopf.
+      // Die Fakten wandern in die gruppierte Liste weiter unten,
+      // hier bleibt nur eine echte Warnung stehen.
       var warn = hints.filter(function(h) { return h.charAt(0) === '⚠'; });
-      var facts = hints.filter(function(h) { return h.charAt(0) !== '⚠'; });
-      return '<div class="plan-summary">' +
-          '<p class="plan-summary-text">' + esc(facts.join(' · ')) + '</p>' +
-          '<button class="plan-summary-edit" onclick="showPage(&quot;account&quot;)">Ändern</button>' +
-        '</div>' +
-        (warn.length ? '<p class="plan-warn">' + esc(warn.join(' ')) + '</p>' : '');
+      window._planFacts = { 
+        equipment: (!s.gymAccess || s.gymAccess === 'none') ? 'Körpergewicht' : (s.gymAccess === 'basic' ? 'Basis' : 'Volles Gym'),
+        level: (s.experienceLevel === 'anfaenger' ? 'Anfänger' : s.experienceLevel === 'wettkampf' ? 'Wettkämpfer' : 'Fortgeschritten'),
+        sc: 'max ' + (s.experienceLevel === 'anfaenger' ? '2' : '3') + '×/Woche'
+      };
+      return (warn.length ? '<p class="plan-warn">' + esc(warn.join(' ')) + '</p>' : '');
     })()}
     <div class="page-header" style="display:none;"></div>
     ${(function() {
@@ -5511,13 +5509,28 @@ function _renderWeekPlanInner() {
       // Acht Eigenfarben mit acht Rahmen fuer die Aussage "4 von 8".
       // iOS zeigt so etwas als eine Zeile mit Fortschritt.
       var offen = saeulenLabels.filter(function(l, i) { return !coveredSet[i]; });
-      return '<div class="pillars">' +
-          '<div class="pillars-head">' +
-            '<span class="pillars-label">Säulen diese Woche</span>' +
-            '<span class="pillars-count">' + covered + '/8</span>' +
+      // Eine gruppierte Liste statt drei Karten: Saeulen mit Balken,
+      // darunter die Planwerte als Einstellungszeilen mit Chevron.
+      var f = window._planFacts || {};
+      function planRow(label, value) {
+        return '<button class="grow" onclick="showPage(&quot;account&quot;)">' +
+            '<span class="grow-main"><span class="grow-t">' + esc(label) + '</span></span>' +
+            '<span class="grow-v">' + esc(value || '—') + '</span>' +
+            '<span class="chev">›</span>' +
+          '</button>';
+      }
+      return '<div class="grp">' +
+          '<div class="grow">' +
+            '<span class="grow-main">' +
+              '<span class="grow-t">Säulen diese Woche</span>' +
+              '<span class="pillars-bar"><i style="width:' + Math.round(covered / 8 * 100) + '%"></i></span>' +
+              (offen.length ? '<span class="grow-s">Offen: ' + esc(offen.join(', ').toLowerCase()) + '</span>' : '') +
+            '</span>' +
+            '<span class="grow-v">' + covered + '/8</span>' +
           '</div>' +
-          '<div class="pillars-bar"><i style="width:' + Math.round(covered / 8 * 100) + '%"></i></div>' +
-          (offen.length ? '<p class="pillars-open">Offen: ' + esc(offen.join(', ').toLowerCase()) + '</p>' : '') +
+          planRow('Equipment', f.equipment) +
+          planRow('Level', f.level) +
+          planRow('Kraft & Kondition', f.sc) +
         '</div>';
     })()}
     <div class="week-grid" data-active="${todayDow}">
