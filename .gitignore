@@ -1,8 +1,21 @@
 node_modules/
+package-lock.json
+
+# lokale Tests / Screenshots
 test-screenshots/
 test-*.mjs
 test-*.png
 test-report.txt
+mobile-screenshots/
+screenshots.mjs
+
+# Deploy-/Tool-Caches
+.vercel/
+.wrangler/
+.firebase/
+
+# Arbeitsdateien
 tlac_full.txt
 FINDINGS.md
-package-lock.json
+.env
+.env.local

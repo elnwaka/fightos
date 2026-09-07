@@ -73,9 +73,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/apexcharts.css">
 <script src="js/chart.min.js"></script>
-<script src="js/apexcharts.min.js"></script>
 <script src="js/firebase-app.js"></script>
 <script src="js/firebase-auth.js"></script>
 <script src="js/firebase-firestore.js"></script>
@@ -101,7 +99,7 @@ if (localStorage.getItem('fos_current')) {
     </div>
     <div id="auth-login">
       <div class="form-group">
-        <label class="form-label">Benutzername</label>
+        <label class="form-label">Benutzername oder E-Mail</label>
         <input class="form-input" id="login-user" placeholder="Dein Name" autocomplete="username">
       </div>
       <div class="form-group">
@@ -109,15 +107,23 @@ if (localStorage.getItem('fos_current')) {
         <input class="form-input" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
       </div>
       <button class="btn btn-red" onclick="doLogin()">EINLOGGEN</button>
+      <div style="text-align:center;margin-top:12px;">
+        <span onclick="doPasswordReset()" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);cursor:pointer;text-decoration:underline;">Passwort vergessen?</span>
+      </div>
     </div>
     <div id="auth-register" style="display:none">
       <div class="form-group">
-        <label class="form-label">Benutzername</label>
-        <input class="form-input" id="reg-user" placeholder="Dein Name" autocomplete="username">
+        <label class="form-label">Benutzername oder E-Mail</label>
+        <input class="form-input" id="reg-user" placeholder="Dein Name oder deine E-Mail" autocomplete="username">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Mit E-Mail kannst du dein Passwort später zurücksetzen — ohne nicht.</div>
       </div>
       <div class="form-group">
         <label class="form-label">Passwort</label>
         <input class="form-input" id="reg-pass" type="password" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Passwort wiederholen</label>
+        <input class="form-input" id="reg-pass2" type="password" placeholder="••••••••" autocomplete="new-password">
       </div>
       <button class="btn btn-red" onclick="doRegister()">REGISTRIEREN</button>
     </div>
@@ -609,6 +615,7 @@ if (localStorage.getItem('fos_current')) {
 </div>
 
 
+<script src="js/util.js"></script>
 <script src="js/program10w.js"></script>
 <script src="js/ai-coach.js"></script>
 <script src="js/video-library.js"></script>
@@ -636,6 +643,8 @@ if (localStorage.getItem('fos_current')) {
   // Enter on auth
   document.getElementById('login-pass').onkeydown = function(e) { if (e.key==='Enter') doLogin(); };
   document.getElementById('reg-pass').onkeydown = function(e) { if (e.key==='Enter') doRegister(); };
+  var _rp2 = document.getElementById('reg-pass2');
+  if (_rp2) _rp2.onkeydown = function(e) { if (e.key==='Enter') doRegister(); };
   // Default log date
   var ld = document.getElementById('log-date');
   if (ld) ld.value = new Date().toISOString().split('T')[0];
@@ -679,13 +688,8 @@ if (localStorage.getItem('fos_current')) {
 </script>
 <div class="toast-container" id="toast-container"></div>
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(function(r) {
-    console.log('SW registered:', r.scope);
-  }).catch(function(e) {
-    console.log('SW failed:', e);
-  });
-}
+// Service-Worker-Registrierung liegt in js/app.js (inkl. Update-Check).
+// Hier bewusst nichts mehr — sonst wird der SW doppelt registriert.
 
 // PWA Install Prompt
 var _pwaInstallEvent = null;

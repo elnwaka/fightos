@@ -4,8 +4,10 @@
    Fed with TLAC methodology + user context
    ============================================ */
 
-// API Key is now hidden server-side in Netlify Function
-var AI_COACH_MODEL = 'gemini-2.5-flash';
+// Key UND Modellwahl liegen serverseitig in api/ai-proxy.js.
+// Der Proxy nimmt das beste verfuegbare Modell und faellt bei
+// Ueberlastung automatisch auf das naechste zurueck — hier bewusst
+// kein Modell fest verdrahten, sonst veraltet es wieder.
 var AI_COACH_ENDPOINT = '/api/ai-proxy';
 
 var _aiChatHistory = [];
@@ -353,44 +355,50 @@ function buildUserContext() {
 }
 
 // ===== SEND MESSAGE TO GEMINI =====
+
+// Firebase ID-Token holen — der Proxy lässt nur eingeloggte User durch
+async function _coachAuthHeader() {
+  try {
+    if (typeof _fbAuth !== 'undefined' && _fbAuth && _fbAuth.currentUser) {
+      var token = await _fbAuth.currentUser.getIdToken();
+      return { Authorization: 'Bearer ' + token };
+    }
+  } catch (e) { /* unten abgefangen */ }
+  return null;
+}
+
 async function sendToCoach(userMessage) {
   var systemPrompt = TLAC_KNOWLEDGE + '\n\n' + buildUserContext();
 
-  // Build conversation history for context
+  var authHeader = await _coachAuthHeader();
+  if (!authHeader) {
+    return 'Du bist nicht eingeloggt — logg dich neu ein, dann bin ich wieder da.';
+  }
+
+  // Verlauf (letzte 16 Nachrichten) + neue Frage.
+  // Das System-Wissen läuft über systemInstruction, nicht als Fake-Turn —
+  // spart Tokens und wird vom Modell zuverlässiger befolgt.
   var contents = [];
-
-  // System instruction as first user message
-  contents.push({
-    role: 'user',
-    parts: [{ text: 'Du bist mein BoxSpec AI-Coach. Hier ist dein Wissen und meine Daten:\n\n' + systemPrompt + '\n\nBestätige kurz dass du bereit bist.' }]
-  });
-  contents.push({
-    role: 'model',
-    parts: [{ text: 'Ich bin dein BoxSpec Coach. Ich kenne deine Daten und das komplette Trainingssystem. Was brauchst du?' }]
-  });
-
-  // Add chat history (last 10 messages to avoid token overflow)
-  var recentHistory = _aiChatHistory.slice(-10);
-  recentHistory.forEach(function(msg) {
+  _aiChatHistory.slice(-16).forEach(function(msg) {
+    if (!msg || !msg.text) return;
     contents.push({
       role: msg.role === 'user' ? 'user' : 'model',
       parts: [{ text: msg.text }]
     });
   });
+  contents.push({ role: 'user', parts: [{ text: userMessage }] });
 
-  // Add new message
-  contents.push({
-    role: 'user',
-    parts: [{ text: userMessage }]
-  });
+  var controller = new AbortController();
+  var timer = setTimeout(function() { controller.abort(); }, 45000);
 
   try {
     var response = await fetch(AI_COACH_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeader),
       body: JSON.stringify({
-        model: AI_COACH_MODEL,
         contents: contents,
+        systemInstruction: { parts: [{ text: systemPrompt }] },
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 2048,
@@ -399,25 +407,54 @@ async function sendToCoach(userMessage) {
       })
     });
 
+    var result = await response.json().catch(function() { return {}; });
+
     if (!response.ok) {
-      if (response.status === 503 || response.status === 429) {
-        return 'Der Coach ist gerade überlastet — versuch es in ein paar Sekunden nochmal.';
+      // Der Proxy liefert fertige deutsche Klartext-Meldungen mit
+      console.error('AI Coach:', response.status, result.code || '', result.error || '');
+      if (response.status === 401) {
+        return 'Deine Sitzung ist abgelaufen. Lade die Seite neu und logg dich nochmal ein.';
       }
-      var errText = await response.text();
-      throw new Error('API Error ' + response.status + ': ' + errText.substring(0, 200));
+      return result.error || 'Der Coach ist gerade nicht erreichbar. Versuch es gleich nochmal.';
     }
 
-    var result = await response.json();
-    var reply = result.candidates && result.candidates[0] && result.candidates[0].content &&
-                result.candidates[0].content.parts && result.candidates[0].content.parts[0] &&
-                result.candidates[0].content.parts[0].text;
+    var cand = result.candidates && result.candidates[0];
+    var reply = cand && cand.content && cand.content.parts && cand.content.parts[0] && cand.content.parts[0].text;
 
-    if (!reply) throw new Error('Leere Antwort vom AI');
+    if (!reply) {
+      if (cand && cand.finishReason === 'MAX_TOKENS') {
+        return 'Die Antwort war zu lang und wurde abgeschnitten. Stell die Frage etwas enger.';
+      }
+      if (cand && cand.finishReason === 'SAFETY') {
+        return 'Darauf kann ich nicht antworten. Formulier die Frage anders.';
+      }
+      console.error('AI Coach: leere Antwort', result);
+      return 'Ich hab gerade keine Antwort bekommen. Frag nochmal.';
+    }
 
     return reply;
+
   } catch (err) {
+    if (err.name === 'AbortError') {
+      return 'Das hat zu lange gedauert. Versuch es nochmal — am besten mit einer kürzeren Frage.';
+    }
     console.error('AI Coach Error:', err);
-    return 'Verbindungsproblem — versuch es nochmal.';
+    return 'Keine Verbindung zum Coach. Prüf dein Internet und versuch es nochmal.';
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Diagnose für die Konsole: boxspecCoachStatus()
+async function boxspecCoachStatus() {
+  try {
+    var r = await fetch(AI_COACH_ENDPOINT, { method: 'GET' });
+    var d = await r.json();
+    console.log('[BoxSpec AI]', d);
+    return d;
+  } catch (e) {
+    console.error('[BoxSpec AI] Health-Check fehlgeschlagen:', e);
+    return null;
   }
 }
 
@@ -465,37 +502,65 @@ function renderCoachMessages() {
 }
 
 function formatCoachText(text) {
-  // Process ACTION tags into buttons BEFORE other formatting
-  // [ACTION:VIDEO:ID:TITLE]
-  text = text.replace(/\[ACTION:VIDEO:([a-zA-Z0-9_-]+):(.*?)\]/g, function(match, id, title) {
-    return '<button onclick="closeAICoachAndDo(function(){openVideoPlayer(\'' + id + '\',\'' + title.replace(/'/g,'') + '\')})" class="ai-action-btn ai-action-video">▶ ' + title + '</button>';
-  });
-  // [ACTION:NAVIGATE:PAGE]
-  text = text.replace(/\[ACTION:NAVIGATE:(\w+)\]/g, function(match, page) {
-    var labels = { wochenplan:'Wochenplan öffnen', training:'Training öffnen', fights:'Kämpfe öffnen', profil:'Profil öffnen', wissen:'Video-Bibliothek öffnen' };
-    var label = labels[page] || page;
-    // For wissen: navigate to training then switch tab
-    var action = page === 'wissen' ? "showPage('training');setTimeout(function(){switchTrainingTab('wissen')},300)" : "showPage('" + page + "')";
-    return '<button onclick="closeAICoachAndDo(function(){' + action + '})" class="ai-action-btn ai-action-nav">→ ' + label + '</button>';
-  });
-  // [ACTION:REGENERATE_PLAN]
-  text = text.replace(/\[ACTION:REGENERATE_PLAN\]/g,
-    '<button onclick="closeAICoachAndDo(function(){var d=getData();d.weekPlan=generateCurrentWeekPlan();saveData(d);showPage(\'wochenplan\');showToast(\'Plan neu generiert\')})" class="ai-action-btn ai-action-do">⟳ Plan neu generieren</button>');
-  // [ACTION:ACTIVATE_DELOAD]
-  text = text.replace(/\[ACTION:ACTIVATE_DELOAD\]/g,
-    '<button onclick="closeAICoachAndDo(function(){if(typeof activateDeload===\'function\')activateDeload();showToast(\'Deload aktiviert\')})" class="ai-action-btn ai-action-do">↓ Deload aktivieren</button>');
-  // [ACTION:SET_PROGRAM:TYPE]
-  text = text.replace(/\[ACTION:SET_PROGRAM:(\w+)\]/g, function(match, prog) {
-    var label = prog === '10w' ? '10-Wochen-Programm aktivieren' : 'Standard-Programm aktivieren';
-    return '<button onclick="closeAICoachAndDo(function(){var u=safeParse(\'fos_users\',{});if(u[currentUser]){u[currentUser].trainingProgram=\'' + prog + '\';localStorage.setItem(\'fos_users\',JSON.stringify(u));var d=getData();if(\'' + prog + '\'===\'10w\'&&!d.program10wStart)d.program10wStart=new Date().toISOString().split(\'T\')[0];d.weekPlan=generateCurrentWeekPlan();saveData(d);showPage(\'wochenplan\');showToast(\'' + label + '\')}})" class="ai-action-btn ai-action-do">★ ' + label + '</button>';
+  if (text === null || text === undefined) return '';
+  text = String(text);
+
+  // ACTION-Tags erst als Platzhalter herausnehmen, damit sie das Escaping überleben.
+  var buttons = [];
+  var MARK = String.fromCharCode(1); // Steuerzeichen, kommt in echtem Text nicht vor
+  function stash(html) {
+    buttons.push(html);
+    return MARK + 'B' + (buttons.length - 1) + MARK;
+  }
+
+  // [ACTION:VIDEO:ID:TITEL]
+  text = text.replace(/\[ACTION:VIDEO:([a-zA-Z0-9_-]+):([^\]]*?)\]/g, function(m, id, title) {
+    return stash('<button onclick="closeAICoachAndDo(function(){openVideoPlayer(\'' + escJs(id) + '\',\'' + escJs(title) + '\')})" class="ai-action-btn ai-action-video">&#9654; ' + esc(title) + '</button>');
   });
 
-  // Standard markdown formatting
-  return text
+  // [ACTION:NAVIGATE:SEITE] — nur bekannte Seiten, sonst raus
+  var NAV = {
+    wochenplan: 'Wochenplan öffnen',
+    training: 'Training öffnen',
+    fights: 'Kämpfe öffnen',
+    profil: 'Profil öffnen',
+    wissen: 'Video-Bibliothek öffnen'
+  };
+  text = text.replace(/\[ACTION:NAVIGATE:(\w+)\]/g, function(m, page) {
+    if (!Object.prototype.hasOwnProperty.call(NAV, page)) return '';
+    var action = page === 'wissen'
+      ? "showPage('training');setTimeout(function(){switchTrainingTab('wissen')},300)"
+      : "showPage('" + page + "')";
+    return stash('<button onclick="closeAICoachAndDo(function(){' + action + '})" class="ai-action-btn ai-action-nav">&rarr; ' + esc(NAV[page]) + '</button>');
+  });
+
+  // [ACTION:REGENERATE_PLAN]
+  text = text.replace(/\[ACTION:REGENERATE_PLAN\]/g, function() {
+    return stash('<button onclick="closeAICoachAndDo(function(){var d=getData();d.weekPlan=generateCurrentWeekPlan();saveData(d);showPage(\'wochenplan\');showToast(\'Plan neu generiert\')})" class="ai-action-btn ai-action-do">&#10227; Plan neu generieren</button>');
+  });
+
+  // [ACTION:ACTIVATE_DELOAD]
+  text = text.replace(/\[ACTION:ACTIVATE_DELOAD\]/g, function() {
+    return stash('<button onclick="closeAICoachAndDo(function(){if(typeof activateDeload===\'function\')activateDeload();showToast(\'Deload aktiviert\')})" class="ai-action-btn ai-action-do">&darr; Deload aktivieren</button>');
+  });
+
+  // [ACTION:SET_PROGRAM:TYP] — nur 10w oder standard
+  text = text.replace(/\[ACTION:SET_PROGRAM:(\w+)\]/g, function(m, prog) {
+    if (prog !== '10w' && prog !== 'standard') return '';
+    var label = prog === '10w' ? '10-Wochen-Programm aktivieren' : 'Standard-Programm aktivieren';
+    return stash('<button onclick="closeAICoachAndDo(function(){var u=safeParse(\'fos_users\',{});if(u[currentUser]){u[currentUser].trainingProgram=\'' + prog + '\';localStorage.setItem(\'fos_users\',JSON.stringify(u));var d=getData();if(\'' + prog + '\'===\'10w\'&&!d.program10wStart)d.program10wStart=new Date().toISOString().split(\'T\')[0];d.weekPlan=generateCurrentWeekPlan();saveData(d);showPage(\'wochenplan\');showToast(\'' + label + '\')}})" class="ai-action-btn ai-action-do">&#9733; ' + esc(label) + '</button>');
+  });
+
+  // Ab hier ist alles Übrige reiner Text → escapen, dann leichtes Markdown.
+  var out = esc(text)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^(\d+)\. /gm, '<strong>$1.</strong> ')
     .replace(/\n/g, '<br>')
-    .replace(/• /g, '&bull; ')
-    .replace(/(\d+)\. /g, '<strong>$1.</strong> ');
+    .replace(/• /g, '&bull; ');
+
+  // Platzhalter zurück in echte Buttons
+  var re = new RegExp(MARK + 'B(\\d+)' + MARK, 'g');
+  return out.replace(re, function(m, i) { return buttons[+i] || ''; });
 }
 
 // Helper: close coach panel then execute action

@@ -1,84 +1,104 @@
 # BoxSpec — Handoff für neue Claude Sessions
 
+> Stand: 2026-09-07. Diese Datei ist die Wahrheit — wenn Code und Doku sich widersprechen, gewinnt der Code, dann bitte hier korrigieren.
+
 ## Was ist BoxSpec?
-Eine Web-App (PWA) für Boxer. Trainingsplan, Ernährung, AI Coach, Video-Bibliothek, 8-Säulen Wissenssystem. Läuft auf boxspec.app (Netlify Hosting).
+Eine Web-App (PWA) für Boxer. Trainingsplan, Ernährung, AI Coach, Video-Bibliothek, Community, 8-Säulen Wissenssystem. Läuft auf boxspec.app.
 
 ## Tech Stack
 - **Frontend:** Vanilla HTML/CSS/JS (kein Framework, kein Build-Step)
-- **Auth + DB:** Firebase Auth + Firestore (Cloud Sync eingebaut)
-- **AI Coach:** Google Gemini 2.5 Flash via Netlify Function Proxy (Key als ENV Variable auf Netlify, NICHT im Code)
-- **Hosting:** Netlify (boxspec.app), Domain bei Strato, DNS über Strato A-Record → 75.2.60.5
+- **Auth + DB:** Firebase Auth + Firestore + Storage (Projekt-ID `fightos-85652`)
+- **AI Coach:** Google Gemini via Serverless-Proxy `api/ai-proxy.js`
+- **Hosting: VERCEL** (nicht Netlify — die Netlify-Reste wurden am 2026-09-07 entfernt)
+- **Domain:** boxspec.app bei Strato, DNS auf Vercel
 - **SEO:** Google Search Console verifiziert, Sitemap mit 5 URLs, 3 SEO-Artikel-Seiten
 
 ## Dateien — Übersicht
 ```
-index.html          → Landing Page (SEO, boxspec.app/)
-app.html            → Die eigentliche App (Login/Register/Dashboard)
-css/style.css       → 4500+ Zeilen CSS, Glasmorphism "Fight Command" Design
-js/app.js           → 8000+ Zeilen Hauptlogik (Dashboard, Plan, Auth, Account, Tests, Fights)
-js/pages.js         → 3000+ Zeilen (8 Säulen, Übungsdatenbank, Ernährung, Periodisierung)
-js/program10w.js    → 10-Wochen Trainingsprogramm (TLAC-basiert)
-js/ai-coach.js      → AI Coach (Gemini, System-Prompt mit Box-Taktik-Wissen)
-js/video-library.js → 60+ kuratierte Videos in 8 Kategorien
-js/calculators.js   → Makro-Rechner, HF-Zonen etc.
-netlify/functions/ai-proxy.js → Serverless Proxy für Gemini API Key
-netlify.toml        → Netlify Build-Config
-manifest.json       → PWA Manifest
-sw.js               → Service Worker (Offline-Cache)
-sitemap.xml         → 5 URLs für Google
-robots.txt          → Erlaubt alle Crawler
-trainingsplan-boxer.html    → SEO-Artikel
-gewicht-machen-boxen.html   → SEO-Artikel
-krafttraining-boxer.html    → SEO-Artikel
+index.html            → Landing Page (SEO, boxspec.app/)
+app.html              → Die eigentliche App (Login/Register/Dashboard)
+css/style.css         → 4500+ Zeilen CSS, Glasmorphism "Fight Command" Design
+js/util.js            → esc/escAttr/escMultiline/initial/safeUrl/escJs — MUSS als erstes geladen werden
+js/app.js             → Hauptlogik (Dashboard, Plan, Auth, Account, Tests, Fights)
+js/pages.js           → 8 Säulen, Übungsdatenbank, Ernährung, Periodisierung
+js/community.js       → Feed, Forum, Ranking, öffentliche Profile
+js/program10w.js      → 10-Wochen Trainingsprogramm
+js/ai-coach.js        → AI Coach (System-Prompt, Chat-UI, ACTION-Buttons)
+js/video-library.js   → 60+ kuratierte Videos in 8 Kategorien
+js/calculators.js     → Makro-Rechner, HF-Zonen etc.
+api/ai-proxy.js       → Vercel Function: Gemini-Proxy mit Auth + Rate-Limit + Health-Check
+firestore.rules       → Firestore Security Rules  (firebase deploy --only firestore:rules)
+storage.rules         → Storage Security Rules    (firebase deploy --only storage)
+firebase.json         → verweist auf die beiden Rules-Dateien
+vercel.json           → Security- und Cache-Header
+sw.js                 → Service Worker (Offline-Cache)
+img/exercises/db/     → Übungsfotos, lokal gehostet (Quelle: free-exercise-db, Public Domain)
 ```
 
-## Was gebaut wurde (chronologisch)
-1. Repo geklont von github.com/elnwaka/fightos
-2. 10-Wochen TLAC-Programm eingebaut (program10w.js)
-3. Navigation vereinfacht: 3 Dropdown-Hubs → 5 flache Tabs (Home, Plan, Training, Kämpfe, Profil)
-4. Training-Seite: Merged Hub mit Sub-Tabs (Übungen, Wissen, Tests, Log, Ernährung, Periodisierung, Recovery, Notizen)
-5. Profil-Seite: Merged Hub (Account, 8 Säulen, Rechner, FAQ)
-6. Dashboard: Fight Command Design (Glasmorphism, animierter Hero-Gradient, Glow-Effekte)
-7. TLAC-Wissenschaft in 4 Säulen eingebaut (Kraft, Conditioning, Ernährung, Mobilität)
-8. Onboarding-Flow gefixt (war kaputt — Race Condition mit Firebase Auth)
-9. AI Coach eingebaut (Gemini, System-Prompt mit 4000+ Wörter Box-Wissen)
-10. AI Coach: integrierte Aktionen (Videos öffnen, Seiten navigieren, Plan ändern)
-11. AI Coach: persistente Chat-History (localStorage)
-12. AI Coach: echtes Taktik-Wissen (Southpaw, Feints, Körperschläge, Clinch, Dirty Boxing, Atmung)
-13. Video-Bibliothek: 60+ Videos in 8 Kategorien (Legenden, Aktive, Ring IQ, Grundlagen, Drills, Defense, Dirty Boxing, S&C)
-14. Custom Video Player (Fullscreen Overlay, kein YT-Branding)
-15. Notizen-Section (6 Kategorien, Filter, Glasmorphism)
-16. Block-Erledigt Animation (Slide-out + Fade)
-17. Kaputte Bilder: Placeholder mit Gradient + Übungsname
-18. Empty States auf allen Seiten (Kämpfe, Tests, Wochenplan)
-19. Rebrand: FightOS → BoxSpec (alle Dateien, neues SVG Logo)
-20. Landing Page (SEO-optimiert, Hero mit Box-Bild, AI Coach Mock-Chat)
-21. 3 SEO-Artikel (Trainingsplan, Gewicht machen, Krafttraining)
-22. Netlify Function für API Key Proxy
-23. Cloud Sync: Profile-Einstellungen syncen jetzt auch automatisch
-24. Domain boxspec.app verbunden (Strato DNS → Netlify)
-25. Google Search Console verifiziert + Sitemap eingereicht
-26. PageSpeed-Optimierung (98/100 Desktop)
+## SICHERHEIT — nicht kaputt machen
 
-## Bekannte Probleme
-- app.js ist 8000+ Zeilen — sollte in Module aufgeteilt werden
-- 1061 Inline-Styles in app.js und pages.js — sollten CSS-Klassen werden
-- Einige Übungsbilder fehlen (Placeholder statt echte Fotos)
-- AI Coach Token-Limit: System-Prompt ~4000 Wörter, Chat-History auf 10 begrenzt
-- Light Mode hat noch einige Inkonsistenzen
-- Wochenplan Mobile: zu viele Info-Banner vor dem Grid
+**1. Alles was von Usern kommt, wird beim Rendern escaped.**
+`js/util.js` stellt `esc()`, `escMultiline()`, `escAttr()`, `initial()`, `safeUrl()`, `escJs()` bereit.
+Regel: **kein User-Wert darf ohne eine dieser Funktionen in einen `innerHTML`-String.**
+- Text zwischen Tags → `esc()` bzw. `escMultiline()` bei mehrzeiligem Text
+- Attribut-Werte → `escAttr()`
+- URLs (`src`, `href`) → `safeUrl()` (lässt nur http/https durch)
+- Werte in `onclick="fn('…')"` → `escJs()`
+
+**2. Der AI-Proxy ist kein offenes Relay.**
+`api/ai-proxy.js` verlangt ein gültiges Firebase-ID-Token im `Authorization: Bearer`-Header,
+prüft den Origin gegen eine Allowlist und limitiert auf 20 Anfragen/Minute pro User.
+Kein Auth-Header = 401. Diese Prüfungen nicht entfernen — sonst zahlt Armann fremde Gemini-Rechnungen.
+
+**3. Private Daten und öffentliches Profil sind getrennt.**
+- `users/{uid}` = Trainingslog, Kämpfe, HRV, Einstellungen → **nur der Besitzer**
+- `public_profiles/{uid}` = Anzeigename, Gym, Bio, Rekord → für eingeloggte User lesbar
+
+Nie wieder Profildaten in `users/{uid}` legen, sonst sind alle Trainingsdaten öffentlich.
+
+## AI Coach — wie er funktioniert und wie man ihn debuggt
+
+Client (`js/ai-coach.js`) → `POST /api/ai-proxy` mit Firebase-Token → Vercel Function → Gemini.
+Der Key liegt **nur** in der Vercel-Env-Variable `GEMINI_API_KEY`, nie im Code.
+
+**Wenn der Coach nicht antwortet — erste Anlaufstelle:**
+```
+curl https://boxspec.app/api/ai-proxy
+```
+Der Health-Check (GET) sagt direkt, ob der Key konfiguriert und bei Google gültig ist,
+zeigt das aktuell benutzte Modell und einen Fingerprint des Keys (nie den Key selbst).
+In der Browser-Konsole geht auch `boxspecCoachStatus()`.
+
+**Modellwahl ist selbstheilend:** Der Proxy fragt Gemini, welche Modelle es gibt, und nimmt
+das erste aus `MODEL_PREFERENCE`. Fehlt das ganze Wunschliste, nimmt er das neueste Flash-Modell.
+Neues Modell einführen = `MODEL_PREFERENCE` in `api/ai-proxy.js` oben ergänzen, sonst nichts.
+
+**Neuer Key:** aistudio.google.com/apikey → Vercel → Projekt → Settings → Environment Variables →
+`GEMINI_API_KEY` → **danach neu deployen**, Env-Änderungen greifen nicht rückwirkend.
+
+## Bekannte Probleme / technische Schulden
+- `js/app.js` ist 8000+ Zeilen — sollte in Module aufgeteilt werden
+- Viele Inline-Styles in `app.js` und `pages.js` — sollten CSS-Klassen werden
+- 17 Übungen haben kein eigenes Foto (`exerciseImageMap`-Einträge mit `null`) → Placeholder
+- `www.boxspec.app` löst nicht auf — nur die Apex-Domain. DNS bei Strato prüfen.
+- Rate-Limit im Proxy ist In-Memory, überlebt keinen Instanz-Neustart. Für echten Schutz KV/Upstash.
+- Community hat keine Melde-/Moderationsfunktion
+- Chat-History des Coaches liegt in localStorage, nicht in der Cloud
 
 ## Wichtige Konventionen
-- App heißt jetzt BoxSpec (nicht mehr FightOS)
-- Firebase Config: Project ID ist noch "fightos-85652" (technischer Name, nicht sichtbar für User)
-- Email-Domain für Auth: user@fightos.app (intern, nicht ändern)
+- App heißt BoxSpec (nicht mehr FightOS). Repo heißt noch `fightos`, Firebase-Projekt auch.
+- Login ohne `@` wird intern zu `name@fightos.app`. Mit `@` ist es eine echte E-Mail — nur damit
+  funktioniert `doPasswordReset()`. Neue User werden im UI Richtung E-Mail geschubst.
 - Alle Texte auf Deutsch
 - TLAC/Boxing Science wird nirgendwo namentlich erwähnt — alles ist "BoxSpec-Wissen"
-- AI Coach System-Prompt: Spricht Deutsch, direkt wie ein Trainer, max 300 Wörter pro Antwort
+- AI Coach: spricht Deutsch, direkt wie ein Trainer, max 300 Wörter pro Antwort
+- Nur Chart.js. ApexCharts wurde entfernt (wurde nie benutzt, 214 KB).
+- **Bei jedem Deploy `BUILD` in `sw.js` hochzählen**, sonst bekommen User den alten Cache.
 
 ## Was als nächstes kommt
-1. App selbst benutzen + Boxer im Verein testen lassen
-2. Social Media (Instagram/TikTok @boxspec)
-3. Feedback-basiert Features priorisieren
-4. Technische Schulden aufräumen (Inline-Styles, Module)
-5. Bei 50+ aktiven Nutzern: Abo-Modell planen (Free vs Pro)
+1. `GEMINI_API_KEY` auf Vercel erneuern → Coach läuft wieder
+2. Rules deployen: `firebase deploy --only firestore:rules,storage`
+3. App selbst benutzen + Boxer im Verein testen lassen
+4. Social Media (Instagram/TikTok @boxspec)
+5. Moderation für die Community (Melden, Blockieren)
+6. Bei 50+ aktiven Nutzern: Abo-Modell planen (Free vs Pro)

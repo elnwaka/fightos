@@ -279,19 +279,7 @@ function getUserAge() {
 }
 
 // ===== AUTH =====
-var APP_SALT = 'BoxSpec_v1_';
-
-async function hashPassword(password, username) {
-  var salted = APP_SALT + username.toLowerCase() + ':' + password;
-  var encoded = new TextEncoder().encode(salted);
-  var buffer = await crypto.subtle.digest('SHA-256', encoded);
-  var arr = Array.from(new Uint8Array(buffer));
-  return arr.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
-}
-
-function isHashed(pass) {
-  return typeof pass === 'string' && pass.length === 64 && /^[0-9a-f]{64}$/.test(pass);
-}
+// Passwoerter liegen ausschliesslich bei Firebase Auth — nie lokal.
 
 function switchAuthTab(tab) {
   document.querySelectorAll('.auth-tab').forEach((t, i) => {
@@ -302,36 +290,91 @@ function switchAuthTab(tab) {
   document.getElementById('auth-msg').textContent = '';
 }
 
+// Benutzername -> Firebase-Login-Adresse.
+// Wer eine echte E-Mail nimmt, kann sein Passwort zuruecksetzen.
+function authEmailFor(user) {
+  return user.indexOf('@') !== -1 ? user : user + '@fightos.app';
+}
+
+// Anzeigename aus der Login-Adresse (bei E-Mail: Teil vor dem @)
+function displayNameFor(user) {
+  return user.indexOf('@') !== -1 ? user.split('@')[0] : user;
+}
+
 async function doRegister() {
   var user = document.getElementById('reg-user').value.trim();
   var pass = document.getElementById('reg-pass').value;
+  var pass2El = document.getElementById('reg-pass2');
+  var pass2 = pass2El ? pass2El.value : pass;
   var msg = document.getElementById('auth-msg');
-  if (!user || !pass) { msg.className = 'auth-msg error'; msg.textContent = 'Alle Felder ausfüllen!'; return; }
-  if (pass.length < 6) { msg.className = 'auth-msg error'; msg.textContent = 'Passwort mind. 6 Zeichen!'; return; }
-  if (!_fbAuth) { msg.className = 'auth-msg error'; msg.textContent = 'Keine Verbindung zum Server.'; return; }
+  msg.className = 'auth-msg error';
+
+  if (!user || !pass) { msg.textContent = 'Alle Felder ausfüllen!'; return; }
+  if (pass.length < 6) { msg.textContent = 'Passwort mind. 6 Zeichen!'; return; }
+  if (pass !== pass2) { msg.textContent = 'Die beiden Passwörter stimmen nicht überein.'; return; }
+  if (!_fbAuth) { msg.textContent = 'Keine Verbindung zum Server.'; return; }
 
   try {
-    var email = user.indexOf('@') !== -1 ? user : user + '@fightos.app';
-    var cred = await _fbAuth.createUserWithEmailAndPassword(email, pass);
+    var cred = await _fbAuth.createUserWithEmailAndPassword(authEmailFor(user), pass);
     _fbUser = cred.user;
-    // Clear old localStorage users + create fresh local entry
-    localStorage.removeItem('fos_users');
-    var users = {};
-    users[user] = { pass: 'firebase', onboardingDone: false, created: new Date().toISOString(), firebaseUid: _fbUser.uid };
+
+    var name = displayNameFor(user);
+    // Bestehende lokale Profile NICHT loeschen — nur den neuen Eintrag anlegen
+    var users = safeParse('fos_users', {});
+    users[name] = {
+      pass: 'firebase',
+      onboardingDone: false,
+      created: new Date().toISOString(),
+      firebaseUid: _fbUser.uid,
+      hasRecoveryEmail: user.indexOf('@') !== -1
+    };
     localStorage.setItem('fos_users', JSON.stringify(users));
-    var data = { fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {} };
-    localStorage.setItem('fos_data_' + user, JSON.stringify(data));
-    // Auto-login after registration — no redirect to login tab
-    currentUser = user;
-    localStorage.setItem('fos_current', user);
+
+    if (!localStorage.getItem('fos_data_' + name)) {
+      localStorage.setItem('fos_data_' + name, JSON.stringify({
+        fights: [], log: [], hrv: [], fightDate: '', upcomingFights: [], weekPlan: {}
+      }));
+    }
+
+    currentUser = name;
+    localStorage.setItem('fos_current', name);
     if (typeof _appEntered !== 'undefined') _appEntered = true;
     enterApp();
   } catch(e) {
-    msg.className = 'auth-msg error';
     if (e.code === 'auth/email-already-in-use') msg.textContent = 'Name bereits vergeben!';
     else if (e.code === 'auth/weak-password') msg.textContent = 'Passwort zu schwach (mind. 6 Zeichen)!';
+    else if (e.code === 'auth/invalid-email') msg.textContent = 'Ungültiger Name — keine Leerzeichen oder Sonderzeichen.';
     else if (e.code === 'auth/configuration-not-found') msg.textContent = 'Firebase Auth nicht aktiviert. Aktiviere E-Mail/Passwort in der Firebase Console.';
     else msg.textContent = e.message || 'Registrierung fehlgeschlagen.';
+  }
+}
+
+// Passwort zuruecksetzen — funktioniert nur mit echter E-Mail-Adresse
+async function doPasswordReset() {
+  var msg = document.getElementById('auth-msg');
+  var user = (document.getElementById('login-user').value || '').trim();
+
+  if (!user) {
+    msg.className = 'auth-msg error';
+    msg.textContent = 'Trag oben deine E-Mail-Adresse ein, dann schicken wir dir einen Link.';
+    return;
+  }
+  if (user.indexOf('@') === -1) {
+    msg.className = 'auth-msg error';
+    msg.textContent = 'Dein Account läuft ohne E-Mail — ein Reset ist dafür technisch nicht möglich. Schreib uns über das Kontaktformular.';
+    return;
+  }
+  if (!_fbAuth) { msg.className = 'auth-msg error'; msg.textContent = 'Keine Verbindung zum Server.'; return; }
+
+  try {
+    await _fbAuth.sendPasswordResetEmail(user);
+    msg.className = 'auth-msg';
+    msg.textContent = 'Link ist unterwegs — schau in dein Postfach (auch im Spam).';
+  } catch(e) {
+    msg.className = 'auth-msg error';
+    if (e.code === 'auth/user-not-found') msg.textContent = 'Zu dieser E-Mail gibt es keinen Account.';
+    else if (e.code === 'auth/invalid-email') msg.textContent = 'Das ist keine gültige E-Mail-Adresse.';
+    else msg.textContent = 'Konnte den Link nicht schicken. Versuch es später nochmal.';
   }
 }
 
@@ -343,9 +386,9 @@ async function doLogin() {
   if (!_fbAuth) { msg.className = 'auth-msg error'; msg.textContent = 'Keine Verbindung zum Server.'; return; }
 
   try {
-    var email = user.indexOf('@') !== -1 ? user : user + '@fightos.app';
-    var cred = await _fbAuth.signInWithEmailAndPassword(email, pass);
+    var cred = await _fbAuth.signInWithEmailAndPassword(authEmailFor(user), pass);
     _fbUser = cred.user;
+    user = displayNameFor(user);
     currentUser = user;
     localStorage.setItem('fos_current', user);
     // Ensure local user entry — LOGIN means user already exists, so onboarding is done

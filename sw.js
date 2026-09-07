@@ -1,10 +1,12 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-05-28d';
+const BUILD = '2026-09-07a';
 const CACHE_NAME = 'boxspec-' + BUILD;
 const PRECACHE = [
   './',
   './index.html',
+  './app.html',
   './css/style.css',
+  './js/util.js',
   './js/app.js',
   './js/pages.js',
   './js/calculators.js',
@@ -14,8 +16,6 @@ const PRECACHE = [
   './js/community.js',
   './manifest.json',
   './js/chart.min.js',
-  './js/apexcharts.min.js',
-  './css/apexcharts.css',
   './js/firebase-app.js',
   './js/firebase-auth.js',
   './js/firebase-firestore.js',
@@ -53,6 +53,18 @@ self.addEventListener('activate', function(event) {
 // Fetch: Stale-While-Revalidate for app files, Cache-First for fonts/images
 self.addEventListener('fetch', function(event) {
   var url = event.request.url;
+
+  // Nur GET cachen — POST an /api/* wuerde cache.put sonst werfen
+  if (event.request.method !== 'GET') return;
+
+  // Firebase/Firestore/Google-APIs und alles Fremde nie cachen:
+  // sonst werden Realtime-Antworten stale ausgeliefert.
+  var isOwn = url.indexOf(self.location.origin) === 0;
+  var isFont = url.indexOf('fonts.googleapis.com') !== -1 || url.indexOf('fonts.gstatic.com') !== -1;
+  if (!isOwn && !isFont) return;
+
+  // Eigene API nie aus dem Cache beantworten
+  if (isOwn && url.indexOf('/api/') !== -1) return;
 
   // Google Fonts: Cache-First
   if (url.indexOf('fonts.googleapis.com') !== -1 || url.indexOf('fonts.gstatic.com') !== -1) {

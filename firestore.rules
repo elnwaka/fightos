@@ -1,0 +1,92 @@
+rules_version = '2';
+
+// BoxSpec — Firestore Security Rules
+// Deploy:  firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    // Der Autor eines Dokuments darf es nicht auf jemand anderen umschreiben
+    function authorIsMe() {
+      return signedIn() && request.resource.data.uid == request.auth.uid;
+    }
+    function textOk(field, maxLen) {
+      return !(field in request.resource.data)
+        || (request.resource.data[field] is string && request.resource.data[field].size() <= maxLen);
+    }
+
+    // ---- Private Nutzerdaten: Trainingslog, Kämpfe, HRV, Einstellungen ----
+    // Nur der Besitzer. Niemand sonst — auch keine anderen eingeloggten User.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ---- Öffentliches Profil: getrennt von den privaten Daten ----
+    match /public_profiles/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(uid)
+        && textOk('displayName', 60)
+        && textOk('bio', 1000)
+        && textOk('gym', 80)
+        && textOk('weight', 10)
+        && textOk('experience', 30)
+        // "Verifizierter Trainer" darf sich niemand selbst geben
+        && (!('isTrainer' in request.resource.data) || request.resource.data.isTrainer == false);
+      allow delete: if isOwner(uid);
+    }
+
+    // ---- Community-Feed ----
+    match /community_posts/{postId} {
+      allow read: if signedIn();
+      allow create: if authorIsMe()
+        && textOk('title', 140)
+        && textOk('body', 5000)
+        && request.resource.data.likeCount == 0
+        && request.resource.data.commentCount == 0;
+      // Fremde Posts dürfen nur über Like-/Kommentarzähler angefasst werden
+      allow update: if signedIn() && (
+        resource.data.uid == request.auth.uid
+        || request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['likeCount', 'commentCount', 'likedBy'])
+      );
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+
+      match /comments/{commentId} {
+        allow read: if signedIn();
+        allow create: if authorIsMe() && textOk('body', 2000);
+        allow update, delete: if signedIn() && resource.data.uid == request.auth.uid;
+      }
+    }
+
+    // ---- Forum ----
+    match /community_threads/{threadId} {
+      allow read: if signedIn();
+      allow create: if authorIsMe()
+        && textOk('title', 140)
+        && textOk('body', 5000)
+        && (!('pinned' in request.resource.data) || request.resource.data.pinned == false);
+      allow update: if signedIn() && (
+        resource.data.uid == request.auth.uid
+        || request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['voteScore', 'replyCount', 'votedBy'])
+      );
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+
+      match /replies/{replyId} {
+        allow read: if signedIn();
+        allow create: if authorIsMe() && textOk('body', 2000);
+        allow update, delete: if signedIn() && resource.data.uid == request.auth.uid;
+      }
+    }
+
+    // Alles andere ist zu.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

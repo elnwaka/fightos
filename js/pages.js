@@ -999,7 +999,9 @@ function muscleSvgBack(activeGroups, color) {
 }
 
 // ===== EXERCISE IMAGES =====
-const EXERCISE_IMG_BASE = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/';
+// Bilder liegen lokal (Quelle: free-exercise-db, Unlicense/Public Domain).
+// Kein Hotlink auf GitHub mehr — raw.githubusercontent ist kein CDN.
+const EXERCISE_IMG_BASE = 'img/exercises/db/';
 // Mapping: nur Bilder die 100% zur Übungsbeschreibung passen
 // Für fehlende: Bilder in img/exercises/{id}.jpg ablegen
 const exerciseImageMap = {
@@ -1052,7 +1054,7 @@ function exerciseImgLocal(id) {
 
 function exerciseImgUrl(id, frame) {
   const dbId = exerciseImageMap[id];
-  if (dbId) return EXERCISE_IMG_BASE + dbId + '/' + (frame || 0) + '.jpg';
+  if (dbId) return EXERCISE_IMG_BASE + dbId + '_' + (frame || 0) + '.jpg';
   return null;
 }
 

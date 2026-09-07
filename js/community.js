@@ -116,16 +116,16 @@ function timeAgo(ts) {
 
 function communityAuthorHTML(name, weight, exp, verified, uid, avatarUrl) {
   var badge = verified ? '<span class="cm-verified" title="Verifizierter Trainer">&#10003;</span>' : '';
-  var weightBadge = weight ? '<span class="cm-weight-badge">' + weight + 'kg</span>' : '';
+  var weightBadge = weight ? '<span class="cm-weight-badge">' + esc(weight) + 'kg</span>' : '';
   var expBadge = '';
   if (exp === 'wettkampf') expBadge = '<span class="cm-exp-pill cm-exp-wettkampf">WETTKAMPF</span>';
   else if (exp === 'profi') expBadge = '<span class="cm-exp-pill cm-exp-profi">PROFI</span>';
-  var click = uid ? ' onclick="viewPublicProfile(\'' + uid + '\')" style="cursor:pointer;"' : '';
-  var avatarInner = avatarUrl ? '<img src="' + avatarUrl + '" class="cm-avatar-img">' : (name ? name.charAt(0).toUpperCase() : '?');
+  var click = uid ? ' onclick="viewPublicProfile(\'' + escJs(uid) + '\')" style="cursor:pointer;"' : '';
+  var avatarInner = avatarUrl ? '<img src="' + safeUrl(avatarUrl) + '" class="cm-avatar-img">' : initial(name);
   return '<div class="cm-author"' + click + '>' +
     '<div class="cm-avatar">' + avatarInner + '</div>' +
     '<div class="cm-author-info">' +
-      '<div class="cm-author-name">' + (name || 'Anonym') + badge + ' ' + expBadge + '</div>' +
+      '<div class="cm-author-name">' + esc(name || 'Anonym') + badge + ' ' + expBadge + '</div>' +
       (weight ? '<div class="cm-author-detail">' + weightBadge + '</div>' : '') +
     '</div>' +
   '</div>';
@@ -173,24 +173,40 @@ function uploadMedia(file, path, progressEl, callback) {
 // ===== PUBLIC PROFILE INIT =====
 function ensurePublicProfile() {
   if (!_fbUser || !_fbDb) return;
-  _fbDb.collection('users').doc(_fbUser.uid).get().then(function(doc) {
-    if (doc.exists && doc.data().publicProfile) return; // Already exists
-    var users = safeParse('fos_users', {});
-    var u = users[currentUser] || {};
-    _fbDb.collection('users').doc(_fbUser.uid).set({
-      publicProfile: {
-        displayName: u.nickname || currentUser,
-        weight: u.weight || '',
-        experience: u.experienceLevel || '',
-        gym: u.gym || '',
-        record: { wins: 0, losses: 0, draws: 0 },
-        bio: '',
-        avatarUrl: '',
-        isTrainer: false,
-        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+  _fbDb.collection('public_profiles').doc(_fbUser.uid).get().then(function(doc) {
+    if (doc.exists) return; // Existiert schon
+
+    // Migration: fruehere Profile lagen in users/{uid}.publicProfile.
+    // Einmalig umziehen, damit niemand sein Profil verliert.
+    _fbDb.collection('users').doc(_fbUser.uid).get().then(function(old) {
+      var legacy = old.exists && old.data() && old.data().publicProfile;
+      if (legacy) {
+        _fbDb.collection('public_profiles').doc(_fbUser.uid).set(legacy, { merge: true });
+        _fbDb.collection('users').doc(_fbUser.uid).update({
+          publicProfile: firebase.firestore.FieldValue.delete()
+        }).catch(function() {});
+        return;
       }
-    }, { merge: true });
+      createFreshPublicProfile();
+    }).catch(function() { createFreshPublicProfile(); });
   });
+}
+
+function createFreshPublicProfile() {
+  if (!_fbUser || !_fbDb) return;
+  var users = safeParse('fos_users', {});
+  var u = users[currentUser] || {};
+  _fbDb.collection('public_profiles').doc(_fbUser.uid).set({
+    displayName: u.nickname || currentUser,
+    weight: u.weight || '',
+    experience: u.experienceLevel || '',
+    gym: u.gym || '',
+    record: { wins: 0, losses: 0, draws: 0 },
+    bio: '',
+    avatarUrl: '',
+    isTrainer: false,
+    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
 }
 
 // ===== FEED TAB =====
@@ -212,7 +228,7 @@ function renderFeedTab() {
 
     // Create post card
     '<div class="cm-create-card" onclick="openCreatePostModal()">' +
-      '<div class="cm-create-avatar">' + (currentUser ? currentUser.charAt(0).toUpperCase() : '?') + '</div>' +
+      '<div class="cm-create-avatar">' + initial(currentUser) + '</div>' +
       '<div class="cm-create-placeholder">Was möchtest du teilen?</div>' +
       '<div class="cm-create-types">' +
         '<span class="cm-create-type-icon" title="Bild">&#128247;</span>' +
@@ -308,9 +324,9 @@ function renderFeedCard(post) {
   var mediaHTML = '';
   if (post.mediaUrl) {
     if (post.type === 'video') {
-      mediaHTML = '<div class="cm-card-media"><video src="' + post.mediaUrl + '" controls preload="metadata" playsinline></video></div>';
+      mediaHTML = '<div class="cm-card-media"><video src="' + safeUrl(post.mediaUrl) + '" controls preload="metadata" playsinline></video></div>';
     } else {
-      mediaHTML = '<div class="cm-card-media"><img src="' + post.mediaUrl + '" alt="Post" loading="lazy"></div>';
+      mediaHTML = '<div class="cm-card-media"><img src="' + safeUrl(post.mediaUrl) + '" alt="Post" loading="lazy"></div>';
     }
   }
 
@@ -336,8 +352,8 @@ function renderFeedCard(post) {
       '</div>' +
     '</div>' +
     (typeIcon ? '<div class="cm-card-type-row">' + typeIcon + engagementHTML + '</div>' : (engagementHTML ? '<div class="cm-card-type-row">' + engagementHTML + '</div>' : '')) +
-    (post.title ? '<div class="cm-card-title">' + post.title + '</div>' : '') +
-    '<div class="cm-card-body">' + (post.body || '').replace(/\n/g, '<br>') + '</div>' +
+    (post.title ? '<div class="cm-card-title">' + esc(post.title) + '</div>' : '') +
+    '<div class="cm-card-body">' + escMultiline(post.body) + '</div>' +
     mediaHTML +
     '<div class="cm-card-actions">' +
       '<button class="cm-action-btn' + (liked ? ' liked' : '') + '" onclick="toggleLike(\'' + post.id + '\')">' +
@@ -403,18 +419,18 @@ function loadComments(postId) {
       var comments = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
       el.innerHTML = comments.map(function(c) {
         return '<div class="cm-comment">' +
-          '<div class="cm-comment-avatar">' + ((c.authorName || '?').charAt(0).toUpperCase()) + '</div>' +
+          '<div class="cm-comment-avatar">' + initial(c.authorName) + '</div>' +
           '<div class="cm-comment-content">' +
             '<div class="cm-comment-header">' +
-              '<strong>' + (c.authorName || 'Anonym') + '</strong>' +
+              '<strong>' + esc(c.authorName || 'Anonym') + '</strong>' +
               '<span class="cm-time">' + timeAgo(c.createdAt) + '</span>' +
             '</div>' +
-            '<div class="cm-comment-body">' + (c.body || '').replace(/\n/g, '<br>') + '</div>' +
+            '<div class="cm-comment-body">' + escMultiline(c.body) + '</div>' +
           '</div>' +
         '</div>';
       }).join('') +
       '<div class="cm-comment-form">' +
-        '<div class="cm-comment-form-avatar">' + (currentUser ? currentUser.charAt(0).toUpperCase() : '?') + '</div>' +
+        '<div class="cm-comment-form-avatar">' + initial(currentUser) + '</div>' +
         '<input type="text" id="comment-input-' + postId + '" placeholder="Kommentar schreiben..." class="cm-comment-input" onkeydown="if(event.key===\'Enter\')submitComment(\'' + postId + '\')">' +
         '<button onclick="submitComment(\'' + postId + '\')" class="cm-comment-submit">&#10148;</button>' +
       '</div>';
@@ -426,7 +442,7 @@ function loadComments(postId) {
 function submitComment(postId) {
   var input = document.getElementById('comment-input-' + postId);
   if (!input || !input.value.trim() || !_fbUser || !_fbDb) return;
-  var body = input.value.trim();
+  var body = input.value.trim().slice(0, 2000);
   input.value = '';
   var users = safeParse('fos_users', {});
   var u = users[currentUser] || {};
@@ -515,8 +531,8 @@ function previewPostMedia(input) {
 function submitFeedPost() {
   if (!_fbUser || !_fbDb) { showToast('Bitte einloggen', 'error'); return; }
   var type = document.getElementById('cm-post-type').value;
-  var body = document.getElementById('cm-post-body').value.trim();
-  var title = document.getElementById('cm-post-title').value.trim();
+  var body = document.getElementById('cm-post-body').value.trim().slice(0, 5000);
+  var title = document.getElementById('cm-post-title').value.trim().slice(0, 140);
   if (!body && type === 'text') { showToast('Schreib etwas', 'error'); return; }
 
   var users = safeParse('fos_users', {});
@@ -687,9 +703,9 @@ function renderThreadList(threads, reset) {
             (isHot ? '<span class="cm-hot-badge">&#128293; HOT</span>' : '') +
             (t.pinned ? '<span class="cm-pinned-badge">&#128204; PINNED</span>' : '') +
           '</div>' +
-          '<div class="cm-thread-title">' + (t.title || 'Ohne Titel') + '</div>' +
+          '<div class="cm-thread-title">' + esc(t.title || 'Ohne Titel') + '</div>' +
           '<div class="cm-thread-meta">' +
-            '<span class="cm-thread-author">' + (t.authorName || 'Anonym') + (t.authorVerified ? ' <span class="cm-verified">&#10003;</span>' : '') + '</span>' +
+            '<span class="cm-thread-author">' + esc(t.authorName || 'Anonym') + (t.authorVerified ? ' <span class="cm-verified">&#10003;</span>' : '') + '</span>' +
             '<span class="cm-meta-dot">&#183;</span>' +
             '<span>' + timeAgo(t.createdAt) + '</span>' +
             '<span class="cm-meta-dot">&#183;</span>' +
@@ -752,8 +768,8 @@ function loadSparringPosts() {
             communityAuthorHTML(p.authorName, p.authorWeight, p.authorExp, false, p.uid) +
             '<span class="cm-time">' + timeAgo(p.createdAt) + '</span>' +
           '</div>' +
-          (p.title ? '<div class="cm-sparring-card-title">' + p.title + '</div>' : '') +
-          '<div class="cm-sparring-card-body">' + (p.body || '').replace(/\n/g, '<br>') + '</div>' +
+          (p.title ? '<div class="cm-sparring-card-title">' + esc(p.title) + '</div>' : '') +
+          '<div class="cm-sparring-card-body">' + escMultiline(p.body) + '</div>' +
         '</div>';
       }).join('');
     }).catch(function() {
@@ -817,9 +833,9 @@ function loadRanking() {
         var medal = i === 0 ? '<span class="cm-medal cm-gold">&#129351;</span>' : (i === 1 ? '<span class="cm-medal cm-silver">&#129352;</span>' : (i === 2 ? '<span class="cm-medal cm-bronze">&#129353;</span>' : '<span class="cm-rank-num">' + (i + 1) + '</span>'));
         return '<div class="cm-ranking-row' + (i < 3 ? ' cm-ranking-top' : '') + '" onclick="viewPublicProfile(\'' + a.uid + '\')">' +
           '<div class="cm-ranking-pos">' + medal + '</div>' +
-          '<div class="cm-ranking-avatar">' + (a.name ? a.name.charAt(0).toUpperCase() : '?') + '</div>' +
+          '<div class="cm-ranking-avatar">' + initial(a.name) + '</div>' +
           '<div class="cm-ranking-info">' +
-            '<div class="cm-ranking-name">' + (a.name || 'Anonym') + (a.weight ? ' <span class="cm-weight-badge">' + a.weight + 'kg</span>' : '') + '</div>' +
+            '<div class="cm-ranking-name">' + esc(a.name || 'Anonym') + (a.weight ? ' <span class="cm-weight-badge">' + esc(a.weight) + 'kg</span>' : '') + '</div>' +
             '<div class="cm-ranking-stats">' + a.posts + ' Posts &middot; ' + a.likes + ' Likes</div>' +
           '</div>' +
           '<div class="cm-ranking-score">' + (a.posts + a.likes) + '<span>Punkte</span></div>' +
@@ -854,13 +870,13 @@ function renderThreadDetail(t) {
     '<div class="cm-thread-page">' +
       '<button onclick="showPage(\'community\');switchCommunityTab(\'forum\')" class="cm-back-btn">&larr; Forum</button>' +
       '<span class="cm-cat-badge" style="background:' + cat.color + '18;color:' + cat.color + ';border-color:' + cat.color + '33;">' + cat.icon + ' ' + cat.label + '</span>' +
-      '<h2 class="cm-thread-page-title">' + (t.title || '') + '</h2>' +
+      '<h2 class="cm-thread-page-title">' + esc(t.title) + '</h2>' +
       '<div class="cm-thread-page-author">' +
         communityAuthorHTML(t.authorName, '', '', t.authorVerified, t.uid) +
         '<span class="cm-time">' + timeAgo(t.createdAt) + '</span>' +
       '</div>' +
-      '<div class="cm-thread-page-body">' + (t.body || '').replace(/\n/g, '<br>') + '</div>' +
-      (t.mediaUrl ? '<div class="cm-card-media"><img src="' + t.mediaUrl + '" alt="Thread media" loading="lazy"></div>' : '') +
+      '<div class="cm-thread-page-body">' + escMultiline(t.body) + '</div>' +
+      (t.mediaUrl ? '<div class="cm-card-media"><img src="' + safeUrl(t.mediaUrl) + '" alt="Thread media" loading="lazy"></div>' : '') +
       (t.uid === myUid ? '<button class="cm-delete-thread" onclick="deleteThread(\'' + t.id + '\')">Thread löschen</button>' : '') +
       '<div class="cm-reply-divider"><span>' + (t.replyCount || 0) + ' Antworten</span></div>' +
       '<div class="cm-reply-form">' +
@@ -913,11 +929,11 @@ function renderReplyTree(nodes, container, threadId, depth) {
         '</div>' +
         '<div class="cm-reply-body">' +
           '<div class="cm-reply-header">' +
-            '<strong>' + (r.authorName || 'Anonym') + '</strong>' +
+            '<strong>' + esc(r.authorName || 'Anonym') + '</strong>' +
             (r.authorVerified ? '<span class="cm-verified">&#10003;</span>' : '') +
             '<span class="cm-time">' + timeAgo(r.createdAt) + '</span>' +
           '</div>' +
-          '<div class="cm-reply-text">' + (r.body || '').replace(/\n/g, '<br>') + '</div>' +
+          '<div class="cm-reply-text">' + escMultiline(r.body) + '</div>' +
           (depth < 2 ? '<button class="cm-reply-btn" onclick="showReplyForm(\'' + threadId + '\',\'' + r.id + '\')">Antworten</button>' : '') +
           '<div id="reply-form-' + r.id + '" style="display:none;" class="cm-nested-reply-form">' +
             '<textarea id="reply-input-' + r.id + '" placeholder="Antwort..." class="cm-textarea cm-textarea-sm" rows="2"></textarea>' +
@@ -942,7 +958,7 @@ function submitReply(threadId, parentReplyId) {
   var inputId = parentReplyId ? 'reply-input-' + parentReplyId : 'reply-input-' + threadId;
   var input = document.getElementById(inputId);
   if (!input || !input.value.trim() || !_fbUser || !_fbDb) return;
-  var body = input.value.trim();
+  var body = input.value.trim().slice(0, 2000);
   input.value = '';
 
   var users = safeParse('fos_users', {});
@@ -1039,8 +1055,8 @@ function selectThreadCat(btn, cat) {
 
 function submitThread() {
   if (!_fbUser || !_fbDb) { showToast('Bitte einloggen', 'error'); return; }
-  var title = document.getElementById('cm-thread-title').value.trim();
-  var body = document.getElementById('cm-thread-body').value.trim();
+  var title = document.getElementById('cm-thread-title').value.trim().slice(0, 140);
+  var body = document.getElementById('cm-thread-body').value.trim().slice(0, 5000);
   var cat = document.getElementById('cm-thread-cat').value;
   if (!title) { showToast('Titel eingeben', 'error'); return; }
 
@@ -1089,8 +1105,8 @@ function renderMyProfileTab() {
 
   content.innerHTML = '<div class="cm-loading"><div class="cm-spinner"></div>Lädt Profil...</div>';
 
-  _fbDb.collection('users').doc(_fbUser.uid).get().then(function(doc) {
-    var pp = (doc.exists && doc.data() && doc.data().publicProfile) || {};
+  _fbDb.collection('public_profiles').doc(_fbUser.uid).get().then(function(doc) {
+    var pp = (doc.exists && doc.data()) || {};
     var users = safeParse('fos_users', {});
     var u = users[currentUser] || {};
     // Merge local data as fallback
@@ -1113,8 +1129,8 @@ function renderMyProfileTab() {
 function renderProfileForm(content, pp) {
   var rec = pp.record || { wins: 0, losses: 0, draws: 0 };
   var avatarHTML = pp.avatarUrl ?
-    '<img src="' + pp.avatarUrl + '" class="cm-avatar-large-img">' :
-    '<div class="cm-avatar-large">' + ((pp.displayName || '?').charAt(0).toUpperCase()) + '</div>';
+    '<img src="' + safeUrl(pp.avatarUrl) + '" class="cm-avatar-large-img">' :
+    '<div class="cm-avatar-large">' + initial(pp.displayName) + '</div>';
 
   content.innerHTML =
     '<div class="cm-profile-edit">' +
@@ -1134,11 +1150,11 @@ function renderProfileForm(content, pp) {
       '</div>' +
       '<div class="cm-profile-fields">' +
         '<label>Anzeigename</label>' +
-        '<input type="text" id="pp-name" value="' + (pp.displayName || '') + '" class="cm-input">' +
+        '<input type="text" id="pp-name" value="' + escAttr(pp.displayName) + '" class="cm-input">' +
         '<label>Gewichtsklasse (kg)</label>' +
-        '<input type="text" id="pp-weight" value="' + (pp.weight || '') + '" class="cm-input">' +
+        '<input type="text" id="pp-weight" value="' + escAttr(pp.weight) + '" class="cm-input">' +
         '<label>Gym / Verein</label>' +
-        '<input type="text" id="pp-gym" value="' + (pp.gym || '') + '" class="cm-input">' +
+        '<input type="text" id="pp-gym" value="' + escAttr(pp.gym) + '" class="cm-input">' +
         '<label>Erfahrung</label>' +
         '<select id="pp-exp" class="cm-input">' +
           '<option value="anfaenger"' + (pp.experience === 'anfaenger' ? ' selected' : '') + '>Anfänger</option>' +
@@ -1174,7 +1190,7 @@ function savePublicProfile() {
     bio: document.getElementById('pp-bio').value.trim()
   };
 
-  _fbDb.collection('users').doc(_fbUser.uid).set({ publicProfile: profile }, { merge: true })
+  _fbDb.collection('public_profiles').doc(_fbUser.uid).set(profile, { merge: true })
     .then(function() { showToast('Profil gespeichert!', 'success'); })
     .catch(function(err) { showToast('Fehler: ' + err.message, 'error'); });
 }
@@ -1184,7 +1200,7 @@ function uploadAvatar(input) {
   var path = 'avatars/' + _fbUser.uid + '.jpg';
   uploadMedia(input.files[0], path, null, function(url) {
     if (!url) return;
-    _fbDb.collection('users').doc(_fbUser.uid).set({ publicProfile: { avatarUrl: url } }, { merge: true })
+    _fbDb.collection('public_profiles').doc(_fbUser.uid).set({ avatarUrl: url }, { merge: true })
       .then(function() { showToast('Avatar aktualisiert!', 'success'); renderMyProfileTab(); });
   });
 }
@@ -1197,30 +1213,30 @@ function viewPublicProfile(uid) {
   el.innerHTML = '<div style="padding:20px;"><div class="cm-loading"><div class="cm-spinner"></div>Lädt Profil...</div></div>';
   showPage('community-profile');
 
-  _fbDb.collection('users').doc(uid).get().then(function(doc) {
+  _fbDb.collection('public_profiles').doc(uid).get().then(function(doc) {
     if (!doc.exists) { showToast('Profil nicht gefunden', 'error'); showPage('community'); return; }
-    var pp = (doc.data() && doc.data().publicProfile) || {};
+    var pp = doc.data() || {};
     var rec = pp.record || { wins: 0, losses: 0, draws: 0 };
 
     el.innerHTML =
       '<div class="cm-thread-page">' +
         '<button onclick="showPage(\'community\')" class="cm-back-btn">&larr; Zurück</button>' +
         '<div class="cm-public-profile">' +
-          (pp.avatarUrl ? '<img src="' + pp.avatarUrl + '" class="cm-avatar-large-img" style="margin:0 auto 16px;display:block;">' :
-            '<div class="cm-avatar-large" style="margin:0 auto 16px;">' + ((pp.displayName || '?').charAt(0).toUpperCase()) + '</div>') +
-          '<h2 class="cm-profile-name">' + (pp.displayName || 'Unbekannt') +
+          (pp.avatarUrl ? '<img src="' + safeUrl(pp.avatarUrl) + '" class="cm-avatar-large-img" style="margin:0 auto 16px;display:block;">' :
+            '<div class="cm-avatar-large" style="margin:0 auto 16px;">' + initial(pp.displayName) + '</div>') +
+          '<h2 class="cm-profile-name">' + esc(pp.displayName || 'Unbekannt') +
             (pp.isTrainer ? '<span class="cm-verified">&#10003;</span>' : '') + '</h2>' +
           '<div class="cm-profile-stats">' +
-            (pp.weight ? '<span class="cm-weight-badge">' + pp.weight + 'kg</span>' : '') +
-            (pp.experience ? '<span class="cm-exp-badge">' + pp.experience + '</span>' : '') +
-            (pp.gym ? '<span class="cm-gym-badge">' + pp.gym + '</span>' : '') +
+            (pp.weight ? '<span class="cm-weight-badge">' + esc(pp.weight) + 'kg</span>' : '') +
+            (pp.experience ? '<span class="cm-exp-badge">' + esc(pp.experience) + '</span>' : '') +
+            (pp.gym ? '<span class="cm-gym-badge">' + esc(pp.gym) + '</span>' : '') +
           '</div>' +
           '<div class="cm-profile-record">' +
             '<div class="cm-record-item"><span class="cm-record-num" style="color:#22C55E;">' + rec.wins + '</span><span class="cm-record-label">Siege</span></div>' +
             '<div class="cm-record-item"><span class="cm-record-num" style="color:#E8000D;">' + rec.losses + '</span><span class="cm-record-label">Ndl.</span></div>' +
             '<div class="cm-record-item"><span class="cm-record-num" style="color:#6b6b80;">' + rec.draws + '</span><span class="cm-record-label">Unent.</span></div>' +
           '</div>' +
-          (pp.bio ? '<div class="cm-profile-bio">' + pp.bio.replace(/\n/g, '<br>') + '</div>' : '') +
+          (pp.bio ? '<div class="cm-profile-bio">' + escMultiline(pp.bio) + '</div>' : '') +
         '</div>' +
       '</div>';
   }).catch(function() { showToast('Fehler beim Laden', 'error'); showPage('community'); });
