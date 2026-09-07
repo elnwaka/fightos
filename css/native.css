@@ -506,3 +506,17 @@
   #app-screen { padding-left: 0 !important; padding-right: 0 !important; margin: 0 !important; }
   .page { max-width: none !important; }
 }
+
+@media (max-width: 768px) {
+  /* Die Saeulen-Seite faerbt Cluster-Namen, Trennlinien und
+     Schlagworte einzeln ein. Eine Akzentfarbe, sonst Grautoene. */
+  .si-cluster-name, .sc-cluster-label { color: var(--n-label) !important; }
+  .sc-cluster-line { background: var(--n-label-3) !important; }
+  .tag, .si-tag, .pillar-tag {
+    color: var(--n-label-2) !important;
+    background: var(--n-elev-2) !important;
+    border: none !important;
+    border-radius: 999px !important;
+    font-size: 13px !important;
+  }
+}

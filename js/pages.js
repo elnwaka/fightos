@@ -96,12 +96,12 @@ function renderSaeulenPage() {
           <div class="si-cluster-desc">Kraft, Ausdauer, Mobilität</div>
           <div class="si-cluster-count">3 Säulen</div>
         </div>
-        <div class="si-cluster-card" style="--scc:var(--blue);">
+        <div class="si-cluster-card" style="--scc:var(--text-muted);">
           <div class="si-cluster-name">KOPF</div>
           <div class="si-cluster-desc">Kognition, Taktik, Psychologie</div>
           <div class="si-cluster-count">3 Säulen</div>
         </div>
-        <div class="si-cluster-card" style="--scc:var(--green);">
+        <div class="si-cluster-card" style="--scc:var(--text-muted);">
           <div class="si-cluster-name">SYSTEM</div>
           <div class="si-cluster-desc">Ernährung, Regeneration</div>
           <div class="si-cluster-count">2 Säulen</div>
