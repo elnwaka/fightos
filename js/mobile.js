@@ -204,14 +204,15 @@
   }};
 
   S.wissen = { title: 'Wissen', root: 1, view: function () {
+    var n = (window.allExercises || []).length;
     return '<h1 class="big">Wissen</h1>' +
     grp([
-      row({ t:'Übungen', s:'Bewegungen mit Fotos und Anleitung', chev:1, go:'M.old(&quot;training&quot;,&quot;uebungen&quot;,&quot;Übungen&quot;)' }),
-      row({ t:'Videos', s:'Kampf-Breakdowns und Technik', chev:1, go:'M.old(&quot;training&quot;,&quot;wissen&quot;,&quot;Videos&quot;)' }),
-      row({ t:'Ernährung', s:'Kalorien, Makros, Timing', chev:1, go:'M.old(&quot;training&quot;,&quot;ernaehrung&quot;,&quot;Ernährung&quot;)' }),
-      row({ t:'Periodisierung', s:'Wie sich der Plan aufbaut', chev:1, go:'M.old(&quot;training&quot;,&quot;periodisierung&quot;,&quot;Periodisierung&quot;)' }),
-      row({ t:'Regeneration', s:'Schlaf, HRV, Belastung', chev:1, go:'M.old(&quot;training&quot;,&quot;regeneration&quot;,&quot;Regeneration&quot;)' }),
-      row({ t:'8 Säulen', s:'Worauf das System aufbaut', chev:1, go:'M.old(&quot;profil&quot;,&quot;saeulen&quot;,&quot;8 Säulen&quot;)' })
+      row({ t:'Übungen', s: (n ? n + ' Bewegungen mit Anleitung' : 'Bewegungen mit Anleitung'), chev:1, go:'M.go(&quot;uebungen&quot;)' }),
+      row({ t:'Videos', s:'Kampf-Breakdowns und Technik', chev:1, go:'M.go(&quot;videos&quot;)' }),
+      row({ t:'Ernährung', s:'Kalorien, Makros, Timing', chev:1, go:'M.artikel(&quot;ernaehrung&quot;)' }),
+      row({ t:'Periodisierung', s:'Wie sich der Plan aufbaut', chev:1, go:'M.artikel(&quot;periodisierung&quot;)' }),
+      row({ t:'Regeneration', s:'Schlaf, HRV, Belastung', chev:1, go:'M.artikel(&quot;regeneration&quot;)' }),
+      row({ t:'8 Säulen', s:'Worauf das System aufbaut', chev:1, go:'M.artikel(&quot;saeulen&quot;)' })
     ]) + lbl('Deine Daten') + grp([
       row({ t:'Tests', s:'Kraft, Ausdauer, Schnelligkeit', chev:1, go:'M.old(&quot;training&quot;,&quot;tests&quot;,&quot;Tests&quot;)' }),
       row({ t:'Log', s:'Was du trainiert hast', chev:1, go:'M.old(&quot;training&quot;,&quot;log&quot;,&quot;Log&quot;)' }),
@@ -265,6 +266,153 @@
         row({ t:'FAQ', chev:1, go:'M.old(&quot;profil&quot;,&quot;faq&quot;,&quot;FAQ&quot;)' })
       ]) +
       btn('Abmelden', 'doLogout()', 1);
+  }};
+
+  /* ---------- Wissen: echte Bildschirme statt Altbestand ---------- */
+
+  // Grosstext in gemischte Schreibweise bringen: die Datenbank haelt
+  // Namen in Versalien, das ist Plakatschrift-Erbe.
+  function nice(s) {
+    s = String(s || '');
+    if (s !== s.toUpperCase()) return s;
+    return s.toLowerCase().replace(/(^|[\s\-\u2013/(])([a-zäöüß])/g,
+      function (m, a, b) { return a + b.toUpperCase(); });
+  }
+  function firstMuscle(m) {
+    var t = String(m || '').replace(/PRIMÄR:\s*/i, '');
+    t = t.split('·')[0].split('SEKUNDÄR')[0];
+    return nice(t.trim().replace(/,\s*$/, ''));
+  }
+
+  var EX_GROUPS = [
+    ['Kraft und Explosivität', 'exercisesKraft'],
+    ['Ausdauer', 'exercisesAusdauer'],
+    ['Nacken und Rumpf', 'exercisesArmor'],
+    ['Hand und Handgelenk', 'exercisesHands'],
+    ['Mobilität', 'exercisesMobility'],
+    ['Kraftausdauer', 'exercisesPowerEndurance'],
+    ['Spezialtraining', 'exercisesSpecial']
+  ];
+
+  function exRow(e) {
+    var img = (typeof exerciseImgUrl === 'function') ? exerciseImgUrl(e.id, 0) : null;
+    var thumb = img
+      ? '<span class="ex-i"><img src="' + E(img) + '" alt="" loading="lazy" ' +
+        'onerror="this.parentNode.textContent=&quot;&#9679;&quot;"></span>'
+      : '<span class="ex-i">&#9679;</span>';
+    return '<button class="ex" onclick="M.ex(&quot;' + E(e.id) + '&quot;)">' + thumb +
+      '<span class="ex-m"><span class="ex-t">' + E(nice(e.name)) + '</span>' +
+      '<span class="ex-s">' + E(firstMuscle(e.muscle)) + '</span></span>' +
+      '<span class="chev"></span></button>';
+  }
+
+  S.uebungen = { title: 'Übungen', view: function () {
+    var out = '<h1 class="big">Übungen</h1>';
+    EX_GROUPS.forEach(function (g) {
+      var arr = window[g[1]];
+      if (!arr || !arr.length) return;
+      out += lbl(g[0]) + '<div class="grp">' + arr.map(exRow).join('') + '</div>';
+    });
+    return out;
+  }};
+
+  S.uebung = { title: 'Übung', view: function () {
+    var e = (typeof getExerciseById === 'function') ? getExerciseById(M.exId) : null;
+    if (!e) return '<div class="empty"><b>Übung nicht gefunden</b></div>';
+    var img = (typeof exerciseImgUrl === 'function') ? exerciseImgUrl(e.id, 0) : null;
+    var out = '<h1 class="big">' + E(nice(e.name)) + '</h1>';
+    if (img) out += '<div class="hero"><img src="' + E(img) + '" alt="" ' +
+      'onerror="this.parentNode.remove()"></div>';
+    out += lbl('Muskulatur') +
+      grp([row({ t: firstMuscle(e.muscle) })]);
+    if (e.sets && e.sets.length) {
+      out += lbl('Sätze') + '<div class="grp">' + e.sets.map(function (s) {
+        var parts = String(s).replace(/<[^>]+>/g, '').split(':');
+        return row({ t: parts[0].trim(), v: (parts[1] || '').trim() });
+      }).join('') + '</div>';
+    }
+    if (e.desc) {
+      out += lbl('Ausführung') +
+        '<div class="grp"><div class="row"><span class="row-m">' +
+        '<span class="row-s" style="font-size:15px;line-height:1.5">' + E(e.desc) + '</span>' +
+        '</span></div></div>';
+    }
+    return out;
+  }};
+
+  S.videos = { title: 'Videos', view: function () {
+    var lib = window.VIDEO_LIBRARY || [];
+    var cats = {};
+    lib.forEach(function (v) {
+      var k = v.categoryLabel || v.category || 'Videos';
+      (cats[k] = cats[k] || []).push(v);
+    });
+    var out = '<h1 class="big">Videos</h1>';
+    Object.keys(cats).forEach(function (k) {
+      out += lbl(nice(k)) + '<div class="grp">' + cats[k].map(function (v) {
+        return row({ t: nice(v.title || v.name || 'Video'),
+          s: [v.author, v.duration].filter(Boolean).join(', '),
+          chev: 1,
+          go: 'M.video(&quot;' + E(v.id || v.youtubeId || '') + '&quot;,&quot;' +
+              E(String(v.title || '').replace(/"/g, '')) + '&quot;)' });
+      }).join('') + '</div>';
+    });
+    return out || '<div class="empty"><b>Keine Videos</b></div>';
+  }};
+
+  // Textseiten: die vorhandenen Abschnitte als Menue, jeder Abschnitt
+  // als eigener Bildschirm. Genau das Muster der Tagesansicht.
+  var ARTICLES = {
+    ernaehrung:     { t: 'Ernährung',      p: 'training', s: 'ernaehrung',      sel: '[id^="ern-s"]' },
+    periodisierung: { t: 'Periodisierung', p: 'training', s: 'periodisierung',  sel: '.cat-header, h2, h3' },
+    regeneration:   { t: 'Regeneration',   p: 'training', s: 'regeneration',    sel: '.cat-header, h2, h3' },
+    saeulen:        { t: '8 Säulen',       p: 'profil',   s: 'saeulen',         sel: '.si-title, h2, h3' }
+  };
+
+  function sections(key) {
+    var A = ARTICLES[key];
+    var host = document.getElementById('m-scratch');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'm-scratch';
+      host.style.cssText = 'position:absolute;left:-9999px;top:0;width:360px';
+      document.body.appendChild(host);
+    }
+    try {
+      if (A.p === 'training' && typeof renderTrainingPage === 'function') {
+        window._trainingSubTab = A.s; renderTrainingPage(A.s);
+      } else if (A.p === 'profil' && typeof renderProfilPage === 'function') {
+        window._profilSubTab = A.s; renderProfilPage(A.s);
+      }
+      var src = document.getElementById('page-' + A.p);
+      host.innerHTML = src ? src.innerHTML : '';
+    } catch (e) { host.innerHTML = ''; }
+    var heads = [].slice.call(host.querySelectorAll(A.sel));
+    return heads.map(function (h, i) {
+      var title = nice(h.textContent.replace(/^\s*\d+[.)]\s*/, '').trim());
+      var body = '', n = h.nextElementSibling;
+      while (n && heads.indexOf(n) === -1) { body += n.outerHTML; n = n.nextElementSibling; }
+      return { title: title, body: body, i: i };
+    }).filter(function (x) { return x.title && x.body; });
+  }
+
+  S.artikel = { title: 'Artikel', view: function () {
+    var A = ARTICLES[M.art];
+    var secs = sections(M.art);
+    M.secs = secs;
+    if (!secs.length) return '<div class="empty"><b>Kein Inhalt</b></div>';
+    return '<h1 class="big">' + E(A.t) + '</h1>' +
+      lbl(secs.length + ' Kapitel') +
+      grp(secs.map(function (s, i) {
+        return row({ t: s.title, chev: 1, go: 'M.kap(' + i + ')' });
+      }));
+  }};
+
+  S.kapitel = { title: 'Kapitel', view: function () {
+    var s = (M.secs || [])[M.kapIdx];
+    if (!s) return '<div class="empty"><b>Nicht gefunden</b></div>';
+    return '<h1 class="big">' + E(s.title) + '</h1>' +
+      '<div class="legacy article">' + s.body + '</div>';
   }};
 
   var TABS = [['heute','Heute','h'],['plan','Plan','p'],['wissen','Wissen','w'],
@@ -367,6 +515,12 @@
       else { stack.push({ id: id, title: S[id].title }); bar(); body('push'); }
     },
     tag: function (d) { M.sel = d; stack.push({ id: 'tag', title: 'Tag' }); bar(); body('push'); },
+    ex: function (id) { M.exId = id; stack.push({ id: 'uebung', title: 'Übung' }); bar(); body('push'); },
+    artikel: function (k) { M.art = k; stack.push({ id: 'artikel', title: ARTICLES[k].t }); bar(); body('push'); },
+    kap: function (i) { M.kapIdx = i; stack.push({ id: 'kapitel', title: (M.secs[i]||{}).title || 'Kapitel' }); bar(); body('push'); },
+    video: function (id, t) {
+      if (typeof openVideoPlayer === 'function') { try { openVideoPlayer(id, t); return; } catch (e) {} }
+    },
     old: function (p, s, t) { stack.push({ id: 'old', title: t, old: { p: p, s: s } }); bar(); body('push'); },
     back: function () { if (stack.length > 1) { stack.pop(); bar(); body('pop'); } },
     tick: function (d, i) {

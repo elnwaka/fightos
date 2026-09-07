@@ -277,4 +277,33 @@
   #m-app .legacy [style*="border-left"]{border-left:0!important}
   #m-app .sheet{position:absolute;inset:0;z-index:30;display:none}
   #m-app .sheet.open{display:block}
+
+  /* Uebungszeilen mit Vorschaubild, echte Abstaende, Trennlinien */
+  #m-app .ex{display:flex;align-items:center;gap:13px;width:100%;padding:9px 15px;
+    background:none;border:0;color:inherit;font:inherit;text-align:left;position:relative;
+    cursor:pointer;min-height:66px}
+  #m-app .ex:active{background:var(--e2)}
+  #m-app .ex+.ex::before{content:"";position:absolute;left:74px;right:0;top:0;height:1px;background:var(--sep)}
+  #m-app .ex-i{flex:0 0 auto;width:46px;height:46px;border-radius:9px;background:var(--e2);
+    display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--t3);overflow:hidden}
+  #m-app .ex-i img{width:100%;height:100%;object-fit:cover;display:block}
+  #m-app .ex-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  #m-app .ex-t{display:block;font-size:17px;line-height:1.25}
+  #m-app .ex-s{display:block;font-size:13px;line-height:1.25;color:var(--t2);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* Grossbild auf der Uebungsseite */
+  #m-app .hero{border-radius:var(--r);overflow:hidden;margin:0 0 20px;background:var(--e1)}
+  #m-app .hero img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover}
+
+  /* Artikelkapitel: alter Inhalt, aber lesbar gesetzt */
+  #m-app .article{font-size:17px;line-height:1.5}
+  #m-app .article > *{margin:0 0 14px}
+  #m-app .article strong{font-weight:600}
+  #m-app .article div[style]{background:var(--e1)!important;border-radius:var(--r)!important;
+    padding:14px 15px!important;margin:0 0 14px!important}
+  #m-app .article [style*="font-size"]{font-size:17px!important}
+  #m-app .article [style*="Bebas"],
+  #m-app .article [style*="Space Mono"]{font-family:inherit!important;text-transform:none!important;
+    letter-spacing:0!important}
 }
