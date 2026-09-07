@@ -7,7 +7,14 @@
 
 (function () {
   'use strict';
-  if (!window.matchMedia('(max-width: 768px)').matches) return;
+  // Die Breite wurde bisher nur beim Laden geprueft. Wer breit laedt und
+  // dann schmal zieht, sah die Handy-Oberflaeche nie.
+  var MQ = window.matchMedia('(max-width: 768px)');
+  if (!MQ.matches) {
+    var on = function () { if (MQ.matches) { location.reload(); } };
+    if (MQ.addEventListener) MQ.addEventListener('change', on); else MQ.addListener(on);
+    return;
+  }
   if (window.__mob) return;
   window.__mob = true;
 
@@ -423,6 +430,69 @@
       '<div class="legacy article">' + s.body + '</div>';
   }};
 
+  /* ---------- Einheit: eigener Bildschirm statt Altbestand ---------- */
+
+  S.einheit = { title: 'Einheit', view: function () {
+    var k = M.blkDay, i = M.blkIdx, b = blocks(k), x = b.all[i];
+    if (!x) return '<div class="empty"><b>Einheit nicht gefunden</b></div>';
+    var dn = done(k, i);
+    var titel = nice(String(x.title || 'Einheit').replace(/\s*—\s*/g, ': '));
+
+    var meta = [];
+    if (x.time) meta.push(x.time);
+    if (x.duration) meta.push(x.duration + ' Min');
+    if (x.rpe) meta.push('RPE ' + x.rpe);
+    var exs = (x.exercises && x.exercises.length && typeof x.exercises[0] === 'object')
+      ? x.exercises : [];
+    if (exs.length) meta.push(exs.length + (exs.length === 1 ? ' Übung' : ' Übungen'));
+
+    var out = '<h1 class="big">' + E(titel) + '</h1>' + lbl(meta.join(' · '));
+
+    if (x.desc) {
+      out += '<div class="grp"><div class="row"><span class="row-m">' +
+        '<span class="row-s" style="font-size:15px;line-height:1.5">' +
+        E(String(x.desc).replace(/\s*—\s*/g, ', ')) + '</span></span></div></div>';
+    }
+
+    if (exs.length) {
+      out += lbl('Ablauf') + '<div class="grp">' + exs.map(function (ex) {
+        var lib = (typeof getExerciseById === 'function') ? getExerciseById(ex.id) : null;
+        var name = nice(lib ? lib.name : String(ex.id || '').replace(/-/g, ' '));
+        var img = (lib && typeof exerciseImgUrl === 'function') ? exerciseImgUrl(ex.id, 0) : null;
+        var thumb = img
+          ? '<span class="ex-i"><img src="' + E(img) + '" alt="" loading="lazy" ' +
+            'onerror="this.parentNode.textContent=&quot;&#9679;&quot;"></span>'
+          : '<span class="ex-i">&#9679;</span>';
+        var sub = [ex.sets, ex.rest ? 'Pause ' + ex.rest : ''].filter(Boolean).join(' · ');
+        var note = ex.note ? String(ex.note).replace(/\s*—\s*/g, ', ') : '';
+        return '<button class="ex"' + (lib ? ' onclick="M.ex(&quot;' + E(ex.id) + '&quot;)"' : '') + '>' +
+          thumb + '<span class="ex-m"><span class="ex-t">' + E(name) + '</span>' +
+          '<span class="ex-s">' + E(sub || note) + '</span></span>' +
+          (lib ? '<span class="chev"></span>' : '') + '</button>';
+      }).join('') + '</div>';
+    }
+
+    var C = (typeof BLOCK_DETAIL_CONTENT !== 'undefined')
+      ? (BLOCK_DETAIL_CONTENT[x.type] || null) : null;
+    if (C) {
+      if (C.warmup) out += lbl('Aufwärmen') + txtCard(C.warmup);
+      if (C.cooldown) out += lbl('Ausklang') + txtCard(C.cooldown);
+      if (C.notes) out += lbl('Hinweise') + txtCard(C.notes);
+    }
+
+    out += btn(dn ? 'Wieder öffnen' : 'Als erledigt markieren',
+               'M.tickBack(&quot;' + k + '&quot;,' + i + ')', dn ? 1 : 0);
+    return out;
+  }};
+
+  function txtCard(t) {
+    var s = String(t).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').replace(/\s*—\s*/g, ', ').trim();
+    if (!s) return '';
+    return '<div class="grp"><div class="row"><span class="row-m">' +
+      '<span class="row-s" style="font-size:15px;line-height:1.5">' + E(s) + '</span>' +
+      '</span></div></div>';
+  }
+
   var TABS = [['heute','Heute','h'],['plan','Plan','p'],['wissen','Wissen','w'],
               ['kaempfe','Kämpfe','k'],['profil','Profil','i']];
 
@@ -537,13 +607,15 @@
       body();
     },
     block: function (d, i) {
-      if (typeof openBlockDetail === 'function') openBlockDetail(d, i);
+      M.blkDay = d; M.blkIdx = i;
       var b = blocks(d), x = b.all[i] || {};
-      stack.push({ id: 'old', title: x.title || 'Einheit', old: { p: 'block-detail' } });
-      bar();
-      var el = document.getElementById('m-body'), src = document.getElementById('page-block-detail');
-      el.innerHTML = '<div class="screen"><div class="legacy">' + (src ? src.innerHTML : '') + '</div></div>';
-      el.scrollTop = 0; tabs();
+      stack.push({ id: 'einheit', title: nice(String(x.title || 'Einheit').replace(/\s*—\s*/g, ': ')) });
+      bar(); body('push');
+    },
+    tickBack: function (d, i) {
+      var b = blocks(d), x = b.all[i] || {};
+      if (typeof toggleBlockDone === 'function') toggleBlockDone(d, i, x.type || '', x.title || '');
+      M.back();
     },
     pick: function (key) {
       var P = PICKS[key]; if (!P) return;
