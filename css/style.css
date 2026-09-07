@@ -6231,3 +6231,125 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
     gap: 8px;
   }
 }
+
+/* ============================================================
+   NATIVE-iOS-SPRACHE (nur Handy)
+   Maße nach Apple HIG: Large Title 34pt, Fliesstext 17pt,
+   Seitenrand 16pt, Haarlinien statt Rahmen, gruppierte Listen
+   mit 12pt Radius. Schwarz und Rot bleiben.
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* --- Grosser Titel, faellt beim Scrollen in die Leiste ---- */
+  .appbar-large {
+    padding: 4px 16px 10px;
+    background: var(--surface-0);
+    position: sticky;
+    top: calc(56px + env(safe-area-inset-top, 0px));
+    z-index: 499;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .appbar-large > span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: .01em;
+    color: var(--white);
+    display: block;
+  }
+  .appbar-large.is-collapsed {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+  }
+  .appbar-title { opacity: 1; transition: opacity .18s ease; }
+  .appbar-title.is-tucked { opacity: 0; pointer-events: none; }
+
+  /* --- Fliesstext auf iOS-Groesse ------------------------- */
+  body { font-size: 17px; }
+  .page, .card, .cm-card {
+    font-size: 17px;
+    line-height: 1.45;
+  }
+  .page-sub, .card-sub, .hint-text, .empty-text, .cm-empty-text,
+  .heute-text {
+    font-size: 15px;
+    line-height: 1.47;
+  }
+
+  /* --- Ein Seitenrand fuer alles: 16pt -------------------- */
+  .page { padding-left: 16px; padding-right: 16px; }
+
+  /* --- Karten werden gruppierte Listen -------------------- */
+  /* Kein Rahmen, kein Glow, kein Verlauf. Flaeche und Radius. */
+  .card,
+  .cm-card,
+  .heute,
+  .db-stat,
+  .fc-card {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+  .card { padding: 14px 16px; }
+
+  /* Haarlinien statt Rahmen, eingerueckt wie auf iOS */
+  .heute-block,
+  .list-row,
+  .cm-comment {
+    border-top: none;
+    position: relative;
+  }
+  .heute-block + .heute-block::before,
+  .list-row + .list-row::before {
+    content: "";
+    position: absolute;
+    left: 56px;
+    right: 0;
+    top: 0;
+    height: 1px;
+    background: var(--surface-3);
+    opacity: .5;
+  }
+  .heute-block:last-child { border-bottom: none; }
+
+  /* --- Abschnittsueberschriften nach iOS ------------------ */
+  .sec-title,
+  .cat-header {
+    font-size: 13px !important;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-muted) !important;
+    font-family: 'Space Mono', monospace !important;
+    border-bottom: none !important;
+    padding-bottom: 6px !important;
+  }
+
+  /* --- Weniger Farbe: Rot ist Akzent, nicht Flaeche ------- */
+  .db-stat { border-color: transparent !important; }
+
+  /* --- Tab-Leiste in iOS-Proportion ----------------------- */
+  .bottom-bar {
+    background: rgba(10,10,11,.92);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .btab span { font-size: 10px; letter-spacing: 0; }
+  .btab svg { width: 26px; height: 26px; }
+
+  /* --- Leiste nach iOS ------------------------------------ */
+  .topbar {
+    min-height: 56px;
+    background: rgba(10,10,11,.92);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .appbar-title { font-size: 17px; letter-spacing: .02em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appbar-large, .appbar-title { transition: none; }
+}

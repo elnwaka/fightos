@@ -296,6 +296,10 @@ if (localStorage.getItem('fos_current')) {
     </div>
   </div>
 
+  <!-- Grosser Titel nach iOS-Muster: steht bei Scrollposition 0 unter der
+       Leiste und faellt beim Scrollen in die Leiste zurueck. -->
+  <div class="appbar-large" id="appbar-large" hidden><span></span></div>
+
   <!-- BOTTOM TAB BAR (Mobile) — 5 direct tabs -->
   <nav class="bottom-bar" id="bottom-bar">
     <button class="btab active" data-page="dashboard" onclick="showPage('dashboard')">

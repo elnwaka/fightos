@@ -1249,19 +1249,48 @@ function updateAppBar(page) {
   var titleEl = document.getElementById('appbar-title');
   var logoEl = document.querySelector('.topbar-logo');
   var backEl = document.getElementById('appbar-back');
+  var largeEl = document.getElementById('appbar-large');
   if (!titleEl || !logoEl) return;
 
   var title = SCREEN_TITLES.hasOwnProperty(page) ? SCREEN_TITLES[page] : '';
   var isHome = !title;
 
   titleEl.textContent = title;
-  titleEl.hidden = isHome;
   logoEl.hidden = !isHome;
+
+  // iOS-Muster: grosser Titel unter der Leiste, faellt beim Scrollen hinein.
+  if (largeEl) {
+    largeEl.firstElementChild.textContent = title;
+    largeEl.hidden = isHome;
+    window.scrollTo(0, 0);
+    syncLargeTitle();
+  }
+  titleEl.hidden = isHome;
 
   // Zurueck nur, wo es wirklich eine Ebene tiefer geht
   var deep = ['block-detail', 'community-profile'];
   if (backEl) backEl.hidden = deep.indexOf(page) === -1;
 }
+
+
+// Grosser Titel faellt beim Scrollen in die Leiste — einmal registriert,
+// nicht pro Seitenwechsel.
+function syncLargeTitle() {
+  var largeEl = document.getElementById('appbar-large');
+  var titleEl = document.getElementById('appbar-title');
+  if (!largeEl || !titleEl) return;
+  if (largeEl.hidden) { titleEl.classList.remove('is-tucked'); return; }
+  var collapsed = window.scrollY > 28;
+  largeEl.classList.toggle('is-collapsed', collapsed);
+  titleEl.classList.toggle('is-tucked', !collapsed);
+}
+window.addEventListener('scroll', function() {
+  if (window._ltRaf) return;
+  window._ltRaf = requestAnimationFrame(function() {
+    window._ltRaf = null;
+    syncLargeTitle();
+  });
+}, { passive: true });
 
 function goBackScreen() {
   var prev = _screenStack.pop();
