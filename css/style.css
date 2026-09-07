@@ -6864,3 +6864,71 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   /* Der Rest des Dashboards ruecken wir auf die gleiche Kante */
   #dash-app .fc-content { padding: 0 !important; }
 }
+
+/* ============================================================
+   FLÜSSIGE BEDIENUNG — nativ anfassen
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* Doppelte Karte: "Nächste Session" zeigt dieselbe Einheit wie
+     Zeile eins der Heute-Liste, inklusive eigenem Erledigt-Knopf. */
+  #dash-app .fc-next-session,
+  #dash-app .fc-next-session + *,
+  #dash-app .fc-section-label { display: none !important; }
+
+  /* Kein 300ms-Verzug, kein blauer Blitz beim Antippen */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Anfassen: kurz einsinken, wie iOS es macht */
+  .grow-main, .tick, .wday, .btab, .heute-haupt, .btn,
+  .fold, .acc-head, .sub-tab, .plan-summary-edit, .day-block {
+    transition: transform .12s cubic-bezier(.2,.7,.3,1),
+                opacity .12s ease,
+                background-color .15s ease;
+  }
+  .grow-main:active, .fold:active, .acc-head:active, .day-block:active {
+    opacity: .55;
+  }
+  .heute-haupt:active, .btn:active, .wday:active {
+    transform: scale(.97);
+    opacity: .9;
+  }
+  .btab:active { opacity: .5; }
+  .tick:active { transform: scale(.88); }
+
+  /* Haken springt kurz auf, wenn er gesetzt wird */
+  @keyframes tickPop {
+    0%   { transform: translate(-50%,-50%) scale(.4); }
+    55%  { transform: translate(-50%,-50%) scale(1.14); }
+    100% { transform: translate(-50%,-50%) scale(1); }
+  }
+  .tick.on::before { animation: tickPop .26s cubic-bezier(.2,.8,.3,1); }
+  .tick.on::after  { animation: tickPop .26s cubic-bezier(.2,.8,.3,1) .04s both; }
+
+  /* Bildschirmwechsel: sanft einblenden statt harter Schnitt */
+  @keyframes screenIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .page.active { animation: screenIn .22s cubic-bezier(.2,.7,.3,1); }
+
+  /* Trägheitsscrollen und weiche Sprünge */
+  html { scroll-behavior: smooth; }
+  body, .page { -webkit-overflow-scrolling: touch; }
+
+  /* Text nicht versehentlich markieren beim Tippen und Halten */
+  .btab, .tick, .wday, .heute-haupt, .grow-main, .fold, .acc-head {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page.active { animation: none; }
+  .tick.on::before, .tick.on::after { animation: none; }
+  html { scroll-behavior: auto; }
+  .grow-main, .tick, .wday, .btab, .heute-haupt, .btn { transition: none; }
+}
