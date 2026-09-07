@@ -509,6 +509,18 @@ function renderCoachMessages() {
   var container = document.getElementById('ai-coach-messages');
   if (!container) return;
 
+  // Ohne Verlauf stand hier ein 450px hohes schwarzes Loch.
+  if (!_aiChatHistory.length) {
+    container.innerHTML =
+      '<div class="ai-coach-empty">' +
+        '<div class="ai-coach-empty-mark">🥊</div>' +
+        '<p class="ai-coach-empty-title">Frag mich, was heute ansteht.</p>' +
+        '<p class="ai-coach-empty-text">Ich kenne deinen Plan, deine Tests und dein Kampfdatum. ' +
+        'Je konkreter die Frage, desto brauchbarer die Antwort.</p>' +
+      '</div>';
+    return;
+  }
+
   container.innerHTML = _aiChatHistory.map(function(msg) {
     var isUser = msg.role === 'user';
     return '<div style="display:flex;justify-content:' + (isUser ? 'flex-end' : 'flex-start') + ';margin-bottom:12px;">' +
