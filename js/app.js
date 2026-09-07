@@ -7011,72 +7011,69 @@ function checkAndSaveWeeklySnapshot() {
 // Nutzt dieselbe Mechanik wie der Wochenplan (weekPlan, completedBlocks,
 // toggleBlockDone, openBlockDetail) — kein zweiter Datenpfad.
 function renderHeuteCard(data) {
-  var todayKey = DAY_NAMES[(new Date().getDay() + 6) % 7];
-  var dayLabel = DAY_LABELS[(new Date().getDay() + 6) % 7];
+  var idx = (new Date().getDay() + 6) % 7;
+  var todayKey = DAY_NAMES[idx];
+  var dayLabel = DAY_LABELS[idx];
   var weekId = getWeekId();
-  var blocks = (data.weekPlan && data.weekPlan[todayKey])
-    ? data.weekPlan[todayKey].filter(function(b) { return b.type !== 'meta'; })
-    : [];
-
+  var all = (data.weekPlan && data.weekPlan[todayKey]) ? data.weekPlan[todayKey] : [];
+  var blocks = all.filter(function(b) { return b.type !== 'meta'; });
   var dateStr = new Date().toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
 
-  // Ruhetag
+  // Wochenstreifen: sieben antippbare Felder statt einer Punktreihe
+  var week = DAY_NAMES.map(function(d, i) {
+    var bl = ((data.weekPlan && data.weekPlan[d]) || []).filter(function(b){ return b.type !== 'meta'; });
+    var done = bl.length && bl.every(function(b) {
+      return data.completedBlocks && data.completedBlocks[d + '_' + (data.weekPlan[d].indexOf(b)) + '_' + weekId];
+    });
+    var cls = 'wday' + (i === idx ? ' is-now' : (done ? ' is-done' : ''));
+    return '<button class="' + cls + '" onclick="showPage(&quot;wochenplan&quot;)">' +
+      '<span class="wday-l">' + esc(DAY_LABELS[i].slice(0,2).toUpperCase()) + '</span>' +
+      '<span class="wday-d"></span></button>';
+  }).join('');
+
+  var weekBlock = '<p class="sec-label">Diese Woche</p><div class="wdays">' + week + '</div>';
+
   if (!blocks.length) {
     return '<section class="heute">' +
-      '<div class="heute-kopf">' +
-        '<span class="heute-tag">' + esc(dayLabel) + ', ' + esc(dateStr) + '</span>' +
-      '</div>' +
-      '<h2 class="heute-titel">Ruhetag</h2>' +
-      '<p class="heute-text">Erholung ist Teil des Plans. Wenn du trotzdem etwas tun willst: locker bewegen, dehnen, schlafen.</p>' +
-      '<button class="heute-zweit" onclick="showPage(\'wochenplan\')">Woche ansehen</button>' +
+      '<p class="sec-label">' + esc(dayLabel) + ', ' + esc(dateStr) + '</p>' +
+      '<div class="grp"><div class="grow"><span class="grow-main">' +
+        '<span class="grow-t">Ruhetag</span>' +
+        '<span class="grow-s">Erholung ist Teil des Plans.</span>' +
+      '</span></div></div>' +
+      '<button class="heute-haupt ghost" onclick="showPage(&quot;wochenplan&quot;)">Woche ansehen</button>' +
+      weekBlock +
     '</section>';
   }
 
-  var done = 0;
-  var rows = blocks.map(function(b, i) {
-    // Index im ungefilterten Plan, damit toggleBlockDone denselben Key bildet
-    var realIdx = data.weekPlan[todayKey].indexOf(b);
-    var logKey = todayKey + '_' + realIdx + '_' + weekId;
-    var isDone = !!(data.completedBlocks && data.completedBlocks[logKey]);
-    if (isDone) done++;
-
+  var done = 0, firstOpen = -1;
+  var rows = blocks.map(function(b) {
+    var realIdx = all.indexOf(b);
+    var isDone = !!(data.completedBlocks && data.completedBlocks[todayKey + '_' + realIdx + '_' + weekId]);
+    if (isDone) done++; else if (firstOpen < 0) firstOpen = realIdx;
     var meta = [];
     if (b.duration) meta.push(b.duration + ' Min');
     if (b.rpe) meta.push('RPE ' + b.rpe);
-
-    return '<li class="heute-block' + (isDone ? ' is-done' : '') + '">' +
-      '<button class="heute-haken" aria-label="' + (isDone ? 'Wieder öffnen' : 'Als erledigt markieren') + '"' +
-        ' onclick="event.stopPropagation();toggleBlockDone(\'' + escJs(todayKey) + '\',' + realIdx +
-        ',\'' + escJs(b.type || '') + '\',\'' + escJs(b.title || '') + '\');renderDashboard();">' +
-        (isDone ? '&#10003;' : '') +
+    return '<div class="grow ind' + (isDone ? ' is-done' : '') + '">' +
+      '<button class="tick' + (isDone ? ' on' : '') + '" aria-label="' +
+        (isDone ? 'Wieder öffnen' : 'Als erledigt markieren') + '" ' +
+        'onclick="event.stopPropagation();toggleBlockDone(&quot;' + escJs(todayKey) + '&quot;,' + realIdx +
+        ',&quot;' + escJs(b.type || '') + '&quot;,&quot;' + escJs(b.title || '') + '&quot;);renderDashboard();">✓</button>' +
+      '<button class="grow-main" onclick="openBlockDetail(&quot;' + escJs(todayKey) + '&quot;,' + realIdx + ')">' +
+        '<span class="grow-t">' + esc(b.title || 'Einheit') + '</span>' +
+        (meta.length ? '<span class="grow-s">' + esc(meta.join(' · ')) + '</span>' : '') +
       '</button>' +
-      '<button class="heute-block-text" onclick="openBlockDetail(\'' + escJs(todayKey) + '\',' + realIdx + ')">' +
-        '<span class="heute-block-titel">' + esc(b.title || 'Einheit') + '</span>' +
-        (meta.length ? '<span class="heute-block-meta">' + esc(meta.join(' · ')) + '</span>' : '') +
-      '</button>' +
-    '</li>';
+      '<span class="chev">›</span>' +
+    '</div>';
   }).join('');
 
-  var alleFertig = done === blocks.length;
-  var ersterOffen = blocks.findIndex(function(b, i) {
-    var realIdx = data.weekPlan[todayKey].indexOf(b);
-    return !(data.completedBlocks && data.completedBlocks[todayKey + '_' + realIdx + '_' + weekId]);
-  });
-  var haupttitel = alleFertig
-    ? 'Heute erledigt'
-    : (blocks[ersterOffen < 0 ? 0 : ersterOffen].title || 'Training');
-
-  return '<section class="heute' + (alleFertig ? ' heute-fertig' : '') + '">' +
-    '<div class="heute-kopf">' +
-      '<span class="heute-tag">' + esc(dayLabel) + ', ' + esc(dateStr) + '</span>' +
-      '<span class="heute-zaehler">' + done + '/' + blocks.length + '</span>' +
-    '</div>' +
-    '<h2 class="heute-titel">' + esc(haupttitel) + '</h2>' +
-    '<ul class="heute-liste">' + rows + '</ul>' +
-    (alleFertig
-      ? '<p class="heute-text">Alles abgehakt. Morgen weiter.</p>'
-      : '<button class="heute-haupt" onclick="openBlockDetail(\'' + escJs(todayKey) + '\',' +
-          data.weekPlan[todayKey].indexOf(blocks[ersterOffen < 0 ? 0 : ersterOffen]) + ')">Einheit öffnen</button>') +
+  var alle = done === blocks.length;
+  return '<section class="heute">' +
+    '<p class="sec-label">' + esc(dayLabel) + ', ' + esc(dateStr) + ' · ' + done + ' von ' + blocks.length + '</p>' +
+    '<div class="grp">' + rows + '</div>' +
+    (alle
+      ? '<button class="heute-haupt ghost" onclick="showPage(&quot;wochenplan&quot;)">Woche ansehen</button>'
+      : '<button class="heute-haupt" onclick="openBlockDetail(&quot;' + escJs(todayKey) + '&quot;,' + firstOpen + ')">Einheit starten</button>') +
+    weekBlock +
   '</section>';
 }
 

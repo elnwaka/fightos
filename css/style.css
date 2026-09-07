@@ -6717,3 +6717,106 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   color: var(--white);
   letter-spacing: -0.01em;
 }
+
+/* ============================================================
+   GRUPPIERTE LISTE — 1:1 nach dem Entwurf
+   ============================================================ */
+.sec-label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 2px 0 8px 4px;
+}
+.grp {
+  background: #1C1C1E;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.grow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  position: relative;
+  min-height: 56px;
+}
+.grow + .grow::before {
+  content: "";
+  position: absolute;
+  left: 15px; right: 0; top: 0;
+  height: 1px;
+  background: rgba(255,255,255,.10);
+}
+.grow.ind + .grow.ind::before { left: 56px; }
+.grow-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+.grow-t { font-size: 17px; line-height: 1.25; color: #fff; }
+.grow-s { font-size: 13px; line-height: 1.2; color: rgba(235,235,245,.6); }
+.grow.is-done .grow-t { color: rgba(235,235,245,.3); text-decoration: line-through; }
+.grow .chev { flex: 0 0 auto; color: rgba(235,235,245,.3); font-size: 17px; }
+
+.tick {
+  flex: 0 0 auto;
+  width: 44px; height: 44px;
+  margin-left: -9px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0;
+}
+.tick::before {
+  content: "";
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1.6px solid rgba(235,235,245,.3);
+}
+.tick.on { font-size: 15px; color: #000; font-weight: 700; }
+.tick.on::before {
+  position: absolute;
+  border-color: #30D158;
+  background: #30D158;
+}
+
+/* Wochenstreifen als sieben Felder */
+.wdays { display: flex; gap: 6px; margin-bottom: 18px; }
+.wday {
+  flex: 1;
+  background: #1C1C1E;
+  border: none;
+  border-radius: 9px;
+  padding: 9px 0 8px;
+  min-height: 46px;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  cursor: pointer;
+}
+.wday-l { font-size: 11px; font-weight: 500; letter-spacing: .05em; color: rgba(235,235,245,.3); }
+.wday-d { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.16); }
+.wday.is-done .wday-d { background: rgba(235,235,245,.6); }
+.wday.is-now { background: rgba(232,0,13,.16); }
+.wday.is-now .wday-l { color: #fff; }
+.wday.is-now .wday-d { background: var(--red); }
+
+.heute { background: none !important; border: none !important; padding: 0 !important; }
+.heute-haupt {
+  display: block; width: 100%;
+  background: var(--red); color: #fff; border: none;
+  border-radius: 12px; padding: 15px 0;
+  font-size: 17px; font-weight: 600;
+  margin-bottom: 18px; cursor: pointer;
+}
+.heute-haupt.ghost { background: #1C1C1E; color: var(--red); font-weight: 500; }
