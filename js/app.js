@@ -121,11 +121,15 @@ function showCloudDisconnectedBanner() {
   if (document.getElementById('cloud-disconnected')) return;
   var b = document.createElement('div');
   b.id = 'cloud-disconnected';
-  b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9998;background:#7a1216;'
-    + 'padding:12px 16px;display:flex;gap:12px;justify-content:space-between;align-items:center;'
-    + 'font-family:monospace;font-size:12px;color:#fff;';
+  // WICHTIG: auf dem Handy liegt unten die .bottom-bar (Navigation).
+  // Das Banner gehoert deshalb nach OBEN, sonst ist die App unbedienbar.
+  b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9998;background:#7a1216;'
+    + 'padding:10px 14px;display:flex;gap:10px;justify-content:space-between;align-items:center;'
+    + 'font-family:monospace;font-size:11px;line-height:1.4;color:#fff;'
+    + 'padding-top:calc(10px + env(safe-area-inset-top, 0px));';
+  document.body.style.paddingTop = '';
   var txt = document.createElement('span');
-  txt.textContent = 'Nicht mit der Cloud verbunden — Sync, Community und AI Coach sind aus.';
+  txt.textContent = 'Nicht mit der Cloud verbunden — Sync und AI Coach sind aus.';
   var btn = document.createElement('button');
   btn.textContent = 'NEU EINLOGGEN';
   btn.style.cssText = 'font-family:inherit;font-size:12px;color:#fff;background:rgba(255,255,255,.18);'
