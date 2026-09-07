@@ -1106,6 +1106,8 @@ function renderUebungenPage() {
 
   let counter = 0;
 
+
+  if (typeof applyCollapsibleSections === "function") applyCollapsibleSections();
   el.innerHTML = `
   <div class="page-header">
     <div class="page-title">ÜBUNGS<span>BIBLIOTHEK</span></div>
@@ -2258,6 +2260,8 @@ function renderErnaehrungPage() {
     <button onclick="showPage('regeneration')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);background:none;border:1px solid rgba(41,121,255,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Recovery</button>
     <button onclick="showPage('rechner')" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold);background:none;border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-sm);padding:6px 14px;cursor:pointer;">Rechner</button>
   </div>`;
+
+  if (typeof applyCollapsibleSections === "function") applyCollapsibleSections();
   renderErnTimeline();
 }
 

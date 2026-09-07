@@ -6092,3 +6092,41 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   color: var(--light);
 }
 .heute-haupt:active { transform: scale(.99); }
+
+/* Klappabschnitte auf den langen Nachschlage-Seiten */
+.acc-head {
+  cursor: pointer;
+  position: relative;
+  padding-right: 40px !important;
+  user-select: none;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.acc-head:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+.acc-mark {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: -9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: .55;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.acc-head.is-open .acc-mark {
+  transform: rotate(-135deg);
+  margin-top: -3px;
+  opacity: .9;
+}
+.acc-body { padding-bottom: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  .acc-mark { transition: none; }
+}
