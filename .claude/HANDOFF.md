@@ -76,6 +76,41 @@ Neues Modell einführen = `MODEL_PREFERENCE` in `api/ai-proxy.js` oben ergänzen
 **Neuer Key:** aistudio.google.com/apikey → Vercel → Projekt → Settings → Environment Variables →
 `GEMINI_API_KEY` → **danach neu deployen**, Env-Änderungen greifen nicht rückwirkend.
 
+## Bedienung auf dem Handy — die Regeln, die hier gelten
+
+Gemessen wird bei 390px Breite mit Playwright (`screenshots.mjs` als Vorlage).
+Massstab sind Apple HIG (44x44pt), Material Design (48dp, 8dp Abstand) und die
+NN/g-Daumenzonenforschung.
+
+1. **Nichts unter 11px.** Versal-Labels 11px, Fliesstext 14px+. Der Boden steht
+   am Ende von `css/style.css` im Block "MOBILE LESBARKEITS- UND TREFFERBODEN".
+2. **Alles Bedienbare mindestens 44x44.** Vorher lagen 19 von 29 Zielen auf der
+   Startseite darunter.
+3. **Fliesstext ist kein Etikett.** Beschreibungen in DM Sans, gemischte
+   Schreibweise, Zeilenlaenge auf 58 Zeichen. Space Mono in Versalien mit
+   Sperrsatz bleibt echten Mikro-Labels vorbehalten — nicht fuer Saetze.
+4. **Kein schwebender Knopf ueber dem Inhalt.** Mit einer Tab-Leiste unten
+   konkurriert ein FAB mit der Navigation und verdeckt Inhalt. Der AI-Coach
+   sitzt deshalb als Icon in der Kopfzeile (`#ai-coach-btn`).
+5. **Lange Nachschlage-Seiten werden gefaltet, nicht gekuerzt.**
+   `applyCollapsibleSections()` in `js/util.js`, zentral aus `showPage()`
+   gerufen. Der Inhalt bleibt im DOM, damit die Suche ihn findet.
+6. **Der Startbildschirm beantwortet: Was trainiere ich heute?**
+   `renderHeuteCard()` in `js/app.js` steht als erstes Element im Dashboard und
+   nutzt dieselbe Mechanik wie der Wochenplan (`weekPlan`, `completedBlocks`,
+   `toggleBlockDone`, `openBlockDetail`) — kein zweiter Datenpfad.
+
+Ergebnis der Umbauten (jeweils vorher -> nachher, bei 390px):
+- Ernaehrung 12,8 -> 3,0 Bildschirme, 18.926 -> 2.520 Zeichen
+- Uebungen 20,6 -> 8,2 Bildschirme
+- Antippflaechen unter 44x44: Home 19 -> 10, Wochenplan 13 -> 3, Training 23 -> 6
+- Kleinste Schrift 7px -> 11px
+
+**Beim Aendern pruefen:** `node screenshots.mjs` gegen die Live-URL laufen lassen
+und die Aufnahmen ansehen. Der Klassiker, den das aufdeckt: etwas rendert in
+einen anderen Container als erwartet (die Uebungen schreiben nach
+`#training-content`, nicht `#page-uebungen`).
+
 ## Bekannte Probleme / technische Schulden
 - `js/app.js` ist 8000+ Zeilen — sollte in Module aufgeteilt werden
 - Viele Inline-Styles in `app.js` und `pages.js` — sollten CSS-Klassen werden
