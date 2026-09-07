@@ -6413,3 +6413,50 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
     color: var(--white) !important;
   }
 }
+
+/* Säulen als Fortschrittszeile statt acht farbiger Kacheln */
+.pillars {
+  background: var(--surface-1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.pillars-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pillars-label {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
+  color: var(--light);
+}
+.pillars-count {
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.pillars-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-3);
+  margin-top: 10px;
+  overflow: hidden;
+}
+.pillars-bar > i {
+  display: block;
+  height: 100%;
+  background: var(--red);
+  border-radius: 2px;
+  transition: width .3s ease;
+}
+.pillars-open {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 10px 0 0;
+  line-height: 1.45;
+}
+@media (prefers-reduced-motion: reduce) { .pillars-bar > i { transition: none; } }
