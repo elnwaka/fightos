@@ -6853,3 +6853,14 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   #dash-app > .db-stat-grid,
   #dash-app .fc-hero-record { display: none !important; }
 }
+
+@media (max-width: 768px) {
+  /* Der Heute-Bildschirm endet nach dem Wochenstreifen.
+     Kennzahlen und Onboarding-Liste beantworten "Wer bin ich?" —
+     sie gehoeren unter Profil, nicht an den Anfang des Trainingstags. */
+  #dash-app .fc-stats-bar,
+  #dash-app .fc-checklist { display: none !important; }
+
+  /* Der Rest des Dashboards ruecken wir auf die gleiche Kante */
+  #dash-app .fc-content { padding: 0 !important; }
+}
