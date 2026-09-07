@@ -272,6 +272,10 @@
         row({ t:'Rechner', chev:1, go:'M.old(&quot;profil&quot;,&quot;rechner&quot;,&quot;Rechner&quot;)' }),
         row({ t:'FAQ', chev:1, go:'M.old(&quot;profil&quot;,&quot;faq&quot;,&quot;FAQ&quot;)' })
       ]) +
+      lbl('Version') + grp([
+        row({ t: 'Stand', v: String(window.__BUILD || 'unbekannt') }),
+        row({ t: 'Neu laden und Cache leeren', chev: 1, go: 'M.reset()' })
+      ]) +
       btn('Abmelden', 'doLogout()', 1);
   }};
 
@@ -652,7 +656,19 @@
       if (el) PICKS[key].set(isNaN(+el.dataset.v) ? el.dataset.v : +el.dataset.v);
       M.close(); body();
     },
-    close: function () { document.getElementById('m-sheet').classList.remove('open'); }
+    close: function () { document.getElementById('m-sheet').classList.remove('open'); },
+    // Harte Reparatur von Hand, falls die automatische nicht greift.
+    reset: function () {
+      var jobs = [];
+      try { sessionStorage.removeItem('bs_healed'); } catch (e) {}
+      if (window.caches) jobs.push(caches.keys().then(function (k) {
+        return Promise.all(k.map(function (n) { return caches.delete(n); })); }));
+      if (navigator.serviceWorker) jobs.push(
+        navigator.serviceWorker.getRegistrations().then(function (rs) {
+          return Promise.all(rs.map(function (r) { return r.unregister(); })); }));
+      Promise.all(jobs).then(function () { location.reload(); })
+        .catch(function () { location.reload(); });
+    }
   };
   window.M = M;
 
