@@ -1222,7 +1222,7 @@ var _skipHashUpdate = false;
 // Seite. Vorher: 61px Leiste + 52-73px Seitenkopf, erster Inhalt erst
 // bei 203-225px von 844px.
 var SCREEN_TITLES = {
-  dashboard: '', // Home traegt das Logo
+  dashboard: 'Heute',
   wochenplan: 'Plan',
   training: 'Wissen',
   uebungen: 'Übungen',
@@ -1253,7 +1253,7 @@ function updateAppBar(page) {
   if (!titleEl || !logoEl) return;
 
   var title = SCREEN_TITLES.hasOwnProperty(page) ? SCREEN_TITLES[page] : '';
-  var isHome = !title;
+  var isHome = (page === 'dashboard');
 
   titleEl.textContent = title;
   logoEl.hidden = !isHome;
@@ -1261,11 +1261,11 @@ function updateAppBar(page) {
   // iOS-Muster: grosser Titel unter der Leiste, faellt beim Scrollen hinein.
   if (largeEl) {
     largeEl.firstElementChild.textContent = title;
-    largeEl.hidden = isHome;
+    largeEl.hidden = !title;
     window.scrollTo(0, 0);
     syncLargeTitle();
   }
-  titleEl.hidden = isHome;
+  titleEl.hidden = !title;
 
   // Zurueck nur, wo es wirklich eine Ebene tiefer geht
   var deep = ['block-detail', 'community-profile'];

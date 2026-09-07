@@ -6820,3 +6820,36 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   margin-bottom: 18px; cursor: pointer;
 }
 .heute-haupt.ghost { background: #1C1C1E; color: var(--red); font-weight: 500; }
+
+/* Haken: Kreis als Rahmen, Häkchen sichtbar darin */
+.tick { position: relative; }
+.tick::before {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  box-sizing: border-box;
+}
+.tick.on { color: #000; font-size: 15px; font-weight: 800; line-height: 1; }
+.tick.on::before { border-color: #30D158; background: #30D158; z-index: 0; }
+.tick > * , .tick.on { position: relative; }
+.tick.on::after {
+  content: "✓";
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%,-52%);
+  color: #000;
+  font-size: 15px;
+  font-weight: 800;
+  z-index: 1;
+}
+.tick { font-size: 0 !important; }
+
+@media (max-width: 768px) {
+  /* Der Heute-Bildschirm endet nach dem Wochenstreifen. Bilanz,
+     Kennzahlen und Onboarding-Liste beantworten "Wer bin ich" und
+     gehoeren unter Profil, nicht an den Anfang des Trainingstags. */
+  #dash-app > .db-hero,
+  #dash-app > .db-stats,
+  #dash-app > .db-stat-grid,
+  #dash-app .fc-hero-record { display: none !important; }
+}
