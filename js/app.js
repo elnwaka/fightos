@@ -1217,7 +1217,65 @@ function applyRevealToPage() {
 // ===== NAVIGATION + HASH ROUTING =====
 var _skipHashUpdate = false;
 
+// ===== APP-LEISTE (Handy) =====
+// Der Bildschirmtitel gehoert in die Leiste, nicht zusaetzlich in die
+// Seite. Vorher: 61px Leiste + 52-73px Seitenkopf, erster Inhalt erst
+// bei 203-225px von 844px.
+var SCREEN_TITLES = {
+  dashboard: '', // Home traegt das Logo
+  wochenplan: 'Plan',
+  training: 'Training',
+  uebungen: 'Übungen',
+  wissen: 'Wissen',
+  tests: 'Tests',
+  log: 'Log',
+  ernaehrung: 'Ernährung',
+  periodisierung: 'Periodisierung',
+  regeneration: 'Recovery',
+  notizen: 'Notizen',
+  fights: 'Kämpfe',
+  community: 'Verein',
+  'community-profile': 'Profil',
+  'block-detail': 'Einheit',
+  profil: 'Profil',
+  saeulen: 'Säulen',
+  rechner: 'Rechner',
+  faq: 'FAQ'
+};
+
+var _screenStack = [];
+
+function updateAppBar(page) {
+  var titleEl = document.getElementById('appbar-title');
+  var logoEl = document.querySelector('.topbar-logo');
+  var backEl = document.getElementById('appbar-back');
+  if (!titleEl || !logoEl) return;
+
+  var title = SCREEN_TITLES.hasOwnProperty(page) ? SCREEN_TITLES[page] : '';
+  var isHome = !title;
+
+  titleEl.textContent = title;
+  titleEl.hidden = isHome;
+  logoEl.hidden = !isHome;
+
+  // Zurueck nur, wo es wirklich eine Ebene tiefer geht
+  var deep = ['block-detail', 'community-profile'];
+  if (backEl) backEl.hidden = deep.indexOf(page) === -1;
+}
+
+function goBackScreen() {
+  var prev = _screenStack.pop();
+  if (prev && typeof showPage === 'function') showPage(prev, true);
+  else if (typeof showPage === 'function') showPage('dashboard', true);
+}
+
 function showPage(pageId) {
+  if (typeof _screenStack !== 'undefined' && !arguments[1] && window._currentScreen && window._currentScreen !== pageId) {
+    _screenStack.push(window._currentScreen);
+    if (_screenStack.length > 12) _screenStack.shift();
+  }
+  window._currentScreen = pageId;
+  updateAppBar(pageId);
 
   // Lange Nachschlage-Abschnitte falten. Zentral hier, weil die
   // einzelnen Render-Funktionen in unterschiedliche Container

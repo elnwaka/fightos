@@ -272,6 +272,12 @@ if (localStorage.getItem('fos_current')) {
   <!-- TOP BAR — 5 flat tabs, no dropdowns -->
   <div class="topbar">
     <button class="topbar-logo" onclick="showPage('dashboard')" aria-label="Zur Übersicht">BOX<span>SPEC</span></button>
+    <!-- App-Leiste auf dem Handy: traegt den Titel des aktuellen Bildschirms,
+         damit nicht jede Seite zusaetzlich einen eigenen Kopf braucht. -->
+    <button class="appbar-back" id="appbar-back" onclick="goBackScreen()" aria-label="Zurück" hidden>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <h1 class="appbar-title" id="appbar-title" hidden></h1>
     <div class="topbar-nav">
       <button class="nav-btn active" data-page="dashboard">Home</button>
       <button class="nav-btn" data-page="wochenplan">Plan</button>

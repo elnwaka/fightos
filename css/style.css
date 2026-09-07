@@ -6143,3 +6143,65 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   .db-stats,
   .db-stat-grid { padding-left: 0; padding-right: 0; }
 }
+
+/* ============================================================
+   APP-LEISTE — Schritt 1 des Handy-Neubaus
+   Der Bildschirmtitel sitzt in der Leiste, die Seite traegt
+   keinen eigenen Kopf mehr. Optik unveraendert: gleiche
+   Schriften, gleiche Farben.
+   ============================================================ */
+.appbar-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: .04em;
+  color: var(--white);
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.appbar-back {
+  background: none;
+  border: none;
+  color: var(--light);
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  margin-left: -10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.appbar-back[hidden], .appbar-title[hidden] { display: none !important; }
+
+@media (min-width: 769px) {
+  /* Am Desktop bleibt alles wie gehabt: Logo plus Seitenkopf. */
+  .appbar-title, .appbar-back { display: none !important; }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    height: auto;
+    min-height: 56px;
+    padding-top: env(safe-area-inset-top, 0px);
+    background: var(--surface-0);
+    border-bottom: 1px solid var(--surface-2);
+    gap: 8px;
+  }
+
+  /* Der Seitenkopf ist jetzt doppelt gemoppelt. */
+  .page > .page-header { display: none; }
+  .page { padding-top: 16px; }
+
+  /* Unterzeile der Seite entfaellt mit — sie war ohnehin der
+     laengste Textblock ohne Funktion. */
+  .page > .page-header + * { margin-top: 0; }
+}
