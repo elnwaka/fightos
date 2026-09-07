@@ -1224,7 +1224,7 @@ var _skipHashUpdate = false;
 var SCREEN_TITLES = {
   dashboard: '', // Home traegt das Logo
   wochenplan: 'Plan',
-  training: 'Training',
+  training: 'Wissen',
   uebungen: 'Übungen',
   wissen: 'Wissen',
   tests: 'Tests',
