@@ -5427,10 +5427,15 @@ function _renderWeekPlanInner() {
       // Shift-Work Warnung
       var wh = parseInt((s.workStart || '08:00').split(':')[0]);
       if (wh >= 12 || wh < 5) hints.push('\u26A0 Ungewöhnliche Arbeitszeiten – prüfe ob Trainingszeiten passen');
-      return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">' +
-        hints.map(function(h) { return '<span style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:var(--surface-1);border:1px solid var(--surface-2);border-radius:var(--radius-sm);color:var(--text-muted);">' + h + '</span>'; }).join('') +
-        '<span onclick="showPage(\'account\')" style="font-family:\'Space Mono\',monospace;font-size:10px;padding:4px 10px;background:transparent;border:1px solid var(--surface-3);border-radius:var(--radius-sm);color:var(--red);cursor:pointer;">AENDERN \u2192</span>' +
-      '</div>';
+      // Eine Zusammenfassungszeile statt vier umrandeter Kaestchen —
+      // so fasst iOS Einstellungen zusammen: Text plus getoenter Knopf.
+      var warn = hints.filter(function(h) { return h.charAt(0) === '⚠'; });
+      var facts = hints.filter(function(h) { return h.charAt(0) !== '⚠'; });
+      return '<div class="plan-summary">' +
+          '<p class="plan-summary-text">' + esc(facts.join(' · ')) + '</p>' +
+          '<button class="plan-summary-edit" onclick="showPage(&quot;account&quot;)">Ändern</button>' +
+        '</div>' +
+        (warn.length ? '<p class="plan-warn">' + esc(warn.join(' ')) + '</p>' : '');
     })()}
     <div class="page-header" style="display:none;"></div>
     ${(function() {
