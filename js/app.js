@@ -5397,7 +5397,7 @@ function _renderWeekPlanInner() {
     }
     p10wBanner = '<div class="phase-banner" style="margin-bottom:16px;padding:14px 18px;background:var(--surface-1);border-radius:12px;">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'
-      + '<div><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:'+p10wPhase.color+';letter-spacing:1px;">WOCHE '+p10wWeek+'/10</span>'
+      + '<div><span class="phase-week">Woche '+p10wWeek+' von 10</span>'
       + '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);margin-left:12px;">'+p10wPhase.name.toUpperCase()+'</span></div>'
       + (isP10WDeload(p10wWeek) ? '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--green);border:1px solid var(--green);padding:2px 8px;border-radius:4px;">DELOAD</span>' : '')
       + '</div>'
@@ -5417,7 +5417,7 @@ function _renderWeekPlanInner() {
       ${is10W ? '' : '</div>'}
       ${_deloadWarnings.length && !isDeloadActive ? '<div style="margin-top:8px;padding:10px 14px;background:var(--surface-0);border:1px solid var(--orange);border-radius:var(--radius-md);font-size:12px;color:var(--orange);">⚠ Dein Körper zeigt Zeichen von Überbelastung: ' + _deloadWarnings.join(', ') + '. Brauchst du einen Deload?</div>' : ''}
     </div>
-    ${(!data.log || data.log.length === 0) ? '<div style="padding:14px 20px;background:var(--surface-1);border-radius:var(--radius-md);border-left:3px solid var(--green);margin-bottom:20px;"><div style="font-size:14px;color:var(--white);font-weight:500;margin-bottom:4px;">Dein Plan wurde automatisch erstellt</div><div style="font-size:13px;color:var(--text-muted);line-height:1.6;">Basierend auf deinem Level, Equipment und Zeitplan. Klicke auf einen Block um Details zu sehen. Nach dem Training: Haken setzen um es als erledigt zu markieren.</div></div>' : ''}
+    
     ${(function() {
       var hints = [];
       if (!s.gymAccess || s.gymAccess === 'none') hints.push('Equipment: Körpergewicht');
@@ -5497,7 +5497,7 @@ function _renderWeekPlanInner() {
         actions +
       '</div>';
     })()}
-    ${!data.fightDate ? '<div class="info-box info-tip" style="margin-bottom:20px;"><span>💡</span><div>Trage unter <strong>Profil → Account → Kampf</strong> ein Kampfdatum ein – der Plan passt sich automatisch an.</div></div>' : ''}
+    
     ${(function() {
       var coveredSet = {};
       DAY_NAMES.forEach(function(day) {
@@ -5576,7 +5576,7 @@ function _renderWeekPlanInner() {
       <button class="submit-btn" style="padding:8px 16px;font-size:12px;" onclick="regenerateWeekPlan()">NEU GENERIEREN</button>
       <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);">Erstellt den Plan basierend auf Trainingszeiten + Kampfdatum</span>
     </div>
-    <div class="info-box info-tip"><span>💡</span><div>Klicke auf einen <strong>Block</strong> um die vollständige Trainingsanleitung zu sehen. Der Plan wird automatisch neu generiert wenn du ein Kampfdatum einträgst oder änderst.</div></div>`;
+    `;
 }
 
 function regenerateWeekPlan() {

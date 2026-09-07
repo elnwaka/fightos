@@ -6709,3 +6709,11 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   .day-block.boxing::before,
   .day-block.fight::before { background: var(--red) !important; }
 }
+
+/* Wochenzeile im Systemtext statt Plakatschrift in Phasenfarbe */
+.phase-week {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: -0.01em;
+}
