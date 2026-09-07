@@ -498,3 +498,11 @@
     width: 26px !important; height: 26px !important;
   }
 }
+
+@media (max-width: 768px) {
+  /* Der aeussere Container brachte 8px mit, dazu die 16px der Seite —
+     macht 24 statt 16. Die Fluchtlinie gehoert an EINE Stelle. */
+  body { margin: 0 !important; padding: 0 !important; }
+  #app-screen { padding-left: 0 !important; padding-right: 0 !important; margin: 0 !important; }
+  .page { max-width: none !important; }
+}
