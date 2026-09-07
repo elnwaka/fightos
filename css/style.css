@@ -5599,3 +5599,179 @@ body.hide-coach #ai-coach-panel { display: none !important; }
 
 /* Light mode */
 
+
+/* ============================================================
+   MOBILE LESBARKEITS- UND TREFFERBODEN
+   ------------------------------------------------------------
+   Aendert ausschliesslich Schriftgroessen und Antippflaechen
+   unter 768px. Keine Farbe, keine Schriftart, kein Layout.
+
+   Regeln, gegen die hier gemessen wird:
+   - Apple HIG: Antippflaeche mindestens 44x44 pt
+   - Material Design: 48x48 dp, mindestens 8 dp Abstand
+   - NN/g: getrackte Versal-Labels unter 11px sind auf Armlaenge
+     nicht mehr sicher lesbar
+
+   Vorher gemessen (iPhone-Breite 390px): 79% des Textes auf der
+   Startseite unter 14px, kleinste Labels 7px, 19 von 29
+   Antippflaechen unter 44x44.
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* --- 1. Typo-Boden -------------------------------------- */
+
+  :root {
+    --fs-xs: 12px;
+    --fs-sm: 14px;
+    --fs-base: 16px;
+  }
+
+  /* Versal-Labels: 7-9px -> 11px, Tracking bleibt */
+  .db-stat-lbl,
+  .db-week-day-lbl,
+  .dash-week-daylbl,
+  .fighter-pill-lbl,
+  .fc-stat-lbl,
+  .score-label,
+  .fc-week-lbl,
+  .cm-stat-label,
+  .cm-trending-label,
+  .cm-forum-cat-label,
+  .cm-exp-pill,
+  .vid-tag,
+  .cm-type-badge,
+  .cm-hot-badge,
+  .cm-pinned-badge {
+    font-size: 11px;
+  }
+
+  /* Fliesstext und Beschreibungen: 9-10px -> 14px */
+  .page-sub,
+  .block-hint,
+  .day-col.day-active .day-block .block-hint,
+  .auth-sub,
+  .bd-ex-rest,
+  .bd-ex-sets {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Sekundaere Angaben: 9-10px -> 12px */
+  .vid-duration,
+  .cm-time,
+  .cm-weight-badge,
+  .cm-hot-indicator,
+  .cm-verified {
+    font-size: 12px;
+  }
+
+  /* --- 2. Hauptnavigation --------------------------------- */
+  /* War 9px Schrift auf 40px Breite — die wichtigste Leiste
+     der App und die am schlechtesten treffbare. */
+
+  .bottom-bar {
+    padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+  .btab {
+    padding: 8px 4px;
+    min-height: 56px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .btab span {
+    font-size: 11px;
+    letter-spacing: .04em;
+  }
+  .btab svg,
+  .btab img {
+    width: 22px;
+    height: 22px;
+  }
+  .page {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* --- 3. Antippflaechen ---------------------------------- */
+  /* Alles Bedienbare auf mindestens 44x44. */
+
+  .logout-btn,
+  .topbar-icon-btn,
+  .user-pill {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logout-btn { font-size: 18px; padding: 0 10px; }
+  .user-pill  { font-size: 12px; padding: 0 12px; }
+
+  .sub-tab {
+    font-size: 13px;
+    min-height: 44px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .ex-chip {
+    font-size: 12px;
+    min-height: 44px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .wk-btn {
+    font-size: 13px;
+    min-height: 44px;
+  }
+
+  .btn-sm {
+    font-size: 14px !important;
+    min-height: 44px;
+    padding: 10px 18px !important;
+  }
+
+  .ern-nav button,
+  .ai-quick-btn,
+  .cm-tab,
+  .cm-trending-tag,
+  .cm-feed-filter,
+  .cm-sort-btn {
+    font-size: 12px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cm-tab { flex-direction: column; gap: 3px; padding: 6px 14px; }
+
+  /* Die Onboarding-Zeilen waren 288x32 */
+  .card-body::after { height: 44px; font-size: 12px; }
+
+  /* Inline gesetzte Chip-Reihen (per Attribut-Selektor im
+     Original auf 9px !important gezwungen) */
+  [style*="display:flex"][style*="flex-wrap:wrap"][style*="gap:8px"][style*="margin-bottom:16px"] > span {
+    font-size: 12px !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Abstand zwischen benachbarten Zielen — Material: min. 8dp */
+  .week-controls,
+  .cm-feed-filters,
+  .cm-forum-sort { gap: 8px; }
+}
+
+/* Sehr schmale Geraete: der Boden bleibt, nur das Tracking weicht,
+   damit Labels nicht umbrechen. */
+@media (max-width: 360px) {
+  .db-stat-lbl,
+  .dash-week-daylbl,
+  .fc-stat-lbl,
+  .score-label { letter-spacing: .02em; }
+  .btab span { font-size: 10.5px; letter-spacing: 0; }
+}
