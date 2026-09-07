@@ -6671,3 +6671,41 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   }
   .btab svg { stroke-width: 1.6 !important; }
 }
+
+@media (max-width: 768px) {
+  /* Der grosse Titel lag ausserhalb der Schrift-Selektoren und hing
+     noch in der Plakatschrift. */
+  .appbar-large, .appbar-large * {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "Segoe UI", Roboto, system-ui, sans-serif !important;
+    text-transform: none !important;
+  }
+  .appbar-large > span {
+    font-size: 34px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+  }
+  .appbar-large { background: transparent !important; }
+
+  /* "WOCHE 1/10" war gruen und in Plakatgroesse — Gruen ist fuer
+     erledigt reserviert. */
+  .week-label, .wk-title, .phase-week,
+  [class*="woche"] { color: var(--white) !important; }
+
+  /* Der heutige Tag markiert sich durch ein rotes Label, nicht durch
+     eine getoente Flaeche — die las sich braun. */
+  .day-col.day-today,
+  .day-col.day-active {
+    background: #1C1C1E !important;
+    box-shadow: inset 3px 0 0 var(--red);
+  }
+
+  /* Blocktyp-Zeichen: nur Akzent oder neutral, keine sechs Farben */
+  .day-block.recovery::before,
+  .day-block.meta::before,
+  .day-block.cardio::before,
+  .day-block.off::before { background: rgba(235,235,245,.30) !important; }
+  .day-block.strength::before,
+  .day-block.boxing::before,
+  .day-block.fight::before { background: var(--red) !important; }
+}
