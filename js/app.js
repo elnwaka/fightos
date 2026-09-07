@@ -1218,6 +1218,13 @@ function applyRevealToPage() {
 var _skipHashUpdate = false;
 
 function showPage(pageId) {
+
+  // Lange Nachschlage-Abschnitte falten. Zentral hier, weil die
+  // einzelnen Render-Funktionen in unterschiedliche Container
+  // schreiben und der Zeitpunkt sonst schwer zu treffen ist.
+  setTimeout(function() {
+    if (typeof applyCollapsibleSections === 'function') applyCollapsibleSections();
+  }, 0);
   // Map old page IDs to new merged pages for backward compatibility
   var pageMap = {
     'account': 'profil',

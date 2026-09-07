@@ -1107,7 +1107,6 @@ function renderUebungenPage() {
   let counter = 0;
 
 
-  if (typeof applyCollapsibleSections === "function") applyCollapsibleSections();
   el.innerHTML = `
   <div class="page-header">
     <div class="page-title">ÜBUNGS<span>BIBLIOTHEK</span></div>
