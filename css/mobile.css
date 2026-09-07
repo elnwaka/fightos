@@ -306,4 +306,13 @@
   #m-app .article [style*="Bebas"],
   #m-app .article [style*="Space Mono"]{font-family:inherit!important;text-transform:none!important;
     letter-spacing:0!important}
+
+  /* Alte Regeln faerben Unterzeilen mit einer eigenen Flaeche ein.
+     Innerhalb der neuen Oberflaeche traegt nur die Gruppe eine Flaeche. */
+  #m-app .ex-s, #m-app .row-s, #m-app .ex-t, #m-app .row-t,
+  #m-app .tl-n, #m-app .tl-s, #m-app .stat-l, #m-app .stat-v {
+    background: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+  }
 }
