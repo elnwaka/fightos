@@ -6542,3 +6542,35 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   background: var(--red);
   box-shadow: 0 0 0 2px rgba(232,0,13,.25);
 }
+
+@media (max-width: 768px) {
+  /* Letzte Eigenfarben: Infokasten in Blassgelb, Phasen-Abzeichen in
+     Gruen. Grün bleibt reserviert fuer "erledigt", sonst nichts. */
+  .info-box,
+  .info-box * {
+    color: var(--text-muted) !important;
+    border-color: transparent !important;
+  }
+  .info-box {
+    background: var(--surface-1) !important;
+    border-radius: 12px;
+  }
+  .info-box > span:first-child { color: var(--red) !important; }
+
+  .phase-badge,
+  .phase-badge.phase-aufbau,
+  .phase-badge.phase-peak,
+  .phase-badge.phase-taper {
+    background: var(--surface-2) !important;
+    color: var(--light) !important;
+    border: none !important;
+  }
+
+  /* Die Tageskarte "heute" markiert sich durch Fläche, nicht durch
+     einen gelben Rahmen. */
+  .day-col.day-today,
+  .day-col.day-active {
+    background: rgba(232,0,13,.10) !important;
+    border: none !important;
+  }
+}

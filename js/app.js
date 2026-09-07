@@ -5540,7 +5540,7 @@ function _renderWeekPlanInner() {
         return `<div class="day-col${isToday ? ' day-today day-active' : ''}">
           <div class="day-header" onclick="toggleDayCol(this)">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--gold);">HEUTE</span>' : ''}</div>
+              <div class="day-name">${DAY_LABELS[di]}${isToday ? ' <span style="font-size:11px;color:var(--red);">HEUTE</span>' : ''}</div>
               <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-subtle);">${blocks.length}</span>
             </div>
             <div style="display:flex;align-items:center;gap:4px;margin-top:4px;">
