@@ -1350,6 +1350,7 @@ function renderTrainingPage(subTab) {
       '<button onclick="showPage(\'wochenplan\')" style="margin-top:8px;font-family:\'Space Mono\',monospace;font-size:11px;padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-full);cursor:pointer;">ZUM WOCHENPLAN \u2192</button>' +
     '</div>' : '';
   el.innerHTML = '<div class="page-header"><div class="page-title">TRAIN<span>ING</span></div><div class="page-sub">\u00dcbungen, Tests, Log, Ern\u00e4hrung und Recovery \u2014 alles an einem Ort.</div></div>' + tabsHTML + trainingHint + '<div id="' + contentId + '"></div>';
+  scrollActiveTabIntoView(el);
 
   var contentEl = document.getElementById(contentId);
   if (!contentEl) return;
@@ -1473,7 +1474,28 @@ function deleteNotiz(idx) {
   renderNotizenTab(document.getElementById('training-content'));
 }
 
+// Den aktiven Reiter in den sichtbaren Bereich holen. Ohne das steht
+// er bei den hinteren Tabs halb im Rand — auf der Ernaehrungsseite war
+// ausgerechnet der aktive Reiter der abgeschnittene.
+function scrollActiveTabIntoView(root) {
+  requestAnimationFrame(function() {
+    var strips = (root || document).querySelectorAll('.sub-tabs, .cm-tabs, .ern-nav');
+    strips.forEach(function(strip) {
+      var act = strip.querySelector('.active');
+      if (!act) return;
+      var sb = strip.getBoundingClientRect(), ab = act.getBoundingClientRect();
+      if (ab.left < sb.left + 12 || ab.right > sb.right - 12) {
+        strip.scrollTo({
+          left: strip.scrollLeft + (ab.left - sb.left) - (sb.width - ab.width) / 2,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+}
+
 function switchTrainingTab(tab) {
+  scrollActiveTabIntoView();
   _trainingSubTab = tab;
   renderTrainingPage(tab);
 }
@@ -1511,6 +1533,7 @@ function renderProfilPage(subTab) {
 }
 
 function switchProfilTab(tab) {
+  scrollActiveTabIntoView();
   _profilSubTab = tab;
   renderProfilPage(tab);
 }

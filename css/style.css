@@ -5936,3 +5936,11 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   gap: 8px;
   padding-right: 14px;
 }
+
+/* Erster Reiter fluchtet mit Titel und Fliesstext darunter.
+   Der Innenabstand hatte das Label um 14px eingerueckt. */
+@media (max-width: 768px) {
+  .sub-tabs > .sub-tab:first-child,
+  .cm-tabs > .cm-tab:first-child { padding-left: 0; }
+  .sub-tabs, .cm-tabs { scroll-behavior: smooth; }
+}
