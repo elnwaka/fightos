@@ -3,7 +3,7 @@
   "name": "BoxSpec — Built for Fighters",
   "short_name": "BoxSpec",
   "description": "Das komplette Trainingssystem fuer Boxer",
-  "start_url": "./index.html",
+  "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -61,6 +61,26 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Heutiges Training",
+      "short_name": "Heute",
+      "url": "./app.html#wochenplan",
+      "icons": [{ "src": "img/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Training loggen",
+      "short_name": "Log",
+      "url": "./app.html#log",
+      "icons": [{ "src": "img/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Coach fragen",
+      "short_name": "Coach",
+      "url": "./app.html#coach",
+      "icons": [{ "src": "img/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ],
   "categories": ["sports", "fitness", "health"],

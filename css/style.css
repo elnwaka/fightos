@@ -3386,7 +3386,14 @@ img, iframe, canvas, video { max-width: 100%; height: auto; }
   .topbar-nav { display: none; }
   .topbar-right { gap: 4px; }
   .share-pill { display: none; }
-  .user-pill { display: none; }
+  /* Profil ist NICHT in der Bottom-Bar — der Pill in der Topbar ist der
+     einzige Zugang zu Account, Einstellungen, Rechnern und FAQ.
+     Ausblenden macht diese Bereiche auf dem Handy unerreichbar. */
+  .user-pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    max-width: 92px; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; padding: 6px 10px; min-height: 32px;
+  }
   .search-container { display: none; }
   .topbar-icon-btn { width: 44px; height: 44px; min-width: 44px; min-height: 44px; font-size: 16px; }
   .logout-btn { font-size: 14px; padding: 4px 8px; }
