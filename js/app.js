@@ -5507,16 +5507,17 @@ function _renderWeekPlanInner() {
       });
       var covered = Object.keys(coveredSet).length;
       var saeulenLabels = ['KRAFT','AUSDAUER','KOGNITION','ERNÄHRUNG','REGENERATION','RING IQ','MENTAL','MOBILITÄT'];
-      var saeulenColors = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
-      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px;padding:12px 16px;background:var(--surface-0);border:1px solid var(--surface-2);border-radius:var(--radius-md);">' +
-        '<span style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-right:4px;">SÄULEN ' + covered + '/8</span>' +
-        saeulenLabels.map(function(l, i) {
-          var active = coveredSet[i];
-          return '<span style="font-family:\'Space Mono\',monospace;font-size:9px;padding:3px 8px;border-radius:var(--radius-sm);letter-spacing:0.5px;' +
-            (active ? 'background:' + saeulenColors[i] + '22;color:' + saeulenColors[i] + ';border:1px solid ' + saeulenColors[i] + '44;' : 'background:var(--surface-1);color:var(--text-subtle);border:1px solid var(--surface-2);') +
-          '">' + l + '</span>';
-        }).join('') +
-      '</div>';
+      // Acht Eigenfarben mit acht Rahmen fuer die Aussage "4 von 8".
+      // iOS zeigt so etwas als eine Zeile mit Fortschritt.
+      var offen = saeulenLabels.filter(function(l, i) { return !coveredSet[i]; });
+      return '<div class="pillars">' +
+          '<div class="pillars-head">' +
+            '<span class="pillars-label">Säulen diese Woche</span>' +
+            '<span class="pillars-count">' + covered + '/8</span>' +
+          '</div>' +
+          '<div class="pillars-bar"><i style="width:' + Math.round(covered / 8 * 100) + '%"></i></div>' +
+          (offen.length ? '<p class="pillars-open">Offen: ' + esc(offen.join(', ').toLowerCase()) + '</p>' : '') +
+        '</div>';
     })()}
     <div class="week-grid" data-active="${todayDow}">
       ${DAY_NAMES.map((day, di) => {
