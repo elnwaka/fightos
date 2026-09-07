@@ -6,6 +6,18 @@
    ============================================================ */
 @media (max-width: 768px) {
 
+  /* Die alte Oberflaeche verschwindet schon vor dem ersten Bildaufbau,
+     nicht erst wenn JavaScript gelaufen ist. Sonst blitzt sie auf. */
+  html.is-mobile .topbar,
+  html.is-mobile .bottom-bar,
+  html.is-mobile .appbar-large,
+  html.is-mobile #app-screen > .page,
+  html.is-mobile #ai-coach-fab,
+  html.is-mobile #cloud-disconnected { display: none !important; }
+  /* Bis die neue Oberflaeche steht, bleibt der Grund schwarz statt
+     halbfertiger Website. */
+  html.is-mobile, html.is-mobile body { background: #000 !important; }
+
   /* Alte Oberflaeche stilllegen, solange die neue laeuft */
   body.m-on .topbar,
   body.m-on .bottom-bar,

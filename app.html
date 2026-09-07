@@ -78,7 +78,15 @@
    selbst am Aktualisieren hindern. Die Seite prueft deshalb bei jedem
    Start, ob sie zum Server passt, und repariert sich einmalig selbst.
    Gegen Endlosschleifen abgesichert ueber sessionStorage. */
-window.__BUILD = '2026-09-09e';
+window.__BUILD = '2026-09-09f';
+/* Vor dem ersten Bildaufbau markieren, damit die alte Oberflaeche auf
+   dem Handy gar nicht erst gezeigt wird. Wird sie erst per JavaScript
+   ausgeblendet, blitzt sie sichtbar auf. */
+try {
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    document.documentElement.className += ' is-mobile';
+  }
+} catch (e) {}
 (function () {
   try {
     if (sessionStorage.getItem('bs_healed') === window.__BUILD) return;
