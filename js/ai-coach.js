@@ -356,11 +356,30 @@ function buildUserContext() {
 
 // ===== SEND MESSAGE TO GEMINI =====
 
-// Firebase ID-Token holen — der Proxy lässt nur eingeloggte User durch
+// Auf die Firebase-Sitzung warten. Nach einem Reload stellt Firebase die
+// Session asynchron wieder her — wer sofort den Coach oeffnet, wuerde sonst
+// faelschlich "nicht eingeloggt" sehen.
+function _waitForFirebaseUser(timeoutMs) {
+  return new Promise(function(resolve) {
+    if (typeof _fbAuth === 'undefined' || !_fbAuth) return resolve(null);
+    if (_fbAuth.currentUser) return resolve(_fbAuth.currentUser);
+
+    var done = false;
+    function finish(u) { if (!done) { done = true; resolve(u || null); } }
+
+    var unsub = _fbAuth.onAuthStateChanged(function(u) {
+      if (u) { if (unsub) unsub(); finish(u); }
+    });
+    setTimeout(function() { if (unsub) unsub(); finish(_fbAuth.currentUser); }, timeoutMs || 6000);
+  });
+}
+
+// Firebase ID-Token holen — der Proxy laesst nur eingeloggte User durch
 async function _coachAuthHeader() {
   try {
-    if (typeof _fbAuth !== 'undefined' && _fbAuth && _fbAuth.currentUser) {
-      var token = await _fbAuth.currentUser.getIdToken();
+    var user = await _waitForFirebaseUser(6000);
+    if (user) {
+      var token = await user.getIdToken();
       return { Authorization: 'Bearer ' + token };
     }
   } catch (e) { /* unten abgefangen */ }
@@ -372,7 +391,8 @@ async function sendToCoach(userMessage) {
 
   var authHeader = await _coachAuthHeader();
   if (!authHeader) {
-    return 'Du bist nicht eingeloggt — logg dich neu ein, dann bin ich wieder da.';
+    return 'Ich komme gerade nicht an deine Anmeldung. Lade die Seite neu — '
+         + 'wenn es dann immer noch klemmt, einmal ausloggen und neu einloggen.';
   }
 
   // Verlauf (letzte 16 Nachrichten) + neue Frage.

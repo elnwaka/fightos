@@ -98,6 +98,17 @@ function applyCloudData(cloud) {
   localStorage.setItem('fos_last_sync', new Date().toISOString());
 }
 
+// Wird vom Auth-Listener in app.html gerufen, sobald Firebase die Sitzung
+// wiederhergestellt hat — auch wenn das erst NACH enterApp() passiert.
+// Ohne das startet der Cloud-Sync auf langsamen Verbindungen nie.
+window._boxspecAuthReady = function(fbUser) {
+  if (!fbUser || !_fbSyncEnabled) return;
+  if (_snapshotUnsub) return; // laeuft schon
+  if (typeof currentUser === 'undefined' || !currentUser) return;
+  syncFromCloud(function() {});
+  startRealtimeSync();
+};
+
 // Real-time listener — auto-receives changes from other devices
 var _snapshotUnsub = null;
 function startRealtimeSync() {

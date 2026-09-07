@@ -670,16 +670,20 @@ if (localStorage.getItem('fos_current')) {
   }
 
   if (_fbAuth) {
-    var authHandled = false;
+    var autoLoginDone = false;
+    // WICHTIG: Der Listener muss _fbUser IMMER aktualisieren, nicht nur beim
+    // ersten Mal. Frueher blockte ein authHandled-Flag alle weiteren Aufrufe —
+    // wenn Firebase laenger als der Timeout brauchte, blieb _fbUser dauerhaft
+    // null und Cloud-Sync sowie AI Coach waren fuer die ganze Seite tot.
     _fbAuth.onAuthStateChanged(function(fbUser) {
-      if (authHandled) return;
-      authHandled = true;
       _fbUser = fbUser;
-      doAutoLogin();
+      if (window._boxspecAuthReady) window._boxspecAuthReady(fbUser);
+      if (!autoLoginDone) { autoLoginDone = true; doAutoLogin(); }
     });
-    // If Firebase takes too long, go ahead with localStorage
+    // Falls Firebase zu lange braucht: trotzdem rein, aber der Listener
+    // oben traegt _fbUser nach, sobald die Sitzung da ist.
     setTimeout(function() {
-      if (!authHandled) { authHandled = true; doAutoLogin(); }
+      if (!autoLoginDone) { autoLoginDone = true; doAutoLogin(); }
     }, 2000);
   } else {
     doAutoLogin();
