@@ -6460,3 +6460,62 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
   line-height: 1.45;
 }
 @media (prefers-reduced-motion: reduce) { .pillars-bar > i { transition: none; } }
+
+@media (max-width: 768px) {
+  /* ----------------------------------------------------------
+     Sieben Blocktypen, sieben Flaechenfarben, sieben Streifen.
+     iOS faerbt keine ganzen Zeilen ein — die Zeile bleibt
+     neutral, der Typ steht als kleines Zeichen daneben.
+     ---------------------------------------------------------- */
+  .day-block,
+  .day-block.strength,
+  .day-block.cardio,
+  .day-block.boxing,
+  .day-block.recovery,
+  .day-block.meta,
+  .day-block.fight,
+  .day-block.off {
+    background: var(--surface-2) !important;
+    color: var(--light) !important;
+    border-left: 0 !important;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  /* Der Typ als kleiner farbiger Punkt statt als Flaeche */
+  .day-block::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 14px;
+    width: 3px; height: 16px;
+    border-radius: 0 2px 2px 0;
+    background: var(--surface-4);
+  }
+  .day-block.strength::before { background: var(--blue); }
+  .day-block.cardio::before   { background: var(--green); }
+  .day-block.boxing::before   { background: var(--red); }
+  .day-block.recovery::before { background: var(--orange); }
+  .day-block.meta::before     { background: var(--gold); }
+  .day-block.fight::before    { background: var(--red); }
+
+  /* Tageskarte: keine Eigenfarbe, keine Rahmen */
+  .day-col,
+  .day-col.day-active {
+    background: var(--surface-1) !important;
+    border: none !important;
+    border-radius: 12px;
+  }
+
+  /* Wochenpunkte auf eine Farbe: erledigt, aktuell, offen */
+  .wk-dot, .week-dot { background: var(--surface-3) !important; }
+  .wk-dot.done, .week-dot.done { background: var(--text-muted) !important; }
+  .wk-dot.current, .week-dot.current,
+  .wk-dot.active, .week-dot.active { background: var(--red) !important; }
+
+  /* Statusknoepfe: getoenter Text statt umrandetem Kasten (iOS) */
+  .status-pill,
+  .recovery-pill {
+    background: none !important;
+    border: none !important;
+    padding-left: 0 !important;
+  }
+}
