@@ -5391,10 +5391,11 @@ function _renderWeekPlanInner() {
     var progressDots = '';
     for (var pw = 1; pw <= 10; pw++) {
       var pwPhase = getP10WPhase(pw);
-      var dotStyle = pw === p10wWeek ? 'width:12px;height:12px;border:2px solid #fff;' : 'width:8px;height:8px;opacity:0.5;';
-      progressDots += '<div style="'+dotStyle+'border-radius:50%;background:'+pwPhase.color+';"></div>';
+      // Drei Zustaende statt zehn Phasenfarben: erledigt, jetzt, offen.
+      var cls = pw < p10wWeek ? 'wdot done' : (pw === p10wWeek ? 'wdot now' : 'wdot');
+      progressDots += '<div class="' + cls + '"></div>';
     }
-    p10wBanner = '<div style="margin-bottom:16px;padding:14px 18px;background:var(--surface-0);border-radius:var(--radius-md);border-left:3px solid '+p10wPhase.color+';">'
+    p10wBanner = '<div class="phase-banner" style="margin-bottom:16px;padding:14px 18px;background:var(--surface-1);border-radius:12px;">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'
       + '<div><span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:'+p10wPhase.color+';letter-spacing:1px;">WOCHE '+p10wWeek+'/10</span>'
       + '<span style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-muted);margin-left:12px;">'+p10wPhase.name.toUpperCase()+'</span></div>'
@@ -5530,9 +5531,10 @@ function _renderWeekPlanInner() {
           var bs = BLOCK_SAEULEN[b.type];
           if (bs) bs.forEach(function(si) { daySäulen[si] = true; });
         });
-        var saeulenColors8 = ['#e8000d','#2979ff','#ab47bc','#4caf50','#ff6d00','#f5c518','#00bcd4','#8bc34a'];
-        var daySäulenDots = Object.keys(daySäulen).map(function(si) {
-          return '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + saeulenColors8[si] + ';"></span>';
+        // Acht Eigenfarben fuer 6px-Punkte entschluesselt niemand. Die
+        // Information ist die ANZAHL abgedeckter Saeulen, nicht welche.
+        var daySäulenDots = Object.keys(daySäulen).map(function() {
+          return '<span class="sdot"></span>';
         }).join('');
 
         return `<div class="day-col${isToday ? ' day-today day-active' : ''}">
@@ -5551,8 +5553,8 @@ function _renderWeekPlanInner() {
               const logKey = day + '_' + bi + '_' + getWeekId();
               const done = isBlockLogged(logKey);
               var blockSäulen = BLOCK_SAEULEN[b.type] || [];
-              var blockDots = blockSäulen.map(function(si) {
-                return '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + saeulenColors8[si] + ';"></span>';
+              var blockDots = blockSäulen.map(function() {
+                return '<span class="sdot sdot-sm"></span>';
               }).join('');
               return `<div class="day-block ${TYPE_CLASS[b.type] || 'meta'}${done ? ' block-done' : ''}" onclick="openBlockDetail('${day}',${bi})" title="Klicke fürDetails">
               <div style="display:flex;justify-content:space-between;align-items:center;">

@@ -6519,3 +6519,26 @@ body.has-cloud-banner .topbar { margin-top: var(--cloud-banner-h, 0px); }
     padding-left: 0 !important;
   }
 }
+
+/* Säulen-Punkte: eine Farbe. Die Aussage ist die Anzahl, nicht welche. */
+.sdot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(235,235,245,.35);
+  margin-left: 3px;
+}
+.sdot-sm { width: 5px; height: 5px; }
+
+/* Wochenpunkte des Programms: drei Zustände statt zehn Phasenfarben */
+.wdot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(235,235,245,.18);
+}
+.wdot.done { background: rgba(235,235,245,.45); }
+.wdot.now {
+  width: 12px; height: 12px;
+  background: var(--red);
+  box-shadow: 0 0 0 2px rgba(232,0,13,.25);
+}
