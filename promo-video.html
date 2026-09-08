@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoxSpec Promo Video</title>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --red: #E8000D;
+    --red-glow: rgba(232, 0, 13, 0.6);
+    --white: #f0f0f0;
+    --gray: #888;
+    --card-bg: #14141c;
+    --card-border: #1e1e2a;
+  }
+
+  body {
+    background: #111;
+    color: var(--white);
+    font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 60px;
+    padding: 40px 20px;
+  }
+
+  .version-label {
+    font-family: Impact, 'Arial Black', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 8px;
+  }
+
+  /* ===== VIEWPORT FRAMES ===== */
+  .frame {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+    border: 1px solid #222;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .frame-mobile { width: 390px; height: 844px; }
+  .frame-desktop { width: 1920px; height: 1080px; }
+
+  /* ===== SCENE SYSTEM ===== */
+  .scene {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ===== TYPOGRAPHY ===== */
+  .heading {
+    font-family: Impact, 'Arial Black', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    line-height: 1.1;
+  }
+  .subtext {
+    font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--gray);
+    font-weight: 300;
+  }
+
+  /* ===== SHARED ELEMENT STYLES ===== */
+  .red-accent { color: var(--red); }
+  .red-glow-text {
+    text-shadow: 0 0 30px var(--red-glow), 0 0 60px rgba(232,0,13,0.3);
+  }
+
+  .stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .stat-card .stat-num {
+    font-family: Impact, 'Arial Black', sans-serif;
+    color: var(--red);
+  }
+  .stat-card .stat-label {
+    color: var(--gray);
+  }
+
+  .pill {
+    display: inline-block;
+    border-radius: 999px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .pill-outline {
+    border: 1px solid #333;
+    color: var(--gray);
+    background: transparent;
+  }
+  .pill-filled {
+    background: var(--red);
+    color: #fff;
+    border: 1px solid var(--red);
+  }
+
+  .chat-bubble {
+    border-radius: 16px;
+    max-width: 80%;
+    line-height: 1.5;
+  }
+  .bubble-user {
+    background: var(--red);
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .bubble-ai {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--white);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  .cta-button {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: Impact, 'Arial Black', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* ===== MOCK PHONE ===== */
+  .phone-mock {
+    background: #111118;
+    border-radius: 32px;
+    border: 3px solid #2a2a35;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .phone-statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--gray);
+    font-size: 11px;
+    padding: 8px 16px;
+  }
+  .phone-content {
+    flex: 1;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .dash-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: #1e1e2a;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--red);
+    border-radius: 3px;
+  }
+
+  /* ===== VIDEO GRID MOCK ===== */
+  .video-thumb {
+    background: #1a1a24;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+  .video-thumb::after {
+    content: "\25B6";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 20px;
+    background: rgba(0,0,0,0.3);
+  }
+  .video-label {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+
+  /* ================================================
+     MOBILE ANIMATIONS (390x844)
+     ================================================ */
+
+  /* Scene 1: Logo (0-3s) */
+  .frame-mobile .scene-1 {
+    animation: fadeScene 3s ease 0s forwards;
+  }
+  .frame-mobile .scene-1 .logo-text {
+    font-size: 64px;
+    animation: glowPulse 2s ease 0.5s forwards;
+    opacity: 0;
+  }
+  .frame-mobile .scene-1 .tagline {
+    font-size: 16px;
+    margin-top: 16px;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.4s forwards;
+  }
+
+  /* Scene 2: Dashboard (3-7s) */
+  .frame-mobile .scene-2 {
+    animation: fadeScene 4s ease 3s forwards;
+  }
+  .frame-mobile .scene-2 .phone-mock {
+    width: 280px;
+    height: 500px;
+    opacity: 0;
+    animation: slideUp 0.8s ease 3.5s forwards;
+  }
+  .frame-mobile .scene-2 .scene-label {
+    font-size: 22px;
+    margin-top: 20px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 4.2s forwards;
+  }
+
+  /* Scene 3: AI Coach (7-11s) */
+  .frame-mobile .scene-3 {
+    animation: fadeScene 4s ease 7s forwards;
+  }
+  .frame-mobile .scene-3 .chat-container {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .frame-mobile .scene-3 .bubble-user {
+    padding: 12px 18px;
+    font-size: 14px;
+    opacity: 0;
+    animation: slideLeft 0.6s ease 7.5s forwards;
+  }
+  .frame-mobile .scene-3 .bubble-ai {
+    padding: 12px 18px;
+    font-size: 14px;
+    opacity: 0;
+    animation: slideRight 0.6s ease 8.3s forwards;
+  }
+  .frame-mobile .scene-3 .scene-label {
+    font-size: 22px;
+    margin-top: 28px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 9.2s forwards;
+  }
+  .frame-mobile .scene-3 .scene-sublabel {
+    font-size: 14px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 9.6s forwards;
+  }
+
+  /* Scene 4: Videos (11-14s) */
+  .frame-mobile .scene-4 {
+    animation: fadeScene 3s ease 11s forwards;
+  }
+  .frame-mobile .scene-4 .pills-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .frame-mobile .scene-4 .pill {
+    padding: 8px 16px;
+    font-size: 13px;
+    opacity: 0;
+  }
+  .frame-mobile .scene-4 .pill:nth-child(1) { animation: fadeUp 0.4s ease 11.3s forwards; }
+  .frame-mobile .scene-4 .pill:nth-child(2) { animation: fadeUp 0.4s ease 11.5s forwards; }
+  .frame-mobile .scene-4 .pill:nth-child(3) { animation: fadeUp 0.4s ease 11.7s forwards; }
+  .frame-mobile .scene-4 .pill:nth-child(4) { animation: fadeUp 0.4s ease 11.9s forwards; }
+  .frame-mobile .scene-4 .video-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 140px);
+    gap: 10px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 12s forwards;
+  }
+  .frame-mobile .scene-4 .video-thumb {
+    height: 90px;
+  }
+  .frame-mobile .scene-4 .scene-label {
+    font-size: 28px;
+    margin-top: 24px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 12.4s forwards;
+  }
+
+  /* Scene 5: Stats (14-17s) */
+  .frame-mobile .scene-5 {
+    animation: fadeScene 3s ease 14s forwards;
+  }
+  .frame-mobile .scene-5 .stats-row {
+    display: flex;
+    gap: 16px;
+  }
+  .frame-mobile .scene-5 .stat-card {
+    width: 100px;
+    height: 110px;
+    opacity: 0;
+  }
+  .frame-mobile .scene-5 .stat-card .stat-num { font-size: 32px; }
+  .frame-mobile .scene-5 .stat-card .stat-label { font-size: 12px; margin-top: 4px; }
+  .frame-mobile .scene-5 .stat-card:nth-child(1) { animation: flyIn 0.5s ease 14.4s forwards; }
+  .frame-mobile .scene-5 .stat-card:nth-child(2) { animation: flyIn 0.5s ease 14.7s forwards; }
+  .frame-mobile .scene-5 .stat-card:nth-child(3) { animation: flyIn 0.5s ease 15.0s forwards; }
+
+  /* Scene 6: CTA (17-20s) */
+  .frame-mobile .scene-6 {
+    animation: fadeScene 3s ease 17s forwards;
+  }
+  .frame-mobile .scene-6 .cta-main {
+    font-size: 26px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 17.4s forwards;
+  }
+  .frame-mobile .scene-6 .cta-sub {
+    font-size: 14px;
+    margin-top: 8px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 17.8s forwards;
+  }
+  .frame-mobile .scene-6 .cta-button {
+    margin-top: 28px;
+    padding: 16px 40px;
+    font-size: 18px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 18.2s forwards;
+  }
+  .frame-mobile .scene-6 .cta-url {
+    font-size: 20px;
+    margin-top: 20px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 18.6s forwards;
+  }
+  .frame-mobile .scene-6 .cta-button-wrap {
+    animation: buttonPulse 1.5s ease 18.5s infinite;
+  }
+
+  /* ================================================
+     DESKTOP ANIMATIONS (1920x1080)
+     ================================================ */
+
+  /* Scene 1 */
+  .frame-desktop .scene-1 {
+    animation: fadeScene 3s ease 0s forwards;
+  }
+  .frame-desktop .scene-1 .logo-text {
+    font-size: 120px;
+    animation: glowPulse 2s ease 0.5s forwards;
+    opacity: 0;
+  }
+  .frame-desktop .scene-1 .tagline {
+    font-size: 28px;
+    margin-top: 24px;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.4s forwards;
+  }
+
+  /* Scene 2 */
+  .frame-desktop .scene-2 {
+    animation: fadeScene 4s ease 3s forwards;
+  }
+  .frame-desktop .scene-2 .phone-mock {
+    width: 360px;
+    height: 640px;
+    opacity: 0;
+    animation: slideUp 0.8s ease 3.5s forwards;
+  }
+  .frame-desktop .scene-2 .scene-label {
+    font-size: 42px;
+    margin-top: 32px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 4.2s forwards;
+  }
+
+  /* Scene 3 */
+  .frame-desktop .scene-3 {
+    animation: fadeScene 4s ease 7s forwards;
+  }
+  .frame-desktop .scene-3 .chat-container {
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .frame-desktop .scene-3 .bubble-user {
+    padding: 18px 28px;
+    font-size: 20px;
+    opacity: 0;
+    animation: slideLeft 0.6s ease 7.5s forwards;
+  }
+  .frame-desktop .scene-3 .bubble-ai {
+    padding: 18px 28px;
+    font-size: 20px;
+    opacity: 0;
+    animation: slideRight 0.6s ease 8.3s forwards;
+  }
+  .frame-desktop .scene-3 .scene-label {
+    font-size: 42px;
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 9.2s forwards;
+  }
+  .frame-desktop .scene-3 .scene-sublabel {
+    font-size: 22px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 9.6s forwards;
+  }
+
+  /* Scene 4 */
+  .frame-desktop .scene-4 {
+    animation: fadeScene 3s ease 11s forwards;
+  }
+  .frame-desktop .scene-4 .pills-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .frame-desktop .scene-4 .pill {
+    padding: 12px 28px;
+    font-size: 18px;
+    opacity: 0;
+  }
+  .frame-desktop .scene-4 .pill:nth-child(1) { animation: fadeUp 0.4s ease 11.3s forwards; }
+  .frame-desktop .scene-4 .pill:nth-child(2) { animation: fadeUp 0.4s ease 11.5s forwards; }
+  .frame-desktop .scene-4 .pill:nth-child(3) { animation: fadeUp 0.4s ease 11.7s forwards; }
+  .frame-desktop .scene-4 .pill:nth-child(4) { animation: fadeUp 0.4s ease 11.9s forwards; }
+  .frame-desktop .scene-4 .video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 220px);
+    gap: 16px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 12s forwards;
+  }
+  .frame-desktop .scene-4 .video-thumb {
+    height: 130px;
+  }
+  .frame-desktop .scene-4 .scene-label {
+    font-size: 48px;
+    margin-top: 36px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 12.4s forwards;
+  }
+
+  /* Scene 5 */
+  .frame-desktop .scene-5 {
+    animation: fadeScene 3s ease 14s forwards;
+  }
+  .frame-desktop .scene-5 .stats-row {
+    display: flex;
+    gap: 32px;
+  }
+  .frame-desktop .scene-5 .stat-card {
+    width: 200px;
+    height: 180px;
+    opacity: 0;
+  }
+  .frame-desktop .scene-5 .stat-card .stat-num { font-size: 56px; }
+  .frame-desktop .scene-5 .stat-card .stat-label { font-size: 18px; margin-top: 8px; }
+  .frame-desktop .scene-5 .stat-card:nth-child(1) { animation: flyIn 0.5s ease 14.4s forwards; }
+  .frame-desktop .scene-5 .stat-card:nth-child(2) { animation: flyIn 0.5s ease 14.7s forwards; }
+  .frame-desktop .scene-5 .stat-card:nth-child(3) { animation: flyIn 0.5s ease 15.0s forwards; }
+
+  /* Scene 6 */
+  .frame-desktop .scene-6 {
+    animation: fadeScene 3s ease 17s forwards;
+  }
+  .frame-desktop .scene-6 .cta-main {
+    font-size: 52px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 17.4s forwards;
+  }
+  .frame-desktop .scene-6 .cta-sub {
+    font-size: 22px;
+    margin-top: 12px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 17.8s forwards;
+  }
+  .frame-desktop .scene-6 .cta-button {
+    margin-top: 40px;
+    padding: 22px 64px;
+    font-size: 26px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 18.2s forwards;
+  }
+  .frame-desktop .scene-6 .cta-url {
+    font-size: 36px;
+    margin-top: 28px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 18.6s forwards;
+  }
+  .frame-desktop .scene-6 .cta-button-wrap {
+    animation: buttonPulse 1.5s ease 18.5s infinite;
+  }
+
+  /* ================================================
+     KEYFRAMES
+     ================================================ */
+
+  @keyframes fadeScene {
+    0%   { opacity: 0; }
+    8%   { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes glowPulse {
+    0%   { opacity: 0; text-shadow: none; transform: scale(0.9); }
+    50%  { opacity: 1; text-shadow: 0 0 40px var(--red-glow), 0 0 80px rgba(232,0,13,0.3); transform: scale(1.02); }
+    100% { opacity: 1; text-shadow: 0 0 20px var(--red-glow), 0 0 50px rgba(232,0,13,0.2); transform: scale(1); }
+  }
+
+  @keyframes fadeUp {
+    0%   { opacity: 0; transform: translateY(24px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideUp {
+    0%   { opacity: 0; transform: translateY(60px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideLeft {
+    0%   { opacity: 0; transform: translateX(40px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slideRight {
+    0%   { opacity: 0; transform: translateX(-40px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes flyIn {
+    0%   { opacity: 0; transform: scale(0.4) translateY(40px); }
+    70%  { opacity: 1; transform: scale(1.08) translateY(-4px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  @keyframes buttonPulse {
+    0%   { transform: scale(1); box-shadow: 0 0 0 0 var(--red-glow); }
+    50%  { transform: scale(1.04); box-shadow: 0 0 30px 8px var(--red-glow); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 var(--red-glow); }
+  }
+
+  /* ===== LOOPING: restart every 20s ===== */
+  .frame-mobile, .frame-desktop {
+    animation: loopReset 20s linear infinite;
+  }
+  /* Force all children to re-trigger by toggling the parent */
+  @keyframes loopReset {
+    0%, 100% { opacity: 1; }
+  }
+
+  /* ===== Vignette overlay ===== */
+  .vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+    z-index: 10;
+  }
+
+  /* ===== Subtle noise texture ===== */
+  .frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    z-index: 11;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 128px;
+  }
+
+  /* ===== Red corner accents ===== */
+  .corner-accent {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .corner-tl { top: 0; left: 0; border-top: 2px solid var(--red); border-left: 2px solid var(--red); }
+  .corner-tr { top: 0; right: 0; border-top: 2px solid var(--red); border-right: 2px solid var(--red); }
+  .corner-bl { bottom: 0; left: 0; border-bottom: 2px solid var(--red); border-left: 2px solid var(--red); }
+  .corner-br { bottom: 0; right: 0; border-bottom: 2px solid var(--red); border-right: 2px solid var(--red); }
+
+  /* Scanline effect */
+  .scanline {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,0,0,0.05) 3px,
+      rgba(0,0,0,0.05) 4px
+    );
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== MOBILE VERSION ==================== -->
+<div class="version-label">MOBILE / iOS (390 x 844)</div>
+<div class="frame frame-mobile" id="mobileFrame">
+  <div class="vignette"></div>
+  <div class="scanline"></div>
+  <div class="corner-accent corner-tl"></div>
+  <div class="corner-accent corner-tr"></div>
+  <div class="corner-accent corner-bl"></div>
+  <div class="corner-accent corner-br"></div>
+
+  <!-- SCENE 1: Logo -->
+  <div class="scene scene-1">
+    <div class="logo-text heading red-accent red-glow-text">BOX<span style="color:var(--white)">SPEC</span></div>
+    <div class="tagline subtext" style="letter-spacing:4px;">TRAINIERE WIE EIN CHAMPION.</div>
+  </div>
+
+  <!-- SCENE 2: Dashboard -->
+  <div class="scene scene-2">
+    <div class="phone-mock">
+      <div class="phone-statusbar">
+        <span>9:41</span>
+        <span style="font-weight:700; color:var(--white); font-size:13px;">BoxSpec</span>
+        <span>100%</span>
+      </div>
+      <div class="phone-content">
+        <div class="dash-card">
+          <div style="font-size:12px; color:var(--gray); margin-bottom:6px;">Woche 4 / 10</div>
+          <div style="font-family:Impact; font-size:22px; color:var(--white);">Trainingsplan</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:40%;"></div></div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div class="dash-card" style="flex:1;">
+            <div style="font-size:11px; color:var(--gray);">Footwork</div>
+            <div style="font-family:Impact; font-size:20px; color:var(--red);">7.2</div>
+          </div>
+          <div class="dash-card" style="flex:1;">
+            <div style="font-size:11px; color:var(--gray);">Defense</div>
+            <div style="font-family:Impact; font-size:20px; color:var(--red);">6.8</div>
+          </div>
+          <div class="dash-card" style="flex:1;">
+            <div style="font-size:11px; color:var(--gray);">Power</div>
+            <div style="font-family:Impact; font-size:20px; color:var(--red);">8.1</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div style="font-size:12px; color:var(--gray); margin-bottom:4px;">Heute</div>
+          <div style="font-size:14px; color:var(--white); font-weight:600;">Footwork + Schattenboxen</div>
+          <div style="font-size:11px; color:var(--red); margin-top:4px;">3 Runden / 15 Min</div>
+        </div>
+        <div class="dash-card" style="display:flex; flex-direction:row; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-size:18px;">&#x1F94A;</div>
+          <div>
+            <div style="font-size:13px; font-weight:600;">AI Coach</div>
+            <div style="font-size:11px; color:var(--gray);">Tipp: Trainiere deine Jab-Frequenz</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-label heading red-accent">10-Wochen Trainingsplan</div>
+  </div>
+
+  <!-- SCENE 3: AI Coach -->
+  <div class="scene scene-3">
+    <div style="font-size:11px; color:var(--gray); letter-spacing:3px; margin-bottom:16px; text-transform:uppercase;">AI Boxing Coach</div>
+    <div class="chat-container">
+      <div class="chat-bubble bubble-user">Wie verbessere ich meinen Jab?</div>
+      <div class="chat-bubble bubble-ai">Fokus auf 3 Punkte: Gewichtsverlagerung auf den vorderen Fu&szlig;, Faust auf gerader Linie zum Ziel, und sofortiger R&uuml;ckzug. Starte mit 3x2min Schattenboxen &mdash; nur Jab.</div>
+    </div>
+    <div class="scene-label heading red-accent">Dein AI Boxing Coach.</div>
+    <div class="scene-sublabel subtext" style="margin-top:6px;">24/7. Immer bereit.</div>
+  </div>
+
+  <!-- SCENE 4: Videos -->
+  <div class="scene scene-4">
+    <div class="pills-row">
+      <span class="pill pill-filled">Legenden</span>
+      <span class="pill pill-outline">Ring IQ</span>
+      <span class="pill pill-outline">Defense</span>
+      <span class="pill pill-outline">Basics</span>
+    </div>
+    <div class="video-grid">
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label">Mike Tyson: Peek-a-Boo</div>
+      </div>
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label">Ali: Footwork Mastery</div>
+      </div>
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label">Lomachenko Angles</div>
+      </div>
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label">Canelo: Counter</div>
+      </div>
+    </div>
+    <div class="scene-label heading">60+ kuratierte <span class="red-accent">Videos</span></div>
+  </div>
+
+  <!-- SCENE 5: Stats -->
+  <div class="scene scene-5">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num">8</div>
+        <div class="stat-label">S&auml;ulen</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">10</div>
+        <div class="stat-label">Wochen</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Coach</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 6: CTA -->
+  <div class="scene scene-6">
+    <div class="cta-main heading">KOSTENLOS.<br>KEIN DOWNLOAD.</div>
+    <div class="cta-sub subtext">Trainiere direkt im Browser.</div>
+    <div class="cta-button-wrap" style="display:inline-block; border-radius:12px;">
+      <div class="cta-button">JETZT STARTEN</div>
+    </div>
+    <div class="cta-url heading red-accent red-glow-text">boxspec.app</div>
+  </div>
+</div>
+
+<!-- ==================== DESKTOP VERSION ==================== -->
+<div class="version-label" style="margin-top:40px;">DESKTOP (1920 x 1080)</div>
+<div class="frame frame-desktop" id="desktopFrame">
+  <div class="vignette"></div>
+  <div class="scanline"></div>
+  <div class="corner-accent corner-tl" style="width:100px; height:100px;"></div>
+  <div class="corner-accent corner-tr" style="width:100px; height:100px;"></div>
+  <div class="corner-accent corner-bl" style="width:100px; height:100px;"></div>
+  <div class="corner-accent corner-br" style="width:100px; height:100px;"></div>
+
+  <!-- SCENE 1: Logo -->
+  <div class="scene scene-1">
+    <div class="logo-text heading red-accent red-glow-text">BOX<span style="color:var(--white)">SPEC</span></div>
+    <div class="tagline subtext" style="letter-spacing:6px;">TRAINIERE WIE EIN CHAMPION.</div>
+  </div>
+
+  <!-- SCENE 2: Dashboard -->
+  <div class="scene scene-2">
+    <div class="phone-mock">
+      <div class="phone-statusbar">
+        <span>9:41</span>
+        <span style="font-weight:700; color:var(--white); font-size:14px;">BoxSpec</span>
+        <span>100%</span>
+      </div>
+      <div class="phone-content" style="padding:16px; gap:12px;">
+        <div class="dash-card" style="padding:16px;">
+          <div style="font-size:13px; color:var(--gray); margin-bottom:8px;">Woche 4 / 10</div>
+          <div style="font-family:Impact; font-size:26px; color:var(--white);">Trainingsplan</div>
+          <div class="progress-bar" style="height:8px; margin-top:10px;"><div class="progress-fill" style="width:40%;"></div></div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div class="dash-card" style="flex:1; padding:14px;">
+            <div style="font-size:12px; color:var(--gray);">Footwork</div>
+            <div style="font-family:Impact; font-size:24px; color:var(--red);">7.2</div>
+          </div>
+          <div class="dash-card" style="flex:1; padding:14px;">
+            <div style="font-size:12px; color:var(--gray);">Defense</div>
+            <div style="font-family:Impact; font-size:24px; color:var(--red);">6.8</div>
+          </div>
+          <div class="dash-card" style="flex:1; padding:14px;">
+            <div style="font-size:12px; color:var(--gray);">Power</div>
+            <div style="font-family:Impact; font-size:24px; color:var(--red);">8.1</div>
+          </div>
+        </div>
+        <div class="dash-card" style="padding:16px;">
+          <div style="font-size:13px; color:var(--gray); margin-bottom:6px;">Heute</div>
+          <div style="font-size:16px; color:var(--white); font-weight:600;">Footwork + Schattenboxen</div>
+          <div style="font-size:12px; color:var(--red); margin-top:6px;">3 Runden / 15 Min</div>
+        </div>
+        <div class="dash-card" style="display:flex; flex-direction:row; align-items:center; gap:12px; padding:14px;">
+          <div style="width:40px; height:40px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-size:20px;">&#x1F94A;</div>
+          <div>
+            <div style="font-size:14px; font-weight:600;">AI Coach</div>
+            <div style="font-size:12px; color:var(--gray);">Tipp: Trainiere deine Jab-Frequenz</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scene-label heading red-accent">10-Wochen Trainingsplan</div>
+  </div>
+
+  <!-- SCENE 3: AI Coach -->
+  <div class="scene scene-3">
+    <div style="font-size:16px; color:var(--gray); letter-spacing:4px; margin-bottom:24px; text-transform:uppercase;">AI Boxing Coach</div>
+    <div class="chat-container">
+      <div class="chat-bubble bubble-user">Wie verbessere ich meinen Jab?</div>
+      <div class="chat-bubble bubble-ai">Fokus auf 3 Punkte: Gewichtsverlagerung auf den vorderen Fu&szlig;, Faust auf gerader Linie zum Ziel, und sofortiger R&uuml;ckzug. Starte mit 3x2min Schattenboxen &mdash; nur Jab.</div>
+    </div>
+    <div class="scene-label heading red-accent">Dein AI Boxing Coach.</div>
+    <div class="scene-sublabel subtext" style="margin-top:8px;">24/7. Immer bereit.</div>
+  </div>
+
+  <!-- SCENE 4: Videos -->
+  <div class="scene scene-4">
+    <div class="pills-row">
+      <span class="pill pill-filled">Legenden</span>
+      <span class="pill pill-outline">Ring IQ</span>
+      <span class="pill pill-outline">Defense</span>
+      <span class="pill pill-outline">Basics</span>
+    </div>
+    <div class="video-grid">
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label" style="font-size:14px;">Mike Tyson: Peek-a-Boo</div>
+      </div>
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label" style="font-size:14px;">Ali: Footwork Mastery</div>
+      </div>
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label" style="font-size:14px;">Lomachenko Angles</div>
+      </div>
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label" style="font-size:14px;">Canelo: Counter</div>
+      </div>
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label" style="font-size:14px;">Floyd: Shoulder Roll</div>
+      </div>
+      <div>
+        <div class="video-thumb"></div>
+        <div class="video-label" style="font-size:14px;">Pacquiao: Speed</div>
+      </div>
+    </div>
+    <div class="scene-label heading">60+ kuratierte <span class="red-accent">Videos</span></div>
+  </div>
+
+  <!-- SCENE 5: Stats -->
+  <div class="scene scene-5">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num">8</div>
+        <div class="stat-label">S&auml;ulen</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">10</div>
+        <div class="stat-label">Wochen</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Coach</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 6: CTA -->
+  <div class="scene scene-6">
+    <div class="cta-main heading">KOSTENLOS. KEIN DOWNLOAD.</div>
+    <div class="cta-sub subtext">Trainiere direkt im Browser.</div>
+    <div class="cta-button-wrap" style="display:inline-block; border-radius:12px;">
+      <div class="cta-button">JETZT STARTEN</div>
+    </div>
+    <div class="cta-url heading red-accent red-glow-text">boxspec.app</div>
+  </div>
+</div>
+
+<script>
+  // Force animation restart every 20s for true looping
+  function restartAnimations() {
+    const frames = document.querySelectorAll('.frame');
+    frames.forEach(frame => {
+      const clone = frame.cloneNode(true);
+      frame.parentNode.replaceChild(clone, frame);
+    });
+    setTimeout(restartAnimations, 20000);
+  }
+  setTimeout(restartAnimations, 20000);
+</script>
+
+</body>
+</html>
