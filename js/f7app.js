@@ -62,9 +62,20 @@
     t = t.split('·')[0].split('SEKUNDÄR')[0];
     return nice(t.trim().replace(/,\s*$/, ''));
   }
+  /* Die benannten Gruppen decken nur 40 der 74 Uebungen ab, der Rest
+     liegt in exercisesProgram10W. Frueher fehlten die 34 einfach.
+     Damit das nicht wieder passiert, wird am Ende gegen allExercises
+     abgeglichen: was in keiner Gruppe steht, bekommt eine eigene. */
   function exList() {
-    var g = [];
-    function add(l, a) { if (a && a.length) g.push([l, a]); }
+    var g = [], gesehen = {};
+    function add(l, a) {
+      if (!a || !a.length) return;
+      var neu = a.filter(function (e) {
+        if (!e || !e.id || gesehen[e.id]) return false;
+        gesehen[e.id] = 1; return true;
+      });
+      if (neu.length) g.push([l, neu]);
+    }
     try { add('Kraft und Explosivität', exercisesKraft); } catch (e) {}
     try { add('Ausdauer', exercisesAusdauer); } catch (e) {}
     try { add('Nacken und Rumpf', exercisesArmor); } catch (e) {}
@@ -72,6 +83,8 @@
     try { add('Mobilität', exercisesMobility); } catch (e) {}
     try { add('Kraftausdauer', exercisesPowerEndurance); } catch (e) {}
     try { add('Spezialtraining', exercisesSpecial); } catch (e) {}
+    try { add('Aus dem 10-Wochen-Programm', exercisesProgram10W); } catch (e) {}
+    try { add('Weitere', allExercises); } catch (e) {}
     return g;
   }
   function exCount() { try { return allExercises.length; } catch (e) { return 0; } }
@@ -416,11 +429,94 @@
 
   var ARTICLES = {
     ernaehrung:     { t: 'Ernährung',      p: 'training', s: 'ernaehrung',     sel: '[id^="ern-s"]' },
-    periodisierung: { t: 'Periodisierung', p: 'training', s: 'periodisierung', sel: '.cat-header, h2, h3' },
-    regeneration:   { t: 'Regeneration',   p: 'training', s: 'regeneration',   sel: '.cat-header, h2, h3' },
-    saeulen:        { t: '8 Säulen',       p: 'profil',   s: 'saeulen',        sel: '.si-title, h2, h3' }
+    periodisierung: { t: 'Periodisierung', p: 'training', s: 'periodisierung' },
+    regeneration:   { t: 'Regeneration',   p: 'training', s: 'regeneration' },
+    saeulen:        { t: '8 Säulen',       p: 'profil',   s: 'saeulen' }
   };
   var SECS = {};
+
+  /* ---------- Kapitel finden ----------
+     Frueher stand hier je Seite eine Selektorenliste. Drei von vier
+     Seiten trafen damit nichts und fielen auf eine endlose Textwand
+     zurueck: die Ueberschriften heissen dort .sc-card-title, .card-title
+     oder tragen ueberhaupt keine Klasse.
+
+     Statt weiter Selektoren zu pflegen, wird die Struktur befragt:
+     Ueberschriften sind kurz, gross oder fett, und sie wiederholen
+     sich auf derselben Ebene. Genau danach wird gesucht. */
+
+  function tiefe(el, host) {
+    var d = 0;
+    while (el && el !== host) { d++; el = el.parentElement; }
+    return d;
+  }
+
+  function findeUeberschriften(host) {
+    var kand = [];
+    var alle = host.querySelectorAll('*');
+    for (var i = 0; i < alle.length; i++) {
+      var e = alle[i];
+      if (e.children.length > 1) continue;
+      var t = e.textContent.trim();
+      if (t.length < 3 || t.length > 70) continue;
+      var c = getComputedStyle(e);
+      if (parseFloat(c.fontSize) < 17 && +c.fontWeight < 600) continue;
+      if (c.display === 'none' || !e.offsetParent && c.position !== 'fixed') {
+        // unsichtbar, zaehlt nicht
+      }
+      kand.push(e);
+    }
+    // Nach Bauform und Ebene buendeln: was sich wiederholt, ist eine Reihe.
+    var reihen = {};
+    kand.forEach(function (e) {
+      var cls = (typeof e.className === 'string' ? e.className.trim() : '');
+      var key = e.tagName + '|' + cls + '|' + tiefe(e, host);
+      (reihen[key] = reihen[key] || []).push(e);
+    });
+    /* Welche Reihe sind die Kapitel? Nicht einfach die flachste: bei den
+       8 Saeulen liegen darueber drei Obergruppen, und die Seite haette
+       drei Kapitel statt acht gezeigt. Feiner ist hier besser, das ist
+       der Zweck des Aufklappens.
+       Gewertet wird deshalb, wie viele Glieder einer Reihe wirklich
+       Inhalt tragen. Reihen aus Etiketten und Kurzhinweisen fallen so
+       heraus, ohne dass eine Ausnahme je Seite noetig waere. */
+    var beste = null, besteZahl = 0, besteTiefe = 1e9;
+    Object.keys(reihen).forEach(function (k) {
+      var r = reihen[k];
+      if (r.length < 3 || r.length > 20) return;
+      var gut = 0;
+      for (var i = 0; i < r.length; i++) {
+        var rumpf = kapitelRumpf(r[i], r, host);
+        if (rumpf.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().length >= 180) gut++;
+      }
+      if (gut < 3 || gut < r.length * 0.6) return;
+      var d = +k.split('|')[2];
+      if (gut > besteZahl || (gut === besteZahl && d < besteTiefe)) {
+        beste = r; besteZahl = gut; besteTiefe = d;
+      }
+    });
+    return beste || [];
+  }
+
+  /* Der Rumpf eines Kapitels. Bei Karten steht die Ueberschrift im
+     Kasten, nicht davor: dann ist der Kasten der Rumpf. Bei flachem
+     Aufbau sind es die Geschwister bis zur naechsten Ueberschrift. */
+  function kapitelRumpf(h, heads, host) {
+    var knoten = h, karte = null;
+    while (knoten.parentElement && knoten.parentElement !== host) {
+      var el = knoten.parentElement;
+      var drin = 0;
+      for (var i = 0; i < heads.length; i++) if (el.contains(heads[i])) drin++;
+      if (drin !== 1) break;
+      karte = el; knoten = el;
+    }
+    if (karte && karte.textContent.trim().length > h.textContent.trim().length + 30) {
+      return karte.innerHTML;
+    }
+    var rumpf = '', n = h.nextElementSibling;
+    while (n && heads.indexOf(n) === -1) { rumpf += n.outerHTML; n = n.nextElementSibling; }
+    return rumpf;
+  }
 
   function sections(key) {
     var A = ARTICLES[key];
@@ -440,12 +536,11 @@
       var src = document.getElementById('page-' + A.p);
       host.innerHTML = src ? src.innerHTML : '';
     } catch (e) { host.innerHTML = ''; }
-    var heads = [].slice.call(host.querySelectorAll(A.sel));
+    var heads = A.sel ? [].slice.call(host.querySelectorAll(A.sel)) : [];
+    if (!heads.length) heads = findeUeberschriften(host);
     var out = heads.map(function (h) {
       var title = nice(h.textContent.replace(/^\s*\d+[.)]\s*/, '').trim());
-      var body = '', n = h.nextElementSibling;
-      while (n && heads.indexOf(n) === -1) { body += n.outerHTML; n = n.nextElementSibling; }
-      return { title: title, body: body };
+      return { title: title, body: kapitelRumpf(h, heads, host) };
     }).filter(function (x) { return x.title && x.body; });
     SECS[key] = out;
     return { secs: out, raw: host.innerHTML };
