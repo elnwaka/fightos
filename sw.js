@@ -1,13 +1,13 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-09-09i';
+const BUILD = '2026-09-10a';
 const CACHE_NAME = 'boxspec-' + BUILD;
 const PRECACHE = [
   './',
   './index.html',
   './app.html',
   './css/style.css',
-  './css/native.css',
-  './css/mobile.css',
+  './css/f7theme.css',
+  './vendor/framework7.min.css',
   './js/util.js',
   './js/app.js',
   './js/pages.js',
@@ -16,7 +16,8 @@ const PRECACHE = [
   './js/ai-coach.js',
   './js/video-library.js',
   './js/community.js',
-  './js/mobile.js',
+  './js/f7app.js',
+  './vendor/framework7.min.js',
   './manifest.json',
   './js/chart.min.js',
   './js/firebase-app.js',

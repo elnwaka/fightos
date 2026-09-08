@@ -78,7 +78,7 @@
    selbst am Aktualisieren hindern. Die Seite prueft deshalb bei jedem
    Start, ob sie zum Server passt, und repariert sich einmalig selbst.
    Gegen Endlosschleifen abgesichert ueber sessionStorage. */
-window.__BUILD = '2026-09-09i';
+window.__BUILD = '2026-09-10a';
 /* Vor dem ersten Bildaufbau markieren, damit die alte Oberflaeche auf
    dem Handy gar nicht erst gezeigt wird. Wird sie erst per JavaScript
    ausgeblendet, blitzt sie sichtbar auf. */
@@ -89,7 +89,7 @@ try {
        nicht auf, wird die Ausblendung zurueckgenommen. Sonst saehe der
        Nutzer einen schwarzen Bildschirm statt der alten Oberflaeche. */
     setTimeout(function () {
-      if (!document.getElementById('m-app')) {
+      if (!document.getElementById('f7-root')) {
         document.documentElement.className =
           document.documentElement.className.replace(/is-mobile/, '');
         console.warn('[BoxSpec] Handy-Oberflaeche nicht aufgebaut, alte Ansicht wird gezeigt.');
@@ -119,10 +119,10 @@ try {
 </script>
 <!-- /BOXSPEC-SELFHEAL -->
 <link rel="stylesheet" href="css/style.css">
-<!-- Native-Schicht fuer das Handy. MUSS nach style.css kommen. -->
-<link rel="stylesheet" href="css/native.css">
-<!-- Neubau der Handy-Oberflaeche. Eigener Namensraum (m-). -->
-<link rel="stylesheet" href="css/mobile.css">
+<!-- Handy-Oberflaeche auf Framework7. Reihenfolge zaehlt:
+     erst das Framework, dann unsere Marke darueber. -->
+<link rel="stylesheet" href="vendor/framework7.min.css">
+<link rel="stylesheet" href="css/f7theme.css">
 <script src="js/chart.min.js"></script>
 <script src="js/firebase-app.js"></script>
 <script src="js/firebase-auth.js"></script>
@@ -684,7 +684,8 @@ if (localStorage.getItem('fos_current')) {
 <script src="js/app.js"></script>
 <script src="js/pages.js"></script>
 <script src="js/calculators.js"></script>
-<script src="js/mobile.js"></script>
+<script src="vendor/framework7.min.js"></script>
+<script src="js/f7app.js"></script>
 <script>
 // Init AFTER all scripts loaded
 (function init() {
