@@ -99,7 +99,7 @@
    selbst am Aktualisieren hindern. Die Seite prueft deshalb bei jedem
    Start, ob sie zum Server passt, und repariert sich einmalig selbst.
    Gegen Endlosschleifen abgesichert ueber sessionStorage. */
-window.__BUILD = '2026-09-10f';
+window.__BUILD = '2026-09-10g';
 /* Vor dem ersten Bildaufbau markieren, damit die alte Oberflaeche auf
    dem Handy gar nicht erst gezeigt wird. Wird sie erst per JavaScript
    ausgeblendet, blitzt sie sichtbar auf. */
@@ -139,7 +139,19 @@ try {
 })();
 </script>
 <!-- /BOXSPEC-SELFHEAL -->
-<link rel="stylesheet" href="css/style.css">
+<!-- style.css sind 209 KB und blockieren das erste Bild, genutzt werden
+     davon 6,4 Prozent. Auf dem Handy wird davon vor der ersten Navigation
+     gar nichts gebraucht: die alte Oberflaeche ist ausgeblendet, und die
+     Ausblendregeln stehen in f7theme.css, nicht hier. Gebraucht wird es
+     erst vom eingebetteten Altbestand in den Textseiten.
+     Desktop bekommt es blockierend wie bisher, das Handy nachtraeglich.
+     Beide Zeilen zeigen auf dieselbe Datei, das ist ein Abruf.
+     Die Kaskade verschiebt sich dabei nicht: fuer Stylesheets zaehlt die
+     Position im Dokument, nicht der Zeitpunkt des Ladens. style.css steht
+     also weiterhin vor framework7 und den beiden f7-Dateien. -->
+<link rel="stylesheet" href="css/style.css" media="(min-width: 769px)">
+<link rel="stylesheet" href="css/style.css" media="print"
+      onload="this.onload=null;this.media='(max-width: 768px)'">
 <!-- Handy-Oberflaeche auf Framework7. Reihenfolge zaehlt:
      erst das Framework, dann unsere Marke darueber. -->
 <link rel="stylesheet" href="vendor/framework7.min.css">

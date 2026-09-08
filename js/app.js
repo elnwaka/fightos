@@ -177,6 +177,10 @@ window._boxspecAuthReady = function(fbUser) {
   if (typeof currentUser === 'undefined' || !currentUser) return;
   syncFromCloud(function() {});
   startRealtimeSync();
+  // Was offline oder vor dem Eintreffen der Sitzung geschrieben wurde,
+  // geht jetzt hoch. Frueher hing das an enterApp(), das aber inzwischen
+  // schon laeuft, bevor die Sitzung da ist.
+  setTimeout(syncToCloud, 1000);
 };
 
 function showCloudDisconnectedBanner() {
