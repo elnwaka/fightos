@@ -64,7 +64,6 @@
 <link rel="apple-touch-icon" sizes="128x128" href="img/icons/icon-128x128.png">
 
 <!-- iOS Splash Screens -->
-<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="img/icons/icon-512x512.png">
 <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="img/icons/icon-512x512.png">
 <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="img/icons/icon-512x512.png">
@@ -78,7 +77,7 @@
    selbst am Aktualisieren hindern. Die Seite prueft deshalb bei jedem
    Start, ob sie zum Server passt, und repariert sich einmalig selbst.
    Gegen Endlosschleifen abgesichert ueber sessionStorage. */
-window.__BUILD = '2026-09-10a';
+window.__BUILD = '2026-09-10b';
 /* Vor dem ersten Bildaufbau markieren, damit die alte Oberflaeche auf
    dem Handy gar nicht erst gezeigt wird. Wird sie erst per JavaScript
    ausgeblendet, blitzt sie sichtbar auf. */
@@ -123,6 +122,9 @@ try {
      erst das Framework, dann unsere Marke darueber. -->
 <link rel="stylesheet" href="vendor/framework7.min.css">
 <link rel="stylesheet" href="css/f7theme.css">
+<!-- Regelwerk "fuehlt sich nativ an": sichere Bereiche, Scroll,
+     Eingabe, Bewegung, Farbschema. MUSS nach f7theme.css kommen. -->
+<link rel="stylesheet" href="css/f7native.css">
 <script src="js/chart.min.js"></script>
 <script src="js/firebase-app.js"></script>
 <script src="js/firebase-auth.js"></script>
@@ -677,6 +679,7 @@ if (localStorage.getItem('fos_current')) {
 
 
 <script src="js/util.js"></script>
+<script src="js/native.js"></script>
 <script src="js/program10w.js"></script>
 <script src="js/ai-coach.js"></script>
 <script src="js/video-library.js"></script>

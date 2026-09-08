@@ -1,0 +1,406 @@
+/* ============================================================
+   BOXSPEC · DAS REGELWERK "FUEHLT SICH NATIV AN"
+   ------------------------------------------------------------
+   Ergaenzt f7theme.css um die Punkte, die nicht das Aussehen
+   betreffen, sondern das Verhalten: sichere Bereiche, Scroll,
+   Eingabe, Bewegung, Farbschema, Reaktionszeit.
+   Wirkt ausschliesslich unter 768px.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1  CHROME UND LAYOUT
+   ------------------------------------------------------------ */
+
+:root {
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+}
+
+@media (max-width: 768px) {
+
+/* 100dvh statt 100vh: vh springt, sobald Safari seine Leiste ein-
+   oder ausblendet, und reisst das Layout mit. */
+html.is-mobile, html.is-mobile body {
+  height: 100dvh;
+  min-height: 100dvh;
+  /* Kein Gummiband am Seitenende. Gescrollt wird ausschliesslich
+     im Inhaltsbereich, nie der Rumpf selbst. */
+  overscroll-behavior: none;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+#f7-root { height: 100dvh; }
+
+/* Rahmen der App ist kein Text: nichts davon laesst sich markieren,
+   sonst erscheint beim langen Druecken die Auswahllupe. */
+body.f7-on .app-chrome,
+#f7app .navbar,
+#f7app .tabbar,
+#f7app .block-title,
+#f7app .item-after,
+#f7app .cal-w,
+#f7app .wd,
+#f7app .sess-top {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Gelesen wird trotzdem: Fliesstext bleibt markierbar. */
+#f7app .prose,
+#f7app .legacy,
+#f7app .item-title,
+#f7app .item-subtitle { user-select: text; -webkit-user-select: text; }
+
+/* Killt die 300ms Verzoegerung des Doppeltipp-Zooms. */
+#f7app button,
+#f7app a,
+#f7app .item-link,
+#f7app .tab-link,
+#f7app .tick,
+#f7app .cal-d { touch-action: manipulation; }
+
+/* Unter 16px zoomt iOS beim Fokussieren in das Feld hinein und
+   kommt nicht wieder heraus. */
+#f7app input,
+#f7app select,
+#f7app textarea,
+body.f7-on input,
+body.f7-on select,
+body.f7-on textarea { font-size: 16px; }
+
+/* Sichere Bereiche: oben die Leiste, unten die Reiter. */
+#f7app .navbar { padding-top: var(--safe-t); }
+#f7app .toolbar.tabbar {
+  padding-bottom: var(--safe-b);
+  height: calc(54px + var(--safe-b));
+}
+#f7app .page-content {
+  padding-bottom: calc(54px + var(--safe-b) + 12px);
+  padding-left: var(--safe-l);
+  padding-right: var(--safe-r);
+  /* Im Inhalt darf gescrollt werden, aber die Bewegung bleibt drin
+     und zieht nicht die Seite darunter mit. */
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ------------------------------------------------------------
+   2  REAKTIONSZEIT
+   Jede Beruehrung bekommt sichtbare Antwort in unter 100ms.
+   ------------------------------------------------------------ */
+
+#f7app .item-link,
+#f7app .button,
+#f7app .tick,
+#f7app .tl-c,
+#f7app .cal-d:not(.out),
+#f7app .wd,
+#f7app .tab-link {
+  transition: transform .09s cubic-bezier(.2,.9,.3,1),
+              opacity .09s linear,
+              background-color .12s linear;
+}
+#f7app .item-link:active,
+#f7app .tl-c:active,
+#f7app .wd:active { background-color: rgba(255,255,255,.06); }
+
+/* Die Reiter fuellen ihre Leiste vollstaendig aus. Ohne das sind sie
+   nur so gross wie ihr Inhalt (53x44) und verfehlen die 44pt-Regel
+   in der Breite nicht, wohl aber die nutzbare Flaeche dazwischen. */
+#f7app .tabbar .toolbar-inner { height: 100%; align-items: stretch; padding: 0; }
+#f7app .tabbar .tab-link {
+  flex: 1 1 0; height: 100%; min-height: 48px; min-width: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Framework7 gibt grossen Knoepfen 44px minus Rahmen. Apple verlangt
+   44pt als Flaeche, nicht als Aussenmass. */
+#f7app .button { min-height: 44px; }
+#f7app .button-large { min-height: 50px; }
+#f7app .button:active { transform: scale(.97); }
+#f7app .tick:active { transform: scale(.88); }
+#f7app .cal-d:not(.out):active { transform: scale(.88); }
+#f7app .tab-link:active { opacity: .55; }
+
+/* Skelett statt Drehkreisel. Ein Drehkreisel ist das
+   Erkennungsmerkmal einer Webseite.
+   Gilt fuer das Startgeruest und fuer Framework7 gleichermassen,
+   deshalb ueber body.f7-on statt ueber #f7app. */
+#bs-shell-host { background: #000; }
+body.f7-on .skel {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,.05) 25%, rgba(255,255,255,.10) 37%, rgba(255,255,255,.05) 63%);
+  background-size: 400% 100%;
+  animation: skel 1.3s ease-in-out infinite;
+  border-radius: 6px;
+}
+@keyframes skel { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+body.f7-on .skel-row { display: flex; gap: 12px; align-items: center; padding: 12px 16px; }
+body.f7-on .skel-thumb { width: 52px; height: 52px; border-radius: 10px; flex: 0 0 52px; }
+body.f7-on .skel-lines { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+body.f7-on .skel-l1 { height: 15px; width: 62%; }
+body.f7-on .skel-l2 { height: 12px; width: 38%; }
+body.f7-on .skel-card { height: 108px; margin: 0 16px 16px; border-radius: 12px; }
+
+/* ------------------------------------------------------------
+   3  BEWEGUNG
+   Nur transform und opacity. iOS animiert federnd, nicht linear.
+   ------------------------------------------------------------ */
+
+#f7app {
+  /* Feder als Bezier angenaehert: schnell heraus, weich hinein,
+     mit leichtem Ueberschwingen. */
+  --spring: cubic-bezier(.32, .72, 0, 1);
+  --spring-soft: cubic-bezier(.25, 1.2, .4, 1);
+}
+#f7app .page,
+#f7app .navbar,
+#f7app .sheet-modal,
+#f7app .picker,
+#f7app .actions-modal {
+  transition-timing-function: var(--spring) !important;
+}
+#f7app .page { transition-duration: .42s !important; }
+
+/* Beim Vorschieben dunkelt die zurueckweichende Seite ab, wie in iOS. */
+#f7app .page-previous::after {
+  content: ""; position: absolute; inset: 0; background: #000;
+  opacity: .28; pointer-events: none; z-index: 100;
+}
+
+/* Sheets von unten mit Ueberzug */
+#f7app .sheet-modal { border-radius: 14px 14px 0 0; background: #1C1C1E; }
+#f7app .sheet-modal .sheet-handle,
+#f7app .bs-sheet-handle {
+  width: 36px; height: 5px; border-radius: 3px;
+  background: rgba(235,235,245,.30); margin: 8px auto 4px;
+}
+
+/* Wer weniger Bewegung eingestellt hat, bekommt weniger Bewegung. */
+@media (prefers-reduced-motion: reduce) {
+  #f7app *, #f7app *::before, #f7app *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  body.f7-on .skel { animation: none !important; background: rgba(255,255,255,.07); }
+}
+
+/* ------------------------------------------------------------
+   4  OPTIK
+   ------------------------------------------------------------ */
+
+/* Leisten schweben ueber dem Inhalt, statt ihn abzuschneiden. */
+#f7app .navbar-bg,
+#f7app .toolbar.tabbar {
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+#f7app .navbar-bg { background: rgba(10,10,11,.72); }
+#f7app .views.tabs > .toolbar.tabbar { background: rgba(10,10,11,.72); }
+
+/* Es gibt keine Maus. Kein Zustand darf nur beim Ueberfahren
+   erscheinen, jeder Hover-Effekt hat ein Gegenstueck beim Druecken. */
+@media (hover: none) {
+  #f7app *:hover { background-color: inherit; }
+  #f7app .item-link:hover,
+  #f7app .button:hover,
+  #f7app .wd:hover { background-color: inherit; }
+}
+
+/* ------------------------------------------------------------
+   HELL UND DUNKEL NACH SYSTEMEINSTELLUNG
+   Die Farben stehen als Variablen, damit ein einziger Block sie
+   umschaltet, statt jede Regel zu verdoppeln.
+   ------------------------------------------------------------ */
+
+#f7app {
+  --bg:    #000000;
+  --e1:    #131315;
+  --e2:    #1C1C1E;
+  --sep:   rgba(255,255,255,.09);
+  --t1:    #FFFFFF;
+  --t2:    rgba(235,235,245,.60);
+  --t3:    rgba(235,235,245,.30);
+  --press: rgba(255,255,255,.06);
+  --bar:   rgba(10,10,11,.72);
+}
+
+@media (prefers-color-scheme: light) {
+  #f7app.theme-auto {
+    --bg:    #F2F2F7;
+    --e1:    #FFFFFF;
+    --e2:    #FFFFFF;
+    --sep:   rgba(60,60,67,.16);
+    --t1:    #000000;
+    --t2:    rgba(60,60,67,.60);
+    --t3:    rgba(60,60,67,.30);
+    --press: rgba(0,0,0,.05);
+    --bar:   rgba(249,249,249,.80);
+
+    /* Framework7s eigene Variablen mit umschalten. Sonst bleiben
+       Bausteine dunkel, die ich hier nicht einzeln aufzaehle: die
+       Leisten ziehen ihren Verlauf aus --f7-bars-bg-color, und der
+       war ein dunkler Schleier ueber hellem Grund. */
+    --f7-bars-bg-color: rgba(249,249,249,.80);
+    --f7-bars-text-color: #000000;
+    --f7-bars-link-color: #E8000D;
+    --f7-page-bg-color: #F2F2F7;
+    --f7-list-bg-color: #FFFFFF;
+    --f7-list-strong-bg-color: #FFFFFF;
+    --f7-block-strong-bg-color: #FFFFFF;
+    --f7-list-item-border-color: rgba(60,60,67,.16);
+    --f7-text-color: #000000;
+    --f7-block-title-text-color: rgba(60,60,67,.60);
+    --f7-list-item-after-text-color: rgba(60,60,67,.60);
+    --f7-list-item-subtitle-text-color: rgba(60,60,67,.60);
+    --f7-list-item-text-text-color: rgba(60,60,67,.45);
+    --f7-tabbar-link-inactive-color: rgba(60,60,67,.45);
+    --f7-tabbar-link-active-color: #E8000D;
+    --f7-picker-item-selected-text-color: #000000;
+  }
+  /* Der Verlauf der Leiste haengt an einem Pseudoelement und wuerde
+     die Variable sonst nicht mitbekommen. */
+  #f7app.theme-auto .navbar-bg::after { background-image: none; }
+  #f7app.theme-auto .picker,
+  #f7app.theme-auto .picker .toolbar { background: #FFFFFF; }
+  #f7app.theme-auto .picker-center-highlight { background: rgba(0,0,0,.06); }
+  #f7app.theme-auto .sheet-modal { background: #FFFFFF; }
+}
+
+/* Die Bausteine greifen auf die Variablen zu, nicht auf feste Werte. */
+#f7app.theme-auto,
+#f7app.theme-auto .page,
+#f7app.theme-auto .page-content { background: var(--bg); color: var(--t1); }
+#f7app.theme-auto .navbar-bg,
+#f7app.theme-auto .views.tabs > .toolbar.tabbar { background: var(--bar); }
+#f7app.theme-auto .navbar .title,
+#f7app.theme-auto .title-large-text,
+#f7app.theme-auto .item-title,
+#f7app.theme-auto .big,
+#f7app.theme-auto .sess-title,
+#f7app.theme-auto .tl-n,
+#f7app.theme-auto .cal-d { color: var(--t1); }
+#f7app.theme-auto .block-title,
+#f7app.theme-auto .item-subtitle,
+#f7app.theme-auto .item-after,
+#f7app.theme-auto .sess-top,
+#f7app.theme-auto .tl-s,
+#f7app.theme-auto .tl-t,
+#f7app.theme-auto .prose,
+#f7app.theme-auto .legacy { color: var(--t2); }
+#f7app.theme-auto .cal-w span,
+#f7app.theme-auto .cal-d.out { color: var(--t3); }
+/* Die Wochenleiste hat eigene Farben, sonst steht sie in der hellen
+   Darstellung weiss auf weiss. */
+#f7app.theme-auto .wd { color: var(--t2); }
+#f7app.theme-auto .wd.now { color: var(--t1); }
+#f7app.theme-auto .wd .ring {
+  background: conic-gradient(#E8000D var(--p), var(--sep) 0);
+}
+#f7app.theme-auto .list-strong,
+#f7app.theme-auto .block-strong,
+#f7app.theme-auto .sess,
+#f7app.theme-auto .cal,
+#f7app.theme-auto .tl-c,
+#f7app.theme-auto .wd,
+#f7app.theme-auto .sheet-modal,
+#f7app.theme-auto .picker,
+#f7app.theme-auto .picker .toolbar { background: var(--e1); }
+#f7app.theme-auto .wd.now,
+#f7app.theme-auto .tl-e.is-now .tl-c { background: var(--e2); }
+#f7app.theme-auto .media-list .item-media img,
+#f7app.theme-auto .media-list .item-media .ph,
+#f7app.theme-auto .hero img { background: var(--e2); }
+#f7app.theme-auto .item-link:active,
+#f7app.theme-auto .tl-c:active,
+#f7app.theme-auto .wd:active { background-color: var(--press); }
+#f7app.theme-auto .item-content.is-done .item-title,
+#f7app.theme-auto .tl-e.is-done .tl-n { color: var(--t3); }
+#f7app.theme-auto .statbar { background: var(--sep); }
+#f7app.theme-auto .item-after.chev { border-color: var(--t3); }
+#f7app.theme-auto .tick { border-color: var(--t3); }
+#f7app.theme-auto .tl-e::before { background: var(--sep); }
+#f7app.theme-auto .skel { background-color: var(--sep); }
+
+/* Eingebetteter Altbestand ist auf Schwarz gebaut. In der hellen
+   Darstellung bekommt er eine eigene helle Flaeche und dunklen Text,
+   damit nichts unlesbar wird. */
+@media (prefers-color-scheme: light) {
+  #f7app.theme-auto .legacy,
+  #f7app.theme-auto .legacy * {
+    color: rgba(60,60,67,.85) !important;
+    background-color: transparent !important;
+    border-color: rgba(60,60,67,.16) !important;
+  }
+  #f7app.theme-auto .legacy h1, #f7app.theme-auto .legacy h2,
+  #f7app.theme-auto .legacy h3, #f7app.theme-auto .legacy strong,
+  #f7app.theme-auto .legacy b { color: #000 !important; }
+  #f7app.theme-auto .legacy .card,
+  #f7app.theme-auto .legacy .info-box,
+  #f7app.theme-auto .legacy .stat-card { background: #FFFFFF !important; }
+  #f7app.theme-auto .legacy .card-title { color: rgba(60,60,67,.60) !important; }
+}
+
+/* ------------------------------------------------------------
+   5  STATUS, OFFLINE, INSTALLATION
+   ------------------------------------------------------------ */
+
+/* Auf dem Homescreen verschwinden alle Browser-Hinweise. */
+#f7app .only-browser { display: block; }
+@media (display-mode: standalone) { #f7app .only-browser { display: none !important; } }
+body.bs-standalone .only-browser { display: none !important; }
+
+/* Offline ist ein Hinweis, keine Fehlerseite. */
+#bs-offline {
+  position: fixed; left: 0; right: 0; z-index: 13600;
+  top: calc(var(--safe-t) + 0px);
+  transform: translateY(-140%);
+  transition: transform .32s cubic-bezier(.32,.72,0,1);
+  background: #48484A; color: #fff;
+  font: 500 13px/1.3 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  padding: 9px 16px calc(9px); text-align: center;
+  padding-top: calc(9px + var(--safe-t));
+}
+#bs-offline.on { transform: translateY(0); }
+#bs-offline.sync { background: #30D158; color: #06240F; }
+
+/* Installationshinweis: iOS kann nur ueber Teilen, das muss man sagen. */
+#bs-install {
+  position: fixed; inset: 0; z-index: 13800;
+  background: rgba(0,0,0,.62);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .28s ease;
+}
+#bs-install.on { opacity: 1; pointer-events: auto; }
+#bs-install .card {
+  width: 100%; max-width: 460px; background: #1C1C1E; color: #fff;
+  border-radius: 16px 16px 0 0; padding: 8px 22px calc(26px + var(--safe-b));
+  transform: translateY(16px); transition: transform .34s cubic-bezier(.32,.72,0,1);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+#bs-install.on .card { transform: translateY(0); }
+#bs-install h2 { font-size: 20px; font-weight: 700; margin: 14px 0 6px; letter-spacing: -.01em; }
+#bs-install p { color: rgba(235,235,245,.60); margin: 0 0 16px; font-size: 15px; }
+#bs-install ol { margin: 0 0 18px; padding-left: 20px; color: rgba(235,235,245,.85); }
+#bs-install li { margin-bottom: 9px; }
+#bs-install .sq {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 5px; background: rgba(255,255,255,.12);
+  vertical-align: -5px; margin: 0 3px;
+}
+#bs-install button {
+  width: 100%; min-height: 48px; border: 0; border-radius: 12px;
+  background: #E8000D; color: #fff; font-size: 17px; font-weight: 600;
+  touch-action: manipulation;
+}
+#bs-install button.ghost { background: transparent; color: rgba(235,235,245,.60); margin-top: 4px; }
+
+}

@@ -1,5 +1,5 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-09-10a';
+const BUILD = '2026-09-10b';
 const CACHE_NAME = 'boxspec-' + BUILD;
 const PRECACHE = [
   './',
@@ -7,8 +7,10 @@ const PRECACHE = [
   './app.html',
   './css/style.css',
   './css/f7theme.css',
+  './css/f7native.css',
   './vendor/framework7.min.css',
   './js/util.js',
+  './js/native.js',
   './js/app.js',
   './js/pages.js',
   './js/calculators.js',

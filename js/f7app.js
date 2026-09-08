@@ -576,7 +576,6 @@
       if (!users[currentUser]) users[currentUser] = {};
       users[currentUser][key] = val;
       localStorage.setItem('fos_users', JSON.stringify(users));
-      if (typeof syncToCloud === 'function') syncToCloud();
       if (typeof generateCurrentWeekPlan === 'function') {
         var d = getData(); d.weekPlan = generateCurrentWeekPlan(); saveData(d);
       }
@@ -649,16 +648,24 @@
   F7 = {
     tab: function (id) { app.tab.show('#tab-' + id); },
     open: function (url) { current().router.navigate(url); },
+    /* Optimistisch: erst der lokale Stand und das Bild, dann das Netz.
+       Der Haken sitzt in dem Moment, in dem der Finger ihn beruehrt,
+       nicht wenn die Cloud geantwortet hat. */
     tick: function (k, i) {
       var b = blocks(k), x = b.all[i] || {};
+      var war = done(k, i);
+      if (window.Native) Native.haptic(war ? 'light' : 'success');
       if (typeof toggleBlockDone === 'function') toggleBlockDone(k, i, x.type || '', x.title || '');
       F7.refresh();
+      laterSync();
     },
     tickBack: function (k, i) {
       var b = blocks(k), x = b.all[i] || {};
+      if (window.Native) Native.haptic(done(k, i) ? 'light' : 'success');
       if (typeof toggleBlockDone === 'function') toggleBlockDone(k, i, x.type || '', x.title || '');
       current().router.back();
       setTimeout(F7.refresh, 350);
+      laterSync();
     },
     refresh: function () {
       ['heute','plan','kaempfe','profil'].forEach(function (id) {
@@ -678,6 +685,8 @@
       var picker = app.picker.create({
         rotateEffect: true,
         toolbarCloseText: 'Fertig',
+        sheetSwipeToClose: true,
+        sheetPush: true,
         value: [P.cur()],
         formatValue: function (values) {
           return P.labels ? (P.labels[values[0]] || values[0]) : values[0] + (P.u || '');
@@ -689,10 +698,12 @@
           })
         }],
         on: {
+          change: function () { if (window.Native) Native.haptic('light'); },
           close: function (p) {
             var v = p.value[0];
             setSched(P.key, isNaN(+v) ? v : +v);
             F7.refresh();
+            laterSync();
           }
         }
       });
@@ -712,8 +723,65 @@
   };
   window.F7 = F7;
 
+  /* Ohne Netz wandert die Uebertragung in die Schlange und wird
+     nachgereicht, sobald das Geraet wieder online und im Vordergrund
+     ist. Hintergrund-Sync gibt es auf iOS nicht, darauf zu bauen
+     hiesse, Daten zu verlieren. */
+  function laterSync() {
+    if (!window.Native) {
+      if (typeof syncToCloud === 'function') try { syncToCloud(); } catch (e) {}
+      return;
+    }
+    if (!Native.online()) { Native.enqueue({ kind: 'sync', payload: {} }); return; }
+    if (typeof syncToCloud === 'function') {
+      try {
+        var r = syncToCloud();
+        if (r && r.catch) r.catch(function () { Native.enqueue({ kind: 'sync', payload: {} }); });
+      } catch (e) { Native.enqueue({ kind: 'sync', payload: {} }); }
+    }
+  }
+
   function current() {
     return app.views.current || app.views.main;
+  }
+
+  /* ---------- App-Shell ----------
+     Zwischen Seitenaufbau und fertigem Framework7 liegen ein paar
+     hundert Millisekunden. In der Zeit zeigt die App ihr Geruest
+     statt einer schwarzen Flaeche oder eines Drehkreisels. Ein
+     Drehkreisel ist das Erkennungsmerkmal einer Webseite. */
+  function skeleton() {
+    var rows = '';
+    for (var i = 0; i < 5; i++) {
+      rows += '<div class="skel-row"><div class="skel skel-thumb"></div>' +
+        '<div class="skel-lines"><div class="skel skel-l1"></div>' +
+        '<div class="skel skel-l2"></div></div></div>';
+    }
+    return '<div id="bs-shell" style="position:fixed;inset:0;background:#000;' +
+      'padding-top:calc(var(--safe-t) + 56px)">' +
+      '<div class="skel skel-card"></div>' + rows + '</div>';
+  }
+
+  function showShell() {
+    if (document.getElementById('f7-root')) return;
+    var host = document.getElementById('app-screen');
+    if (!host || document.getElementById('bs-shell')) return;
+    var d = document.createElement('div');
+    // Bewusst NICHT id="f7app": Framework7 sucht sein Wurzelelement per
+    // Selektor und wuerde sich an das erste Treffer-Element binden. Das
+    // Geruest kommt zuerst im Dokument, Framework7 haenge sich daran,
+    // und nach dem Entfernen des Geruests lag seine Wurzel ausserhalb
+    // des Dokuments: Auswahlraeder und Sheets wurden unsichtbar erzeugt.
+    d.id = 'bs-shell-host';
+    d.style.cssText = 'position:fixed;inset:0;z-index:899';
+    d.innerHTML = skeleton();
+    host.appendChild(d);
+    document.body.classList.add('f7-on');
+  }
+
+  function hideShell() {
+    var sh = document.getElementById('bs-shell-host');
+    if (sh) sh.remove();
   }
 
   function build() {
@@ -747,6 +815,7 @@
       '</div>';
     host.appendChild(root);
     document.body.classList.add('f7-on');
+    hideShell();
 
     app = new Framework7({
       el: '#f7app',
@@ -763,13 +832,172 @@
         iosSwipeBackAnimateShadow: true,
         iosSwipeBackActiveArea: 30
       },
-      touch: { tapHold: true }
+      touch: { tapHold: true },
+      // Wer weniger Bewegung eingestellt hat, bekommt weniger Bewegung.
+      animate: !(window.Native && Native.reducedMotion())
     });
     window.__f7app = app;
+
+    behaviour();
+  }
+
+  /* ============================================================
+     VERHALTEN
+     Reaktionszeit, Haptik, Vorabladen, Offline, Installation.
+     ============================================================ */
+
+  function behaviour() {
+    var el = document.getElementById('f7app');
+
+    // Farbschema folgt der Systemeinstellung, nicht einem Schalter.
+    el.classList.add('theme-auto');
+    var mqDark = window.matchMedia('(prefers-color-scheme: dark)');
+    var applyScheme = function () {
+      var dark = mqDark.matches;
+      try { app.setDarkMode(dark); } catch (e) {}
+      if (window.Native) Native.statusBar(dark ? 'DARK' : 'LIGHT');
+    };
+    applyScheme();
+    if (mqDark.addEventListener) mqDark.addEventListener('change', applyScheme);
+    else if (mqDark.addListener) mqDark.addListener(applyScheme);
+
+    // Auf dem Homescreen verschwinden alle Browser-Hinweise.
+    if (window.Native && Native.standalone) document.body.classList.add('bs-standalone');
+
+    haptics();
+    prefetch();
+    offlineBanner();
+    installHint();
+  }
+
+  /* ---------- Haptik ----------
+     Nur dort, wo etwas passiert. Haptik bei jeder Beruehrung ist
+     Laerm, nicht Rueckmeldung. */
+  function haptics() {
+    if (!window.Native) return;
+    document.getElementById('f7app').addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t.closest) return;
+      if (t.closest('.tick')) return;                    // wird selbst ausgeloest
+      if (t.closest('.tab-link')) Native.haptic('light');
+      else if (t.closest('.button')) Native.haptic('medium');
+    }, true);
+  }
+
+  /* ---------- Vorabladen ----------
+     Beim Beruehren, nicht beim Loslassen. Die Textseiten muessen die
+     alten Seiten erst rendern und zerlegen; passiert das schon
+     waehrend der Finger unterwegs ist, ist der Bildschirm sofort da. */
+  var warmed = {};
+  function prefetch() {
+    document.getElementById('f7app').addEventListener('touchstart', function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="/artikel/"]');
+      if (!a) return;
+      var key = a.getAttribute('href').split('/')[2];
+      if (!key || warmed[key]) return;
+      warmed[key] = 1;
+      try { sections(key); } catch (err) {}
+    }, { passive: true });
+  }
+
+  /* ---------- Offline ----------
+     Ein Hinweis, keine Fehlerseite. Was offline geschrieben wurde,
+     wird beim naechsten Netz nachgereicht. */
+  function offlineBanner() {
+    var bar = document.createElement('div');
+    bar.id = 'bs-offline';
+    bar.setAttribute('role', 'status');
+    document.body.appendChild(bar);
+
+    var show = function (text, kind) {
+      bar.textContent = text;
+      bar.className = 'on' + (kind ? ' ' + kind : '');
+    };
+    var hide = function () { bar.className = ''; };
+
+    if (!window.Native) return;
+
+    Native.registerRunner('sync', function () {
+      if (typeof syncToCloud !== 'function') return true;
+      return syncToCloud();
+    });
+
+    Native.onNetwork(function (on) {
+      if (!on) {
+        show('Offline. Änderungen werden gespeichert und später übertragen.');
+        return;
+      }
+      var offen = Native.queueLength();
+      if (!offen) { hide(); return; }
+      show('Wieder online, ' + offen + (offen === 1 ? ' Änderung' : ' Änderungen') + ' werden übertragen…');
+      Native.flush().then(function () {
+        show('Alles übertragen.', 'sync');
+        setTimeout(hide, 1800);
+      });
+    });
+    if (!Native.online()) show('Offline. Änderungen werden gespeichert und später übertragen.');
+  }
+
+  /* ---------- Installation ----------
+     Safari kennt keinen Installationsdialog. Ohne Erklaerung findet
+     niemand den Weg ueber Teilen, also wird er gezeigt: nach dem
+     dritten Start, einmal, und nie wieder nach dem Wegtippen. */
+  function installHint() {
+    if (!window.Native) return;
+    var state = Native.installState();
+    if (state === 'installiert' || state === 'nativ') return;
+    var seen = 0, starts = 0;
+    try {
+      seen = +localStorage.getItem('bs_install_seen') || 0;
+      starts = (+localStorage.getItem('bs_starts') || 0) + 1;
+      localStorage.setItem('bs_starts', starts);
+    } catch (e) {}
+    if (seen || starts < 3) return;
+
+    var teilen = '<span class="sq">' +
+      '<svg width="13" height="16" viewBox="0 0 14 18" fill="none" stroke="#0A84FF" ' +
+      'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M7 1v10M3.5 4.5 7 1l3.5 3.5M1 8v8h12V8"/></svg></span>';
+    var plus = '<span class="sq">' +
+      '<svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="#fff" ' +
+      'stroke-width="1.8" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>';
+
+    var box = document.createElement('div');
+    box.id = 'bs-install';
+    box.innerHTML =
+      '<div class="card">' +
+        '<div class="bs-sheet-handle"></div>' +
+        '<h2>BoxSpec auf den Homescreen</h2>' +
+        (state === 'ios-anleitung'
+          ? '<p>Safari hat keinen Installationsknopf. Auf dem Homescreen startet ' +
+            'BoxSpec ohne Browserleiste, behält deine Daten dauerhaft und darf ' +
+            'dir Erinnerungen schicken.</p>' +
+            '<ol><li>Unten auf ' + teilen + ' <b>Teilen</b> tippen</li>' +
+            '<li>Nach unten wischen zu ' + plus + ' <b>Zum Home-Bildschirm</b></li>' +
+            '<li>Oben rechts auf <b>Hinzufügen</b></li></ol>' +
+            '<button id="bs-install-ok">Verstanden</button>'
+          : '<p>Auf dem Homescreen startet BoxSpec ohne Browserleiste und behält ' +
+            'deine Daten dauerhaft.</p>' +
+            '<button id="bs-install-go">Installieren</button>' +
+            '<button class="ghost" id="bs-install-ok">Später</button>') +
+      '</div>';
+    document.body.appendChild(box);
+    requestAnimationFrame(function () { box.classList.add('on'); });
+
+    var close = function () {
+      box.classList.remove('on');
+      try { localStorage.setItem('bs_install_seen', '1'); } catch (e) {}
+      setTimeout(function () { box.remove(); }, 320);
+    };
+    box.addEventListener('click', function (e) {
+      if (e.target === box || e.target.id === 'bs-install-ok') close();
+      if (e.target.id === 'bs-install-go') Native.installPrompt().then(close);
+    });
   }
 
   function start() {
     var a = document.getElementById('app-screen');
+    if (a && a.classList.contains('active')) showShell();
     if (typeof Framework7 === 'undefined') return setTimeout(start, 200);
     if (!a || !a.classList.contains('active')) return setTimeout(start, 300);
     build();
