@@ -453,6 +453,13 @@
      gar nicht erst danach gesucht: ein 404 je Aufruf ist Laerm in der
      Konsole und ein Abruf umsonst. Beim Umstellen der naechsten Seite
      gehoert ihr Schluessel hierher. */
+  /* ernaehrung ist bewusst NICHT freigeschaltet. Die Datenfassung
+     ersetzt feste Zahlen durch gewichtsabhaengige, die inhaltlich
+     nichts damit zu tun haben: "Kaufe zu 80 Prozent unverarbeitete
+     Lebensmittel" wird bei 78 kg zu 62 Prozent, "500 ml pro
+     Trainingsstunde" zu 390 ml, "250 % Tagesbedarf pro 100 g" zu
+     "195 % pro 78 g". Bis das geklaert ist, laeuft die Seite ueber
+     den alten Weg weiter, der stimmt. */
   var MIT_DATEN = { periodisierung: 1 };
 
   function ensureContent(key) {
@@ -490,10 +497,25 @@
   var TONE = { info: '#0A84FF', warn: '#FF9F0A', sci: '#30D158',
                gruen: '#30D158', blau: '#0A84FF', rot: '#E8000D' };
 
+  /* Werte des gerade gezeichneten Artikels. In Ernaehrung stehen 16
+     Zahlen mitten im Satz, alle aus dem Koerpergewicht gerechnet. Die
+     Saetze bleiben in den Daten, nur die Zahl wird eingesetzt. */
+  var aktuelleWerte = null;
+
+  function werteFuer(key) {
+    if (!window.Content || !Content.values) return null;
+    var s = SCH();
+    return Content.values(key, {
+      weight: s.weight, height: s.height,
+      age: (function () { try { return getUserAge(); } catch (e) { return null; } })()
+    });
+  }
+
   function inl(t) {
     // Content.inline escaped zuerst alles und gibt nur strong, em, br
     // und https-Anker wieder frei. Fehlt der Vertrag, wird hart escaped.
-    return (window.Content && Content.inline) ? Content.inline(t) : E(t);
+    if (window.Content && Content.inline) return Content.inline(t, aktuelleWerte);
+    return E(t);
   }
 
   function blockHTML(b) {
@@ -626,6 +648,62 @@
         liste(b.conditioning, 'Conditioning');
     }
 
+    /* Der Makro-Rechner ist ein eigener Bildschirm. Ein zweites
+       Formular mitten im Artikel waere dieselbe Rechnung an zwei
+       Stellen, und eine davon laeuft irgendwann auseinander. */
+    if (b.id === 'makroRechner') {
+      return (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
+        (b.text ? '<div class="block block-strong inset"><p class="prose">' + inl(b.text) + '</p></div>' : '') +
+        bigButton('Makros berechnen', 'F7.open(&quot;/rechner/makros/&quot;)');
+    }
+
+    /* Die Ernaehrungswerte des Programms. Die Zahlen stehen in
+       P10W_NUTRITION, die Beschriftungen in den Daten: so steht kein
+       Wort im Renderer und keine Zahl doppelt. */
+    if (b.id === 'nut10w') {
+      var N = null;
+      try { N = P10W_NUTRITION; } catch (e) {}
+      if (!N) return '';
+      var L = b.labels || {};
+      var woche = 0;
+      try { woche = getProgram10WCurrentWeek() || 0; } catch (e) {}
+
+      var feld = function (schluessel) {
+        var q = N[schluessel];
+        if (!q) return '';
+        var zeilen = [];
+        ['carbs', 'protein', 'fat'].forEach(function (k) {
+          if (q[k]) zeilen.push(item({ title: { carbs: 'Kohlenhydrate', protein: 'Eiweiß',
+            fat: 'Fett' }[k], after: plainText(q[k]) }));
+        });
+        var text = [q.timing, q.note].filter(Boolean).map(function (t) {
+          return '<div class="block block-strong inset"><p class="prose">' + inl(t) + '</p></div>';
+        }).join('');
+        return (zeilen.length ? listBlock(zeilen, L[schluessel] || plainText(q.label || '')) : '') + text;
+      };
+
+      var out = (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
+        (b.text ? '<div class="block block-strong inset"><p class="prose">' + inl(b.text) + '</p></div>' : '');
+      // Reihenfolge kommt aus den Beschriftungen, nicht aus einer
+      // Liste hier: was benannt ist, wird gezeigt.
+      Object.keys(L).forEach(function (k) {
+        if (N[k]) out += feld(k);
+        else if (typeof N[k] === 'undefined') {
+          // Beschriftung ohne eigenen Datensatz: als Unterpunkt der
+          // Kampfwoche suchen, dort liegen waterLoading und Co.
+          var fw = N.fightWeek || {};
+          if (fw[k]) out += '<div class="block-title">' + E(plainText(L[k])) + '</div>' +
+            '<div class="block block-strong inset"><p class="prose">' + inl(fw[k]) + '</p></div>';
+        }
+      });
+      if (b.hinweis) out += '<div class="block inset bs-note" style="--tone:' + TONE.info + '">' +
+        '<p class="prose">' + inl(b.hinweis) + '</p></div>';
+      if (woche) out += '<div class="block-title">Laufende Woche</div>' +
+        '<div class="list list-strong list-outline inset"><ul>' +
+        statRow('Woche', woche + ' von 10', woche * 10) + '</ul></div>';
+      return out;
+    }
+
     // Unbekannter Platzhalter: lieber sichtbar leer als still verschluckt
     return b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '';
   }
@@ -640,17 +718,19 @@
   function artikelDatenHTML(key) {
     var c = Content.get(key);
     if (!c) return '';
+    aktuelleWerte = werteFuer(key);
     return (c.sub ? '<div class="block block-strong inset"><p class="prose">' +
               inl(c.sub) + '</p></div>' : '') +
       (c.intro || []).map(blockHTML).join('') +
       listBlock(c.sections.map(function (s) {
-        return item({ title: plainText(s.title), link: '/kapitel/' + key + '/' + s.id + '/' });
+        return item({ title: nice(plainText(s.title)), link: '/kapitel/' + key + '/' + s.id + '/' });
       }), c.sections.length + ' Kapitel');
   }
 
   function kapitelDatenHTML(key, id) {
     var s = Content.section(key, id);
     if (!s) return '<div class="block"><p>Kapitel nicht gefunden.</p></div>';
+    aktuelleWerte = werteFuer(key);
     return (s.blocks || []).map(blockHTML).join('');
   }
 
@@ -1430,7 +1510,7 @@
             if (da && hatInhalt(key)) {
               var c = Content.get(key), sec = Content.section(key, ref);
               return ctx.resolve({ content: page('kapitel', '',
-                '<h1 class="big">' + E(sec ? Content.plain(sec.title) : 'Kapitel') + '</h1>' +
+                '<h1 class="big">' + E(sec ? nice(Content.plain(sec.title)) : 'Kapitel') + '</h1>' +
                 kapitelDatenHTML(key, ref),
                 { back: c.title || 'Zurück' }) });
             }
