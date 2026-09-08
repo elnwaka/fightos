@@ -17,7 +17,10 @@ Eine Web-App (PWA) für Boxer. Trainingsplan, Ernährung, AI Coach, Video-Biblio
 ```
 index.html            → Landing Page (SEO, boxspec.app/)
 app.html              → Die eigentliche App (Login/Register/Dashboard)
-css/style.css         → 4500+ Zeilen CSS, Glasmorphism "Fight Command" Design
+css/style.css         → 4500+ Zeilen CSS, Desktop. Besitzt .page — Kollision mit Framework7, siehe unten
+vendor/framework7.*   → Framework7 9, lokal statt CDN (sonst kein Offline-Betrieb)
+js/f7app.js           → Die komplette Handy-Oberflaeche (unter 768px). Nutzt die Logik unten, hat keine eigene
+css/f7theme.css       → Marke fuer Framework7 + eigene Bausteine (Kalender, Zeitstrahl, Haken)
 js/util.js            → esc/escAttr/escMultiline/initial/safeUrl/escJs — MUSS als erstes geladen werden
 js/app.js             → Hauptlogik (Dashboard, Plan, Auth, Account, Tests, Fights)
 js/pages.js           → 8 Säulen, Übungsdatenbank, Ernährung, Periodisierung
