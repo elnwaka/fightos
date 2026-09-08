@@ -403,9 +403,9 @@
       item({ title: 'Regeneration', sub: 'Schlaf, HRV, Belastung', link: '/artikel/regeneration/' }),
       item({ title: '8 Säulen', sub: 'Worauf das System aufbaut', link: '/artikel/saeulen/' })
     ]) + listBlock([
-      item({ title: 'Tests', sub: 'Kraft, Ausdauer, Schnelligkeit', link: '/alt/training/tests/Tests/' }),
-      item({ title: 'Log', sub: 'Was du trainiert hast', link: '/alt/training/log/Log/' }),
-      item({ title: 'Notizen', sub: 'Gedanken und Beobachtungen', link: '/alt/training/notizen/Notizen/' })
+      item({ title: 'Tests', sub: 'Kraft, Ausdauer, Schnelligkeit', link: '/tests/' }),
+      item({ title: 'Log', sub: 'Was du trainiert hast', link: '/log/' }),
+      item({ title: 'Notizen', sub: 'Gedanken und Beobachtungen', link: '/notizen/' })
     ], 'Deine Daten');
   }
 
@@ -718,7 +718,7 @@
            : (s.gymAccess === 'basic' ? 'Basis' : 'Volles Gym');
     return listBlock([
       item({ title: (typeof getDisplayName === 'function' ? getDisplayName() : 'Dein Profil'),
-             sub: 'Name und Konto', link: '/alt/profil/account/Account/' })
+             sub: 'Name und Konto', link: '/konto/' })
     ]) +
     '<div class="block-title">Training</div>' +
     '<div class="list list-strong list-outline inset"><ul>' +
@@ -728,9 +728,9 @@
       pickItem('gym', 'Equipment', eq) +
     '</ul></div>' +
     listBlock([item({ title: 'Feed und Forum', sub: 'Beiträge anderer Boxer',
-                      link: '/alt/community//Verein/' })], 'Verein') +
+                      link: '/verein/' })], 'Verein') +
     listBlock([
-      item({ title: 'Rechner', link: '/alt/profil/rechner/Rechner/' }),
+      item({ title: 'Rechner', sub: 'Makros, Herzfrequenz, 1RM', link: '/rechner/' }),
       item({ title: 'FAQ', link: '/alt/profil/faq/FAQ/' })
     ], 'Hilfe') +
     listBlock([
@@ -764,6 +764,312 @@
       host.querySelectorAll('.sub-tabs, .page-header').forEach(function (n) { n.remove(); });
     } catch (e) { host.innerHTML = '<p>Bereich nicht verfügbar.</p>'; }
     return '<div class="block legacy">' + host.innerHTML + '</div>';
+  }
+
+  /* ============================================================
+     EIGENE BILDSCHIRME STATT GESCHABTEM DESKTOP-DOM
+     ------------------------------------------------------------
+     Diese sechs lesen ausschliesslich Daten: Nutzerdaten aus
+     getData(), Testdefinitionen aus getBenchmarks(), Rechner aus
+     calculators.js. Keiner von ihnen ruft ensurePages().
+     ============================================================ */
+
+  function heute() { return new Date().toISOString().slice(0, 10); }
+
+  function leer(titel, text, knopf) {
+    return '<div class="block block-strong inset text-align-center">' +
+      '<p><b>' + E(titel) + '</b></p>' +
+      '<p class="prose">' + E(text) + '</p></div>' +
+      (knopf || '');
+  }
+
+  /* ---------- Tests ----------
+     getBenchmarks() liefert Ziele, Einheiten, Cluster und die
+     Durchfuehrung schon strukturiert. Frueher wurde die fertige
+     Desktop-Seite geschabt, obwohl die Daten danebenlagen. */
+
+  function benchWert(id) {
+    var h = (D().benchmarkHistory || {})[id];
+    if (!h || !h.length) return null;
+    return h[h.length - 1];
+  }
+
+  function testsHTML() {
+    var B = [];
+    try { B = getBenchmarks() || []; } catch (e) {}
+    if (!B.length) return leer('Tests nicht verfügbar', 'Die Testdefinitionen konnten nicht geladen werden.');
+
+    var gruppen = {}, gemessen = 0, summe = 0;
+    B.forEach(function (b) {
+      (gruppen[b.cluster || 'Weitere'] = gruppen[b.cluster || 'Weitere'] || []).push(b);
+      var w = benchWert(b.id);
+      if (w && b.target) { gemessen++; summe += Math.min(100, w.value / b.target * 100); }
+    });
+    var schnitt = gemessen ? Math.round(summe / gemessen) : null;
+    var stufe = null;
+    if (schnitt !== null) { try { stufe = getBenchLevel(schnitt); } catch (e) {} }
+
+    var c = '<div class="block block-strong inset sess">' +
+        '<div class="sess-top"><span>Leistungsstand</span><span>' +
+          gemessen + ' von ' + B.length + ' gemessen</span></div>' +
+        '<div class="sess-title">' + (schnitt === null ? 'Noch kein Test' :
+          schnitt + ' %' + (stufe ? ' · ' + stufe.label : '')) + '</div>' +
+        '<div class="statbar big"><i style="width:' + (schnitt || 0) + '%"></i></div>' +
+      '</div>';
+
+    Object.keys(gruppen).forEach(function (g) {
+      c += listBlock(gruppen[g].map(function (b) {
+        var w = benchWert(b.id);
+        var pct = (w && b.target) ? Math.min(100, Math.round(w.value / b.target * 100)) : 0;
+        return item({
+          title: b.name,
+          sub: w ? (w.value + ' ' + b.unit + ' von ' + b.target + ' ' + b.unit + ' · ' + pct + ' %')
+                 : ('Ziel ' + b.target + ' ' + b.unit),
+          after: w ? String(w.value) : 'offen',
+          link: '/test/' + encodeURIComponent(b.id) + '/'
+        });
+      }), g);
+    });
+    return c;
+  }
+
+  function testHTML(id) {
+    var B = [];
+    try { B = getBenchmarks() || []; } catch (e) {}
+    var b = B.filter(function (x) { return x.id === id; })[0];
+    if (!b) return '<div class="block"><p>Test nicht gefunden.</p></div>';
+
+    var hist = ((D().benchmarkHistory || {})[id] || []).slice().reverse();
+    var w = hist[0];
+    var pct = (w && b.target) ? Math.min(100, Math.round(w.value / b.target * 100)) : 0;
+
+    var c = '<div class="block block-strong inset sess">' +
+        '<div class="sess-top"><span>' + E(b.cluster || '') + '</span>' +
+        '<span>Ziel ' + b.target + ' ' + E(b.unit) + '</span></div>' +
+        '<div class="sess-title">' + (w ? w.value + ' ' + E(b.unit) : 'Noch kein Wert') + '</div>' +
+        '<div class="statbar big"><i style="width:' + pct + '%"></i></div>' +
+      '</div>' +
+      bigButton(w ? 'Neuen Wert eintragen' : 'Wert eintragen',
+                'F7.testWert(&quot;' + E(id) + '&quot;)');
+
+    if (b.how) c += '<div class="block-title">Kurz</div>' +
+      '<div class="block block-strong inset"><p class="prose">' +
+      E(String(b.how).replace(/\s*·\s*/g, ', ')) + '</p></div>';
+
+    if (b.howSteps && b.howSteps.length) {
+      c += listBlock(b.howSteps.map(function (s) {
+        return item({ title: s.t, sub: s.d });
+      }), 'Durchführung');
+    }
+
+    if (hist.length) {
+      c += listBlock(hist.slice(0, 12).map(function (h) {
+        return item({ title: fmtDate(h.date), after: h.value + ' ' + b.unit });
+      }), hist.length + (hist.length === 1 ? ' Messung' : ' Messungen'));
+    }
+    if (b.interval) c += '<div class="block-title">Rhythmus</div>' +
+      '<div class="block block-strong inset"><p class="prose">Alle ' + b.interval +
+      ' Wochen wiederholen.</p></div>';
+    return c;
+  }
+
+  /* ---------- Log ---------- */
+
+  var LOG_TYPEN = [['boxen','Boxen'],['sparring','Sparring'],['kraft','Kraft'],
+                   ['cardio','Cardio'],['mobility','Mobility']];
+
+  function logHTML() {
+    var log = D().log || [];
+    if (!log.length) {
+      return leer('Noch nichts eingetragen',
+        'Trag ein, was du trainiert hast. Daraus entstehen Wochenumfang und Belastung.',
+        bigButton('Training eintragen', 'F7.open(&quot;/log-neu/&quot;)'));
+    }
+    var jetzt = new Date();
+    var woche = log.filter(function (e) {
+      return (jetzt - new Date(e.date)) / 864e5 < 7; });
+    var minWoche = woche.reduce(function (s, e) { return s + (+e.duration || 0); }, 0);
+    var rpes = woche.filter(function (e) { return e.rpe; });
+    var rpe = rpes.length ? rpes.reduce(function (s, e) { return s + (+e.rpe || 0); }, 0) / rpes.length : 0;
+
+    var nachTag = {};
+    log.forEach(function (e) { (nachTag[e.date] = nachTag[e.date] || []).push(e); });
+
+    var c = '<div class="block-title">Diese Woche</div>' +
+      '<div class="list list-strong list-outline inset"><ul>' +
+        statRow('Einheiten', String(woche.length), Math.min(100, woche.length * 12)) +
+        statRow('Zeit', (minWoche / 60).toFixed(1).replace('.', ',') + ' Std', Math.min(100, minWoche / 6)) +
+        statRow('Mittlerer RPE', rpe ? rpe.toFixed(1).replace('.', ',') : '-', rpe * 10) +
+      '</ul></div>';
+
+    Object.keys(nachTag).slice(0, 20).forEach(function (tag) {
+      c += listBlock(nachTag[tag].map(function (e) {
+        var label = (LOG_TYPEN.filter(function (t) { return t[0] === e.type; })[0] || [0, e.type])[1];
+        var m = [];
+        if (e.duration) m.push(e.duration + ' Min');
+        if (e.rpe) m.push('RPE ' + e.rpe);
+        return item({ title: nice(label || 'Training'), sub: m.join(' · ') || e.notes || '' });
+      }), fmtDate(tag));
+    });
+    c += bigButton('Training eintragen', 'F7.open(&quot;/log-neu/&quot;)', false);
+    return c;
+  }
+
+  function logNeuHTML() {
+    return '<div class="list list-strong list-outline inset"><ul>' +
+        '<li><a href="#" class="item-link item-content" onclick="F7.logWahl()">' +
+          '<div class="item-inner"><div class="item-title">Art</div>' +
+          '<div class="item-after" id="ln-typ-txt">Boxen</div></div></a></li>' +
+        '<li class="item-content item-input"><div class="item-inner">' +
+          '<div class="item-title item-label">Datum</div><div class="item-input-wrap">' +
+          '<input type="date" id="ln-datum" value="' + heute() + '"></div></div></li>' +
+        '<li class="item-content item-input"><div class="item-inner">' +
+          '<div class="item-title item-label">Dauer in Minuten</div><div class="item-input-wrap">' +
+          '<input type="number" id="ln-dauer" inputmode="numeric" placeholder="60"></div></div></li>' +
+        '<li><a href="#" class="item-link item-content" onclick="F7.rpeWahl()">' +
+          '<div class="item-inner"><div class="item-title">RPE</div>' +
+          '<div class="item-after" id="ln-rpe-txt">7</div></div></a></li>' +
+        '<li class="item-content item-input"><div class="item-inner">' +
+          '<div class="item-title item-label">Notiz</div><div class="item-input-wrap">' +
+          '<textarea id="ln-notiz" rows="3" placeholder="Optional"></textarea></div></div></li>' +
+      '</ul></div>' +
+      bigButton('Eintragen', 'F7.logSpeichern()');
+  }
+
+  /* ---------- Notizen ---------- */
+
+  var NOTIZ_KAT = [['technik','Technik'],['taktik','Taktik'],['mental','Mental'],
+                   ['koerper','Körper'],['sonstiges','Sonstiges']];
+
+  function notizenHTML() {
+    var n = D().notizen || [];
+    if (!n.length) {
+      return leer('Noch keine Notizen',
+        'Halt fest, was dir auffällt. Beobachtungen aus dem Training sind später mehr wert als die Erinnerung.',
+        bigButton('Notiz schreiben', 'F7.open(&quot;/notiz-neu/&quot;)'));
+    }
+    return listBlock(n.map(function (x, i) {
+      var kat = (NOTIZ_KAT.filter(function (k) { return k[0] === x.category; })[0] || [0, ''])[1];
+      return item({ title: String(x.text || '').split('\n')[0].slice(0, 60),
+        sub: [fmtDate(x.date), kat].filter(Boolean).join(' · '),
+        link: '/notiz/' + i + '/' });
+    }), n.length + (n.length === 1 ? ' Notiz' : ' Notizen')) +
+      bigButton('Notiz schreiben', 'F7.open(&quot;/notiz-neu/&quot;)', false);
+  }
+
+  function notizHTML(i) {
+    var x = (D().notizen || [])[i];
+    if (!x) return '<div class="block"><p>Notiz nicht gefunden.</p></div>';
+    var kat = (NOTIZ_KAT.filter(function (k) { return k[0] === x.category; })[0] || [0, ''])[1];
+    return '<div class="block-title">' + E([fmtDate(x.date), kat].filter(Boolean).join(' · ')) + '</div>' +
+      '<div class="block block-strong inset"><p class="prose" style="white-space:pre-wrap">' +
+      E(x.text || '') + '</p></div>' +
+      bigButton('Notiz löschen', 'F7.notizWeg(' + i + ')', false);
+  }
+
+  function notizNeuHTML() {
+    return '<div class="list list-strong list-outline inset"><ul>' +
+        '<li><a href="#" class="item-link item-content" onclick="F7.notizWahl()">' +
+          '<div class="item-inner"><div class="item-title">Kategorie</div>' +
+          '<div class="item-after" id="nn-kat-txt">Technik</div></div></a></li>' +
+        '<li class="item-content item-input"><div class="item-inner">' +
+          '<div class="item-title item-label">Notiz</div><div class="item-input-wrap">' +
+          '<textarea id="nn-text" rows="8" placeholder="Was ist dir aufgefallen?"></textarea>' +
+          '</div></div></li>' +
+      '</ul></div>' +
+      bigButton('Speichern', 'F7.notizSpeichern()');
+  }
+
+  /* ---------- Konto ---------- */
+
+  function kontoHTML() {
+    var s = SCH();
+    var u = {};
+    try { u = (safeParse('fos_users', {}) || {})[currentUser] || {}; } catch (e) {}
+    var wolke = null;
+    try { wolke = typeof _fbUser !== 'undefined' ? _fbUser : null; } catch (e) {}
+
+    return listBlock([
+      item({ title: 'Name', after: (typeof getDisplayName === 'function' ? getDisplayName() : currentUser) }),
+      item({ title: 'Anmeldung', after: wolke ? 'Verbunden' : 'Nur auf diesem Gerät' }),
+      item({ title: 'Konto', after: wolke && wolke.email ? wolke.email : '' })
+    ], 'Konto') +
+    '<div class="block-title">Körper</div>' +
+    '<div class="list list-strong list-outline inset"><ul>' +
+      pickItem('weight', 'Gewicht', (s.weight || '-') + ' kg') +
+      pickItem('height', 'Größe', (s.height || '-') + ' cm') +
+    '</ul></div>' +
+    listBlock([
+      item({ title: 'Einheiten gespeichert',
+             after: String(Object.keys(D().completedBlocks || {}).length) }),
+      item({ title: 'Trainingseinträge', after: String((D().log || []).length) }),
+      item({ title: 'Kämpfe', after: String((D().fights || []).length) }),
+      item({ title: 'Notizen', after: String((D().notizen || []).length) })
+    ], 'Deine Daten') +
+    listBlock([
+      '<li><a href="#" class="item-link item-content" onclick="F7.datenExport()">' +
+        '<div class="item-inner"><div class="item-title">Daten sichern</div>' +
+        '<div class="item-after">JSON</div></div></a></li>'
+    ], 'Sicherung') +
+    bigButton('Abmelden', 'doLogout()', false);
+  }
+
+  /* ---------- Rechner ----------
+     Die Rechenwege stehen in js/calculators.js und sind reine
+     Funktionen. Frueher wurde die Desktop-Seite mit ihren Formularen
+     geschabt; hier bekommen sie eigene Felder. */
+
+  function rechnerHTML() {
+    return listBlock([
+      item({ title: 'Makros', sub: 'Kalorien und Nährstoffe nach Phase', link: '/rechner/makros/' }),
+      item({ title: 'Herzfrequenzzonen', sub: 'Fünf Zonen aus Ruhe- und Maximalpuls', link: '/rechner/hf/' }),
+      item({ title: 'Einwiederholungsmaximum', sub: 'Aus Gewicht und Wiederholungen', link: '/rechner/1rm/' })
+    ]);
+  }
+
+  var RECHNER = {
+    makros: { t: 'Makros', felder: [
+        { id: 'r-gew', l: 'Gewicht in kg', v: function () { return SCH().weight || 75; } },
+        { id: 'r-vol', l: 'Trainingsstunden pro Woche', v: function () { return 8; } }
+      ], wahl: [{ id: 'phase', l: 'Phase', opt: [['aufbau','Aufbau'],['halten','Halten'],['abbau','Abbau']] }] },
+    hf:     { t: 'Herzfrequenzzonen', felder: [
+        { id: 'r-alter', l: 'Alter', v: function () { try { return getUserAge() || 25; } catch (e) { return 25; } } },
+        { id: 'r-ruhe', l: 'Ruhepuls', v: function () { return 60; } }
+      ], wahl: [] },
+    '1rm':  { t: 'Einwiederholungsmaximum', felder: [
+        { id: 'r-last', l: 'Gewicht in kg', v: function () { return 80; } },
+        { id: 'r-wdh', l: 'Wiederholungen', v: function () { return 5; } }
+      ], wahl: [] }
+  };
+
+  function rechnerSeiteHTML(key) {
+    var R = RECHNER[key];
+    if (!R) return '<div class="block"><p>Rechner nicht gefunden.</p></div>';
+    var felder = R.felder.map(function (f) {
+      return '<li class="item-content item-input"><div class="item-inner">' +
+        '<div class="item-title item-label">' + E(f.l) + '</div><div class="item-input-wrap">' +
+        '<input type="number" inputmode="decimal" id="' + f.id + '" value="' + E(f.v()) + '">' +
+        '</div></div></li>';
+    }).join('');
+    var wahl = R.wahl.map(function (w) {
+      return '<li><a href="#" class="item-link item-content" onclick="F7.rechnerWahl(&quot;' + w.id + '&quot;)">' +
+        '<div class="item-inner"><div class="item-title">' + E(w.l) + '</div>' +
+        '<div class="item-after" id="rw-' + w.id + '">' + E(w.opt[0][1]) + '</div></div></a></li>';
+    }).join('');
+    return '<div class="list list-strong list-outline inset"><ul>' + felder + wahl + '</ul></div>' +
+      bigButton('Berechnen', 'F7.rechne(&quot;' + key + '&quot;)') +
+      '<div id="r-ergebnis"></div>';
+  }
+
+  /* ---------- Verein ----------
+     Community-Beitraege liegen in Firestore. Der Feed selbst bleibt
+     vorerst der bestehende Renderer, aber der Einstieg ist eigen. */
+
+  function vereinHTML() {
+    return listBlock([
+      item({ title: 'Feed', sub: 'Beiträge anderer Boxer', link: '/alt/community//Feed/' }),
+      item({ title: 'Rangliste', sub: 'Wer wie viel trainiert', link: '/alt/community//Rangliste/' })
+    ]);
   }
 
   /* ---------- Auswahlrad ---------- */
@@ -848,6 +1154,39 @@
             '<h1 class="big">' + E(x.opponent || 'Kampf') + '</h1>' + kampfHTML(i),
             { back: 'Kämpfe' }) });
         } },
+      { path: '/tests/', async: function (c) { c.resolve({ content:
+          page('tests', 'Tests', testsHTML(), { large: 1, back: 'Wissen' }) }); } },
+      { path: '/test/:id/', async: function (ctx) {
+          var id = decodeURIComponent(ctx.to.params.id);
+          var B = []; try { B = getBenchmarks() || []; } catch (e) {}
+          var b = B.filter(function (x) { return x.id === id; })[0];
+          ctx.resolve({ content: page('test', '',
+            '<h1 class="big">' + E(b ? b.name : 'Test') + '</h1>' + testHTML(id),
+            { back: 'Tests' }) });
+        } },
+      { path: '/log/', async: function (c) { c.resolve({ content:
+          page('log', 'Log', logHTML(), { large: 1, back: 'Wissen' }) }); } },
+      { path: '/log-neu/', async: function (c) { c.resolve({ content:
+          page('log-neu', 'Training eintragen', logNeuHTML(), { back: 'Log' }) }); } },
+      { path: '/notizen/', async: function (c) { c.resolve({ content:
+          page('notizen', 'Notizen', notizenHTML(), { large: 1, back: 'Wissen' }) }); } },
+      { path: '/notiz/:i/', async: function (ctx) {
+          var i = parseInt(ctx.to.params.i, 10);
+          ctx.resolve({ content: page('notiz', 'Notiz', notizHTML(i), { back: 'Notizen' }) });
+        } },
+      { path: '/notiz-neu/', async: function (c) { c.resolve({ content:
+          page('notiz-neu', 'Neue Notiz', notizNeuHTML(), { back: 'Notizen' }) }); } },
+      { path: '/konto/', async: function (c) { c.resolve({ content:
+          page('konto', 'Konto', kontoHTML(), { large: 1, back: 'Profil' }) }); } },
+      { path: '/rechner/', async: function (c) { c.resolve({ content:
+          page('rechner', 'Rechner', rechnerHTML(), { large: 1, back: 'Profil' }) }); } },
+      { path: '/rechner/:key/', async: function (ctx) {
+          var k = ctx.to.params.key;
+          ctx.resolve({ content: page('rechner-detail', RECHNER[k] ? RECHNER[k].t : 'Rechner',
+            rechnerSeiteHTML(k), { back: 'Rechner' }) });
+        } },
+      { path: '/verein/', async: function (c) { c.resolve({ content:
+          page('verein', 'Verein', vereinHTML(), { large: 1, back: 'Profil' }) }); } },
       { path: '/videos/', async: function (c) { c.resolve({ content:
           page('videos', 'Videos', videosHTML(), { large: 1, back: 'Wissen' }) }); } },
       { path: '/artikel/:key/', async: function (ctx) {
@@ -868,7 +1207,12 @@
         } },
       { path: '/alt/:p/:s/:t/', async: function (ctx) {
           var p = ctx.to.params.p, s = ctx.to.params.s, t = decodeURIComponent(ctx.to.params.t);
-          ensurePages().then(function () {
+          // Nur training und profil rendern aus pages.js. Verein und
+          // Kaempfe haben ihre Renderer in community.js und app.js,
+          // die ohnehin geladen sind: fuer die waeren 272 KB umsonst.
+          var braucht = (p === 'training' || p === 'profil')
+            ? ensurePages() : Promise.resolve(true);
+          braucht.then(function () {
             ctx.resolve({ content: page('alt', '',
               '<h1 class="big">' + E(t) + '</h1>' + altHTML(p, s || null), { back: 'Zurück' }) });
           });
@@ -1021,6 +1365,197 @@
       });
     },
 
+    /* Ein Auswahlfeld, wie es die neuen Formulare brauchen. */
+    feldWahl: function (feldId, paare, merker) {
+      var vals = paare.map(function (x) { return x[0]; });
+      var txt  = paare.map(function (x) { return x[1]; });
+      var akt  = formWerte[merker] != null ? formWerte[merker] : vals[0];
+      openPicker({
+        rotateEffect: true, toolbarCloseText: 'Fertig', sheetSwipeToClose: true,
+        value: [akt], cols: [{ values: vals, displayValues: txt }],
+        on: { close: function (p) {
+          var v = p.value[0];
+          formWerte[merker] = v;
+          var el = document.getElementById(feldId);
+          if (el) el.textContent = txt[vals.indexOf(v)] || v;
+        } }
+      });
+    },
+    logWahl:   function () { F7.feldWahl('ln-typ-txt', LOG_TYPEN, 'logTyp'); },
+    notizWahl: function () { F7.feldWahl('nn-kat-txt', NOTIZ_KAT, 'notizKat'); },
+    rpeWahl:   function () {
+      var p = []; for (var i = 1; i <= 10; i++) p.push([String(i), String(i)]);
+      F7.feldWahl('ln-rpe-txt', p, 'rpe');
+    },
+    rechnerWahl: function (id) {
+      var w = null;
+      Object.keys(RECHNER).forEach(function (k) {
+        (RECHNER[k].wahl || []).forEach(function (x) { if (x.id === id) w = x; });
+      });
+      if (w) F7.feldWahl('rw-' + id, w.opt, id);
+    },
+
+    /* ---- Tests ---- */
+    testWert: function (id) {
+      var B = []; try { B = getBenchmarks() || []; } catch (e) {}
+      var b = B.filter(function (x) { return x.id === id; })[0];
+      if (!b) return;
+      var akt = benchWert(id);
+      var von = 0, bis = Math.max(Math.round(b.target * 2), 10), schritt = 1;
+      if (b.target > 500) { schritt = 25; }
+      else if (b.target > 100) { schritt = 5; }
+      var vals = [];
+      for (var v = von; v <= bis; v += schritt) vals.push(String(v));
+      openPicker({
+        rotateEffect: true, toolbarCloseText: 'Fertig', sheetSwipeToClose: true,
+        value: [String(akt ? akt.value : b.target)],
+        cols: [{ values: vals, displayValues: vals.map(function (v) { return v + ' ' + b.unit; }) }],
+        on: { close: function (p) {
+          var wert = +p.value[0];
+          var data = getData(); if (!data) return;
+          if (!data.benchmarkHistory) data.benchmarkHistory = {};
+          if (!data.benchmarkHistory[id]) data.benchmarkHistory[id] = [];
+          var h = data.benchmarkHistory[id];
+          var tag = new Date().toISOString().slice(0, 10);
+          var vorhanden = h.findIndex(function (x) { return x.date === tag; });
+          if (vorhanden >= 0) h[vorhanden].value = wert;
+          else h.push({ date: tag, value: wert });
+          if (h.length > 50) data.benchmarkHistory[id] = h.slice(-50);
+          if (!data.benchmarks) data.benchmarks = {};
+          data.benchmarks[id] = wert;
+          saveData(data);
+          if (window.Native) Native.haptic('success');
+          F7.neuZeichnen();
+          laterSync();
+        } }
+      });
+    },
+
+    /* ---- Log ---- */
+    logSpeichern: function () {
+      var dauer = +(document.getElementById('ln-dauer') || {}).value || 0;
+      if (!dauer) {
+        if (window.Native) Native.haptic('error');
+        app.dialog.alert('Trag zuerst die Dauer ein.', 'Dauer fehlt');
+        return;
+      }
+      var data = getData(); if (!data) return;
+      if (!data.log) data.log = [];
+      data.log.unshift({
+        date: (document.getElementById('ln-datum') || {}).value || heute(),
+        type: formWerte.logTyp || 'boxen',
+        duration: dauer,
+        rpe: +(formWerte.rpe || 7),
+        weight: null,
+        notes: (document.getElementById('ln-notiz') || {}).value || ''
+      });
+      saveData(data);
+      if (window.Native) Native.haptic('success');
+      formWerte = {};
+      F7.neuZeichnen();
+      current().router.back();
+      laterSync();
+    },
+
+    /* ---- Notizen ---- */
+    notizSpeichern: function () {
+      var t = ((document.getElementById('nn-text') || {}).value || '').trim();
+      if (!t) {
+        if (window.Native) Native.haptic('error');
+        app.dialog.alert('Schreib zuerst etwas.', 'Notiz ist leer');
+        return;
+      }
+      var data = getData(); if (!data) return;
+      if (!data.notizen) data.notizen = [];
+      data.notizen.unshift({ date: heute(), category: formWerte.notizKat || 'technik', text: t });
+      saveData(data);
+      if (window.Native) Native.haptic('success');
+      formWerte = {};
+      F7.neuZeichnen();
+      current().router.back();
+      laterSync();
+    },
+    notizWeg: function (i) {
+      app.dialog.confirm('Diese Notiz löschen?', 'Löschen', function () {
+        var data = getData(); if (!data || !data.notizen) return;
+        data.notizen.splice(i, 1);
+        saveData(data);
+        if (window.Native) Native.haptic('warning');
+        F7.neuZeichnen();
+        current().router.back();
+        laterSync();
+      });
+    },
+
+    /* ---- Rechner ---- */
+    rechne: function (key) {
+      var z = document.getElementById('r-ergebnis');
+      if (!z) return;
+      var n = function (id) { return +(document.getElementById(id) || {}).value || 0; };
+      var zeilen = [];
+      try {
+        if (key === 'makros') {
+          var r = calculateMacros(n('r-gew'), formWerte.phase || 'halten', n('r-vol'), 'sitzend');
+          zeilen = [['Kalorien', Math.round(r.kcal) + ' kcal'],
+                    ['Eiweiß', Math.round(r.protein) + ' g'],
+                    ['Kohlenhydrate', Math.round(r.carbs) + ' g'],
+                    ['Fett', Math.round(r.fat) + ' g']];
+        } else if (key === 'hf') {
+          var max = 220 - n('r-alter'), ruhe = n('r-ruhe'), res = max - ruhe;
+          zeilen = [[1, 50, 60], [2, 60, 70], [3, 70, 80], [4, 80, 90], [5, 90, 100]]
+            .map(function (z2) {
+              return ['Zone ' + z2[0],
+                Math.round(ruhe + res * z2[1] / 100) + ' bis ' +
+                Math.round(ruhe + res * z2[2] / 100) + ' pro Min'];
+            });
+          zeilen.unshift(['Maximalpuls', max + ' pro Min']);
+        } else {
+          var last = n('r-last'), wdh = n('r-wdh');
+          var em = Math.round(last * (1 + wdh / 30));
+          zeilen = [['Einwiederholungsmaximum', em + ' kg'],
+                    ['90 Prozent', Math.round(em * 0.9) + ' kg'],
+                    ['80 Prozent', Math.round(em * 0.8) + ' kg'],
+                    ['70 Prozent', Math.round(em * 0.7) + ' kg']];
+        }
+      } catch (e) {
+        z.innerHTML = '<div class="block"><p class="prose">Rechnung nicht möglich.</p></div>';
+        return;
+      }
+      if (window.Native) Native.haptic('light');
+      z.innerHTML = listBlock(zeilen.map(function (r) {
+        return item({ title: r[0], after: r[1] }); }), 'Ergebnis');
+    },
+
+    datenExport: function () {
+      try {
+        var d = JSON.stringify(getData(), null, 2);
+        if (window.Native) {
+          Native.share({ title: 'BoxSpec Daten', text: d }).then(function (ok) {
+            if (!ok) app.dialog.alert('Teilen ist auf diesem Gerät nicht möglich.', 'Sichern');
+          });
+        }
+      } catch (e) { app.dialog.alert('Daten konnten nicht gelesen werden.', 'Sichern'); }
+    },
+
+    /* Zeichnet alle Reiter neu, auch die Detailseite, auf der man steht. */
+    neuZeichnen: function () {
+      F7.refresh();
+      var v = app.views.current || app.views.main;
+      var pg = v && v.el.querySelector('.page-current .page-content');
+      var name = v && v.el.querySelector('.page-current');
+      if (!pg || !name) return;
+      var n = name.dataset.name;
+      if (n === 'tests') pg.innerHTML = testsHTML();
+      else if (n === 'log') pg.innerHTML = logHTML();
+      else if (n === 'notizen') pg.innerHTML = notizenHTML();
+      else if (n === 'konto') pg.innerHTML = kontoHTML();
+      else if (n === 'test') {
+        var id = (pg.querySelector('[onclick*="F7.testWert"]') || {}).getAttribute
+          ? pg.querySelector('[onclick*="F7.testWert"]').getAttribute('onclick').match(/"([^"]+)"/) : null;
+        if (id) pg.innerHTML = '<h1 class="big">' + (pg.querySelector('.big') || {}).textContent + '</h1>' + testHTML(id[1]);
+      }
+    },
+
     reset: function () {
       var jobs = [];
       try { sessionStorage.removeItem('bs_healed'); } catch (e) {}
@@ -1041,6 +1576,8 @@
      hiesse, Daten zu verlieren. */
   // Auswahl des Kampfformulars, bis gespeichert wird
   var kampfWerte = {};
+  // Auswahl der uebrigen Formulare (Log, Notiz, Rechner)
+  var formWerte = {};
 
   function laterSync() {
     if (!window.Native) {
