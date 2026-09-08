@@ -154,10 +154,11 @@ body.f7-on .skel-card { height: 108px; margin: 0 16px 16px; border-radius: 12px;
    ------------------------------------------------------------ */
 
 #f7app {
-  /* Feder als Bezier angenaehert: schnell heraus, weich hinein,
-     mit leichtem Ueberschwingen. */
+  /* Die Kurve, mit der iOS Seiten schiebt: schnell heraus, lang und
+     weich hinein. Bewusst ohne Ueberschwingen, das wirkt gefedert
+     statt schwer und ist genau das, was eine App billig aussehen
+     laesst. Echte Gegenstaende bremsen weich ab, sie huepfen nicht. */
   --spring: cubic-bezier(.32, .72, 0, 1);
-  --spring-soft: cubic-bezier(.25, 1.2, .4, 1);
 }
 #f7app .page,
 #f7app .navbar,
