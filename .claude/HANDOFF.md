@@ -21,6 +21,8 @@ css/style.css         → 4500+ Zeilen CSS, Desktop. Besitzt .page — Kollision
 vendor/framework7.*   → Framework7 9, lokal statt CDN (sonst kein Offline-Betrieb)
 js/f7app.js           → Die komplette Handy-Oberflaeche (unter 768px). Nutzt die Logik unten, hat keine eigene
 css/f7theme.css       → Marke fuer Framework7 + eigene Bausteine (Kalender, Zeitstrahl, Haken)
+css/f7native.css      → Regelwerk "fuehlt sich nativ an": safe-area, Scroll, Bewegung, Farbschema
+js/native.js          → Adapter fuer Plattformfaehigkeiten. Capacitor haengt hier dran, sonst nirgends
 js/util.js            → esc/escAttr/escMultiline/initial/safeUrl/escJs — MUSS als erstes geladen werden
 js/app.js             → Hauptlogik (Dashboard, Plan, Auth, Account, Tests, Fights)
 js/pages.js           → 8 Säulen, Übungsdatenbank, Ernährung, Periodisierung
@@ -129,6 +131,63 @@ unveraendert weiterverwendet. `js/f7app.js` liest und schreibt nichts selbst, au
 7. **Nichts behaupten, was die Daten nicht hergeben.** Der Kalender faerbte anfangs
    alle vergangenen Tage gruen. `completedBlocks` ist nach Wochen-ID geschluesselt,
    fuer vergangene Wochen liegt nichts vor — gruen gibt es nur fuer die laufende Woche.
+
+### Das Regelwerk "fuehlt sich nativ an"
+
+`css/f7native.css` und `js/native.js` setzen 43 gemessene Punkte um. Die Pruefung
+liegt als Playwright-Durchlauf vor (`regelwerk.mjs`) und prueft Meta-Angaben,
+gerechnete Stile, echtes Offline-Verhalten und die Warteschlange. **Bei jeder
+Aenderung an der Handy-Oberflaeche erneut laufen lassen**, gegen die Live-URL.
+
+**Layout:** `100dvh` statt `100vh` (vh springt, sobald Safari seine Leiste ein-
+oder ausblendet). Der Rumpf scrollt nie: `position:fixed`, `overflow:hidden`,
+`overscroll-behavior:none`. Gescrollt wird nur `.page-content`, dort mit
+`overscroll-behavior-y:contain`. Eingabefelder stehen auf **16px**, darunter zoomt
+iOS beim Fokussieren hinein und kommt nicht wieder heraus. `touch-action:
+manipulation` auf allem Bedienbaren gegen die 300ms des Doppeltipp-Zooms.
+
+**Reaktionszeit:** sichtbare Antwort in 90ms. Abhaken ist optimistisch, also erst
+lokaler Stand und Bild, dann Netz. Beim Start zeigt die App ein Skelett-Geruest,
+keinen Drehkreisel. Textseiten werden beim **touchstart** vorgeladen.
+
+**Bewegung:** nur `transform` und `opacity`. Federkurve `--spring`, nie linear.
+`prefers-reduced-motion` schaltet auch Framework7s eigene Animationen ab
+(`animate:` beim App-Aufbau).
+
+**Farbschema:** folgt `prefers-color-scheme`, kein Schalter. Die Farben stehen als
+Variablen auf `#f7app.theme-auto`. **Wichtig: dort werden auch Framework7s eigene
+`--f7-*`-Variablen umgeschaltet**, sonst bleiben Bausteine dunkel, die nicht
+einzeln aufgezaehlt sind (die Leisten ziehen ihren Verlauf aus
+`--f7-bars-bg-color` ueber ein Pseudoelement).
+
+**Offline:** Banner statt Fehlerseite. Schreibvorgaenge wandern in
+`Native.enqueue()` und werden abgearbeitet, sobald das Geraet online und im
+Vordergrund ist. **Hintergrund-Sync gibt es auf iOS nicht**, darauf zu bauen hiesse
+Daten zu verlieren.
+
+### js/native.js: der Adapter
+
+Jede Plattformfaehigkeit liegt dahinter, nie direkt im Anwendungscode. Liegt
+`window.Capacitor` vor, wird der native Weg genommen, sonst der Web-Weg. **Damit
+ist Capacitor ein Wechsel der Implementierung an einer Stelle und kein Umbau.**
+Es gibt keine Server-Abhaengigkeit, alles laeuft im Browser.
+
+`haptic` `share` `statusBar` `pushStatus` `pushAsk` `persistStorage` `onNetwork`
+`online` `enqueue` `flush` `registerRunner` `queueLength` `installState`
+`installPrompt` `reducedMotion`
+
+### Was auf iOS nicht geht, und wie es hier geloest ist
+
+| Grenze | Loesung im Code |
+|---|---|
+| Kein Installationsdialog in Safari | Eigene Anleitung ueber Teilen, nach dem dritten Start, einmal (`installHint()`) |
+| Web Push erst nach Installation (ab 16.4) | `pushStatus()` meldet `braucht-installation` als eigenen Zustand statt still zu scheitern |
+| Keine Vibration API | `<input type="checkbox" switch>`-Kniff (iOS 17.4+), sonst `navigator.vibrate`, nativ ueber Capacitor |
+| Kein Background Sync | Schreibschlange, abgearbeitet bei Netz und im Vordergrund |
+| Speicher wird nach 7 Tagen Nichtnutzung geraeumt | `navigator.storage.persist()` beim Start, plus der Installationshinweis |
+| Kein Bluetooth, NFC, WebUSB | Nicht verwendet |
+| Nur Safari-Engine, auch in Chrome auf iOS | Keine Chrome-eigenen APIs verwendet |
+
 
 **Beim Aendern pruefen:** Playwright bei 390px gegen die Live-URL. Der Durchlauf
 prueft je Bildschirm Titel, Zeichenzahl, Zeilenzahl und Antippflaechen; zusaetzlich
