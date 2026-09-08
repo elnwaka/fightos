@@ -371,6 +371,11 @@ body.f7-on { margin: 0; background: #000; overflow: hidden; }
 #f7app .bs-week.now .bs-week-n { background: #E8000D; color: #fff; }
 #f7app .bs-week-p { flex: 1; font-size: 16px; }
 #f7app .bs-week.now .bs-week-p { font-weight: 600; }
+#f7app .bs-week-tag {
+  font-size: 11px; font-weight: 600; letter-spacing: .03em;
+  color: rgba(235,235,245,.60); background: rgba(255,255,255,.08);
+  padding: 3px 8px; border-radius: 6px;
+}
 #f7app .bs-week-jetzt {
   font-size: 12px; font-weight: 600; color: #FF4A4A;
   letter-spacing: .03em; text-transform: uppercase;

@@ -339,6 +339,7 @@ body.f7-on .skel-card { height: 108px; margin: 0 16px 16px; border-radius: 12px;
 #f7app.theme-auto .bs-week { border-color: var(--sep); }
 #f7app.theme-auto .bs-cap, #f7app.theme-auto .bs-phase .bs-list { color: var(--t2); }
 #f7app.theme-auto .bs-week-n { background: var(--sep); color: var(--t2); }
+#f7app.theme-auto .bs-week-tag { background: var(--sep); color: var(--t2); }
 #f7app.theme-auto .item-after.chev { border-color: var(--t3); }
 #f7app.theme-auto .tick::before { border-color: var(--t3); }
 #f7app.theme-auto .tl-e::before { background: var(--sep); }

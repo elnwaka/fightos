@@ -594,17 +594,36 @@
         var p = null;
         try { p = getP10WPhase(w); } catch (e) {}
         var jetzt = (w === woche);
+        // Die Erholungswochen kommen aus der Programmlogik, nicht aus
+        // einer Zahl im Renderer. Aendert sich das 3:1-Muster, aendert
+        // sich der Zeitstrahl mit, ohne dass es hier jemand nachzieht.
+        var deload = false;
+        try { deload = !!isP10WDeload(w); } catch (e) {}
         zeilen += '<div class="bs-week' + (jetzt ? ' now' : '') + (w < woche ? ' done' : '') + '">' +
           '<span class="bs-week-n">' + w + '</span>' +
           '<span class="bs-week-p">' + E(p ? p.name : '') + '</span>' +
+          (deload ? '<span class="bs-week-tag">Deload</span>' : '') +
           (jetzt ? '<span class="bs-week-jetzt">jetzt</span>' : '') + '</div>';
       }
+      // legend und conditioning sind Listen aus label und text, nicht
+      // Fliesstext. Als Text behandelt kaeme "[object Object]" heraus.
+      var liste = function (arr, marke) {
+        if (!arr || !arr.length) return '';
+        return (marke ? '<div class="block-title">' + E(marke) + '</div>' : '') +
+          '<div class="list list-strong list-outline inset media-list"><ul>' +
+          arr.map(function (x) {
+            return '<li><div class="item-content"><div class="item-inner">' +
+              '<div class="item-title-row"><div class="item-title">' +
+                E(plainText(x.label || '')) + '</div></div>' +
+              '<div class="item-subtitle" style="white-space:normal">' +
+                inl(x.text || '') + '</div></div></div></li>';
+          }).join('') + '</ul></div>';
+      };
       return (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
         (b.text ? '<div class="block block-strong inset"><p class="prose">' + inl(b.text) + '</p></div>' : '') +
         '<div class="block inset bs-weeks">' + zeilen + '</div>' +
-        (b.legend ? '<div class="block block-strong inset"><p class="prose">' + inl(b.legend) + '</p></div>' : '') +
-        (b.conditioning ? '<div class="block-title">Conditioning</div>' +
-          '<div class="block block-strong inset"><p class="prose">' + inl(b.conditioning) + '</p></div>' : '');
+        liste(b.legend, 'Phasen') +
+        liste(b.conditioning, 'Conditioning');
     }
 
     // Unbekannter Platzhalter: lieber sichtbar leer als still verschluckt
@@ -613,12 +632,20 @@
 
   /* ---------- Die beiden Bildschirme ---------- */
 
+  /* intro sind die Bloecke vor dem ersten Kapitel. Sie gehoeren auf
+     den Uebersichtsbildschirm ueber die Kapitelliste, nicht in ein
+     erfundenes Kapitel: im Original steht dort auch keine Ueberschrift.
+     Wer sie ueberspringt, verliert stillen Inhalt. Genau das ist mir
+     bei Periodisierung passiert, 1400 Zeichen. */
   function artikelDatenHTML(key) {
     var c = Content.get(key);
     if (!c) return '';
-    return listBlock(c.sections.map(function (s) {
-      return item({ title: plainText(s.title), link: '/kapitel/' + key + '/' + s.id + '/' });
-    }), c.sections.length + (c.sections.length === 1 ? ' Kapitel' : ' Kapitel'));
+    return (c.sub ? '<div class="block block-strong inset"><p class="prose">' +
+              inl(c.sub) + '</p></div>' : '') +
+      (c.intro || []).map(blockHTML).join('') +
+      listBlock(c.sections.map(function (s) {
+        return item({ title: plainText(s.title), link: '/kapitel/' + key + '/' + s.id + '/' });
+      }), c.sections.length + ' Kapitel');
   }
 
   function kapitelDatenHTML(key, id) {
