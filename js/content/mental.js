@@ -18,6 +18,7 @@ Content.define('mental', {
   title: 'Mentaltraining',
   sub: 'Neunzig Prozent des Kampfes passieren im Kopf, und genau das ist trainierbar.',
   related: ['regeneration', 'periodisierung', 'ernaehrung'],
+  vars: { ego: { from: 'alterEgo', fallback: 'dein Alter Ego' } },
   intro: [
     {
       t: 'note',
@@ -785,7 +786,7 @@ Content.define('mental', {
           t: 'dyn',
           id: 'mentalProtokoll',
           title: 'Tägliches Protokoll, 15 Minuten',
-          text: 'Wo {ego} steht, setzt die App den Namen deines Alter Ego ein. Solange keiner angelegt ist, steht dort der allgemeine Begriff.',
+          text: 'Sobald du oben ein Alter Ego angelegt hast, steht sein Name in diesen Schritten. Vorher steht dort der allgemeine Begriff.',
           bloecke: [
             {
               id: 'morgens',

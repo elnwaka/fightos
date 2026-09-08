@@ -58,8 +58,13 @@
    Dafuer gibt es Platzhalter in geschweiften Klammern und eine
    Deklaration am Artikel:
 
-     vars: { kg: { from:'weight' }, p22: { from:'weight', mul:2.2 } }
+     vars: { kg:  { from:'weight' },
+             p22: { from:'weight', mul:2.2 },
+             ego: { from:'alterEgo', fallback:'dein Alter Ego' } }
      text: 'Bei {kg} kg sind das {p22} g Protein pro Tag.'
+
+   Mit mul oder div wird gerechnet, ohne wird durchgereicht. So kommt
+   auch ein selbst eingegebener Name ueber denselben Weg in den Text.
 
    Content.values(key, { weight: 78 }) rechnet die Werte aus,
    Content.inline(text, werte) setzt sie ein. Gerechnet wird in beiden
@@ -190,7 +195,7 @@
      Text ist. */
   var NO_TEXT = { t: 1, id: 1, tone: 1, accent: 1, src: 1, href: 1,
                   fill: 1, pct: 1, ordered: 1, vars: 1, from: 1,
-                  mul: 1, div: 1, round: 1 };
+                  mul: 1, div: 1, round: 1, fallback: 1 };
 
   /* Die Grenze ist nur ein Schutz gegen Ringschluss, keine
      Strukturannahme. Bei 8 fielen Tabellenzeilen heraus: Artikel,
@@ -221,10 +226,20 @@
     return parts.filter(Boolean).join('\n');
   }
 
-  /* Rechnet die personalisierten Werte eines Artikels aus. base ist
-     das, was ueber den Nutzer bekannt ist, heute nur das Gewicht.
-     Fehlt der Wert, wird der Platzhalter zu einem Strich statt zu
-     "NaN" oder "undefined". */
+  /* Holt die personalisierten Werte eines Artikels. base ist das, was
+     ueber den Nutzer bekannt ist: Gewicht, Groesse, Alter, der selbst
+     vergebene Alter-Ego-Name und so weiter.
+
+     Steht mul oder div dabei, wird gerechnet und gerundet. Steht keins
+     dabei, wird der Wert durchgereicht, auch wenn er keine Zahl ist.
+     Damit heisst vars nicht "rechne aus dem Gewicht", sondern "hol dir
+     was du brauchst, wahlweise mit Faktor". Welche Tatsache eine Seite
+     braucht und wie sie sie nennt, entscheiden die Daten und nicht der
+     Renderer. Sonst steht Inhaltswissen im Code, und genau das haben
+     die Platzhalter abgeschafft.
+
+     Fehlt der Wert, greift fallback, sonst ein Gedankenstrich. Nie
+     "NaN" und nie "undefined", das liest sonst jemand im Text. */
   function values(key, base) {
     var c = CONTENT[key];
     var out = {};
@@ -233,7 +248,14 @@
     Object.keys(c.vars).forEach(function (name) {
       var spec = c.vars[name] || {};
       var raw = base[spec.from];
-      if (raw == null || isNaN(raw)) { out[name] = '–'; return; }
+      var leer = raw == null || raw === '';
+      var rechnen = spec.mul != null || spec.div != null;
+
+      if (!rechnen) {
+        out[name] = leer ? (spec.fallback || '–') : String(raw);
+        return;
+      }
+      if (leer || isNaN(raw)) { out[name] = spec.fallback || '–'; return; }
       var v = Number(raw);
       if (spec.mul != null) v = v * spec.mul;
       if (spec.div != null) v = v / spec.div;

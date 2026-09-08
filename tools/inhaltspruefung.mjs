@@ -44,7 +44,18 @@ const daten = await p.evaluate(k=>{
   const setz = t => String(t).replace(/\{([a-zA-Z0-9_]+)\}/g,
     (m, n) => (werte && werte[n] != null) ? werte[n] : m);
   const raus = [];
-  const nimm = v => { if (typeof v === 'string' && v.trim()) raus.push(Content.plain(setz(v))); };
+  /* Nicht Content.plain: das entfernt alles zwischen < und dem
+     naechsten >, also auch "<10g Ballaststoffe/Tag. Weisser Reis,
+     ... Durchschnittlich". Hier werden nur die vier erlaubten Tags
+     entfernt, alles andere ist Text. */
+  // <br> ist ein Umbruch und wird zum Leerzeichen. Die uebrigen drei
+  // sind Auszeichnung mitten im Satz und verschwinden spurlos, sonst
+  // steht in der Erwartung "Training ." und im Bild "Training.".
+  const nurText = t => String(t)
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<\/?(?:strong|em|a[^>]*)>/gi, '')
+    .replace(/\s+/g, ' ').trim();
+  const nimm = v => { if (typeof v === 'string' && v.trim()) raus.push(nurText(setz(v))); };
   const geh = b => {
     if (!b || typeof b !== 'object') return;
     ['text','title','label','value','caption','alt','when','name','sub'].forEach(f => nimm(b[f]));

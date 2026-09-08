@@ -473,7 +473,8 @@
        tools/altneu-vergleich.mjs  fehlt ein Wort gegenueber dem Original?
        tools/platzhalter-pruefung.py  war die Zahl vorher wirklich gerechnet?
        tools/zweigewichte.mjs      aendert sich nur, was sich aendern darf? */
-  var MIT_DATEN = { periodisierung: 1, ernaehrung: 1, regeneration: 1, mental: 1 };
+  var MIT_DATEN = { periodisierung: 1, ernaehrung: 1, regeneration: 1,
+                    mental: 1, saeulen: 1, faq: 1 };
 
   function ensureContent(key) {
     if (!MIT_DATEN[key]) return Promise.resolve(false);
@@ -524,23 +525,15 @@
   function werteFuer(key) {
     if (!window.Content || !Content.values) return null;
     var s = SCH();
-    var w = Content.values(key, {
+    /* Hier stehen nur Tatsachen ueber den Nutzer. Welche davon eine
+       Seite braucht, wie sie sie nennt und ob sie einen Faktor
+       darauflegt, entscheiden die Daten ueber vars. Der Renderer weiss
+       nichts ueber Inhalte, auch nicht, dass es {ego} gibt. */
+    return Content.values(key, {
       weight: s.weight, height: s.height,
       alterEgo: alterEgoName(),
       age: (function () { try { return getUserAge(); } catch (e) { return null; } })()
     }) || {};
-
-    /* BRUECKE, befristet. {ego} in mental.js kommt nicht aus einer
-       Formel, sondern aus einem Eingabefeld, und wird deshalb in den
-       Daten nicht deklariert. Content.values() liefert dafuer nichts,
-       weil es heute nur Zahlen kennt.
-
-       Der saubere Weg ist eine Deklaration in den Daten
-       (ego: { from: 'alterEgo' }) plus ein Durchreichen in values(),
-       wenn weder mul noch div gesetzt sind. Dann weiss der Renderer
-       wieder nichts ueber Inhalte. Faellt weg, sobald das steht. */
-    if (w.ego == null) w.ego = alterEgoName() || 'dein Alter Ego';
-    return w;
   }
 
   function inl(t) {
@@ -893,13 +886,39 @@
       bloeckeHTML(c.intro) +
       listBlock(c.sections.map(function (s) {
         return item({ title: nice(plainText(s.title)), link: '/kapitel/' + key + '/' + s.id + '/' });
-      }), c.sections.length + ' Kapitel');
+      }).concat(begriffeZahl(c) ? [item({ title: 'Begriffe',
+        sub: begriffeZahl(c) + ' Erklärungen',
+        link: '/kapitel/' + key + '/__begriffe/' })] : []),
+        c.sections.length + ' Kapitel');
+  }
+
+  function begriffeZahl(c) {
+    return (c && c.begriffe) ? Object.keys(c.begriffe).length : 0;
+  }
+
+  /* Das Glossar. Frueher standen die 39 Erklaerungen als Tooltips im
+     Text, also auf dem Telefon unerreichbar. Sie stehen jetzt als
+     eigenes Kapitel: eine Liste, die man lesen und in der man suchen
+     kann. Der Begriff bleibt im Satz stehen, wo er hingehoert. */
+  function begriffeHTML(key) {
+    var c = Content.get(key);
+    var b = (c && c.begriffe) || {};
+    var namen = Object.keys(b).sort(function (x, y) {
+      return x.localeCompare(y, 'de');
+    });
+    return listBlock(namen.map(function (n) {
+      return '<li><div class="item-content"><div class="item-inner">' +
+        '<div class="item-title bs-wrap">' + E(n) + '</div>' +
+        '<div class="item-text bs-wrap">' + inl(b[n]) + '</div>' +
+        '</div></div></li>';
+    }), namen.length + ' Begriffe');
   }
 
   function kapitelDatenHTML(key, id) {
+    aktuelleWerte = werteFuer(key);
+    if (id === '__begriffe') return begriffeHTML(key);
     var s = Content.section(key, id);
     if (!s) return '<div class="block"><p>Kapitel nicht gefunden.</p></div>';
-    aktuelleWerte = werteFuer(key);
     return bloeckeHTML(s.blocks);
   }
 
@@ -1199,7 +1218,7 @@
                       link: '/verein/' })], 'Verein') +
     listBlock([
       item({ title: 'Rechner', sub: 'Makros, Herzfrequenz, 1RM', link: '/rechner/' }),
-      item({ title: 'FAQ', link: '/alt/profil/faq/FAQ/' })
+      item({ title: 'FAQ', sub: '18 Fragen und Antworten', link: '/artikel/faq/' })
     ], 'Hilfe') +
     listBlock([
       item({ title: 'Stand', after: String(window.__BUILD || 'unbekannt') }),
@@ -1679,7 +1698,8 @@
             if (da && hatInhalt(key)) {
               var c = Content.get(key), sec = Content.section(key, ref);
               return ctx.resolve({ content: page('kapitel', '',
-                '<h1 class="big">' + E(sec ? nice(Content.plain(sec.title)) : 'Kapitel') + '</h1>' +
+                '<h1 class="big">' + E(ref === '__begriffe' ? 'Begriffe' :
+                  (sec ? nice(Content.plain(sec.title)) : 'Kapitel')) + '</h1>' +
                 kapitelDatenHTML(key, ref),
                 { back: c.title || 'Zurück' }) });
             }

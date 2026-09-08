@@ -309,7 +309,16 @@ body.f7-on { margin: 0; background: #000; overflow: hidden; }
 
 /* Produktnamen und Beschreibungen sind Inhalt, kein Etikett: sie
    duerfen umbrechen statt abgeschnitten zu werden. */
-#f7app .bs-wrap { white-space: normal; overflow: visible; text-overflow: clip; }
+/* Framework7 kappt .item-text nach zwei Zeilen und setzt
+   Auslassungspunkte. Bei Etiketten ist das richtig, bei Inhalt nicht:
+   "Energieproduktion... nutzen." liest sich wie ein Fehler, und der
+   Text steht ja da. Die Kappung muss vollstaendig zurueckgenommen
+   werden, white-space allein reicht nicht. */
+#f7app .bs-wrap {
+  white-space: normal; overflow: visible; text-overflow: clip;
+  display: block; -webkit-line-clamp: unset; -webkit-box-orient: horizontal;
+  max-height: none;
+}
 #f7app .item-text.bs-wrap { line-height: 1.45; margin-top: 3px; }
 
 #f7app .bs-list { margin: 0; padding-left: 20px; }
