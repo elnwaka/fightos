@@ -330,6 +330,15 @@ body.f7-on .skel-card { height: 108px; margin: 0 16px 16px; border-radius: 12px;
 #f7app.theme-auto .item-content.is-done .item-title,
 #f7app.theme-auto .tl-e.is-done .tl-n { color: var(--t3); }
 #f7app.theme-auto .statbar { background: var(--sep); }
+#f7app.theme-auto .bs-tablewrap,
+#f7app.theme-auto .bs-note,
+#f7app.theme-auto .bs-weeks { background: var(--e1); }
+#f7app.theme-auto .bs-table th { background: var(--e2); color: var(--t2); }
+#f7app.theme-auto .bs-table td { color: var(--t1); }
+#f7app.theme-auto .bs-table th, #f7app.theme-auto .bs-table td,
+#f7app.theme-auto .bs-week { border-color: var(--sep); }
+#f7app.theme-auto .bs-cap, #f7app.theme-auto .bs-phase .bs-list { color: var(--t2); }
+#f7app.theme-auto .bs-week-n { background: var(--sep); color: var(--t2); }
 #f7app.theme-auto .item-after.chev { border-color: var(--t3); }
 #f7app.theme-auto .tick::before { border-color: var(--t3); }
 #f7app.theme-auto .tl-e::before { background: var(--sep); }

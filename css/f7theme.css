@@ -303,6 +303,79 @@ body.f7-on { margin: 0; background: #000; overflow: hidden; }
 #f7app .item-input .item-inner { padding-top: 10px; padding-bottom: 4px; }
 #f7app .item-content.item-input { min-height: 56px; }
 
+/* ---- Bausteine der Inhaltsdaten ----
+   Ersetzen den eingebetteten Altbestand. Ab hier braucht das Handy
+   fuer diese Seiten kein style.css mehr. */
+
+#f7app .bs-list { margin: 0; padding-left: 20px; }
+#f7app .bs-list li { margin-bottom: 7px; }
+#f7app .bs-list li:last-child { margin-bottom: 0; }
+
+/* Tabellen scrollen in ihrem eigenen Kasten, nie die Seite. Die
+   Kopfzeile bleibt stehen, sonst weiss man nach zwei Spalten nicht
+   mehr, was man liest. */
+#f7app .bs-tablewrap {
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  background: #131315; border-radius: 12px; padding: 0;
+}
+#f7app .bs-table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 14px; }
+#f7app .bs-table th, #f7app .bs-table td {
+  padding: 10px 14px; text-align: left; white-space: nowrap;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+}
+#f7app .bs-table th {
+  position: sticky; top: 0; z-index: 1; background: #1F1F22;
+  font-size: 12px; font-weight: 600; letter-spacing: .03em;
+  text-transform: uppercase; color: rgba(235,235,245,.60);
+}
+#f7app .bs-table td { color: rgba(235,235,245,.85); }
+#f7app .bs-table tr:last-child td { border-bottom: 0; }
+
+/* Hinweiskarte. Die Toenung sitzt als schmale Marke oben, nicht als
+   Streifen links: ein farbiger Balken an der Kante ist das
+   Erkennungsmerkmal generierter Seiten. */
+#f7app .bs-note {
+  background: #131315; border-radius: 12px; padding: 14px 16px;
+}
+#f7app .bs-note-t {
+  display: block; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--tone); margin-bottom: 6px;
+}
+#f7app .bs-note .prose { margin: 0; }
+
+#f7app .bs-card { margin-bottom: 4px; }
+#f7app .bs-card .block-title { margin-top: 22px; }
+
+#f7app .bs-fig { padding: 0; }
+#f7app .bs-fig img { width: 100%; border-radius: 12px; display: block; background: #1F1F22; }
+#f7app .bs-cap {
+  display: block; font-size: 13px; color: rgba(235,235,245,.60); margin-top: 8px;
+}
+
+/* Phasen und Wochen des Programms */
+#f7app .bs-phase-n { font-size: 19px; font-weight: 600; margin: 2px 0 10px; }
+#f7app .bs-phase .bs-list { margin-top: 12px; font-size: 15px; color: rgba(235,235,245,.75); }
+#f7app .bs-weeks { background: #131315; border-radius: 12px; padding: 4px 0; }
+#f7app .bs-week {
+  display: flex; align-items: center; gap: 12px; padding: 11px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+}
+#f7app .bs-week:last-child { border-bottom: 0; }
+#f7app .bs-week-n {
+  flex: 0 0 26px; height: 26px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-size: 13px; font-weight: 600;
+  background: rgba(255,255,255,.08); color: rgba(235,235,245,.60);
+}
+#f7app .bs-week.done .bs-week-n { background: rgba(48,209,88,.18); color: #30D158; }
+#f7app .bs-week.now .bs-week-n { background: #E8000D; color: #fff; }
+#f7app .bs-week-p { flex: 1; font-size: 16px; }
+#f7app .bs-week.now .bs-week-p { font-weight: 600; }
+#f7app .bs-week-jetzt {
+  font-size: 12px; font-weight: 600; color: #FF4A4A;
+  letter-spacing: .03em; text-transform: uppercase;
+}
+
 /* ---- Auswahlrad ----
    Framework7 richtet eine einzelne Spalte rechtsbuendig aus, weil sie
    zugleich erste und letzte ist. Bei einer Spalte gehoert der Wert in

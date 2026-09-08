@@ -12,7 +12,12 @@
 set -euo pipefail
 
 VERSION=9.1.3
-KOMPONENTEN=(picker sheet dialog preloader)
+# ACHTUNG: Hier gehoeren auch Komponenten hinein, die NUR im Markup
+# vorkommen und nie per JavaScript aufgerufen werden. Genau daran ist
+# es schon einmal gescheitert: tabs fehlte, dadurch standen alle fuenf
+# Reiteransichten gleichzeitig auf display:block und sichtbar war immer
+# nur die erste. Die Pruefung dafuer steht in tools/f7check.sh.
+KOMPONENTEN=(tabs input picker sheet dialog preloader)
 ZIEL=vendor/framework7.min.css
 CDN="https://cdn.jsdelivr.net/npm/framework7@${VERSION}"
 

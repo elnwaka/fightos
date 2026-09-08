@@ -435,6 +435,198 @@
   };
   var SECS = {};
 
+  /* ============================================================
+     INHALTE AUS DATEN STATT AUS GESCHABTEM DOM
+     ------------------------------------------------------------
+     js/content/<key>.js liefert Abschnitte aus Bloecken. Hier
+     werden sie nativ gezeichnet, mit denselben Bausteinen wie der
+     Rest der App. Kein .legacy, kein style.css.
+
+     Solange eine Seite noch nicht umgestellt ist, faellt artikelHTML
+     auf den alten Weg zurueck. Die Umstellung geht damit Seite fuer
+     Seite, ohne dass zwischendurch etwas leer ist.
+     ============================================================ */
+
+  var contentGeladen = {};
+
+  /* Welche Seiten schon als Daten vorliegen. Fehlt eine hier, wird
+     gar nicht erst danach gesucht: ein 404 je Aufruf ist Laerm in der
+     Konsole und ein Abruf umsonst. Beim Umstellen der naechsten Seite
+     gehoert ihr Schluessel hierher. */
+  var MIT_DATEN = { periodisierung: 1 };
+
+  function ensureContent(key) {
+    if (!MIT_DATEN[key]) return Promise.resolve(false);
+    if (window.Content && Content.has && Content.has(key)) return Promise.resolve(true);
+    if (contentGeladen[key]) return contentGeladen[key];
+    contentGeladen[key] = new Promise(function (fertig) {
+      var laden = function (src) {
+        return new Promise(function (ok) {
+          var sc = document.createElement('script');
+          sc.src = src;
+          sc.onload = function () { ok(true); };
+          sc.onerror = function () { ok(false); };
+          document.head.appendChild(sc);
+        });
+      };
+      var vertrag = window.Content ? Promise.resolve(true) : laden('js/content.js');
+      vertrag.then(function (ok) {
+        if (!ok) return fertig(false);
+        return laden('js/content/' + key + '.js').then(function (ok2) {
+          if (!ok2) contentGeladen[key] = null;
+          fertig(ok2);
+        });
+      });
+    });
+    return contentGeladen[key];
+  }
+
+  function hatInhalt(key) {
+    return !!(window.Content && Content.has && Content.has(key));
+  }
+
+  /* ---------- Bloecke ---------- */
+
+  var TONE = { info: '#0A84FF', warn: '#FF9F0A', sci: '#30D158',
+               gruen: '#30D158', blau: '#0A84FF', rot: '#E8000D' };
+
+  function inl(t) {
+    // Content.inline escaped zuerst alles und gibt nur strong, em, br
+    // und https-Anker wieder frei. Fehlt der Vertrag, wird hart escaped.
+    return (window.Content && Content.inline) ? Content.inline(t) : E(t);
+  }
+
+  function blockHTML(b) {
+    if (!b || !b.t) return '';
+    switch (b.t) {
+
+      case 'p':
+        return '<div class="block block-strong inset"><p class="prose">' +
+          inl(b.text) + '</p></div>';
+
+      case 'h':
+        return '<div class="block-title">' + E(plainText(b.text)) + '</div>';
+
+      case 'list':
+        return '<div class="block block-strong inset"><' + (b.ordered ? 'ol' : 'ul') +
+          ' class="prose bs-list">' +
+          (b.items || []).map(function (x) { return '<li>' + inl(x) + '</li>'; }).join('') +
+          '</' + (b.ordered ? 'ol' : 'ul') + '></div>';
+
+      /* Waagerecht scrollender Kasten mit Kopfzeile. Die Kopfzeile
+         bleibt beim Scrollen stehen, sonst weiss man nach zwei Spalten
+         nicht mehr, was man liest. Die Seite selbst scrollt nie quer. */
+      case 'table':
+        return '<div class="block inset bs-tablewrap"><table class="bs-table">' +
+          (b.head && b.head.length ? '<thead><tr>' +
+            b.head.map(function (h) { return '<th>' + inl(h) + '</th>'; }).join('') +
+            '</tr></thead>' : '') +
+          '<tbody>' + (b.rows || []).map(function (r) {
+            return '<tr>' + r.map(function (c) { return '<td>' + inl(c) + '</td>'; }).join('') + '</tr>';
+          }).join('') + '</tbody></table></div>';
+
+      case 'note':
+        return '<div class="block inset bs-note" style="--tone:' +
+          (TONE[b.tone] || TONE.info) + '">' +
+          (b.title ? '<b class="bs-note-t">' + E(plainText(b.title)) + '</b>' : '') +
+          '<p class="prose">' + inl(b.text) + '</p></div>';
+
+      case 'stat':
+        return '<div class="list list-strong list-outline inset"><ul>' +
+          (b.pct != null
+            ? statRow(plainText(b.label), plainText(b.value), b.pct)
+            : item({ title: plainText(b.label), after: plainText(b.value) })) +
+          '</ul></div>';
+
+      case 'img':
+        return '<div class="block inset bs-fig"><img src="' + safeUrl(b.src) + '" alt="' +
+          E(plainText(b.alt || '')) + '" loading="lazy">' +
+          (b.caption ? '<span class="bs-cap">' + inl(b.caption) + '</span>' : '') + '</div>';
+
+      case 'link':
+        return '<div class="list list-strong list-outline inset"><ul><li>' +
+          '<a href="' + safeUrl(b.href) + '" target="_blank" rel="noopener noreferrer" ' +
+          'class="item-link item-content external"><div class="item-inner">' +
+          '<div class="item-title">' + E(plainText(b.label)) + '</div>' +
+          '<div class="item-after chev"></div></div></a></li></ul></div>';
+
+      case 'card':
+        return '<div class="bs-card' + (b.accent ? ' accent' : '') + '">' +
+          (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
+          (b.blocks || []).map(blockHTML).join('') + '</div>';
+
+      case 'dyn':
+        return dynHTML(b);
+
+      default:
+        return '';
+    }
+  }
+
+  function plainText(t) {
+    return (window.Content && Content.plain) ? Content.plain(t) : String(t == null ? '' : t);
+  }
+
+  /* ---------- Berechnetes ----------
+     Nur Auswahl und Rechnung stehen hier. Die Woerter kommen aus den
+     Daten, sonst saehe sie keine Vollstaendigkeitspruefung je wieder. */
+
+  function dynHTML(b) {
+    if (b.id === 'phaseCycle') {
+      return (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
+        (b.items || []).map(function (x) {
+          return '<div class="block block-strong inset bs-phase" style="--tone:' +
+            (TONE[x.tone] || TONE.info) + '">' +
+            '<div class="sess-top"><span>' + E(plainText(x.when)) + '</span></div>' +
+            '<div class="bs-phase-n">' + E(plainText(x.name)) + '</div>' +
+            '<div class="statbar"><i style="width:' + (+x.fill || 0) + '%;background:var(--tone)"></i></div>' +
+            '<ul class="prose bs-list">' +
+              (x.details || []).map(function (d) { return '<li>' + inl(d) + '</li>'; }).join('') +
+            '</ul></div>';
+        }).join('');
+    }
+
+    if (b.id === 'timeline10w') {
+      var woche = 0, phase = null;
+      try { woche = getProgram10WCurrentWeek() || 0; } catch (e) {}
+      var zeilen = '';
+      for (var w = 1; w <= 10; w++) {
+        var p = null;
+        try { p = getP10WPhase(w); } catch (e) {}
+        var jetzt = (w === woche);
+        zeilen += '<div class="bs-week' + (jetzt ? ' now' : '') + (w < woche ? ' done' : '') + '">' +
+          '<span class="bs-week-n">' + w + '</span>' +
+          '<span class="bs-week-p">' + E(p ? p.name : '') + '</span>' +
+          (jetzt ? '<span class="bs-week-jetzt">jetzt</span>' : '') + '</div>';
+      }
+      return (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
+        (b.text ? '<div class="block block-strong inset"><p class="prose">' + inl(b.text) + '</p></div>' : '') +
+        '<div class="block inset bs-weeks">' + zeilen + '</div>' +
+        (b.legend ? '<div class="block block-strong inset"><p class="prose">' + inl(b.legend) + '</p></div>' : '') +
+        (b.conditioning ? '<div class="block-title">Conditioning</div>' +
+          '<div class="block block-strong inset"><p class="prose">' + inl(b.conditioning) + '</p></div>' : '');
+    }
+
+    // Unbekannter Platzhalter: lieber sichtbar leer als still verschluckt
+    return b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '';
+  }
+
+  /* ---------- Die beiden Bildschirme ---------- */
+
+  function artikelDatenHTML(key) {
+    var c = Content.get(key);
+    if (!c) return '';
+    return listBlock(c.sections.map(function (s) {
+      return item({ title: plainText(s.title), link: '/kapitel/' + key + '/' + s.id + '/' });
+    }), c.sections.length + (c.sections.length === 1 ? ' Kapitel' : ' Kapitel'));
+  }
+
+  function kapitelDatenHTML(key, id) {
+    var s = Content.section(key, id);
+    if (!s) return '<div class="block"><p>Kapitel nicht gefunden.</p></div>';
+    return (s.blocks || []).map(blockHTML).join('');
+  }
+
   /* ---------- Altbestand bei Bedarf ----------
      pages.js sind 272 KB Desktop-Renderfunktionen. Das Handy laedt sie
      nicht mehr beim Start, sondern erst wenn ein Bildschirm sie
@@ -1191,18 +1383,37 @@
           page('videos', 'Videos', videosHTML(), { large: 1, back: 'Wissen' }) }); } },
       { path: '/artikel/:key/', async: function (ctx) {
           var key = ctx.to.params.key;
-          ensurePages().then(function () {
-            ctx.resolve({ content: page('artikel', ARTICLES[key] ? ARTICLES[key].t : 'Artikel',
-              artikelHTML(key), { large: 1, back: 'Wissen' }) });
+          // Erst die Daten versuchen. Erst wenn es fuer diese Seite noch
+          // keine gibt, wird der alte Weg ueber pages.js genommen.
+          ensureContent(key).then(function (da) {
+            if (da && hatInhalt(key)) {
+              var c = Content.get(key);
+              return ctx.resolve({ content: page('artikel', c.title || 'Artikel',
+                artikelDatenHTML(key), { large: 1, back: 'Wissen' }) });
+            }
+            ensurePages().then(function () {
+              ctx.resolve({ content: page('artikel', ARTICLES[key] ? ARTICLES[key].t : 'Artikel',
+                artikelHTML(key), { large: 1, back: 'Wissen' }) });
+            });
           });
         } },
       { path: '/kapitel/:key/:i/', async: function (ctx) {
-          var key = ctx.to.params.key, i = parseInt(ctx.to.params.i, 10);
-          ensurePages().then(function () {
-            var s = (SECS[key] || [])[i];
-            ctx.resolve({ content: page('kapitel', '',
-              '<h1 class="big">' + E(s ? s.title : 'Kapitel') + '</h1>' + kapitelHTML(key, i),
-              { back: ARTICLES[key] ? ARTICLES[key].t : 'Zurück' }) });
+          var key = ctx.to.params.key, ref = decodeURIComponent(ctx.to.params.i);
+          ensureContent(key).then(function (da) {
+            if (da && hatInhalt(key)) {
+              var c = Content.get(key), sec = Content.section(key, ref);
+              return ctx.resolve({ content: page('kapitel', '',
+                '<h1 class="big">' + E(sec ? Content.plain(sec.title) : 'Kapitel') + '</h1>' +
+                kapitelDatenHTML(key, ref),
+                { back: c.title || 'Zurück' }) });
+            }
+            ensurePages().then(function () {
+              var i = parseInt(ref, 10);
+              var s = (SECS[key] || [])[i];
+              ctx.resolve({ content: page('kapitel', '',
+                '<h1 class="big">' + E(s ? s.title : 'Kapitel') + '</h1>' + kapitelHTML(key, i),
+                { back: ARTICLES[key] ? ARTICLES[key].t : 'Zurück' }) });
+            });
           });
         } },
       { path: '/alt/:p/:s/:t/', async: function (ctx) {
@@ -1785,7 +1996,10 @@
       var key = a.getAttribute('href').split('/')[2];
       if (!key || warmed[key]) return;
       warmed[key] = 1;
-      ensurePages().then(function () { try { sections(key); } catch (err) {} });
+      ensureContent(key).then(function (da) {
+        if (da && hatInhalt(key)) return;
+        ensurePages().then(function () { try { sections(key); } catch (err) {} });
+      });
     }, { passive: true });
   }
 
