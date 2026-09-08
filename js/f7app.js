@@ -471,7 +471,7 @@
        tools/altneu-vergleich.mjs  fehlt ein Wort gegenueber dem Original?
        tools/platzhalter-pruefung.py  war die Zahl vorher wirklich gerechnet?
        tools/zweigewichte.mjs      aendert sich nur, was sich aendern darf? */
-  var MIT_DATEN = { periodisierung: 1, ernaehrung: 1 };
+  var MIT_DATEN = { periodisierung: 1, ernaehrung: 1, regeneration: 1 };
 
   function ensureContent(key) {
     if (!MIT_DATEN[key]) return Promise.resolve(false);
@@ -577,17 +577,19 @@
           E(plainText(b.alt || '')) + '" loading="lazy">' +
           (b.caption ? '<span class="bs-cap">' + inl(b.caption) + '</span>' : '') + '</div>';
 
+      /* Verweise tragen optional Untertitel, Beschreibung und Bild.
+         Die Produktempfehlungen brauchen das: Kategorie, Preis und
+         Beschreibung sind dort Inhalt, nicht Schmuck. Die Felder
+         bilden eins zu eins auf eine Listenzeile ab.
+         Die Bilder liegen auf einem fremden Server, so wie im
+         Original. Faellt eins aus, bleibt die Zeile bestehen. */
       case 'link':
-        return '<div class="list list-strong list-outline inset"><ul><li>' +
-          '<a href="' + safeUrl(b.href) + '" target="_blank" rel="noopener noreferrer" ' +
-          'class="item-link item-content external"><div class="item-inner">' +
-          '<div class="item-title">' + E(plainText(b.label)) + '</div>' +
-          '<div class="item-after chev"></div></div></a></li></ul></div>';
+        return listBlock([linkZeile(b)]);
 
       case 'card':
         return '<div class="bs-card' + (b.accent ? ' accent' : '') + '">' +
           (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
-          (b.blocks || []).map(blockHTML).join('') + '</div>';
+          bloeckeHTML(b.blocks) + '</div>';
 
       case 'dyn':
         return dynHTML(b);
@@ -595,6 +597,43 @@
       default:
         return '';
     }
+  }
+
+  /* Eine Verweis-Zeile. Der Winkel kommt von Framework7 selbst, ein
+     eigener daneben waere der zweite. Der Name darf umbrechen: bei
+     Produkten ist er Inhalt, kein Etikett, und "BLACKROLL Standard
+     Fasz..." nuetzt niemandem. */
+  function linkZeile(b) {
+    var bild = b.img ? safeUrl(b.img) : '';
+    return '<li><a href="' + safeUrl(b.href) + '" target="_blank" ' +
+      'rel="noopener noreferrer" class="item-link item-content external">' +
+      (bild ? '<div class="item-media"><img src="' + bild + '" alt="" loading="lazy" ' +
+              'onerror="this.parentNode.remove()"></div>' : '') +
+      '<div class="item-inner">' +
+        '<div class="item-title bs-wrap">' + E(plainText(b.label)) + '</div>' +
+        (b.sub ? '<div class="item-subtitle">' + E(plainText(b.sub)) + '</div>' : '') +
+        (b.text ? '<div class="item-text bs-wrap">' + inl(b.text) + '</div>' : '') +
+      '</div></a></li>';
+  }
+
+  /* Aufeinanderfolgende Verweise gehoeren in EINE Liste. Sechs
+     Produkte als sechs einzelne Kaesten sind sechsmal derselbe
+     Rahmen und kein Zusammenhang. */
+  function bloeckeHTML(blocks) {
+    var out = '', puffer = [];
+    var leeren = function () {
+      if (!puffer.length) return;
+      out += '<div class="list list-strong list-outline inset media-list"><ul>' +
+        puffer.map(linkZeile).join('') + '</ul></div>';
+      puffer = [];
+    };
+    (blocks || []).forEach(function (b) {
+      if (b && b.t === 'link') { puffer.push(b); return; }
+      leeren();
+      out += blockHTML(b);
+    });
+    leeren();
+    return out;
   }
 
   function plainText(t) {
@@ -797,7 +836,7 @@
     aktuelleWerte = werteFuer(key);
     return (c.sub ? '<div class="block block-strong inset"><p class="prose">' +
               inl(c.sub) + '</p></div>' : '') +
-      (c.intro || []).map(blockHTML).join('') +
+      bloeckeHTML(c.intro) +
       listBlock(c.sections.map(function (s) {
         return item({ title: nice(plainText(s.title)), link: '/kapitel/' + key + '/' + s.id + '/' });
       }), c.sections.length + ' Kapitel');
@@ -807,7 +846,7 @@
     var s = Content.section(key, id);
     if (!s) return '<div class="block"><p>Kapitel nicht gefunden.</p></div>';
     aktuelleWerte = werteFuer(key);
-    return (s.blocks || []).map(blockHTML).join('');
+    return bloeckeHTML(s.blocks);
   }
 
   /* ---------- Altbestand bei Bedarf ----------

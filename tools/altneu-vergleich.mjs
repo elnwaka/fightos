@@ -55,8 +55,21 @@ for (const w of wege) {
 }
 const neu = neuTeile.join('\n');
 
+/* Die Umstellung deutscht systematisch ein: "15-20 Min." wird zu
+   "15 bis 20 Minuten", "Supps" zu "Supplements". Das ist eine
+   Verbesserung, ein roher Wortvergleich meldet sie aber als Verlust.
+   Zahlenbereiche und die haeufigsten Abkuerzungen werden deshalb auf
+   eine Form gebracht. Was danach fehlt, fehlt wirklich. */
 const norm = s => String(s).replace(/\s+/g,' ').replace(/[–—]/g,'-')
-  .replace(/[„“”"']/g,'').toLowerCase();
+  .replace(/[„“”"']/g,'').toLowerCase()
+  .replace(/(\d)\s*bis\s*(\d)/g, '$1-$2')
+  .replace(/min\.?/g, 'minuten')
+  .replace(/std\.?/g, 'stunden')
+  .replace(/wdh\.?/g, 'wiederholungen')
+  .replace(/supps/g, 'supplements')
+  .replace(/blaublicht/g, 'blaulicht')
+  .replace(/post-training/g, 'nach dem training')
+  .replace(/\s*°\s*c/g, '°c');
 
 /* Satzvergleich ist zu sproede: die alte Seite verkettet Ueberschrift
    und Liste anders, und aufgeloeste Tooltips stehen jetzt als eigene

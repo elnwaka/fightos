@@ -307,6 +307,11 @@ body.f7-on { margin: 0; background: #000; overflow: hidden; }
    Ersetzen den eingebetteten Altbestand. Ab hier braucht das Handy
    fuer diese Seiten kein style.css mehr. */
 
+/* Produktnamen und Beschreibungen sind Inhalt, kein Etikett: sie
+   duerfen umbrechen statt abgeschnitten zu werden. */
+#f7app .bs-wrap { white-space: normal; overflow: visible; text-overflow: clip; }
+#f7app .item-text.bs-wrap { line-height: 1.45; margin-top: 3px; }
+
 #f7app .bs-list { margin: 0; padding-left: 20px; }
 #f7app .bs-list li { margin-bottom: 7px; }
 #f7app .bs-list li:last-child { margin-bottom: 0; }
