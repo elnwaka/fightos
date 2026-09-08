@@ -5,7 +5,8 @@ import { chromium } from 'playwright';
    verloren gegangen" wirklich belegt. */
 const KEY  = process.argv[2] || 'ernaehrung';
 const ELT  = { ernaehrung: ['training','ernaehrung'], periodisierung: ['training','periodisierung'],
-               regeneration: ['training','regeneration'], saeulen: ['profil','saeulen'] }[KEY];
+               regeneration: ['training','regeneration'], mental: ['training','mental'],
+               saeulen: ['profil','saeulen'] }[KEY];
 
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport:{width:390,height:844}, isMobile:true, hasTouch:true,
@@ -25,11 +26,22 @@ await p.waitForTimeout(600);
 const alt = await p.evaluate(async ([par, sub]) => {
   await new Promise(r => { const sc=document.createElement('script'); sc.src='js/pages.js';
     sc.onload=r; sc.onerror=r; document.head.appendChild(sc); });
+  // Nicht jede Seite rendert in den Container ihres Reiters: Mental
+  // hat einen eigenen. Also erst rendern lassen, dann den Container
+  // suchen, der wirklich gefuellt ist.
+  /* Nicht jede Seite haengt am Reiter-Renderer: Mental hat einen
+     eigenen und fuellt seinen eigenen Container. Erst den direkten
+     Weg versuchen, dann den ueber den Reiter. */
   try {
+    var direkt = window['render' + sub.charAt(0).toUpperCase() + sub.slice(1) + 'Page'];
+    if (typeof direkt === 'function') direkt();
     if (par === 'training') { window._trainingSubTab = sub; renderTrainingPage(sub); }
     else { window._profilSubTab = sub; renderProfilPage(sub); }
-  } catch (e) { return 'FEHLER ' + e.message; }
-  const el = document.getElementById('page-' + par);
+  } catch (e) { /* der direkte Weg hat schon gefuellt */ }
+  const el = (document.getElementById('page-' + sub) &&
+              document.getElementById('page-' + sub).innerHTML.length > 500)
+    ? document.getElementById('page-' + sub)
+    : document.getElementById('page-' + par);
   // Die Klappen der alten Ansicht aufmachen, sonst zaehlt innerText
   // den verborgenen Teil nicht mit.
   el.querySelectorAll('[hidden]').forEach(x => x.hidden = false);

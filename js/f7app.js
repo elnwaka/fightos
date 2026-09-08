@@ -401,6 +401,7 @@
       item({ title: 'Ernährung', sub: 'Kalorien, Makros, Timing', link: '/artikel/ernaehrung/' }),
       item({ title: 'Periodisierung', sub: 'Wie sich der Plan aufbaut', link: '/artikel/periodisierung/' }),
       item({ title: 'Regeneration', sub: 'Schlaf, HRV, Belastung', link: '/artikel/regeneration/' }),
+      item({ title: 'Mental', sub: 'Alter Ego, Resilienz, Arousal', link: '/artikel/mental/' }),
       item({ title: '8 Säulen', sub: 'Worauf das System aufbaut', link: '/artikel/saeulen/' })
     ]) + listBlock([
       item({ title: 'Tests', sub: 'Kraft, Ausdauer, Schnelligkeit', link: '/tests/' }),
@@ -431,6 +432,7 @@
     ernaehrung:     { t: 'Ernährung',      p: 'training', s: 'ernaehrung',     sel: '[id^="ern-s"]' },
     periodisierung: { t: 'Periodisierung', p: 'training', s: 'periodisierung' },
     regeneration:   { t: 'Regeneration',   p: 'training', s: 'regeneration' },
+    mental:         { t: 'Mental',         p: 'training', s: 'mental' },
     saeulen:        { t: '8 Säulen',       p: 'profil',   s: 'saeulen' }
   };
   var SECS = {};
@@ -471,7 +473,7 @@
        tools/altneu-vergleich.mjs  fehlt ein Wort gegenueber dem Original?
        tools/platzhalter-pruefung.py  war die Zahl vorher wirklich gerechnet?
        tools/zweigewichte.mjs      aendert sich nur, was sich aendern darf? */
-  var MIT_DATEN = { periodisierung: 1, ernaehrung: 1, regeneration: 1 };
+  var MIT_DATEN = { periodisierung: 1, ernaehrung: 1, regeneration: 1, mental: 1 };
 
   function ensureContent(key) {
     if (!MIT_DATEN[key]) return Promise.resolve(false);
@@ -514,13 +516,31 @@
      Saetze bleiben in den Daten, nur die Zahl wird eingesetzt. */
   var aktuelleWerte = null;
 
+  function alterEgoName() {
+    var a = D().alterEgo;
+    return (a && a.name) ? a.name : '';
+  }
+
   function werteFuer(key) {
     if (!window.Content || !Content.values) return null;
     var s = SCH();
-    return Content.values(key, {
+    var w = Content.values(key, {
       weight: s.weight, height: s.height,
+      alterEgo: alterEgoName(),
       age: (function () { try { return getUserAge(); } catch (e) { return null; } })()
-    });
+    }) || {};
+
+    /* BRUECKE, befristet. {ego} in mental.js kommt nicht aus einer
+       Formel, sondern aus einem Eingabefeld, und wird deshalb in den
+       Daten nicht deklariert. Content.values() liefert dafuer nichts,
+       weil es heute nur Zahlen kennt.
+
+       Der saubere Weg ist eine Deklaration in den Daten
+       (ego: { from: 'alterEgo' }) plus ein Durchreichen in values(),
+       wenn weder mul noch div gesetzt sind. Dann weiss der Renderer
+       wieder nichts ueber Inhalte. Faellt weg, sobald das steht. */
+    if (w.ego == null) w.ego = alterEgoName() || 'dein Alter Ego';
+    return w;
   }
 
   function inl(t) {
@@ -816,6 +836,40 @@
       return (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
         (b.text ? '<div class="block block-strong inset"><p class="prose">' + inl(b.text) + '</p></div>' : '') +
         (art ? '<div class="block-title">Heute: ' + E(art) + '</div>' : '') +
+        '<div class="block tl">' + zeilen + '</div>';
+    }
+
+    /* Die Kampf-Identitaet. Ein echtes Formular, kein Verweis auf
+       einen anderen Bildschirm: was hier eingetragen wird, taucht
+       gleich darunter im Protokoll wieder auf. */
+    if (b.id === 'alterEgoForm') {
+      var a = D().alterEgo || {};
+      var feld = function (f) {
+        return '<li class="item-content item-input"><div class="item-inner">' +
+          '<div class="item-title item-label">' + E(plainText(f.label)) + '</div>' +
+          '<div class="item-input-wrap"><input type="text" id="ego-' + E(f.id) + '" ' +
+          'value="' + E(a[f.id] || '') + '" placeholder="' +
+          E(plainText(f.beispiel || '')) + '" autocomplete="off"></div></div></li>';
+      };
+      return (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
+        (b.text ? '<div class="block block-strong inset"><p class="prose">' + inl(b.text) + '</p></div>' : '') +
+        '<div class="list list-strong list-outline inset"><ul>' +
+          (b.felder || []).map(feld).join('') + '</ul></div>' +
+        bigButton(plainText(b.knopf) || 'Speichern', 'F7.egoSpeichern()');
+    }
+
+    /* Der Tagesablauf. Die Bloecke stehen als Zeitstrahl, weil sie
+       einer sind: morgens, vor dem Training, danach, abends. */
+    if (b.id === 'mentalProtokoll') {
+      var zeilen = (b.bloecke || []).map(function (x) {
+        return '<div class="tl-e"><span class="tl-t">' + E(plainText(x.dauer || '')) + '</span>' +
+          '<span class="tl-c"><span class="tl-n">' + E(plainText(x.when)) + '</span>' +
+          '<ul class="prose bs-list" style="margin-top:8px">' +
+            (x.items || []).map(function (i) { return '<li>' + inl(i) + '</li>'; }).join('') +
+          '</ul></span></div>';
+      }).join('');
+      return (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
+        (b.text ? '<div class="block block-strong inset"><p class="prose">' + inl(b.text) + '</p></div>' : '') +
         '<div class="block tl">' + zeilen + '</div>';
     }
 
@@ -1987,6 +2041,26 @@
           ? pg.querySelector('[onclick*="F7.testWert"]').getAttribute('onclick').match(/"([^"]+)"/) : null;
         if (id) pg.innerHTML = '<h1 class="big">' + (pg.querySelector('.big') || {}).textContent + '</h1>' + testHTML(id[1]);
       }
+    },
+
+    egoSpeichern: function () {
+      var hol = function (id) {
+        var e = document.getElementById('ego-' + id); return e ? e.value.trim() : ''; };
+      var name = hol('name');
+      if (!name) {
+        if (window.Native) Native.haptic('error');
+        app.dialog.alert('Gib deinem Alter Ego einen Namen.', 'Name fehlt');
+        return;
+      }
+      var data = getData(); if (!data) return;
+      data.alterEgo = { name: name, traits: hol('traits'), totem: hol('totem') };
+      saveData(data);
+      if (window.Native) Native.haptic('success');
+      // Der Name taucht gleich darunter im Protokoll auf, also neu zeichnen
+      var v = current();
+      var pc = v && v.el.querySelector('.page-current .page-content');
+      if (pc) pc.innerHTML = artikelDatenHTML('mental');
+      laterSync();
     },
 
     reset: function () {

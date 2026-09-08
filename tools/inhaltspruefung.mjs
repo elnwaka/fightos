@@ -33,8 +33,18 @@ const sichtbar = gesehen.join(' ').replace(/\s+/g,' ');
 // Was steht in den Daten?
 const daten = await p.evaluate(k=>{
   const c = Content.get(k);
+  // Personalisierte Zahlen einsetzen, sonst vergleicht man rohe
+  // Platzhalter gegen eingesetzte Werte und jagt Scheinluecken.
+  const werte = Content.values(k, { weight: (getUserSchedule()||{}).weight,
+    height: (getUserSchedule()||{}).height,
+    alterEgo: ((getData()||{}).alterEgo||{}).name }) || {};
+  // {ego} kommt aus einem Eingabefeld, nicht aus einer Formel, und wird
+  // in den Daten deshalb nicht deklariert. Die App setzt denselben Wert.
+  if (werte.ego == null) werte.ego = ((getData()||{}).alterEgo||{}).name || 'dein Alter Ego';
+  const setz = t => String(t).replace(/\{([a-zA-Z0-9_]+)\}/g,
+    (m, n) => (werte && werte[n] != null) ? werte[n] : m);
   const raus = [];
-  const nimm = v => { if (typeof v === 'string' && v.trim()) raus.push(Content.plain(v)); };
+  const nimm = v => { if (typeof v === 'string' && v.trim()) raus.push(Content.plain(setz(v))); };
   const geh = b => {
     if (!b || typeof b !== 'object') return;
     ['text','title','label','value','caption','alt','when','name','sub'].forEach(f => nimm(b[f]));
