@@ -76,40 +76,65 @@ Neues Modell einführen = `MODEL_PREFERENCE` in `api/ai-proxy.js` oben ergänzen
 **Neuer Key:** aistudio.google.com/apikey → Vercel → Projekt → Settings → Environment Variables →
 `GEMINI_API_KEY` → **danach neu deployen**, Env-Änderungen greifen nicht rückwirkend.
 
-## Bedienung auf dem Handy — die Regeln, die hier gelten
+## Bedienung auf dem Handy — Framework7
 
-Gemessen wird bei 390px Breite mit Playwright (`screenshots.mjs` als Vorlage).
-Massstab sind Apple HIG (44x44pt), Material Design (48dp, 8dp Abstand) und die
-NN/g-Daumenzonenforschung.
+Unter 768px laeuft **nicht** die Website in schmal, sondern eine eigene App-Schicht
+auf **Framework7 9** (iOS-Theme, Dark). Der Desktop bleibt vollstaendig unberuehrt.
 
-1. **Nichts unter 11px.** Versal-Labels 11px, Fliesstext 14px+. Der Boden steht
-   am Ende von `css/style.css` im Block "MOBILE LESBARKEITS- UND TREFFERBODEN".
-2. **Alles Bedienbare mindestens 44x44.** Vorher lagen 19 von 29 Zielen auf der
-   Startseite darunter.
-3. **Fliesstext ist kein Etikett.** Beschreibungen in DM Sans, gemischte
-   Schreibweise, Zeilenlaenge auf 58 Zeichen. Space Mono in Versalien mit
-   Sperrsatz bleibt echten Mikro-Labels vorbehalten — nicht fuer Saetze.
-4. **Kein schwebender Knopf ueber dem Inhalt.** Mit einer Tab-Leiste unten
-   konkurriert ein FAB mit der Navigation und verdeckt Inhalt. Der AI-Coach
-   sitzt deshalb als Icon in der Kopfzeile (`#ai-coach-btn`).
-5. **Lange Nachschlage-Seiten werden gefaltet, nicht gekuerzt.**
-   `applyCollapsibleSections()` in `js/util.js`, zentral aus `showPage()`
-   gerufen. Der Inhalt bleibt im DOM, damit die Suche ihn findet.
-6. **Der Startbildschirm beantwortet: Was trainiere ich heute?**
-   `renderHeuteCard()` in `js/app.js` steht als erstes Element im Dashboard und
-   nutzt dieselbe Mechanik wie der Wochenplan (`weekPlan`, `completedBlocks`,
-   `toggleBlockDone`, `openBlockDetail`) — kein zweiter Datenpfad.
+**Dateien**
+- `vendor/framework7.min.{js,css}` — liegen bewusst **lokal** im Projekt, nicht auf
+  einem CDN, sonst funktioniert die App offline nicht. 275 KB komprimiert, danach
+  im Service-Worker-Vorrat.
+- `js/f7app.js` — die gesamte Handy-Oberflaeche. Gekapselte IIFE, laeuft nur unter
+  768px, laedt bei Viewport-Wechsel neu.
+- `css/f7theme.css` — gibt Framework7 die Marke (Rot statt iOS-Blau) und enthaelt
+  die eigenen Bausteine, die es nicht mitbringt: Kalender, Zeitstrahl, Balken,
+  Uebungszeilen, Haken.
 
-Ergebnis der Umbauten (jeweils vorher -> nachher, bei 390px):
-- Ernaehrung 12,8 -> 3,0 Bildschirme, 18.926 -> 2.520 Zeichen
-- Uebungen 20,6 -> 8,2 Bildschirme
-- Antippflaechen unter 44x44: Home 19 -> 10, Wochenplan 13 -> 3, Training 23 -> 6
-- Kleinste Schrift 7px -> 11px
+**Aufbau:** fuenf Reiter, jeder ein eigener View mit eigenem Navigationsstapel
+(`#tab-heute`, `-plan`, `-wissen`, `-kaempfe`, `-profil`). Detailseiten werden per
+Route aufgeschoben, mit Zurueckwischen vom linken Rand.
 
-**Beim Aendern pruefen:** `node screenshots.mjs` gegen die Live-URL laufen lassen
-und die Aufnahmen ansehen. Der Klassiker, den das aufdeckt: etwas rendert in
-einen anderen Container als erwartet (die Uebungen schreiben nach
-`#training-content`, nicht `#page-uebungen`).
+**Die Logik ist unveraendert.** `getData`, `weekPlan`, `completedBlocks`,
+`toggleBlockDone`, `getExerciseById`, `generateCurrentWeekPlan` und der Coach werden
+unveraendert weiterverwendet. `js/f7app.js` liest und schreibt nichts selbst, ausser
+`setSched()` fuer die Profilwerte. Es gibt keinen zweiten Datenpfad.
+
+### Fallen, die hier schon zugeschnappt sind
+
+1. **`.page` gehoert beiden.** `css/style.css` besitzt die Klasse `.page` und setzt
+   sie auf `display:none`. Framework7 nutzt exakt denselben Klassennamen — dadurch
+   blieb anfangs jede Seite unsichtbar. Innerhalb von `#f7app` gehoert `.page`
+   Framework7; der Block "ALTBESTAND ENTWAFFNEN" in `css/f7theme.css` sichert das.
+   **Bei neuen Regeln in style.css auf Klassennamen achten, die Framework7 belegt**
+   (`.page`, `.left`, `.right`, `.link`, `.icon`, `.block`, `.list`, `.item-*`).
+2. **`view-main` allein startet nicht.** Framework7 initialisiert nur `.view-init`
+   automatisch. Der erste Reiter braucht **beide** Klassen.
+3. **Keine Icon-Schrift.** Framework7 Icons waeren 200 KB fuer fuenf Zeichen. Die
+   Symbole stehen als SVG in `IC`/`svg()` in `js/f7app.js`. Also **nie**
+   `<i class="icon f7-...">` schreiben, das rendert 0 Pixel breit.
+4. **Eingebetteter Altbestand wird eingerahmt, nicht uebernommen.** Legacy-HTML
+   landet in `<div class="legacy">`. Dort gilt: `.card-body` nicht zuklappen
+   (`max-height:160px` + "Mehr anzeigen" versteckte den Inhalt — das war die
+   Ursache dafuer, dass im Wissen-Bereich nichts zu lesen war), Zeilenabstand 1,55,
+   `.card-title` als 13px-Abschnittsmarke.
+5. **Das Auswahlrad haengt im DOM unter `#f7app`, die Regeln greifen also.** Eine
+   einzelne Spalte ist zugleich `picker-column-first` und `-last`, was Framework7
+   rechtsbuendig ausrichtet; bei einer Spalte gehoert der Wert zentriert.
+6. **Der Coach-Bereich liegt im alten Stylesheet auf z-index 600**, die App auf 900.
+   `body.f7-on #ai-coach-panel` hebt ihn auf 12000, unter die Framework7-Modale (13000).
+7. **Nichts behaupten, was die Daten nicht hergeben.** Der Kalender faerbte anfangs
+   alle vergangenen Tage gruen. `completedBlocks` ist nach Wochen-ID geschluesselt,
+   fuer vergangene Wochen liegt nichts vor — gruen gibt es nur fuer die laufende Woche.
+
+**Beim Aendern pruefen:** Playwright bei 390px gegen die Live-URL. Der Durchlauf
+prueft je Bildschirm Titel, Zeichenzahl, Zeilenzahl und Antippflaechen; zusaetzlich
+Abhaken, Kalenderlogik, Zurueckwischen (braucht **echte** Touch-Events per CDP,
+synthetische `TouchEvent` reichen Framework7 nicht) und das Auswahlrad.
+
+**Grundsaetze, die bleiben:** nichts unter 11px, alles Bedienbare mindestens 44x44,
+kein schwebender Knopf ueber dem Inhalt (der Coach sitzt als Symbol in der Kopfleiste),
+der Startbildschirm beantwortet "Was trainiere ich heute?".
 
 ## Bekannte Probleme / technische Schulden
 - `js/app.js` ist 8000+ Zeilen — sollte in Module aufgeteilt werden
