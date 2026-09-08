@@ -453,13 +453,21 @@
      gar nicht erst danach gesucht: ein 404 je Aufruf ist Laerm in der
      Konsole und ein Abruf umsonst. Beim Umstellen der naechsten Seite
      gehoert ihr Schluessel hierher. */
-  /* ernaehrung ist bewusst NICHT freigeschaltet. Die Datenfassung
-     ersetzt feste Zahlen durch gewichtsabhaengige, die inhaltlich
-     nichts damit zu tun haben: "Kaufe zu 80 Prozent unverarbeitete
-     Lebensmittel" wird bei 78 kg zu 62 Prozent, "500 ml pro
-     Trainingsstunde" zu 390 ml, "250 % Tagesbedarf pro 100 g" zu
-     "195 % pro 78 g". Bis das geklaert ist, laeuft die Seite ueber
-     den alten Weg weiter, der stimmt. */
+  /* Welche Seiten schon als Daten vorliegen. Fehlt eine hier, wird
+     gar nicht erst danach gesucht: ein 404 je Aufruf ist Laerm in der
+     Konsole und ein Abruf umsonst. Beim Umstellen der naechsten Seite
+     gehoert ihr Schluessel hierher.
+
+     Bevor eine Seite hier landet: tools/platzhalter-pruefung.py und
+     tools/altneu-vergleich.mjs laufen lassen. Ernaehrung stand schon
+     einmal hier und musste wieder heraus, weil feste Zahlen durch
+     gewichtsabhaengige ersetzt worden waren. */
+  /* ernaehrung ist geprueft und die Zahlen stimmen jetzt, aber im
+     Kapitel Timing fehlt der Mahlzeitenplan aus renderErnTimeline:
+     sieben bis acht Mahlzeiten mit Text, aus Arbeits- und
+     Trainingszeiten gerechnet, rund 1200 Zeichen. Freischalten wuerde
+     Inhalt kosten, den es heute gibt. Bleibt aus, bis der Block als
+     dyn in den Daten steht. */
   var MIT_DATEN = { periodisierung: 1 };
 
   function ensureContent(key) {
