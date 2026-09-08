@@ -167,8 +167,11 @@ const pre = await p.evaluate(() => new Promise(res => {
   const t0 = performance.now();
   a.dispatchEvent(new TouchEvent('touchstart', { bubbles: true,
     touches: [new Touch({ identifier: 1, target: a, clientX: 100, clientY: 300 })] }));
+  // Zwei Wege: Datenseiten laden ihre Datei nach, geschabte Seiten
+  // fuellen den Zwischenspeicher. Geprueft wird, dass EINER greift.
   setTimeout(() => res({ warm: performance.now() - t0 > 0.5,
-    scratch: !!document.getElementById('f7-scratch') }), 250);
+    scratch: !!document.getElementById('f7-scratch') ||
+             !!(window.Content && Content.has && Content.has('ernaehrung')) }), 700);
 }));
 chk('2e','Vorabladen beim Beruehren', pre.scratch === true, JSON.stringify(pre));
 

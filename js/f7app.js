@@ -462,13 +462,16 @@
      tools/altneu-vergleich.mjs laufen lassen. Ernaehrung stand schon
      einmal hier und musste wieder heraus, weil feste Zahlen durch
      gewichtsabhaengige ersetzt worden waren. */
-  /* ernaehrung ist geprueft und die Zahlen stimmen jetzt, aber im
-     Kapitel Timing fehlt der Mahlzeitenplan aus renderErnTimeline:
-     sieben bis acht Mahlzeiten mit Text, aus Arbeits- und
-     Trainingszeiten gerechnet, rund 1200 Zeichen. Freischalten wuerde
-     Inhalt kosten, den es heute gibt. Bleibt aus, bis der Block als
-     dyn in den Daten steht. */
-  var MIT_DATEN = { periodisierung: 1 };
+  /* Welche Seiten als Daten vorliegen. Fehlt eine hier, wird gar nicht
+     erst danach gesucht: ein 404 je Aufruf ist Laerm und ein Abruf
+     umsonst.
+
+     Bevor eine Seite hier landet, laufen vier Pruefungen:
+       tools/inhaltspruefung.mjs   steht jeder Text im Bild?
+       tools/altneu-vergleich.mjs  fehlt ein Wort gegenueber dem Original?
+       tools/platzhalter-pruefung.py  war die Zahl vorher wirklich gerechnet?
+       tools/zweigewichte.mjs      aendert sich nur, was sich aendern darf? */
+  var MIT_DATEN = { periodisierung: 1, ernaehrung: 1 };
 
   function ensureContent(key) {
     if (!MIT_DATEN[key]) return Promise.resolve(false);
@@ -503,7 +506,8 @@
   /* ---------- Bloecke ---------- */
 
   var TONE = { info: '#0A84FF', warn: '#FF9F0A', sci: '#30D158',
-               gruen: '#30D158', blau: '#0A84FF', rot: '#E8000D' };
+               gruen: '#30D158', blau: '#0A84FF', rot: '#E8000D',
+               gold: '#FFD60A', orange: '#FF9F0A' };
 
   /* Werte des gerade gezeichneten Artikels. In Ernaehrung stehen 16
      Zahlen mitten im Satz, alle aus dem Koerpergewicht gerechnet. Die
@@ -710,6 +714,70 @@
         '<div class="list list-strong list-outline inset"><ul>' +
         statRow('Woche', woche + ' von 10', woche * 10) + '</ul></div>';
       return out;
+    }
+
+    /* Der Mahlzeitenplan. Die Uhrzeiten sind Regeln in den Daten
+       ("aufstehen+1:00"), aufgeloest wird hier gegen den Tagesplan.
+       Welche Mahlzeit an welchem Tag vorkommt, sagen die Daten ueber
+       nur:'training' und nur:'frei', nicht ein if an dieser Stelle. */
+    if (b.id === 'ernTimeline') {
+      var S = SCH();
+      var tag = {};
+      try { tag = getTodaySchedule() || {}; } catch (e) {}
+      var trainingZeit = tag.time || S.trainingTime || '18:00';
+      var frei = (tag.type === 'frei' || !trainingZeit);
+
+      // Die Bezugspunkte, aus denen sich jede Regel ableitet
+      var punkte = {
+        aufstehen: (function () {
+          try { return timeBefore(S.workStart || '08:00', 1, 30); }
+          catch (e) { return '06:30'; }
+        })(),
+        arbeitsbeginn: S.workStart || '08:00',
+        arbeitsende: S.workEnd || '17:00',
+        training: trainingZeit
+      };
+
+      var loese = function (regel) {
+        var m = String(regel || '').match(/^([a-zäöü]+)(?:([+-])(\d+):(\d+))?$/);
+        if (!m || !punkte[m[1]]) return '';
+        if (!m[2]) return punkte[m[1]];
+        var std = +m[3], min = +m[4];
+        try {
+          return m[2] === '+' ? timeAdd(punkte[m[1]], std, min)
+                              : timeBefore(punkte[m[1]], std, min);
+        } catch (e) { return punkte[m[1]]; }
+      };
+
+      var zeilen = (b.meals || []).filter(function (m) {
+        if (m.nur === 'training') return !frei;
+        if (m.nur === 'frei') return frei;
+        return true;
+      }).map(function (m) {
+        var text = m.body;
+        if (m.varianten) {
+          // Benannte Varianten: erst die genaue Tagesart, dann der Fall
+          text = m.varianten[tag.type] ||
+                 m.varianten[frei ? 'frei' : 'training'] ||
+                 m.varianten.normal ||
+                 m.varianten[Object.keys(m.varianten)[0]];
+        }
+        // Die Toenung sitzt als Punkt am Strahl, nicht in der
+        // Ueberschrift: acht verschieden eingefaerbte Titel waeren ein
+        // Regenbogen, ein Punkt je Mahlzeit ist eine Information.
+        return '<div class="tl-e tl-punkt" style="--tone:' + (TONE[m.tone] || TONE.info) + '">' +
+          '<span class="tl-t">' + E(loese(m.when)) + '</span>' +
+          '<span class="tl-c">' +
+            '<span class="tl-n">' + E(plainText(m.title)) + '</span>' +
+            '<span class="tl-s" style="white-space:normal">' + inl(text || '') + '</span>' +
+          '</span></div>';
+      }).join('');
+
+      var art = (b.tagesarten || {})[tag.type];
+      return (b.title ? '<div class="block-title">' + E(plainText(b.title)) + '</div>' : '') +
+        (b.text ? '<div class="block block-strong inset"><p class="prose">' + inl(b.text) + '</p></div>' : '') +
+        (art ? '<div class="block-title">Heute: ' + E(art) + '</div>' : '') +
+        '<div class="block tl">' + zeilen + '</div>';
     }
 
     // Unbekannter Platzhalter: lieber sichtbar leer als still verschluckt

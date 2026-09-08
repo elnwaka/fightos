@@ -338,9 +338,13 @@ body.f7-on { margin: 0; background: #000; overflow: hidden; }
 #f7app .bs-note {
   background: #131315; border-radius: 12px; padding: 14px 16px;
 }
+/* Keine Versalien: Notiz-Titel sind ganze Saetze aus dem Inhalt, keine
+   Etiketten. "Was Muskelproteinsynthese heisst" in Grossbuchstaben
+   schreit, und im Deutschen macht text-transform aus dem ss ein SS,
+   veraendert also das Wort. Etiketten duerfen gross, Saetze nicht. */
 #f7app .bs-note-t {
-  display: block; font-size: 12px; font-weight: 600; letter-spacing: .04em;
-  text-transform: uppercase; color: var(--tone); margin-bottom: 6px;
+  display: block; font-size: 15px; font-weight: 600; letter-spacing: -.01em;
+  color: var(--tone); margin-bottom: 5px;
 }
 #f7app .bs-note .prose { margin: 0; }
 
@@ -371,6 +375,17 @@ body.f7-on { margin: 0; background: #000; overflow: hidden; }
 #f7app .bs-week.now .bs-week-n { background: #E8000D; color: #fff; }
 #f7app .bs-week-p { flex: 1; font-size: 16px; }
 #f7app .bs-week.now .bs-week-p { font-weight: 600; }
+/* Der Mahlzeitenplan nutzt den Zeitstrahl der Tagesansicht, braucht
+   aber Fliesstext statt einer Zeile und einen Punkt je Mahlzeit. */
+#f7app .tl-punkt { position: relative; }
+#f7app .tl-punkt::after {
+  content: ""; position: absolute; left: 51px; top: 18px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--tone, #0A84FF); z-index: 1;
+}
+#f7app .tl-punkt .tl-n { font-weight: 600; }
+#f7app .tl-punkt .tl-s { line-height: 1.5; margin-top: 4px; }
+
 #f7app .bs-week-tag {
   font-size: 11px; font-weight: 600; letter-spacing: .03em;
   color: rgba(235,235,245,.60); background: rgba(255,255,255,.08);
