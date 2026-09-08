@@ -20,6 +20,10 @@ app.html              → Die eigentliche App (Login/Register/Dashboard)
 css/style.css         → 4500+ Zeilen CSS, Desktop. Besitzt .page — Kollision mit Framework7, siehe unten
 vendor/framework7.*   → Framework7 9, lokal statt CDN (sonst kein Offline-Betrieb)
 js/f7app.js           → Die komplette Handy-Oberflaeche (unter 768px). Nutzt die Logik unten, hat keine eigene
+js/exercises.js       → Uebungsdatenbank + Bildpfade. Von beiden Oberflaechen geladen, MUSS vor pages.js stehen
+js/content.js         → Vertrag der Inhaltsdaten: Blocktypen, Auszeichnung, Werte
+js/content/*.js       → Die Inhalte, eine Datei je Artikel. Werden bei Bedarf geladen, nie beim Start
+tools/                → Die sechs Pruefungen. Vor jedem Freischalten laufen lassen
 css/f7theme.css       → Marke fuer Framework7 + eigene Bausteine (Kalender, Zeitstrahl, Haken)
 css/f7native.css      → Regelwerk "fuehlt sich nativ an": safe-area, Scroll, Bewegung, Farbschema
 js/native.js          → Adapter fuer Plattformfaehigkeiten. Capacitor haengt hier dran, sonst nirgends
@@ -243,7 +247,16 @@ Dazu die Geometrie: Framework7 setzt die Leiste absolut an den oberen Rand,
 gibt den Spalten darunter aber keinen Ausgleich. Beide begannen an derselben
 Koordinate. Steht explizit in `css/f7theme.css`.
 
-### Kapitel kommen aus der Struktur, nicht aus Selektoren
+### Kapitel aus der Struktur: nur noch das Sicherheitsnetz
+
+**Dieser Abschnitt beschreibt den alten Weg.** Seit alle sechs Artikel als Daten
+vorliegen, laeuft er nicht mehr im Normalbetrieb. Er greift nur, wenn eine
+Inhaltsdatei nicht geladen werden kann, und dann rettet er die Seite, statt sie
+leer zu lassen. Wer eine neue Seite anlegt, arbeitet mit Daten, nicht hiermit.
+
+Ebenso `ensurePages()`: `pages.js` wird auf dem Handy nur noch in diesem
+Ausfall geholt. Der Verein (`/alt/community/…`) laeuft ueber `community.js` und
+loest `ensurePages()` bewusst nicht aus.
 
 `findeUeberschriften()` sucht Elemente, die kurz, gross oder fett sind und
 sich auf derselben Ebene wiederholen. Gewertet wird, wie viele Glieder einer
@@ -275,6 +288,105 @@ synthetische `TouchEvent` reichen Framework7 nicht) und das Auswahlrad.
 **Grundsaetze, die bleiben:** nichts unter 11px, alles Bedienbare mindestens 44x44,
 kein schwebender Knopf ueber dem Inhalt (der Coach sitzt als Symbol in der Kopfleiste),
 der Startbildschirm beantwortet "Was trainiere ich heute?".
+
+### Inhalte stehen in Daten, nicht in Renderfunktionen
+
+**Das ist die wichtigste Aenderung an dieser Anwendung.** Frueher las die
+Handy-Oberflaeche ihren Inhalt aus dem fertig gerenderten Desktop-DOM: sie rief
+`renderTrainingPage()`, kopierte `#page-training` in einen unsichtbaren Kasten
+und zerlegte das Ergebnis. Das hiess, dass `pages.js` (313 KB) und `style.css`
+(209 KB) auf dem Handy geladen werden mussten, obwohl davon 6 Prozent genutzt
+wurden, und dass jede Aenderung am Desktop-Markup die Handy-Ansicht brechen
+konnte, ohne dass es jemand merkte.
+
+Heute liest **kein einziger Bildschirm** mehr aus dem DOM.
+
+**Wo was liegt**
+- `js/content.js` ist der Vertrag: Blocktypen, Auszeichnung, Werte, Zugriff.
+- `js/content/<seite>.js` sind die Inhalte, eine Datei je Artikel. Sie werden
+  **bei Bedarf** geladen, nicht beim Start (`ensureContent()` in `js/f7app.js`).
+- `js/exercises.js` ist die Uebungsdatenbank, herausgeloest aus `pages.js`.
+- `js/pages.js` enthaelt nur noch Desktop-Renderfunktionen und wird auf dem
+  Handy im Normalbetrieb **nicht mehr geladen**.
+
+**Blocktypen** (`p h list table note stat img link card dyn`) stehen im Kopf von
+`js/content.js`. Erweitert wird der Vertrag nur nach Absprache, weil zwei Seiten
+ihn benutzen.
+
+**Auszeichnung im Text:** erlaubt sind genau `<strong>`, `<em>`, `<br>` und
+`<a href="https://…">`. `Content.inline()` escaped **zuerst alles** und gibt dann
+nur diese vier wieder frei. Andersherum, also erlaubte Tags stehen lassen und den
+Rest saeubern, muesste man jede Umgehung einzeln kennen.
+
+**`Content.plain()` darf NICHT alles zwischen `<` und `>` entfernen.** Genau das
+tat es einmal, und bei `"<10g Ballaststoffe/Tag. Weisser Reis … <strong>~1%"`
+verschwanden 78 Zeichen mitten im Satz. Der Fehler haengt davon ab, ob spaeter im
+Satz noch eine spitze Klammer steht, faellt also nur manchmal auf, und nie in der
+Anzeige: `inline()` war nie betroffen, weil es escaped statt entfernt. Betroffen
+war der Text-Index, also die Suche. Es entfernt jetzt nur die vier erlaubten Tags.
+
+**Personalisierte Zahlen** stehen als `{name}` im Text, deklariert in `vars` am
+Artikel: `{ from: 'weight', mul: 2.2 }`. Ohne `mul`/`div` wird der Wert
+durchgereicht, auch wenn er keine Zahl ist (`{ from: 'alterEgo', fallback: '…' }`).
+Der Renderer gibt in `werteFuer()` nur **Tatsachen ueber den Nutzer** hinein
+(Gewicht, Groesse, Alter, Alter Ego); welche eine Seite braucht und wie sie sie
+nennt, entscheiden die Daten. Der Renderer weiss nicht, dass es `{ego}` gibt.
+
+**Berechnetes** steht als `{ t:'dyn', id:'…' }` mit seinem Text **an sich**, nicht
+im Renderer. Vorhanden: `timeline10w`, `phaseCycle`, `nut10w`, `ernTimeline`,
+`makroRechner`, `alterEgoForm`, `mentalProtokoll`. Die Regel dahinter: **nur
+Auswahl und Rechnung bleiben Code, die Woerter nie.** Text, der im Renderer
+bleibt, ist Text, den keine Pruefung je wieder sieht; genau so sind dreimal
+hintereinander mehr als tausend Zeichen unbemerkt verschwunden.
+
+**Tooltips gibt es nicht.** Auf einem Telefon ist ein `title`-Attribut
+unerreichbar. Erklaerungen sind entweder in den Satz aufgeloest, eine
+`note`-Karte, oder stehen im Glossar (`begriffe` am Artikel, gezeichnet als
+eigenes Kapitel `__begriffe`).
+
+### Die vier Pruefungen, und warum es vier sind
+
+Jede faengt eine andere Fehlerklasse. Vor dem Freischalten einer Seite in
+`MIT_DATEN` laufen alle vier.
+
+| Werkzeug | Frage |
+|---|---|
+| `tools/inhaltspruefung.mjs` | Steht **jeder** Text aus den Daten sichtbar auf einem Bildschirm? |
+| `tools/altneu-vergleich.mjs` | Fehlt gegenueber der alten Seite ein Wort? |
+| `tools/platzhalter-pruefung.py` | War die Zahl im Original wirklich gerechnet? |
+| `tools/zweigewichte.mjs` | Aendert sich beim Gewichtswechsel nur, was sich aendern darf? |
+
+Dazu `tools/regelwerk.mjs` (43 Punkte Bedienbarkeit) und `tools/f7check.sh`
+(fehlt eine Framework7-Komponente im zusammengesetzten CSS?).
+
+**Die Lehre aus dieser Runde, dreimal bezahlt:** zu pruefen, ob etwas **da** ist,
+ist nicht dasselbe wie zu pruefen, ob es **ankommt**.
+- Die Reiter waren kaputt, waehrend jede DOM-Messung gruen war. Aufgefallen auf
+  einem Schnappschuss.
+- 1400 Zeichen wurden nicht gezeichnet, weil der Leser `doc.intro` uebersprang.
+  Alle Bloecke waren da.
+- Vierzehn Ernaehrungsangaben waren falsch, waehrend die Fakten-Pruefung 40 von
+  40 meldete. Falsche Zahlen haben dieselben Woerter.
+
+**Wenn eine Pruefung etwas meldet: erst nachschlagen, dann das Werkzeug
+anfassen.** Nie umgekehrt. Ein Vergleich, den man passend macht, bis er
+schweigt, ist keiner mehr. Bei Regeneration meldete der Wortvergleich 49
+Verluste, alle 49 waren eingedeutschte Schreibweisen ("Supps" -> "Supplements").
+Erst nach dem Nachschlagen wurde das Werkzeug geschaerft.
+
+**Zwei Fallen, die Pruefungen selbst betreffen:**
+- `innerText` liefert CSS-Versalien mit. Im Deutschen macht `text-transform` aus
+  dem `ss` ein `SS`, veraendert also das Wort. Vergleiche in Kleinschreibung.
+- Versalien gehoeren nie in die Daten. Wer sie dort hineinschreibt, kann sie
+  nachher nicht zurueckholen.
+
+### Framework7 kappt Inhalt, wo es Etiketten erwartet
+
+`.item-text` wird nach zwei Zeilen mit Auslassungspunkten gekappt. Bei Etiketten
+ist das richtig, bei Inhalt nicht: im Glossar stand "Energieproduktion...
+nutzen." mitten im Satz, obwohl der Text vollstaendig da war. `white-space`
+allein hebt es nicht auf, es braucht `-webkit-line-clamp` und `display`. Dafuer
+gibt es `.bs-wrap`.
 
 ### Der Startpfad
 

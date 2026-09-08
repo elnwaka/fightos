@@ -151,10 +151,24 @@
 
   /* Reiner Text ohne jede Auszeichnung. Braucht die Suche und jede
      Darstellung, die nur eine Zeile unterbringt. */
+  /* Reiner Text ohne jede Auszeichnung. Braucht die Suche und jede
+     Darstellung, die nur eine Zeile unterbringt.
+
+     Entfernt werden nur die vier erlaubten Auszeichnungen, nicht alles
+     was zwischen < und > steht. Der Unterschied ist kein Feinschliff:
+     in "<10g Ballaststoffe/Tag. … <strong>~1%" haelt eine
+     Sammelregel das <10g fuer den Anfang eines Tags und frisst alles
+     bis zur naechsten spitzen Klammer, hier 78 Zeichen mitten im Satz.
+     Angezeigt wird trotzdem alles richtig, nur der Text-Index verliert
+     es, und damit die Suche und jede Pruefung, die darauf baut.
+
+     <br> wird zum Leerzeichen, die anderen drei verschwinden spurlos:
+     sonst steht im Index "Training ." und im Bild "Training.". */
   function plain(text) {
     return String(text == null ? '' : text)
       .replace(/<br\s*\/?>/gi, ' ')
-      .replace(/<[^>]*>/g, '')
+      .replace(/<\/?(?:strong|em)>/gi, '')
+      .replace(/<a href="[^"]*">|<\/a>/gi, '')
       .replace(/\s+/g, ' ')
       .trim();
   }
