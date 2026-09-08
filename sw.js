@@ -1,5 +1,5 @@
 // ⚠️ UPDATE THIS DATE ON EVERY DEPLOY — triggers cache refresh for all users
-const BUILD = '2026-09-11g';
+const BUILD = '2026-09-11h';
 const CACHE_NAME = 'boxspec-' + BUILD;
 const PRECACHE = [
   './',
@@ -13,6 +13,10 @@ const PRECACHE = [
   './js/native.js',
   './js/app.js',
   './js/exercises.js',
+  // Der Vertrag der Inhaltsdaten. Die Seiten selbst (js/content/*.js)
+  // liegen bewusst NICHT im Vorrat: sie werden nur geladen, wenn
+  // jemand den Artikel oeffnet, und landen dann von selbst im Cache.
+  './js/content.js',
   './js/pages.js',
   './js/calculators.js',
   './js/program10w.js',
