@@ -99,7 +99,7 @@
    selbst am Aktualisieren hindern. Die Seite prueft deshalb bei jedem
    Start, ob sie zum Server passt, und repariert sich einmalig selbst.
    Gegen Endlosschleifen abgesichert ueber sessionStorage. */
-window.__BUILD = '2026-09-10g';
+window.__BUILD = '2026-09-11a';
 /* Vor dem ersten Bildaufbau markieren, damit die alte Oberflaeche auf
    dem Handy gar nicht erst gezeigt wird. Wird sie erst per JavaScript
    ausgeblendet, blitzt sie sichtbar auf. */
@@ -723,7 +723,26 @@ if (localStorage.getItem('fos_current')) {
 <script src="js/video-library.js"></script>
 <script src="js/community.js"></script>
 <script src="js/app.js"></script>
-<script src="js/pages.js"></script>
+<script src="js/exercises.js"></script>
+<!-- pages.js sind 272 KB reine Desktop-Renderfunktionen. Auf dem Handy
+     wurden sie beim Start geparst und nie aufgerufen. Sie kommen jetzt
+     nur noch, wenn sie gebraucht werden: auf dem Desktop sofort nach
+     dem Aufbau, auf dem Handy erst wenn ein Bildschirm sie anfordert
+     (ensurePages() in js/f7app.js). Die Uebungsdatenbank steht seit
+     dem Herausloesen in js/exercises.js und wird immer geladen. -->
+<script>
+(function () {
+  if (document.documentElement.classList.contains('is-mobile')) return;
+  var s = document.createElement('script');
+  s.src = 'js/pages.js';
+  s.onload = function () {
+    // Der Aufruf in js/app.js lief womoeglich schon ins Leere, weil die
+    // Datei da noch nicht stand. Also hier nachholen.
+    if (typeof renderAllPages === 'function') { try { renderAllPages(); } catch (e) {} }
+  };
+  document.head.appendChild(s);
+})();
+</script>
 <script src="js/calculators.js"></script>
 <script src="vendor/framework7.min.js"></script>
 <script src="js/f7app.js"></script>

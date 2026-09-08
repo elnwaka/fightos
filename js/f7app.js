@@ -435,6 +435,30 @@
   };
   var SECS = {};
 
+  /* ---------- Altbestand bei Bedarf ----------
+     pages.js sind 272 KB Desktop-Renderfunktionen. Das Handy laedt sie
+     nicht mehr beim Start, sondern erst wenn ein Bildschirm sie
+     wirklich braucht. Jeder Bildschirm, der noch aus dem Desktop-DOM
+     liest, muss vorher hier durch.
+
+     Das ist die Bruecke, nicht das Ziel: mit jedem Bildschirm, der auf
+     eigene Daten umgestellt wird, faellt ein Aufrufer weg. Wenn keiner
+     mehr uebrig ist, kann die Datei auf dem Handy ganz verschwinden. */
+  var pagesGeladen = null;
+
+  function ensurePages() {
+    if (typeof renderErnaehrungPage === 'function') return Promise.resolve(true);
+    if (pagesGeladen) return pagesGeladen;
+    pagesGeladen = new Promise(function (fertig) {
+      var sc = document.createElement('script');
+      sc.src = 'js/pages.js';
+      sc.onload = function () { fertig(true); };
+      sc.onerror = function () { pagesGeladen = null; fertig(false); };
+      document.head.appendChild(sc);
+    });
+    return pagesGeladen;
+  }
+
   /* ---------- Kapitel finden ----------
      Frueher stand hier je Seite eine Selektorenliste. Drei von vier
      Seiten trafen damit nichts und fielen auf eine endlose Textwand
@@ -828,20 +852,26 @@
           page('videos', 'Videos', videosHTML(), { large: 1, back: 'Wissen' }) }); } },
       { path: '/artikel/:key/', async: function (ctx) {
           var key = ctx.to.params.key;
-          ctx.resolve({ content: page('artikel', ARTICLES[key] ? ARTICLES[key].t : 'Artikel',
-            artikelHTML(key), { large: 1, back: 'Wissen' }) });
+          ensurePages().then(function () {
+            ctx.resolve({ content: page('artikel', ARTICLES[key] ? ARTICLES[key].t : 'Artikel',
+              artikelHTML(key), { large: 1, back: 'Wissen' }) });
+          });
         } },
       { path: '/kapitel/:key/:i/', async: function (ctx) {
           var key = ctx.to.params.key, i = parseInt(ctx.to.params.i, 10);
-          var s = (SECS[key] || [])[i];
-          ctx.resolve({ content: page('kapitel', '',
-            '<h1 class="big">' + E(s ? s.title : 'Kapitel') + '</h1>' + kapitelHTML(key, i),
-            { back: ARTICLES[key] ? ARTICLES[key].t : 'Zurück' }) });
+          ensurePages().then(function () {
+            var s = (SECS[key] || [])[i];
+            ctx.resolve({ content: page('kapitel', '',
+              '<h1 class="big">' + E(s ? s.title : 'Kapitel') + '</h1>' + kapitelHTML(key, i),
+              { back: ARTICLES[key] ? ARTICLES[key].t : 'Zurück' }) });
+          });
         } },
       { path: '/alt/:p/:s/:t/', async: function (ctx) {
           var p = ctx.to.params.p, s = ctx.to.params.s, t = decodeURIComponent(ctx.to.params.t);
-          ctx.resolve({ content: page('alt', '',
-            '<h1 class="big">' + E(t) + '</h1>' + altHTML(p, s || null), { back: 'Zurück' }) });
+          ensurePages().then(function () {
+            ctx.resolve({ content: page('alt', '',
+              '<h1 class="big">' + E(t) + '</h1>' + altHTML(p, s || null), { back: 'Zurück' }) });
+          });
         } }
     ];
   }
@@ -1218,7 +1248,7 @@
       var key = a.getAttribute('href').split('/')[2];
       if (!key || warmed[key]) return;
       warmed[key] = 1;
-      try { sections(key); } catch (err) {}
+      ensurePages().then(function () { try { sections(key); } catch (err) {} });
     }, { passive: true });
   }
 
