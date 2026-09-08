@@ -276,6 +276,23 @@ body.f7-on { margin: 0; background: #000; overflow: hidden; }
   margin: 4px 16px 16px; color: #fff;
 }
 
+/* ---- Formularfelder ----
+   Framework7 bringt sie mit, sie brauchen nur die Farben und die
+   Mindestflaeche. Schriftgroesse steht im Regelwerk auf 16px, sonst
+   zoomt iOS beim Fokussieren hinein. */
+#f7app .item-input .item-label { font-size: 13px; color: rgba(235,235,245,.60); }
+#f7app .item-input input,
+#f7app .item-input textarea {
+  color: #fff; background: transparent; border: 0; width: 100%;
+  padding: 6px 0 10px; min-height: 34px; resize: none;
+  font-family: inherit;
+}
+#f7app .item-input input::placeholder,
+#f7app .item-input textarea::placeholder { color: rgba(235,235,245,.30); }
+#f7app .item-input input[type="date"] { -webkit-appearance: none; appearance: none; }
+#f7app .item-input .item-inner { padding-top: 10px; padding-bottom: 4px; }
+#f7app .item-content.item-input { min-height: 56px; }
+
 /* ---- Auswahlrad ----
    Framework7 richtet eine einzelne Spalte rechtsbuendig aus, weil sie
    zugleich erste und letzte ist. Bei einer Spalte gehoert der Wert in
@@ -283,9 +300,21 @@ body.f7-on { margin: 0; background: #000; overflow: hidden; }
 #f7app .picker {
   background: #1C1C1E; z-index: 12500;
 }
+/* Framework7 setzt die Leiste absolut an den oberen Rand, gibt den
+   Spalten darunter aber keinen Ausgleich: beide begannen an derselben
+   Stelle, und "Fertig" schwebte ueber der obersten Zahl. Geometrie
+   deshalb hier explizit. */
 #f7app .picker .toolbar {
   background: #1C1C1E; border-bottom: 1px solid rgba(255,255,255,.09);
+  height: 44px;
 }
+#f7app .picker .toolbar .toolbar-inner {
+  height: 44px; padding: 0 8px; justify-content: flex-end;
+}
+#f7app .picker .picker-columns {
+  margin-top: 44px; height: calc(100% - 44px);
+}
+#f7app .picker { box-shadow: 0 -8px 30px rgba(0,0,0,.45); }
 #f7app .picker .toolbar a.link { color: #FF4A4A; font-weight: 600; }
 /* Neben dem Wort "Fertig" braucht es kein zweites Schliesszeichen. */
 #f7app .picker .toolbar a.link .icon-close { display: none; }

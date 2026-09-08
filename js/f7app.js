@@ -471,27 +471,124 @@
              : '<div class="block"><p>Kapitel nicht gefunden.</p></div>';
   }
 
+  /* Die Datenbank speichert Ergebnisse als S, N und U. Frueher stand
+     hier ein Vergleich auf "sieg" und "niederlage", dadurch war die
+     Bilanz auch bei vorhandenen Kaempfen falsch. */
+  var RES = { S: 'Sieg', N: 'Niederlage', U: 'Unentschieden' };
+
+  function fmtDate(d) {
+    if (!d) return '';
+    var t = new Date(d);
+    if (isNaN(t)) return d;
+    return t.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
   function kaempfeHTML() {
     var f = D().fights || [];
     if (!f.length) {
       return '<div class="block block-strong inset text-align-center">' +
-        '<p><b>Noch keine Kämpfe</b></p>' +
-        '<p class="prose">Trag deine Kämpfe ein, dann siehst du hier Bilanz und Auswertung.</p></div>';
+          '<p><b>Noch keine Kämpfe</b></p>' +
+          '<p class="prose">Trag deinen ersten Kampf ein, dann siehst du hier ' +
+          'Bilanz, Methoden und Verlauf.</p>' +
+        '</div>' +
+        bigButton('Kampf eintragen', 'F7.open(&quot;/kampf-neu/&quot;)');
     }
-    var w = f.filter(function (x) { return x.result === 'sieg'; }).length;
-    var l = f.filter(function (x) { return x.result === 'niederlage'; }).length;
+    var w = f.filter(function (x) { return x.result === 'S'; }).length;
+    var l = f.filter(function (x) { return x.result === 'N'; }).length;
     var u = f.length - w - l;
-    return '<div class="block-title">Bilanz</div>' +
+    var ko = f.filter(function (x) {
+      return x.result === 'S' && (x.method === 'KO' || x.method === 'RSC'); }).length;
+
+    return '<div class="block block-strong inset sess">' +
+        '<div class="sess-top"><span>Bilanz</span><span>' + f.length +
+          (f.length === 1 ? ' Kampf' : ' Kämpfe') + '</span></div>' +
+        '<div class="sess-title">' + w + ' : ' + l + (u ? ' : ' + u : '') + '</div>' +
+        '<div class="statbar big"><i style="width:' +
+          Math.round(w / f.length * 100) + '%"></i></div>' +
+      '</div>' +
       '<div class="list list-strong list-outline inset"><ul>' +
         statRow('Siege', String(w), w / f.length * 100) +
         statRow('Niederlagen', String(l), l / f.length * 100) +
         statRow('Unentschieden', String(u), u / f.length * 100) +
+        (w ? statRow('Davon vorzeitig', String(ko), ko / w * 100) : '') +
       '</ul></div>' +
-      listBlock(f.slice().reverse().map(function (x) {
+      listBlock(f.map(function (x, i) {
         return item({ title: x.opponent || 'Gegner',
-          sub: [x.date, x.method].filter(Boolean).join(', '),
-          after: x.result === 'sieg' ? 'S' : x.result === 'niederlage' ? 'N' : 'U' });
-      }), 'Alle Kämpfe');
+          sub: [fmtDate(x.date), x.method].filter(Boolean).join(' · '),
+          after: RES[x.result] || '',
+          link: '/kampf/' + i + '/' });
+      }), 'Alle Kämpfe') +
+      bigButton('Kampf eintragen', 'F7.open(&quot;/kampf-neu/&quot;)', false);
+  }
+
+  function kampfHTML(i) {
+    var x = (D().fights || [])[i];
+    if (!x) return '<div class="block"><p>Kampf nicht gefunden.</p></div>';
+    var c = listBlock([
+      item({ title: 'Ergebnis', after: RES[x.result] || '' }),
+      item({ title: 'Methode', after: x.method || '' }),
+      item({ title: 'Datum', after: fmtDate(x.date) })
+    ].concat(x.style ? [item({ title: 'Auslage', after: x.style })] : [])
+     .concat(x.type ? [item({ title: 'Typ', after: x.type })] : []));
+
+    if (x.good) c += '<div class="block-title">Was lief gut</div>' +
+      '<div class="block block-strong inset"><p class="prose">' + E(x.good) + '</p></div>';
+    if (x.improve) c += '<div class="block-title">Was verbessern</div>' +
+      '<div class="block block-strong inset"><p class="prose">' + E(x.improve) + '</p></div>';
+    if (x.opponentWeaknesses) c += '<div class="block-title">Schwächen des Gegners</div>' +
+      '<div class="block block-strong inset"><p class="prose">' + E(x.opponentWeaknesses) + '</p></div>';
+
+    var runden = (x.rounds || []).filter(function (r) { return r && r.notes; });
+    if (runden.length) {
+      c += listBlock(runden.map(function (r) {
+        return item({ title: 'Runde ' + r.round, sub: r.notes });
+      }), 'Runden');
+    }
+    c += bigButton('Kampf löschen', 'F7.kampfWeg(' + i + ')', false);
+    return c;
+  }
+
+  /* Eintragen als eigener Bildschirm statt als Fenster ueber der App:
+     ein Fenster braucht eine Ebene ueber allem und bricht das
+     Zurueckwischen. Ein geschobener Bildschirm ist der App-Weg. */
+  function kampfNeuHTML() {
+    var heute = new Date().toISOString().slice(0, 10);
+    var sel = function (id, label, opts) {
+      return '<li><a href="#" class="item-link item-content" onclick="F7.kampfWahl(&quot;' + id + '&quot;)">' +
+        '<div class="item-inner"><div class="item-title">' + E(label) + '</div>' +
+        '<div class="item-after" id="kn-' + id + '-txt">' + E(opts) + '</div></div></a></li>';
+    };
+    return '<div class="block-title">Pflicht</div>' +
+      '<div class="list list-strong list-outline inset"><ul>' +
+        '<li class="item-content item-input"><div class="item-inner">' +
+          '<div class="item-title item-label">Gegner</div>' +
+          '<div class="item-input-wrap">' +
+            '<input type="text" id="kn-gegner" placeholder="Name" autocomplete="off">' +
+          '</div></div></li>' +
+        '<li class="item-content item-input"><div class="item-inner">' +
+          '<div class="item-title item-label">Datum</div>' +
+          '<div class="item-input-wrap">' +
+            '<input type="date" id="kn-datum" value="' + heute + '">' +
+          '</div></div></li>' +
+        sel('ergebnis', 'Ergebnis', 'Sieg') +
+        sel('methode', 'Methode', 'Punkte') +
+      '</ul></div>' +
+      '<div class="block-title">Optional</div>' +
+      '<div class="list list-strong list-outline inset"><ul>' +
+        sel('auslage', 'Auslage des Gegners', 'Keine Angabe') +
+        sel('typ', 'Typ des Gegners', 'Keine Angabe') +
+        '<li class="item-content item-input item-input-with-value"><div class="item-inner">' +
+          '<div class="item-title item-label">Was lief gut</div>' +
+          '<div class="item-input-wrap">' +
+            '<textarea id="kn-gut" rows="3" placeholder="Kurz notieren"></textarea>' +
+          '</div></div></li>' +
+        '<li class="item-content item-input"><div class="item-inner">' +
+          '<div class="item-title item-label">Was verbessern</div>' +
+          '<div class="item-input-wrap">' +
+            '<textarea id="kn-besser" rows="3" placeholder="Kurz notieren"></textarea>' +
+          '</div></div></li>' +
+      '</ul></div>' +
+      bigButton('Kampf speichern', 'F7.kampfSpeichern()');
   }
 
   function profilHTML() {
@@ -623,6 +720,15 @@
             '<h1 class="big">' + E(nice(e ? e.name : 'Übung')) + '</h1>' + uebungHTML(id),
             { back: 'Zurück' }) });
         } },
+      { path: '/kampf-neu/', async: function (c) { c.resolve({ content:
+          page('kampf-neu', 'Neuer Kampf', kampfNeuHTML(), { back: 'Kämpfe' }) }); } },
+      { path: '/kampf/:i/', async: function (ctx) {
+          var i = parseInt(ctx.to.params.i, 10);
+          var x = (D().fights || [])[i] || {};
+          ctx.resolve({ content: page('kampf', '',
+            '<h1 class="big">' + E(x.opponent || 'Kampf') + '</h1>' + kampfHTML(i),
+            { back: 'Kämpfe' }) });
+        } },
       { path: '/videos/', async: function (c) { c.resolve({ content:
           page('videos', 'Videos', videosHTML(), { large: 1, back: 'Wissen' }) }); } },
       { path: '/artikel/:key/', async: function (ctx) {
@@ -682,11 +788,15 @@
       var P = PICKS[key];
       if (!P) return;
       var vals = P.vals();
-      var picker = app.picker.create({
+      openPicker({
         rotateEffect: true,
         toolbarCloseText: 'Fertig',
         sheetSwipeToClose: true,
-        sheetPush: true,
+        // sheetPush schiebt die Seite darunter hoch. Der Rumpf ist
+        // aber fest verankert (position:fixed aus dem Regelwerk), die
+        // Verschiebung schlaegt fehl und das Rad bleibt unterhalb des
+        // Bildschirms auf modal-out stehen: sichtbar wird nur ein
+        // eckiger Streifen. Ohne Push oeffnet es normal.
         value: [P.cur()],
         formatValue: function (values) {
           return P.labels ? (P.labels[values[0]] || values[0]) : values[0] + (P.u || '');
@@ -698,7 +808,6 @@
           })
         }],
         on: {
-          change: function () { if (window.Native) Native.haptic('light'); },
           close: function (p) {
             var v = p.value[0];
             setSched(P.key, isNaN(+v) ? v : +v);
@@ -707,8 +816,86 @@
           }
         }
       });
-      picker.open();
     },
+    /* Auswahl fuer die vier Listenfelder des Kampfformulars. Die Werte
+       sind exakt die der Datenbank (S, N, U und die Methodenkuerzel),
+       damit die uebrige Auswertung sie versteht. */
+    kampfWahl: function (feld) {
+      var W = {
+        ergebnis: [['S','Sieg'],['N','Niederlage'],['U','Unentschieden']],
+        methode:  [['Punkte','Punkte'],['RSC','RSC / TKO'],['KO','KO'],
+                   ['DQ','Disqualifikation'],['WO','Walkover']],
+        auslage:  [['','Keine Angabe'],['Ausleger','Orthodox'],['Rechtsausleger','Southpaw']],
+        typ:      [['','Keine Angabe'],['Distanz','Distanz'],['Infighter','Infighter'],
+                   ['Konter','Konterboxer'],['Druck','Drucksteller']]
+      }[feld];
+      if (!W) return;
+      var vals = W.map(function (x) { return x[0]; });
+      var txt  = W.map(function (x) { return x[1]; });
+      var akt  = kampfWerte[feld] != null ? kampfWerte[feld] : vals[0];
+      openPicker({
+        rotateEffect: true, toolbarCloseText: 'Fertig', sheetSwipeToClose: true,
+        value: [akt],
+        cols: [{ values: vals, displayValues: txt }],
+        on: {
+          close: function (p) {
+            var v = p.value[0];
+            kampfWerte[feld] = v;
+            var el = document.getElementById('kn-' + feld + '-txt');
+            if (el) el.textContent = txt[vals.indexOf(v)] || v;
+          }
+        }
+      });
+    },
+
+    kampfSpeichern: function () {
+      var g = document.getElementById('kn-gegner');
+      var name = g ? g.value.trim() : '';
+      if (!name) {
+        if (window.Native) Native.haptic('error');
+        app.dialog.alert('Trag zuerst den Namen des Gegners ein.', 'Gegner fehlt');
+        if (g) g.focus();
+        return;
+      }
+      var val = function (id) {
+        var e = document.getElementById(id); return e ? e.value.trim() : ''; };
+      var data = (typeof getData === 'function') ? getData() : null;
+      if (!data) return;
+      if (!data.fights) data.fights = [];
+      data.fights.unshift({
+        date: val('kn-datum') || new Date().toISOString().slice(0, 10),
+        opponent: name,
+        result: kampfWerte.ergebnis || 'S',
+        method: kampfWerte.methode || 'Punkte',
+        style: kampfWerte.auslage || '',
+        type: kampfWerte.typ || '',
+        good: val('kn-gut'),
+        improve: val('kn-besser'),
+        rounds: [],
+        videoLink: '',
+        opponentWeaknesses: ''
+      });
+      if (typeof saveData === 'function') saveData(data);
+      if (window.Native) Native.haptic('success');
+      kampfWerte = {};
+      F7.refresh();
+      current().router.back();
+      laterSync();
+    },
+
+    kampfWeg: function (i) {
+      app.dialog.confirm('Diesen Kampf löschen?', 'Löschen', function () {
+        var data = getData();
+        if (!data || !data.fights) return;
+        data.fights.splice(i, 1);
+        saveData(data);
+        if (window.Native) Native.haptic('warning');
+        F7.refresh();
+        current().router.back();
+        laterSync();
+      });
+    },
+
     reset: function () {
       var jobs = [];
       try { sessionStorage.removeItem('bs_healed'); } catch (e) {}
@@ -727,6 +914,9 @@
      nachgereicht, sobald das Geraet wieder online und im Vordergrund
      ist. Hintergrund-Sync gibt es auf iOS nicht, darauf zu bauen
      hiesse, Daten zu verlieren. */
+  // Auswahl des Kampfformulars, bis gespeichert wird
+  var kampfWerte = {};
+
   function laterSync() {
     if (!window.Native) {
       if (typeof syncToCloud === 'function') try { syncToCloud(); } catch (e) {}
@@ -739,6 +929,43 @@
         if (r && r.catch) r.catch(function () { Native.enqueue({ kind: 'sync', payload: {} }); });
       } catch (e) { Native.enqueue({ kind: 'sync', payload: {} }); }
     }
+  }
+
+  /* Ein Auswahlrad oeffnen, ohne dass die eigene Beruehrung es
+     wieder zumacht. Der Klick, der es aufruft, laeuft anschliessend
+     weiter bis zum Dokument; Framework7 wertet ihn dort als Klick
+     ausserhalb des Sheets und schliesst es im selben Moment. Sichtbar
+     blieb nur ein eckiger Streifen am unteren Rand. Das Oeffnen wartet
+     deshalb, bis die Geste vollstaendig durch ist.
+     Nach dem Schliessen wird das Rad abgeraeumt, sonst sammeln sich
+     Leichen im Dokument, und die naechste Messung erwischt die alte. */
+  function openPicker(cfg) {
+    cfg.on = cfg.on || {};
+    var bereit = false;
+
+    // Framework7 meldet beim Aufbau der Spalten bereits "change".
+    // Da hat noch niemand gedreht, also gibt es auch nichts zu fuehlen.
+    var beiWechsel = cfg.on.change;
+    cfg.on.change = function () {
+      if (!bereit) return;
+      if (window.Native) Native.haptic('light');
+      if (beiWechsel) try { beiWechsel.apply(null, arguments); } catch (e) {}
+    };
+    var beiOffen = cfg.on.opened;
+    cfg.on.opened = function (pk) {
+      bereit = true;
+      if (beiOffen) try { beiOffen(pk); } catch (e) {}
+    };
+    var beiZu = cfg.on.closed;
+    cfg.on.closed = function (pk) {
+      bereit = false;
+      if (beiZu) try { beiZu(pk); } catch (e) {}
+      setTimeout(function () { try { pk.destroy(); } catch (e) {} }, 0);
+    };
+
+    var picker = app.picker.create(cfg);
+    setTimeout(function () { picker.open(); }, 0);
+    return picker;
   }
 
   function current() {
@@ -995,14 +1222,62 @@
     });
   }
 
+  /* ---------- Start ----------
+     Frueher stand hier eine feste Frist von 600ms. Eine Frist ist immer
+     falsch: entweder zu kurz, dann ist die Anmeldung noch nicht durch,
+     oder zu lang, dann wartet die App grundlos. Gewartet wird jetzt auf
+     das Ereignis selbst.
+
+     Gebraucht werden genau zwei Dinge:
+       1. #app-screen traegt "active", die Anmeldung ist also durch
+       2. Framework7 ist geladen
+     Die Uebungs- und Videodaten stehen bereits: pages.js und
+     video-library.js werden vor dieser Datei geladen, ihre Inhalte
+     liegen mit dem Ausfuehren des Skripts vor. */
+  var gestartet = false;
+
+  function bereit() {
+    var a = document.getElementById('app-screen');
+    return !!(a && a.classList.contains('active') && typeof Framework7 !== 'undefined');
+  }
+
   function start() {
+    if (gestartet) return;
     var a = document.getElementById('app-screen');
     if (a && a.classList.contains('active')) showShell();
-    if (typeof Framework7 === 'undefined') return setTimeout(start, 200);
-    if (!a || !a.classList.contains('active')) return setTimeout(start, 300);
+    if (!bereit()) return;
+    gestartet = true;
     build();
   }
+
+  function beobachten() {
+    start();
+    if (gestartet) return;
+
+    var a = document.getElementById('app-screen');
+    if (a) {
+      // Feuert in dem Moment, in dem die Anmeldung durch ist.
+      new MutationObserver(start).observe(a, { attributes: true, attributeFilter: ['class'] });
+    } else {
+      // Das Element steht noch nicht im Dokument, also auf den Rumpf hoeren.
+      new MutationObserver(function () {
+        if (document.getElementById('app-screen')) { beobachten(); }
+      }).observe(document.documentElement, { childList: true, subtree: true });
+      return;
+    }
+
+    // Framework7 kommt aus einer eigenen Datei. Liegt sie noch nicht vor,
+    // meldet kein Ereignis ihr Eintreffen, also wird kurz nachgesehen.
+    if (typeof Framework7 === 'undefined') {
+      var versuche = 0;
+      var warten = setInterval(function () {
+        if (gestartet || ++versuche > 100) return clearInterval(warten);
+        if (typeof Framework7 !== 'undefined') { clearInterval(warten); start(); }
+      }, 30);
+    }
+  }
+
   if (document.readyState === 'loading')
-    document.addEventListener('DOMContentLoaded', function () { setTimeout(start, 600); });
-  else setTimeout(start, 600);
+    document.addEventListener('DOMContentLoaded', beobachten);
+  else beobachten();
 })();

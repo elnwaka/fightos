@@ -25,10 +25,72 @@ var _fbSyncEnabled = false;
     _fbAuth = firebase.auth();
     _fbDb = firebase.firestore();
     _fbDb.enablePersistence({ synchronizeTabs: true }).catch(function() {});
-    _fbStorage = firebase.storage();
+    // firebase.storage() wird nur beim Hochladen von Kampfvideos und
+    // Beitragsbildern gebraucht. Das Buendel laedt ensureStorage() dann,
+    // beim Start kostet es nichts.
     _fbSyncEnabled = true;
   } catch(e) { console.warn('Firebase init failed:', e); }
 })();
+
+/* Laeuft die Handy-Oberflaeche? app.html setzt is-mobile vor dem ersten
+   Bildaufbau und nimmt es nur zurueck, wenn Framework7 nicht hochkommt.
+   Alles, was nur die Desktop-Ansicht betrifft, fragt hier. */
+function isAppShell() {
+  try { return document.documentElement.classList.contains('is-mobile'); }
+  catch (e) { return false; }
+}
+
+/* Chart.js sind 209 KB und wird an genau zwei Stellen gebraucht: im
+   HRV-Verlauf und in der Gewichtskurve einer Uebung. Beides sieht man
+   erst, wenn man dorthin navigiert. Beim Start hat die Datei deshalb
+   nichts zu suchen, sie wird bei Bedarf nachgeladen und liegt danach im
+   Service-Worker-Vorrat, also auch offline bereit. */
+var _chartLoading = null;
+function ensureChart(cb) {
+  if (typeof Chart !== 'undefined') { cb(); return; }
+  if (!_chartLoading) {
+    _chartLoading = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'js/chart.min.js';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  _chartLoading.then(cb).catch(function () {
+    // Ohne Diagramm ist die Seite unvollstaendig, aber nicht kaputt.
+    _chartLoading = null;
+  });
+}
+
+/* Firebase Storage ist 40 KB, die nur zwei Nutzer-Aktionen brauchen:
+   ein Kampfvideo hochladen und ein Bild an einen Beitrag haengen. Beides
+   passiert nach einem Fingerdruck, nie beim Start. */
+var _fbStorageLoading = null;
+function ensureStorage() {
+  if (_fbStorage) return Promise.resolve(_fbStorage);
+  if (typeof firebase === 'undefined' || !_fb) return Promise.reject(new Error('kein Firebase'));
+  if (typeof firebase.storage === 'function') {
+    _fbStorage = firebase.storage();
+    return Promise.resolve(_fbStorage);
+  }
+  if (!_fbStorageLoading) {
+    _fbStorageLoading = new Promise(function (resolve, reject) {
+      var sc = document.createElement('script');
+      sc.src = 'js/firebase-storage.js';
+      sc.onload = resolve;
+      sc.onerror = reject;
+      document.head.appendChild(sc);
+    }).then(function () {
+      _fbStorage = firebase.storage();
+      return _fbStorage;
+    }).catch(function (e) {
+      _fbStorageLoading = null;
+      throw e;
+    });
+  }
+  return _fbStorageLoading;
+}
 
 // Sync data TO Firestore
 function syncToCloud(showFeedback) {
@@ -858,8 +920,19 @@ function enterApp() {
     data.completedBlocks = cleaned;
     saveData(data);
   }
-  // Init pages content
-  if (typeof renderAllPages === 'function') renderAllPages();
+  // Init pages content.
+  //
+  // renderAllPages() baut zehn komplette Desktop-Seiten ins DOM. Auf dem
+  // Handy liegen die alle auf display:none und werden nie gelesen: jede
+  // Unterseite ruft ihren eigenen Renderer, bevor sie ihn ausliest
+  // (renderTrainingPage, renderProfilPage). Beim Start ist das also reine
+  // Arbeit ohne Ergebnis, und zwar die teuerste im ganzen Kaltstart.
+  // Auf dem Desktop bleibt es, laeuft aber erst wenn der Hauptthread frei
+  // ist, damit der erste Bildschirm nicht darauf wartet.
+  if (typeof renderAllPages === 'function' && !isAppShell()) {
+    if (window.requestIdleCallback) requestIdleCallback(renderAllPages, { timeout: 2000 });
+    else setTimeout(renderAllPages, 0);
+  }
   renderLogEntries();
   if (typeof updateQlogSäulen === 'function') updateQlogSäulen();
 
@@ -890,6 +963,19 @@ function enterApp() {
 // ===== NOTIFICATION SYSTEM =====
 function initNotifications() {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+
+  /* Auf dem Handy hat dieser Kasten nichts verloren. Er ist in der
+     Desktop-Optik gebaut und liegt auf bottom:80px, also genau ueber der
+     Tab-Leiste der App. Dazu kommt: auf iOS ist Web Push vor der
+     Installation ohnehin gesperrt, die Frage waere dort eine Sackgasse.
+     Ist die Erlaubnis schon erteilt, werden die Erinnerungen trotzdem
+     gestellt. Gefragt wird spaeter im Profil, an einer Stelle die der
+     Nutzer selbst ansteuert. */
+  if (isAppShell()) {
+    if (Notification.permission === 'granted') scheduleDailyReminders();
+    return;
+  }
+
   setTimeout(function() {
     // Only show if app screen is active (not on login/register)
     var appScreen = document.getElementById('app-screen');
@@ -2305,7 +2391,10 @@ var _hrvChart = null;
 function renderHRVTrend(data) {
   var container = document.getElementById('hrv-display');
   if (!container) return;
-  if (typeof Chart === 'undefined') return;
+  if (typeof Chart === 'undefined') {
+    ensureChart(function () { if (typeof Chart !== 'undefined') renderHRVTrend(data); });
+    return;
+  }
 
   // Cleanup
   var oldCanvas = document.getElementById('hrv-trend-canvas');
@@ -4072,11 +4161,15 @@ function compressVideo(file, callback) {
 // Upload video to Firebase Storage
 function uploadFightVideo(idx, file) {
   if (!file) return;
-  if (!_fbStorage || !_fbUser) { showToast('Nicht eingeloggt oder kein Storage', 'error'); return; }
+  if (!_fbUser) { showToast('Nicht eingeloggt', 'error'); return; }
   if (file.size > 500 * 1024 * 1024) { showToast('Max. 500 MB', 'error'); return; }
 
-  compressVideo(file, function(finalFile) {
-    doUpload(idx, finalFile);
+  ensureStorage().then(function () {
+    compressVideo(file, function(finalFile) {
+      doUpload(idx, finalFile);
+    });
+  }).catch(function () {
+    showToast('Upload nicht moeglich, keine Verbindung', 'error');
   });
 }
 

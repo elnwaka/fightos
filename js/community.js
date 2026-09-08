@@ -150,6 +150,14 @@ function compressImage(file, maxWidth, quality, callback) {
 }
 
 function uploadMedia(file, path, progressEl, callback) {
+  // Das Storage-Buendel laedt erst hier, nicht beim App-Start.
+  if (!_fbStorage && typeof ensureStorage === 'function') {
+    ensureStorage()
+      .then(function () { uploadMedia(file, path, progressEl, callback); })
+      .catch(function () { showToast('Upload nicht moeglich', 'error'); callback(null); });
+    return;
+  }
+  if (!_fbStorage) { showToast('Upload nicht moeglich', 'error'); callback(null); return; }
   var ref = _fbStorage.ref().child(path);
   function doUpload(blob) {
     var task = ref.put(blob);

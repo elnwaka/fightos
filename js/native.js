@@ -49,6 +49,16 @@
       i.tabIndex = -1;
       i.style.cssText =
         'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px';
+      // Der Kniff loest die Haptik ueber einen echten click() aus. Das
+      // Ereignis laeuft danach weiter bis zum Dokument, und alles, was
+      // dort auf Klicks lauscht, haelt es fuer eine Nutzergeste. Ein
+      // offenes Sheet schloss sich dadurch im selben Moment wieder, in
+      // dem es aufging. Hier endet das Ereignis.
+      var stop = function (e) { e.stopPropagation(); e.stopImmediatePropagation(); };
+      i.addEventListener('click', stop, true);
+      i.addEventListener('click', stop, false);
+      i.addEventListener('change', stop, true);
+      i.addEventListener('input', stop, true);
       document.body.appendChild(i);
       hapticSwitch = i;
     } catch (e) { hapticSwitch = null; }

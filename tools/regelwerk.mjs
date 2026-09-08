@@ -197,12 +197,18 @@ const sheet = await p.evaluate(() => {
   let err = null;
   try { F7.pick('weight'); } catch (e) { err = e.message; }
   return new Promise(r => setTimeout(() => {
-    const pk = document.querySelector('.picker');
-    r({ offen: !!pk, err,
-        modalIn: pk ? pk.classList.contains('modal-in') : false,
-        swipeToClose: pk && pk.f7Picker ? !!pk.f7Picker.params.sheetSwipeToClose : null,
-        params: __f7app.picker && __f7app.picker.create ? 'ok' : 'fehlt' }); }, 900)); });
-chk('3f','Sheet von unten, zum Schliessen ziehbar', sheet.offen && sheet.swipeToClose !== false, JSON.stringify(sheet));
+    // Nicht nur "liegt im Dokument", sondern "steht sichtbar im Bild".
+    // Die alte Fassung hat ein Rad durchgewinkt, das unterhalb des
+    // Bildschirms auf modal-out haengen blieb.
+    const alle = [...document.querySelectorAll('.picker')];
+    const pk = alle.find(e => e.classList.contains('modal-in')) || alle[0];
+    if (!pk) return r({ offen: false, err, grund: 'nicht im Dokument' });
+    const b = pk.getBoundingClientRect();
+    r({ offen: b.top < window.innerHeight - 40 && b.bottom > 0 && b.height > 100,
+        err, top: Math.round(b.top), hoehe: Math.round(b.height),
+        modalIn: pk.classList.contains('modal-in'), leichen: alle.length,
+        swipeToClose: pk.f7Picker ? !!pk.f7Picker.params.sheetSwipeToClose : null }); }, 1100)); });
+chk('3f','Sheet sichtbar und zum Schliessen ziehbar', sheet.offen && sheet.swipeToClose !== false, JSON.stringify(sheet));
 await p.evaluate(()=>{ __f7app.picker.close(); });
 await p.waitForTimeout(800);
 

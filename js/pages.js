@@ -1639,7 +1639,15 @@ function renderExProgression(exId, color) {
     '<canvas id="ex-prog-canvas" height="140"></canvas>';
 
   var ctx = document.getElementById('ex-prog-canvas');
-  if (!ctx || typeof Chart === 'undefined') return;
+  if (!ctx) return;
+  if (typeof Chart === 'undefined') {
+    if (typeof ensureChart === 'function') {
+      ensureChart(function () {
+        if (typeof Chart !== 'undefined') renderExProgression(exId, color);
+      });
+    }
+    return;
+  }
 
   _exProgChart = new Chart(ctx, {
     type: 'line',
