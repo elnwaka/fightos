@@ -124,7 +124,7 @@ body.f7-on textarea { font-size: 16px; }
 #f7app .button { min-height: 44px; }
 #f7app .button-large { min-height: 50px; }
 #f7app .button:active { transform: scale(.97); }
-#f7app .tick:active { transform: scale(.88); }
+#f7app .tick:active::before { transform: scale(.88); }
 #f7app .cal-d:not(.out):active { transform: scale(.88); }
 #f7app .tab-link:active { opacity: .55; }
 
@@ -331,7 +331,7 @@ body.f7-on .skel-card { height: 108px; margin: 0 16px 16px; border-radius: 12px;
 #f7app.theme-auto .tl-e.is-done .tl-n { color: var(--t3); }
 #f7app.theme-auto .statbar { background: var(--sep); }
 #f7app.theme-auto .item-after.chev { border-color: var(--t3); }
-#f7app.theme-auto .tick { border-color: var(--t3); }
+#f7app.theme-auto .tick::before { border-color: var(--t3); }
 #f7app.theme-auto .tl-e::before { background: var(--sep); }
 #f7app.theme-auto .skel { background-color: var(--sep); }
 

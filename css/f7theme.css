@@ -191,13 +191,23 @@ body.f7-on { margin: 0; background: #000; overflow: hidden; }
 #f7app .tl-e.is-now .tl-c { background: #1F1F22; }
 
 /* ---- Haken ---- */
+/* Sichtbar sind 26px, antippbar sind 44. Apple verlangt 44pt Flaeche,
+   aber ein 44px grosser Kreis neben einer Zeile waere ein Klotz. Der
+   Kreis steckt deshalb als Pseudoelement mittig in einer groesseren,
+   durchsichtigen Flaeche. */
 #f7app .tick {
-  display: block; width: 26px; height: 26px; border-radius: 50%;
-  border: 1.6px solid rgba(255,255,255,.22); position: relative; flex: 0 0 26px;
+  display: block; width: 44px; height: 44px; flex: 0 0 44px;
+  position: relative; border: 0; background: none; padding: 0;
 }
-#f7app .tick.on { background: #30D158; border-color: #30D158; }
+#f7app .tick::before {
+  content: ""; position: absolute; left: 9px; top: 9px;
+  width: 26px; height: 26px; border-radius: 50%; box-sizing: border-box;
+  border: 1.6px solid rgba(255,255,255,.22);
+  transition: background-color .12s linear, border-color .12s linear;
+}
+#f7app .tick.on::before { background: #30D158; border-color: #30D158; }
 #f7app .tick.on::after {
-  content: ""; position: absolute; left: 9px; top: 5px; width: 5px; height: 10px;
+  content: ""; position: absolute; left: 18px; top: 14px; width: 5px; height: 10px;
   border: solid #000; border-width: 0 2px 2px 0; transform: rotate(45deg);
 }
 #f7app .item-media .tick { margin: 0; }
